@@ -13,7 +13,16 @@ according to your configuration.
   - a 3D printer board STEVAL-3DP001V1 
   - a 3D printer mechanic (for example a Prusa I3 rework 5)
 
-#  How to use it ? 
+#  How to load the FW? 
+A binary of the FW can be found under folder: _\stm32_cube\Binary_.
+To load it or to load your own binary into the 3D printer board, the easiest way is to use the mass storage interface provided by the embedded ST-LINK (simply drag and drop to disk). To use it, follow the procedure below:
+  - Power on the 3D Printer board by connecting its connectors Vin (12V-24V) and Gnd to a DC power supply   
+  - Connect the ST 3D Printer reference board to a PC with the USB cable through the ST Link USB  port. Jumper J22 (boot mode selection) must be set.
+  - In your files explorer, a new drive should appear in the list of removable storages. If this is not the case, this is probably because you haven't the ST-Link USB driver. You can find it  [here](http://www.st.com/web/catalog/tools/FM147/SC1887/PF260219).
+  - Just copy, the binary file to the root of this new drive. Then refresh your file explorer:  if the binary file has disappeared and no error log file has been generated, it means the binary file has been successfully loaded.
+  - Reset the board to start the loaded binary file. To correctly start the default firmware requires   a SD card with a configuration file. 
+
+#  How to build the FW? 
 In order to recompile the program , you must do the following :
  - Open your preferred toolchain (IAR or SW4STM32 are natively supported) 
    - For IAR, open the project: _stm32_cube\Projects\STM32F4xx-3dPrinter\Marlin\EWARM\Project.eww_  
