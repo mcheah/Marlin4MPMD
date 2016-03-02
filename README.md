@@ -1,12 +1,9 @@
 Marlin4ST
 ---------
 
-A Marlin firmware for the ST Microelectronics 3D printer board STEVAL-3DP001V1  
-(based on STM32 and L6474 stepper motor drivers).
-
-This repository proposes  an example of a 3D printer firmware which relies on STM32Cube and 
-integers the 3D printer algorithm from the Marlin firmware.  
-It can be used unchanged on a Prusa I3 rework 5.  
+This repository proposes an example firmware for the ST Microelectronics 3D printer board STEVAL-3DP001V1.    
+The Marlin4ST firmware relies on [STM32Cube](http://www.st.com/web/catalog/tools/FM147/CL1794/SC961/SS1743/LN1897?s_searchtype=reco) and integers the 3D printer algorithms from the [Marlin](https://github.com/MarlinFirmware/Marlin) firmware.  
+It can be used unchanged on the 3D Printer "Prusa I3 rework 5".  
 For other mechanics, you will need to update the file:  
 _stm32_cube\Middlewares\Third_Party\Marlin\configuration.h_  
 according to your configuration.
