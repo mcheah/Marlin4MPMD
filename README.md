@@ -1,7 +1,7 @@
 Marlin4ST
 ---------
 
-a Marlin firmware for the ST Microelectronics 3D printer board STEVAL-3DP001V1  
+A Marlin firmware for the ST Microelectronics 3D printer board STEVAL-3DP001V1  
 (based on STM32 and L6474 stepper motor drivers).
 
 This repository proposes  an example of a 3D printer firmware which relies on STM32Cube and 
@@ -19,10 +19,10 @@ according to your configuration.
 #  How to use it ? 
 In order to recompile the program , you must do the following :
  - Open your preferred toolchain (IAR or SW4STM32 are natively supported) 
- - For IAR, open the project: _stm32_cube\Projects\STM32F4xx-3dPrinter\Marlin\EWARM\Project.eww_  
- - For SW4STM32 :
-    - the workspace location must be: _stm32_cube\_
-    - then open the project from: _ST_Marlin\stm32_cube\Projects\STM32F4xx-3dPrinter\Marlin\SW4STM32\Marlin_
+   - For IAR, open the project: _stm32_cube\Projects\STM32F4xx-3dPrinter\Marlin\EWARM\Project.eww_  
+   - For SW4STM32 :
+      - the workspace location must be: _stm32_cube\_
+      - then open the project from: _ST_Marlin\stm32_cube\Projects\STM32F4xx-3dPrinter\Marlin\SW4STM32\Marlin_
  - Rebuild all files and load your image into target memory
  - Run the example
  
