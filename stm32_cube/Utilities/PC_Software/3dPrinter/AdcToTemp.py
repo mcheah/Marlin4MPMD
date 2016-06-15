@@ -38,8 +38,8 @@ def adcValToTemp(adcVal, r0, t0, beta):
 
 def main(argv):
 
-  beta = 3950.0 # beta value of the thermistor (eg on the Prusa I3 the NTC thermistor beta is 3950)
-  r0 = 100000.0 # Thermistor reference resistance (in ohms)  (eg: 100000 for the 100k resitance of the Prusa I3 NTC thermistor)
+  beta = 3950 # beta value of the thermistor (eg on the Prusa I3 the NTC thermistor beta is 3950)
+  r0 = 100000 # Thermistor reference resistance (in ohms)  (eg: 100000 for the 100k resitance of the Prusa I3 NTC thermistor)
   t0 = 25       # Temperature in degree Celsius corresponding to the thermistor reference resistance (eg: 25 for the the Prusa I3 NTC thermistor)
   adcVal = -1
   adcValFound = 0
