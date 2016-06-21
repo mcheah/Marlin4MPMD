@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <!-- <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> -->
+  <link rel="stylesheet" media="all" type="text/css" href="./3dCommon.css" />
+  <!--[if lt IE 9]><script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->  
+  <title>3D printer wifi control</title>
+  <script type="text/javascript" src="3dCommon.js"></script>
+  <script type="text/javascript" src="wifictrl.js"></script>
+</head>
+<body>
+  <span style="font-size:30px">3D printer web control tool</span>
+  <span style="font-size:15px">by IPC Rennes (ST-Microelectronics) August 2015</span>
+  <div class="menu_v">
+    <div class="menu_v_top">Links</div>
+    <div class="menu_v_ctn">
+  	  <a href="command.shtml">Command</a><br />
+      <a href="axisctrl.shtml">Axis Control</a><br />
+      <a href="heatctrl.shtml">Temperature Control</a><br />
+      <a href="extructrl.shtml">Extrusion Control</a><br />
+      <a href="filemgt.shtml">File Management</a><br />
+    </div>
+  </div>
+  <div class="corp_ctn">
+	  <h1>Wifi links</h1>  
+      <a href=/config.shtml>WIFI settings page</a><br />
+      <a href=/status.shtml>WIFI status page</a><br />
+      <a href=/peers.shtml>WIFI peers page</a><br />
+      <a href=/remote.html>WIFI remote control page</a><br />     
+		<h1>AT command line</h1>
+      <input type="text" class="large" name="atcom" value="AT">
+      <br /><br /> 
+      <div id="my_button" onclick="sendAtCommand()">Send the command</div>                     
+  </div>
+</body>
+</html>

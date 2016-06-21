@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <!-- <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> -->
+  <link rel="stylesheet" media="all" type="text/css" href="./3dCommon.css" />
+  <!--[if lt IE 9]><script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  <title>3D printer file management</title>
+  <script type="text/javascript" src="3dCommon.js"></script>
+  <script type="text/javascript" src="filemgt.js"></script>
+</head>
+<body>
+  <span style="font-size:30px">3D printer web control tool</span>
+  <span style="font-size:15px">by IPC Rennes (ST-Microelectronics) August 2015</span>
+  <div class="menu_v">
+    <div class="menu_v_top">Links</div>
+    <div class="menu_v_ctn">
+  	  <a href="command.shtml">Command</a><br />
+      <a href="axisctrl.shtml">Axis Control</a><br />
+      <a href="heatctrl.shtml">Temperature Control</a><br />
+      <a href="extructrl.shtml">Extrusion Control</a><br />
+      <a href="wifictrl.html">Wifi Control</a><br />
+    </div>
+  </div>
+  <div class="corp_ctn">
+		<h1>G codes file management</h1>
+      <div style='float:left' id="my_button" onclick="printFile()">Print file</div>
+      <div style='float:right' id="my_button" onclick="getFilesList()">Get G codes file list</div>
+      <br /><br />
+      <p style='float:left'>File to print (including path):</p>
+      <br />
+      <input type="text" class="large" style='float:left' id="fileToBePrinted" maxlength="84">
+      <br /><br /><br /><br />  
+      <div style='float:left' id="my_button" onclick="getFile()">Upload a file</div>
+      <div style='height: 0px;width: 0px; overflow:hidden;'>
+        <input id="fileinput" type="file" value="upload" onchange="sub(this,id)"/>
+      </div>      
+      <div class="clean"></div>
+	  <h1>3D printer configuration file</h1> 
+      <div style='float:left' id="my_button" onclick="get3dPrinterConfig()">Get config</div>  
+      <div style='float:right' id="my_button" onclick="load3dPrinterConfig()">Load file</div>   
+      <div style='height: 0px;width: 0px; overflow:hidden;'>
+        <input id="configfileinput" type="file" value="upload" onchange="sub(this,id)"/>
+      </div>
+      <br /><br /><br /> 
+      <div style='float:left' id="my_button" onclick="send3dPrinterConfig()">Send config</div>
+      <div style='float:right' id="my_button" onclick="save3dPrinterConfig()">Save to file</div>
+      <br /><br /><br /> 
+      <textarea style="float:left;width:48em;height:10em;line-height:1em;overflow:scroll;padding:5px;background-color:#FFFFFF;color:#333333" type="text" class="large" id="file_text_box" placeholder="Configuration or files list will be downloaded here"></textarea>
+      <br /><br />          
+      <p style='float:left'>Filename to Save As:</p>
+      <input type="text" class="large" style='float:left' id="inputFileNameToSaveAs" maxlength="84">
+  </div>
+</body>
+</html>

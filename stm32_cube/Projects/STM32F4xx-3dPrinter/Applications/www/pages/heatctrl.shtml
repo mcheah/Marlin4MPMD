@@ -1,0 +1,81 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <!-- <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> -->
+  <link rel="stylesheet" media="all" type="text/css" href="./3dCommon.css" />
+  <style>
+  #SwitchTitle {width:5.6em;padding:.2em;border:3px solid #1dbdfb;-webkit-border-radius:.7em;-moz-border-radius:.7em;border-radius:.7em;-webkit-box-shadow: 2px 2px 3px #999999;box-shadow: 2px 2px 2px #bbbbbb;background-color:#0fa6eb;background-image:-webkit-gradient(linear, left top, left bottom,from(#1dbdfb), to(#0fa6eb),color-stop(0.4, #13a9ef))}
+  #SwitchTitle a {text-align:center;text-shadow: 1px 1px 1px #000000;color:#e2eaf3;font-family:Verdana;font-size:0.8em;font-weight:bold}
+  #xs_button {width:3.2em;padding:0.2em;padding-left: 0.5em;-moz-box-sizing: border-box;-webkit-box-sizing: border-box;box-sizing:border-box;overflow:hidden;cursor:pointer;border:2px solid #999999;border-radius:20px;background-color:#EEEEEE;} 
+  #xs_button a {text-align:center;color:#999999;font-family: Trebuchet, Arial, sans-serif;font-size:0.9em;font-weight:bold}
+  #small_legend {font-family:Verdana;font-size:0.5em;text-decoration:none}
+  .onoffswitch {position:absolute;width:90px;-webkit-user-select:none;-moz-user-select:none;-ms-user-select: none}
+  .onoffswitch-checkbox {display:none}
+  .onoffswitch-label {display:block;overflow:hidden;cursor:pointer;border: 2px solid #999999;border-radius: 20px}
+  .onoffswitch-inner {display:block;width:200%;margin-left:-100%;-moz-transition: margin 0.3s ease-in 0s; -webkit-transition: margin 0.3s ease-in 0s;-o-transition: margin 0.3s ease-in 0s; transition: margin 0.3s ease-in 0s}
+  .onoffswitch-inner:before, .onoffswitch-inner:after {display:block;float:left;width:50%;height:30px;padding:0;line-height:30px;font-size:14px;color:white;font-family:Trebuchet,Arial,sans-serif;font-weight:bold;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
+  .onoffswitch-inner:before {content: "ON";padding-left:10px;background-color:rgb(0,161,75);color:#FFFFFF}
+  .onoffswitch-inner:after {content: "OFF";padding-right:10px;background-color:#EEEEEE;color:#999999;text-align:right}
+  .onoffswitch-switch {display:block;width:18px;margin:6px;background:#FFFFFF;border:2px solid #999999;border-radius:20px;position:absolute;top:0;bottom:0;right:56px;-moz-transition:all 0.3s ease-in 0s;-webkit-transition:all 0.3s ease-in 0s;-o-transition:all 0.3s ease-in 0s;transition:all 0.3s ease-in 0s}
+  .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {margin-left:0}
+  .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {right:0px}
+  </style>
+  <!--[if lt IE 9]><script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->  
+  <title>3D printer temperature control</title>
+  <script type="text/javascript" src="3dCommon.js"></script>
+  <script type="text/javascript" src="heatctrl.js"></script>
+</head>
+<body onload="checkCookies()">
+  <span style="font-size:30px">3D printer web control tool</span>
+  <span style="font-size:15px">by IPC Rennes (ST-Microelectronics) August 2015</span>
+  <div class="menu_v">
+    <div class="menu_v_top">Links</div>
+    <div class="menu_v_ctn">
+  	  <a href="command.shtml">Command</a><br />
+      <a href="axisctrl.shtml">Axis Control</a><br />
+      <a href="extructrl.shtml">Extrusion Control</a><br />
+      <a href="filemgt.shtml">File Management</a><br />
+      <a href="wifictrl.html">Wifi Control</a><br />
+    </div>
+  </div>
+  <div class="corp_ctn">
+	  <h1>Temperature control</h1>
+    <div class="graph">   
+      <div id ="WatchTitlePosition" style="position: absolute;top: -16em;left: 7.5em"><div id="SwitchTitle"><a>WATCH ?</a></div></div>
+      <div id ="small_legend"><div id ="HeaterBedTarget_legend" style="position: absolute;top: -27.4em;left: 24em">Target T(C)</div></div>
+      <div id ="small_legend"><div id ="HeaterBedCurrent_legend" style="position: absolute;top: -27.4em;left: 16em">Current T(C)</div></div>
+      <div id="WatchSwitchPosition" style="position: absolute;top: -16.1em;left: 14em"><div class="onoffswitch">
+          <input type="checkbox" class="onoffswitch-checkbox" id="WatchSwitch" onclick="SwitchWatch()">
+          <label class="onoffswitch-label" for="WatchSwitch">
+            <span class="onoffswitch-inner"></span>
+            <span class="onoffswitch-switch"></span>
+          </label>
+      </div></div>         
+      <div id ="HeaterTitlePosition" style="position: absolute;top: -12.9em;left: -8em"><div id="SwitchTitle"><a>HEATER</a></div></div> 
+      <div id="HeaterSwitchPosition" style="position: absolute;top: -13em;left: 0em"><div class="onoffswitch">
+          <input type="checkbox" class="onoffswitch-checkbox" id="HeaterSwitch" onclick="SwitchHeater()">
+          <label class="onoffswitch-label" for="HeaterSwitch">
+            <span class="onoffswitch-inner"></span>
+            <span class="onoffswitch-switch"></span>
+          </label>
+      </div></div>
+      <input type="number" id="HeaterTemperatureTarget" style="position: absolute;top: -12.9em;left: 12em;width:3.4em;padding:0.2em;overflow:hidden;text-align:center;color: #999999;font-family:Verdana;font-size:1em;font-weight:bold" value="185">
+      <input readonly type="number" id="HeaterTemperatureCurrent" style="position: absolute;top: -12.9em;left: 8em;width:3.4em;padding:0.2em;overflow:hidden;text-align:center;color: #999999;font-family:Verdana;font-size:1em;font-weight:bold"> 
+      <div id ="HeaterSetButtonPosition" style="position: absolute;top: -12.9em;left: 16em"><div id="xs_button" onclick="SwitchHeater()"><a>SET</a></div></div>
+      <div id ="BedTitlePosition" style="position: absolute;top: -10.4em;left: -8em"><div id="SwitchTitle"><a>BED</a></div></div>           
+      <div id="BedSwitchPosition" style="position: absolute;top: -10.5em;left: 0em"><div class="onoffswitch">
+          <input type="checkbox" class="onoffswitch-checkbox" id="BedSwitch" onclick="SwitchBed()">
+          <label class="onoffswitch-label" for="BedSwitch">
+            <span class="onoffswitch-inner"></span>
+            <span class="onoffswitch-switch"></span>
+          </label>
+      </div></div>  
+      <input type="number" id="BedTemperatureTarget" style="position: absolute;top: -10.4em;left: 12em;width:3.4em;padding:0.2em;overflow:hidden;text-align:center;color: #999999;font-family:Verdana;font-size:1em;font-weight:bold" value="60">
+      <input readonly type="number" id="BedTemperatureCurrent" style="position: absolute;top: -10.4em;left: 8em;width:3.4em;padding:0.2em;overflow:hidden;text-align:center;color: #999999;font-family:Verdana;font-size:1em;font-weight:bold">
+      <div id ="BedSetButtonPosition" style="position: absolute;top: -10.4em;left: 16em"><div id="xs_button" onclick="SwitchBed()"><a>SET</a></div></div>                
+    </div>                   
+  </div>
+</body>
+</html>

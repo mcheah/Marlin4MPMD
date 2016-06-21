@@ -1,0 +1,86 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <!-- <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> -->
+  <link rel="stylesheet" media="all" type="text/css" href="./3dCommon.css" />
+  <style>
+  .frame {height:16px;width:24px;white-space:nowrap;text-align:center}
+  .helper {display:inline-block;height:100%;vertical-align:middle}
+  #round-button img {vertical-align:middle;width:16px;height:16px}
+  #round-button {width:100%;height:0;padding-bottom:100%;border-radius:50%;border:3px solid #1dbdfb;overflow:hidden;background: #0fa6eb;box-shadow:0 0 3px gray}
+  #round-button:hover {background:#137288}
+  #round-button a {display:block;float:left;width:100%;padding-top:50%;padding-bottom:50%;line-height:1em;margin-top:-0.5em;text-align:center;color:#e2eaf3;font-family:Verdana;font-size:1em;font-weight:bold}
+  #round-button a-decimal {display:block;float:left;width:100%;padding-top:50%;padding-bottom:50%;line-height:1em;margin-top:-0.5em;text-align:center;color:#e2eaf3;font-family:Verdana;font-size:0.5em;font-weight:bold}
+  </style>
+  <!--[if lt IE 9]><script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->  
+  <title>3D printer axis control</title>
+  <script type="text/javascript" src="3dCommon.js"></script>
+  <script type="text/javascript" src="axisctrl.js"></script>
+</head>
+<body>
+  <span style="font-size:30px">3D printer web control tool</span>
+  <span style="font-size:15px">by IPC Rennes (ST-Microelectronics) August 2015</span>
+  <div class="menu_v">
+    <div class="menu_v_top">Links</div>
+    <div class="menu_v_ctn">
+  	  <a href="command.shtml">Command</a><br />
+      <a href="heatctrl.shtml">Temperature Control</a><br />
+      <a href="extructrl.shtml">Extrusion Control</a><br />
+      <a href="filemgt.shtml">File Management</a><br />
+      <a href="wifictrl.html">Wifi Control</a><br />
+    </div>
+  </div>
+  <div class="corp_ctn">
+	  <h1>Axis control</h1>    
+    <div class="graph">
+      <div style="position: absolute;top: -16em;left: -15em">Maximum speed for X & Y axis (mm/min)</div>
+      <input id ="XYspeed" style="position: absolute;top: -15em;left: -15em" type="number" class="small" value="3000">
+      <div style="position: absolute;top: -12em;left: -15em">Maximum speed for Z axis (mm/min)</div>
+      <input id ="Zspeed" style="position: absolute;top: -11em;left: -15em" type="number" class="small" value="50">
+      <div style="position: absolute;top: -8em;left: -15em"><div id="small_button"><a onclick="sendGcode('M84')">Motors off</a></div></div>         
+      <div style="text-align:center;color:#0fa6eb;font-family:Verdana;font-size:1em;font-weight:bold">
+        <div style="position: absolute;top: 0.4em;left: 14.4em">+X</div>
+        <div style="position: absolute;top: 0.4em;left: -13.8em">-X</div>
+        <div style="position: absolute;top: -9.6em;left: 10.0em">+Y</div>
+        <div style="position: absolute;top: 10.4em;left: -9.8em">-Y</div>
+        <div style="position: absolute;top: -9.6em;left: 0.2em">+Z</div>
+        <div style="position: absolute;top: 10.4em;left: 0.2em">-Z</div>            
+      </div>      
+      <div style="width: 26.0em;border-top: 1px solid blue;position: absolute;top: 1em;left: -12em"></div>
+      <div style="width: 26.0em;border-top: 1px solid blue;-webkit-transform: rotate(-45deg);-moz-transform: rotate(-45deg);-o-transform: rotate(-45deg);-ms-transform: rotate(-45deg);transform: rotate(-45deg);position: absolute;top: 1em;left: -12em"></div>
+      <div style="width: 16.0em;border-top: 1px solid blue;-webkit-transform: rotate(-90deg);-moz-transform: rotate(-90deg);-o-transform: rotate(-90deg);-ms-transform: rotate(-90deg);transform: rotate(-90deg);position: absolute;top: 1em;left: -7em"></div>        
+      <div style="position: absolute;top: 0.2em;left: 16.5em" onclick="sendGcode('G28 X0')"><div class=frame><div id="round-button"><span class="helper"></span><img src="home_16x16.png"></div></div></div>
+      <div style="position: absolute;top: -11.1em;left: 11.5em" onclick="sendGcode('G28 Y0')"><div class=frame><div id="round-button"><span class="helper"></span><img src="home_16x16.png"></div></div></div>
+      <div style="position: absolute;top: -11.6em;left: 0.2em" onclick="sendGcode('G28 Z0')"><div class=frame><div id="round-button"><span class="helper"></span><img src="home_16x16.png"></div></div></div>                              
+      <div style="height: 16em;width: 16em;border-radius: 8em;border: 1px solid blue;position: absolute;top: -7em;left: -7em" ></div>
+      <div style="height: 10em;width: 10em;border-radius: 5em;border: 1px solid blue;position: absolute;top: -4em;left: -4em"></div>
+      <div style="height: 4.8em;width: 4.8em;border-radius: 10em;border: 1px solid blue;position: absolute;top: -1.5em;left: -1.5em"></div>                            
+      <div style="position:absolute; top: -0.4em; left: 11.2em"><div id="round-button"><a onclick="move_Rel('X100')">100</a></div></div>
+      <div style="position:absolute; top: -0.4em; left: -12em"><div id="round-button"><a onclick="move_Rel('X-100')">100</a></div></div>
+      <div style="position:absolute; top: -8.6em; left: 7.9em"><div id="round-button"><a onclick="move_Rel('Y100')">100</a></div></div>
+      <div style="position:absolute; top: 7.9em; left: -8.6em"><div id="round-button"><a onclick="move_Rel('Y-100')">100</a></div></div>           
+      <div style="position:absolute; top: 0em; left: 8.0em"><div id="round-button"><a onclick="move_Rel('X10')">10</a></div></div>
+      <div style="position:absolute; top: 0em; left: -8.0em"><div id="round-button"><a onclick="move_Rel('X-10')">10</a></div></div>
+      <div style="position:absolute; top: -5.7em; left: 5.7em"><div id="round-button"><a onclick="move_Rel('Y10')">10</a></div></div>
+      <div style="position:absolute; top: 5.7em; left: -5.7em"><div id="round-button"><a onclick="move_Rel('Y-10')">10</a></div></div> 
+      <div style="position:absolute; top: -8.0em; left: 0em"><div id="round-button"><a onclick="move_Rel('Z10')">10</a></div></div>       
+      <div style="position:absolute; top: 8.0em; left: 0em"><div id="round-button"><a onclick="move_Rel('Z-10')">10</a></div></div>                                             
+      <div style="position:absolute; top: 0.3em; left: 5.3em"><div id="round-button"><a onclick="move_Rel('X1')">1</a></div></div>
+      <div style="position:absolute; top: 0.3em; left: -4.7em"><div id="round-button"><a onclick="move_Rel('X-1')">1</a></div></div>
+      <div style="position:absolute; top: -3.3em; left: 3.8em"><div id="round-button"><a onclick="move_Rel('Y1')">1</a></div></div>
+      <div style="position:absolute; top: 3.8em; left: -3.3em"><div id="round-button"><a onclick="move_Rel('Y-1')">1</a></div></div>  
+      <div style="position:absolute; top: -4.7em; left: 0.3em"><div id="round-button"><a onclick="move_Rel('Z1')">1</a></div></div>        
+      <div style="position:absolute; top: 5.3em; left: 0.3em"><div id="round-button"><a onclick="move_Rel('Z-1')">1</a></div></div>
+      <div style="position:absolute; top: 0.4em; left: 2.7em"><div id="round-button"><a-decimal onclick="move_Rel('X0.1')">.1</a-decimal></div></div>
+      <div style="position:absolute; top: 0.4em; left: -2.1em"><div id="round-button"><a-decimal onclick="move_Rel('X-0.1')">.1</a-decimal></div></div>
+      <div style="position:absolute; top: -1.4em; left: 2.0em"><div id="round-button"><a-decimal onclick="move_Rel('Y0.1')">.1</a-decimal></div></div>
+      <div style="position:absolute; top: 2.0em; left: -1.4em"><div id="round-button"><a-decimal onclick="move_Rel('Y-0.1')">.1</a-decimal></div></div> 
+      <div style="position:absolute; top: -2.1em; left: 0.4em"><div id="round-button"><a-decimal onclick="move_Rel('Z0.1')">.1</a-decimal></div></div>       
+      <div style="position:absolute; top: 2.8em; left: 0.4em"><div id="round-button"><a-decimal onclick="move_Rel('Z-0.1')">.1</a-decimal></div></div>  
+      <div style="position: absolute" onclick="GoToBedCenter()"><div class=frame><div id="round-button"><span class="helper"></span><img src="home_16x16.png" alt="Go to bed center"></div></div></div>          
+    </div>                    
+  </div>
+</body>
+</html>

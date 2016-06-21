@@ -1,0 +1,43 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <!-- <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> -->
+  <link rel="stylesheet" media="all" type="text/css" href="./3dCommon.css" />
+  <style>
+  #small_legend {font-family:Verdana;font-size:0.5em;text-decoration:none}
+  </style>
+  <!--[if lt IE 9]><script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->  
+  <title>3D printer extruder control</title>
+  <script type="text/javascript" src="3dCommon.js"></script>
+  <script type="text/javascript" src="extructrl.js"></script>
+</head>
+<body>
+  <span style="font-size:30px">3D printer web control tool</span>
+  <span style="font-size:15px">by IPC Rennes (ST-Microelectronics) August 2015</span>
+  <div class="menu_v">
+    <div class="menu_v_top">Links</div>
+    <div class="menu_v_ctn">
+  	  <a href="command.shtml">Command</a><br />
+      <a href="axisctrl.shtml">Axis Control</a><br />
+      <a href="heatctrl.shtml">Temperature Control</a><br />
+      <a href="filemgt.shtml">File Management</a><br />
+      <a href="wifictrl.html">Wifi Control</a><br />      
+    </div>
+  </div>
+  <div class="corp_ctn">
+	  <h1>Extruder control</h1>
+    <div class="graph">                 
+      <div id ="ExtrudeForward" style="position: absolute;top: -14em;left: -15em"><div id="small_button"><a onclick="Extrude(true)">Extrude</a></div></div>
+      <div id ="ExtrudeReverse" style="position: absolute;top: -14em;left: -8em"><div id="small_button"><a onclick="Extrude(false)">Reverse</a></div></div> 
+      <div id ="small_legend"><div id ="Extrude_legend1" style="position: absolute;top: -30.5em;left: 0em">Length to extrude </div></div>
+      <div id ="small_legend"><div id ="Extrude_legend2" style="position: absolute;top: -29.5em;left: 0em">or retract in mm</div></div>
+      <input type="number" class="small" id="ExtrudeLength" style="position: absolute;top: -14em;left: 0em" value="5">
+      <div id ="small_legend"><div id ="Extrude_legend3" style="position: absolute;top: -30.5em;left: 16em">Extrude or retract</div></div>
+      <div id ="small_legend"><div id ="Extrude_legend4" style="position: absolute;top: -29.5em;left: 16em">speed in mm/min</div></div>
+      <input type="number" class="small" id="ExtrudeSpeed" style="position: absolute;top: -14em;left: 8em" value="50">   
+    </div>                   
+  </div>
+</body>
+</html>
