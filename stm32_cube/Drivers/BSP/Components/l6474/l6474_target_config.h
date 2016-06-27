@@ -226,7 +226,11 @@
 /// Overcurrent threshold settings for device 0 (OCD_TH register)
 #define L6474_CONF_PARAM_OCD_TH_DEVICE_0  (L6474_OCD_TH_1125mA)
 /// Overcurrent threshold settings for device 1 (OCD_TH register)
-#define L6474_CONF_PARAM_OCD_TH_DEVICE_1  (L6474_OCD_TH_1125mA)
+#if defined(TOMEN)
+#define L6474_CONF_PARAM_OCD_TH_DEVICE_1  (L6474_OCD_TH_1500mA)
+#else
+#define L6474_CONF_PARAM_OCD_TH_DEVICE_1  (L6474_OCD_TH_1125mA) 
+#endif
 /// Overcurrent threshold settings for device 2 (OCD_TH register)
 #define L6474_CONF_PARAM_OCD_TH_DEVICE_2  (L6474_OCD_TH_1125mA)
 /// Overcurrent threshold settings for device 3 (OCD_TH register)

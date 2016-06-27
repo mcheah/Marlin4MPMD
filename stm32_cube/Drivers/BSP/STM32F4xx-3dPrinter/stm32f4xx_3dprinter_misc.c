@@ -436,8 +436,12 @@ void BSP_MiscStopInit(uint8_t id)
     case 2:
       /* Configure Z_STOP pin */
       gpioPin = BSP_STOP_Z_PIN;
-      gpioPort = BSP_STOP_Z_PORT;    
+      gpioPort = BSP_STOP_Z_PORT;
+#if defined(TOMEN)
+      GPIO_InitStruct.Pull = GPIO_PULLUP;
+#else
       GPIO_InitStruct.Pull = GPIO_PULLDOWN;     
+#endif
       break;   
     case 3:
       /* Configure U_STOP pin */

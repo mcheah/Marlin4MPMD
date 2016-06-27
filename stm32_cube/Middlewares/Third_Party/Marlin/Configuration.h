@@ -115,7 +115,12 @@
 // 147 is Pt100 with 4k7 pullup
 // 110 is Pt100 with 1k pullup (non standard)
 
+#if defined(MAKEBLOCK)
+#define TEMP_SENSOR_0 1
+#else
 #define TEMP_SENSOR_0 24
+#endif
+
 #define TEMP_SENSOR_1 24
 #define TEMP_SENSOR_2 24
 #define TEMP_SENSOR_BED 25
@@ -308,7 +313,13 @@ your extruder heater takes 2 minutes to hit the target on heating.
 // The pullups are needed if you directly connect a mechanical endswitch between the signal and ground pins.
 const bool X_MIN_ENDSTOP_INVERTING = true; // set to true to invert the logic of the endstop.
 const bool Y_MIN_ENDSTOP_INVERTING = true; // set to true to invert the logic of the endstop.
+#if defined(MAKEBLOCK)
+const bool Z_MIN_ENDSTOP_INVERTING = true; // set to true to invert the logic of the endstop.
+#elif defined(TOMEN)
+const bool Z_MIN_ENDSTOP_INVERTING = true; // set to true to invert the logic of the endstop.
+#else
 const bool Z_MIN_ENDSTOP_INVERTING = false; // set to true to invert the logic of the endstop.
+#endif
 const bool X_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of the endstop.
 const bool Y_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of the endstop.
 const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of the endstop.
@@ -333,10 +344,18 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 #define DISABLE_E false // For all extruders
 #define DISABLE_INACTIVE_EXTRUDER true //disable only inactive extruders and keep active extruder enabled
 
-#define INVERT_X_DIR false    // for Mendel set to false, for Orca set to true
-#define INVERT_Y_DIR false    // for Mendel set to true, for Orca set to false
+#define INVERT_X_DIR false    // for Mendel set to true, for Orca set to false
+#if defined(TOMEN)
+#define INVERT_Y_DIR true    // for Mendel set to false, for Orca set to true
+#else
+#define INVERT_Y_DIR false    // for Mendel set to false, for Orca set to true
+#endif
 #define INVERT_Z_DIR true     // for Mendel set to false, for Orca set to true
+#if defined(TOMEN)
+#define INVERT_E0_DIR true   // for direct drive extruder v9 set to true, for geared extruder set to false
+#else
 #define INVERT_E0_DIR false   // for direct drive extruder v9 set to true, for geared extruder set to false
+#endif
 #define INVERT_E1_DIR false    // for direct drive extruder v9 set to true, for geared extruder set to false
 #define INVERT_E2_DIR false   // for direct drive extruder v9 set to true, for geared extruder set to false
 
@@ -496,8 +515,13 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 #define HOMING_FEEDRATE {50*60, 50*60, 4*60, 0}  // set the homing speeds (mm/min)
 
 // default settings
-
+#if defined(MAKEBLOCK)
+#define DEFAULT_AXIS_STEPS_PER_UNIT   {80,80,1052,180}  // default steps per unit for Ultimaker
+#elif defined(TOMEN)
+#define DEFAULT_AXIS_STEPS_PER_UNIT   {80,80,400,110}  // default steps per unit for Ultimaker
+#else
 #define DEFAULT_AXIS_STEPS_PER_UNIT   {80,80,1600,180}  // default steps per unit for Ultimaker
+#endif
 #define DEFAULT_MAX_FEEDRATE          {200, 200, 5, 35}    // (mm/sec)
 #define DEFAULT_MAX_ACCELERATION      {2000,2000,100,2000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for Skeinforge 40+, for older versions raise them a lot.
 
