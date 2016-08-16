@@ -183,4 +183,4 @@ Nothing in this Agreement shall create, or be deemed to create, a partnership or
 power to bind, to contract in the name of or to create a liability for the other in any way or for any purpose
 
 The terms of the license are also available here:
-[SLA0068](http://www.st.com/content/ccc/resource/legal/legal_agreement/license_agreement/group0/39/50/32/6c/e0/a8/45/2d/DM00218346/files/DM00218346.pdf/jcr:content/translations/en.DM00218346.pdf)
+[SLA0048](http://www.st.com/content/ccc/resource/legal/legal_agreement/license_agreement/group0/39/50/32/6c/e0/a8/45/2d/DM00218346/files/DM00218346.pdf/jcr:content/translations/en.DM00218346.pdf)
