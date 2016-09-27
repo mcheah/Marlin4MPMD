@@ -24,11 +24,9 @@ To load it or to load your own binary into the 3D printer board, the easiest way
 
 #  How to build the FW? 
 In order to recompile the program , you must do the following :
- - Open your preferred toolchain (IAR or SW4STM32 are natively supported) 
-   - For IAR, open the project: _stm32_cube\Projects\STM32F4xx-3dPrinter\Marlin\EWARM\Project.eww_  
-   - For SW4STM32 :
-      - the workspace location must be: _stm32_cube\_
-      - then open the project from: _ST_Marlin\stm32_cube\Projects\STM32F4xx-3dPrinter\Marlin\SW4STM32\Marlin_
+ - Open OpenSTM32 (SW4STM32) toolchain
+ - the workspace location must be stm32_cube\
+ - then In ProjectExplorer, import an existing project into workspace : stm32_cube\Projects\STM32F4xx-3dPrinter\Marlin\SW4STM32\Marlin
  - Rebuild all files and load your image into target memory
  - Run the example
  

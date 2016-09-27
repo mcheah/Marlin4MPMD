@@ -24,8 +24,7 @@
 #include "temperature.h"
 #include "language.h"
 
-#include "ff_gen_drv.h"  //for SD_Driver used with FATFS_LinkDriver
-#include "sd_diskio.h"   //for SD_Driver used with FATFS_LinkDriver
+#include "ff.h"  //for FATFS
 
 #include <ctype.h> //for call to tolower function
 
@@ -217,7 +216,7 @@ public:
 	void setroot();
 
 	FORCE_INLINE uint32_t fileLength() { return filesize; }
-	FORCE_INLINE bool isFileOpen() { return (bool)file.fs; }
+	FORCE_INLINE bool isFileOpen() { return (bool)file.obj.fs; }
 	FORCE_INLINE bool eof() { return sdpos>=filesize ;};
 	FORCE_INLINE int16_t get() {
 		BYTE readByte;

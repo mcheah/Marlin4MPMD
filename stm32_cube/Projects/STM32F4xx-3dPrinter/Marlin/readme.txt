@@ -52,11 +52,9 @@ according to your configuration.
 
 @par How to use it ? 
 In order to recompile the program , you must do the following :
- - Open your preferred toolchain (IAR or SW4STM32) 
- - For IAR, open the project: stm32_cube\Projects\STM32F4xx-3dPrinter\Marlin\EWARM\Project.eww
- - For SW4STM32: 
-        - the workspace location must be stm32_cube\
-        - then open the project from ST_Marlin\stm32_cube\Projects\STM32F4xx-3dPrinter\Marlin\SW4STM32\Marlin
+ - Open OpenSTM32 (SW4STM32) toolchain
+ - the workspace location must be stm32_cube\
+ - then In ProjectExplorer, import an existing project into workspace : stm32_cube\Projects\STM32F4xx-3dPrinter\Marlin\SW4STM32\Marlin
  - Rebuild all files and load your image into target memory
  - Run the example
 

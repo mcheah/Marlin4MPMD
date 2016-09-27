@@ -147,6 +147,16 @@
 			<locationURI>PARENT-5-PROJECT_LOC/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_sdmmc.c</locationURI>
 		</link>
 		<link>
+			<name>Middlewares/FatFs/diskio.c</name>
+			<type>1</type>
+			<location>/local/brdirais/Development/MotionControl/04-GIT_IPC_SW/STM32/St3dPrinter_GitHub/Marlin4ST/stm32_cube/Middlewares/Third_Party/FatFs/src/diskio.c</location>
+		</link>
+		<link>
+			<name>Middlewares/FatFs/ff.c</name>
+			<type>1</type>
+			<location>/local/brdirais/Development/MotionControl/04-GIT_IPC_SW/STM32/St3dPrinter_GitHub/Marlin4ST/stm32_cube/Middlewares/Third_Party/FatFs/src/ff.c</location>
+		</link>
+		<link>
 			<name>Middlewares/Marlin/BlinkM.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-5-PROJECT_LOC/Middlewares/Third_Party/Marlin/BlinkM.cpp</locationURI>
@@ -280,26 +290,6 @@
 			<name>Drivers/BSP/STM32F4xx-3dPrinter/stm32f4xx_3dprinter_wifi.c</name>
 			<type>1</type>
 			<locationURI>PARENT-5-PROJECT_LOC/Drivers/BSP/STM32F4xx-3dPrinter/stm32f4xx_3dprinter_wifi.c</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/FatFs/Core/diskio.c</name>
-			<type>1</type>
-			<locationURI>PARENT-5-PROJECT_LOC/Middlewares/Third_Party/FatFs/src/diskio.c</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/FatFs/Core/ff.c</name>
-			<type>1</type>
-			<locationURI>PARENT-5-PROJECT_LOC/Middlewares/Third_Party/FatFs/src/ff.c</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/FatFs/Core/ff_gen_drv.c</name>
-			<type>1</type>
-			<locationURI>PARENT-5-PROJECT_LOC/Middlewares/Third_Party/FatFs/src/ff_gen_drv.c</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/FatFs/Drivers/sd_diskio.c</name>
-			<type>1</type>
-			<locationURI>PARENT-5-PROJECT_LOC/Middlewares/Third_Party/FatFs/src/drivers/sd_diskio.c</locationURI>
 		</link>
 		<link>
 			<name>Drivers/BSP/Components/l6474/l6474.c</name>

@@ -61,6 +61,7 @@ void CardReader::mountsd()
 {
   cardOK = false;
 
+  strcpy( SDPath, "/");
 
   if (rootIsOpened == false)
   {
@@ -70,8 +71,7 @@ void CardReader::mountsd()
       SERIAL_ECHOLNPGM(MSG_SD_INIT_FAIL);
       //SERIAL_ECHOLNPGM("CardReader::mountsd");  // BDI
     }
-    else if ((FATFS_LinkDriver(&SD_Driver, SDPath) != FR_OK)||
-             (f_mount(&fileSystem, (TCHAR const*)SDPath, 0) != FR_OK))
+    else if (f_mount(&fileSystem, (TCHAR const*)SDPath, 0) != FR_OK)
     {
       SERIAL_ERROR_START;
       SERIAL_ERRORLNPGM(MSG_SD_VOL_INIT_FAIL);
@@ -306,8 +306,6 @@ void CardReader::release()
   cardReaderInitialized = false;
   rootIsOpened = false;
 
-  FATFS_UnLinkDriver(SDPath);
-
   SERIAL_ECHO_START;
   SERIAL_ECHOLNPGM(MSG_SD_INIT_FAIL);
   //SERIAL_ECHOLNPGM("CardReader::release"); // BDI
@@ -497,7 +495,7 @@ void CardReader::openFile(char* name,bool read, bool replace_current/*=true*/)
 	  if (f_open(&file, name, FA_OPEN_EXISTING | FA_READ) == FR_OK)
     {
       fileOpened[file_subcall_ctr] = 1;
-      filesize = file.fsize;
+      filesize = f_size(&file);
       SERIAL_PROTOCOLPGM(MSG_SD_FILE_OPENED);
       SERIAL_PROTOCOL(fname);
       SERIAL_PROTOCOLPGM(MSG_SD_SIZE);
