@@ -149,12 +149,12 @@
 		<link>
 			<name>Middlewares/FatFs/diskio.c</name>
 			<type>1</type>
-			<location>/local/brdirais/Development/MotionControl/04-GIT_IPC_SW/STM32/St3dPrinter_GitHub/Marlin4ST/stm32_cube/Middlewares/Third_Party/FatFs/src/diskio.c</location>
+			<locationURI>PARENT-5-PROJECT_LOC/Middlewares/Third_Party/FatFs/src/diskio.c</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/FatFs/ff.c</name>
 			<type>1</type>
-			<location>/local/brdirais/Development/MotionControl/04-GIT_IPC_SW/STM32/St3dPrinter_GitHub/Marlin4ST/stm32_cube/Middlewares/Third_Party/FatFs/src/ff.c</location>
+			<locationURI>PARENT-5-PROJECT_LOC/Middlewares/Third_Party/FatFs/src/ff.c</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/Marlin/BlinkM.cpp</name>
