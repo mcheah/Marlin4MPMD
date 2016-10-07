@@ -552,7 +552,7 @@ void setup_powerhold()
 #if defined(PROD_TEST)
   BSP_WifiHwInit(BAUDRATE,WIFI_SSID,WIFI_WEP_KEY,WIFI_FW_VERSION,WIFI_FS_VERSION);
 #else
-  BSP_WifiHwInit(BAUDRATE,WIFI_SSID,WIFI_WEP_KEY);
+  BSP_WifiHwInit(BAUDRATE,(char *)WIFI_SSID, (char *)WIFI_WEP_KEY);
 #endif
 #endif //#if !defined(NO_WIFI)
   
