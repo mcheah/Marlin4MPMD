@@ -24,8 +24,8 @@ To load it or to load your own binary into the 3D printer board, the easiest way
 ###  How to build the FW?
 In order to recompile the program , you must do the following :
  - Open OpenSTM32 (SW4STM32) toolchain (you can download installer for your OS [here](http://www.openstm32.org/HomePage).  You shall be register to download it for free
- - the workspace location must be stm32_cube\
- - then In ProjectExplorer, import an existing project into workspace : stm32_cube\Projects\STM32F4xx-3dPrinter\Marlin\SW4STM32\Marlin
+ - the workspace location must be stm32_cube/STM32/Projects/SW4STM32
+ - then In ProjectExplorer, import an existing project into workspace : stm32_cube/STM32/Projects/SW4STM32/Marlin_3DPrinter/
  - Rebuild all files and load your image into target memory
  - Run the example
 
