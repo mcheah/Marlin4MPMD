@@ -1,7 +1,7 @@
 
 #include "Marlin.h"
 #include "cardreader.h"
-
+#include <strings.h>
 
 #if ENABLED(SDSUPPORT)
 
