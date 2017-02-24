@@ -47,7 +47,6 @@
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.725618142" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="USE_HAL_DRIVER"/>
 									<listOptionValue builtIn="false" value="WITH_RPI_DETECTION__N"/>
-									<listOptionValue builtIn="false" value="WAIT_FOR_RPI__N"/>
 									<listOptionValue builtIn="false" value="BICEPHALE"/>
 									<listOptionValue builtIn="false" value="NO_SD_WIDE_BUS"/>
 									<listOptionValue builtIn="false" value="STM32F401xE"/>
@@ -81,7 +80,7 @@
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.1408105883" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="USE_HAL_DRIVER"/>
-									<listOptionValue builtIn="false" value="WAIT_FOR_RPI__N"/>
+									<listOptionValue builtIn="false" value="WAIT_FOR_RPI"/>
 									<listOptionValue builtIn="false" value="WITH_RPI_DETECTION__N"/>
 									<listOptionValue builtIn="false" value="BICEPHALE"/>
 									<listOptionValue builtIn="false" value="NO_SD_WIDE_BUS"/>

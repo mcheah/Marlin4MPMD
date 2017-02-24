@@ -314,10 +314,21 @@
   //#define  DEFAULT_Ki 2.25
   //#define  DEFAULT_Kd 440
 
-  // Bicephale
+  // Bicephale (OLD - BDI)
+#if defined(BICEPHALE)
+  #define  DEFAULT_Kp 42.61
+  #define  DEFAULT_Ki 5.70
+  #define  DEFAULT_Kd 79.58
+/*
   #define  DEFAULT_Kp 35.74
   #define  DEFAULT_Ki 3.49
   #define  DEFAULT_Kd 91.50
+*/
+#else
+	#define  DEFAULT_Kp 31.36
+	#define  DEFAULT_Ki 3.17
+	#define  DEFAULT_Kd 77.58
+#endif
 
 #endif // PIDTEMP
 
@@ -424,7 +435,7 @@
 // Almost all printers will be using one per axis. Probes will use one or more of the
 // extra connectors. Leave undefined any used for non-endstop and non-probe purposes.
 #define USE_XMIN_PLUG
-//#define USE_YMIN_PLUG   -- For Bicephale 3D Printer
+//#define USE_YMIN_PLUG   //	-- For Bicephale 3D Printer
 #define USE_ZMIN_PLUG
 //#define USE_XMAX_PLUG
 #define USE_YMAX_PLUG  //    -- For Bicephale 3D Printer
@@ -628,8 +639,8 @@
 #define Y_HOME_DIR 1
 #define Z_HOME_DIR -1
 
-#define min_software_endstops true // If true, axis won't move to coordinates less than HOME_POS.
-#define max_software_endstops true  // If true, axis won't move to coordinates greater than the defined lengths below.
+#define min_software_endstops false // BDI => true // If true, axis won't move to coordinates less than HOME_POS.
+#define max_software_endstops false // BDI => true  // If true, axis won't move to coordinates greater than the defined lengths below.
 
 // @section machine
 
@@ -786,6 +797,7 @@
 
 // default settings
 
+#if 0
 #define DEFAULT_AXIS_STEPS_PER_UNIT   {80,80,4000,500}  // default steps per unit for Ultimaker
 #define DEFAULT_MAX_FEEDRATE          {300, 300, 5, 25}    // (mm/sec)
 #define DEFAULT_MAX_ACCELERATION      {3000,3000,100,10000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for Skeinforge 40+, for older versions raise them a lot.
@@ -798,7 +810,20 @@
 #define DEFAULT_XYJERK                20.0    // (mm/sec)
 #define DEFAULT_ZJERK                 0.4     // (mm/sec)
 #define DEFAULT_EJERK                 5.0    // (mm/sec)
+#endif
 
+#define DEFAULT_AXIS_STEPS_PER_UNIT   {80,80,1600,180}  // default steps per unit for ST
+#define DEFAULT_MAX_FEEDRATE          {200, 200, 5, 35}    // (mm/sec)
+#define DEFAULT_MAX_ACCELERATION      {2000,2000,100,2000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for Skeinforge 40+, for older versions raise them a lot.
+
+#define DEFAULT_ACCELERATION          2000    // X, Y, Z and E acceleration in mm/s^2 for printing moves
+#define DEFAULT_RETRACT_ACCELERATION  0       // E acceleration in mm/s^2 for retracts
+#define DEFAULT_TRAVEL_ACCELERATION   2000    // X, Y, Z acceleration in mm/s^2 for travel (non printing) moves
+
+// The speed change that does not require acceleration (i.e. the software might assume it can be done instantaneously)
+#define DEFAULT_XYJERK                20.0    // (mm/sec)
+#define DEFAULT_ZJERK                 0.4     // (mm/sec)
+#define DEFAULT_EJERK                 5.0    // (mm/sec)
 
 //=============================================================================
 //============================= Additional Features ===========================
@@ -1018,7 +1043,7 @@
 // SD Card support is disabled by default. If your controller has an SD slot,
 // you must uncomment the following option or it won't work.
 //
-#define SDSUPPORT
+//#define SDSUPPORT
 #if ENABLED(SDSUPPORT)
   #define SD_SETTINGS
   #define CONFIG_FILE_NAME "sys/m_cfg.g"

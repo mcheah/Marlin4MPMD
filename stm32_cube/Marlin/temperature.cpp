@@ -864,7 +864,8 @@ float Temperature::analog2tempBed(int raw) {
     }
 
     // Overflow: Set to last value in the table
-    if (i == BEDTEMPTABLE_LEN) celsius = PGM_RD_W(BEDTEMPTABLE[i - 1][1]);
+    if (i == BEDTEMPTABLE_LEN)
+    	celsius = PGM_RD_W(BEDTEMPTABLE[i - 1][1]);
 
     return celsius;
 
@@ -1450,7 +1451,6 @@ void Temperature::TemperatureHandler(void)
 
       #if HAS_HEATER_BED
         soft_pwm_BED = soft_pwm_bed;
-        //  WRITE_HEATER_BED(soft_pwm_BED > 0 ? 1 : 0);    -- BDI
         if( soft_pwm_BED > 0)
         	WRITE_HEATER_BED(1);
         else
@@ -1626,42 +1626,23 @@ void Temperature::TemperatureHandler(void)
 
   #endif // SLOW_PWM_HEATERS
 
-#if 0  // BDI
-  #define SET_ADMUX_ADCSRA(pin) ADMUX = _BV(REFS0) | (pin & 0x07); SBI(ADCSRA, ADSC)
-  #ifdef MUX5
-    #define START_ADC(pin) if (pin > 7) ADCSRB = _BV(MUX5); else ADCSRB = 0; SET_ADMUX_ADCSRA(pin)
-  #else
-    #define START_ADC(pin) ADCSRB = 0; SET_ADMUX_ADCSRA(pin)
-  #endif
-#endif // BDI
 
   // Prepare or measure a sensor, each one every 12th frame
   switch (temp_state) {
     case PrepareTemp_0:
-#if 0  // BDI
-      #if HAS_TEMP_0
-        START_ADC(TEMP_0_PIN);
-      #endif
-#endif
       lcd_buttons_update();
       temp_state = MeasureTemp_0;
       break;
 
     case MeasureTemp_0:
-        raw_temp_value[0] += BSP_AdcGetValue(BSP_ADC_RANK_THERM_E1 - 1);
       #if HAS_TEMP_0
-        //raw_temp_value[0] += BSP_AdcGetValue(BSP_ADC_RANK_THERM_E1 - 1);
-        // raw_temp_value[0] += ADC;   BDI  -- to supp
+        raw_temp_value[0] += BSP_AdcGetValue(BSP_ADC_RANK_THERM_E1 - 1);
       #endif
-      temp_state = PrepareTemp_BED;
+      //temp_state = PrepareTemp_BED;  -- No ADC preparation, no LCD
+      temp_state = MeasureTemp_BED;
       break;
 
     case PrepareTemp_BED:
-#if 0  //  BDI -- To supp
-      #if HAS_TEMP_BED
-        START_ADC(TEMP_BED_PIN);
-      #endif
-#endif
       lcd_buttons_update();
       temp_state = MeasureTemp_BED;
       break;
@@ -1669,17 +1650,12 @@ void Temperature::TemperatureHandler(void)
     case MeasureTemp_BED:
       #if HAS_TEMP_BED
         raw_temp_bed_value += BSP_AdcGetValue(BSP_ADC_RANK_THERM_BED1 - 1);
-        //raw_temp_bed_value += ADC; // BDI  -- To supp
       #endif
-      temp_state = PrepareTemp_1;
+      // temp_state = PrepareTemp_1;  -- No ADC preparation, no LCD
+      temp_state = MeasureTemp_1;
       break;
 
     case PrepareTemp_1:
-#if 0  //  BDI  -- To supp.
-      #if HAS_TEMP_1
-        START_ADC(TEMP_1_PIN);
-      #endif
-#endif
       lcd_buttons_update();
       temp_state = MeasureTemp_1;
       break;
@@ -1687,17 +1663,12 @@ void Temperature::TemperatureHandler(void)
     case MeasureTemp_1:
       #if HAS_TEMP_1
     	raw_temp_value[1] += BSP_AdcGetValue(BSP_ADC_RANK_THERM_E2 - 1);
-        //raw_temp_value[1] += ADC; // BDI  -- To supp
       #endif
-      temp_state = PrepareTemp_2;
+      // temp_state = PrepareTemp_2;  -- No ADC preparation, no LCD
+      temp_state = MeasureTemp_2;
       break;
 
     case PrepareTemp_2:
-#if 0  // BDI  --  To supp.
-      #if HAS_TEMP_2
-        START_ADC(TEMP_2_PIN);
-      #endif
-#endif
       lcd_buttons_update();
       temp_state = MeasureTemp_2;
       break;
@@ -1705,17 +1676,12 @@ void Temperature::TemperatureHandler(void)
     case MeasureTemp_2:
       #if HAS_TEMP_2
     	raw_temp_value[2] += BSP_AdcGetValue(BSP_ADC_RANK_THERM_E3 - 1);
-        // raw_temp_value[2] += ADC;  // BDI  -- To supp
       #endif
-      temp_state = PrepareTemp_3;
+      // temp_state = PrepareTemp_3;  -- No ADC preparation, no LCD
+      temp_state = MeasureTemp_3;
       break;
 
     case PrepareTemp_3:
-#if 0  // BDI  --  To supp.
-      #if HAS_TEMP_3
-        START_ADC(TEMP_3_PIN);
-      #endif
-#endif
       lcd_buttons_update();
       temp_state = MeasureTemp_3;
       break;
@@ -1723,18 +1689,16 @@ void Temperature::TemperatureHandler(void)
     case MeasureTemp_3:
       #if HAS_TEMP_3
     	raw_temp_value[3] += BSP_AdcGetValue(BSP_ADC_RANK_THERM_E4 - 1);
-        // raw_temp_value[3] += ADC;   // BDI  -- To supp
       #endif
-      temp_state = Prepare_FILWIDTH;
+      // temp_state = Prepare_FILWIDTH;  -- No ADC preparation, no LCD
+      temp_state = Measure_FILWIDTH;
       break;
 
     case Prepare_FILWIDTH:
-      #if ENABLED(FILAMENT_WIDTH_SENSOR)
-        START_ADC(FILWIDTH_PIN);
-      #endif
       lcd_buttons_update();
       temp_state = Measure_FILWIDTH;
       break;
+
     case Measure_FILWIDTH:
       #if ENABLED(FILAMENT_WIDTH_SENSOR)
         // raw_filwidth_value += ADC;  //remove to use an IIR filter approach
@@ -1743,12 +1707,14 @@ void Temperature::TemperatureHandler(void)
           raw_filwidth_value += ((unsigned long)ADC << 7); //add new ADC reading
         }
       #endif
-      temp_state = PrepareTemp_0;
+      //temp_state = PrepareTemp_0;  -- No ADC preparation, no LCD
+      temp_state = MeasureTemp_0;
       temp_count++;
       break;
 
     case StartupDelay:
-      temp_state = PrepareTemp_0;
+      //temp_state = PrepareTemp_0;  -- No ADC preparation, no LCD
+      temp_state = MeasureTemp_0;
       break;
 
     // default:

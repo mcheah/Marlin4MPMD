@@ -57,8 +57,8 @@ GPIO_TypeDef* gArrayGpioPort[BSP_MISC_MAX_PIN_NUMBER] = {
   BSP_MOTOR_CONTROL_BOARD_PWM_X_PORT,    //X_STEP_PIN       0       
   BSP_MOTOR_CONTROL_BOARD_DIR_X_PORT,    //X_DIR_PIN        1
   BSP_MOTOR_CONTROL_BOARD_RESET_X_PORT,  //X_ENABLE_PIN    
-  BSP_STOP_X_PORT,                       //X_MIN_PIN       
-  0,                                     //X_MAX_PIN       
+  BSP_STOP_X_PORT,                       //X_MIN_PIN
+  0,                                     //X_MAX_PIN
   BSP_MOTOR_CONTROL_BOARD_PWM_Y_PORT,    //Y_STEP_PIN       5
   BSP_MOTOR_CONTROL_BOARD_DIR_Y_PORT,    //Y_DIR_PIN       
   BSP_MOTOR_CONTROL_BOARD_RESET_Y_PORT,  //Y_ENABLE_PIN    
@@ -113,8 +113,8 @@ uint16_t gArrayGpioPin[BSP_MISC_MAX_PIN_NUMBER] = {
   BSP_MOTOR_CONTROL_BOARD_PWM_X_PIN,    //X_STEP_PIN        0       
   BSP_MOTOR_CONTROL_BOARD_DIR_X_PIN,    //X_DIR_PIN         1
   BSP_MOTOR_CONTROL_BOARD_RESET_X_PIN,  //X_ENABLE_PIN    
-  BSP_STOP_X_PIN,                       //X_MIN_PIN       
-  0,                                    //X_MAX_PIN       
+  BSP_STOP_X_PIN,                       //X_MIN_PIN
+  0,                                    //X_MAX_PIN
   BSP_MOTOR_CONTROL_BOARD_PWM_Y_PIN,    //Y_STEP_PIN        5
   BSP_MOTOR_CONTROL_BOARD_DIR_Y_PIN,    //Y_DIR_PIN               
   BSP_MOTOR_CONTROL_BOARD_RESET_Y_PIN,  //Y_ENABLE_PIN    

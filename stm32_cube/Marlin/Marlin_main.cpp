@@ -901,6 +901,7 @@ void setup() {
     HAL_Delay(30000);  //debug elan for raspberry
   #endif
 #endif
+
     BSP_UartHwInit(BAUDRATE);
     BSP_UartIfStart();
     MYSERIAL.begin(BAUDRATE);
@@ -939,6 +940,9 @@ void setup() {
 
   // Send "ok" after commands by default
   for (int8_t i = 0; i < BUFSIZE; i++) send_ok[i] = true;
+
+  // Reset parameters to default values
+  Config_ResetDefault();
 
   // Init and autostart on SD card
 #if defined(SDSUPPORT)

@@ -183,7 +183,8 @@ void BSP_UartIfQueueTxData(uint8_t *pBuf, uint8_t nbData)
       {
         pUart->pTxWrap = pUart->pTxWriteBuffer; 
         pUart->pTxWriteBuffer = pUart->pTxBuffer;
-      }        
+      }
+      //BSP_UartIfSendQueuedData();  // BDI
     }
 #else
     if (pUart->pTxWriteBuffer >= pUart->pTxBuffer + UART_TX_BUFFER_SIZE)
@@ -191,8 +192,9 @@ void BSP_UartIfQueueTxData(uint8_t *pBuf, uint8_t nbData)
       pUart->pTxWrap = pUart->pTxWriteBuffer; 
       pUart->pTxWriteBuffer = pUart->pTxBuffer;
     }
-    BSP_UartIfSendQueuedData();
 #endif
+    BSP_UartIfSendQueuedData();
+//#endif
   }
 }
    
