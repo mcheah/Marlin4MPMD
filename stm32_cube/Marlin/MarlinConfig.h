@@ -45,7 +45,7 @@
 #include "stm32f4xx_3dprinter_uart.h"
 #include "stm32f4xx_3dprinter_adc.h"
 #include "stm32f4xx_3dprinter_wifi.h"
-#ifdef BICEPHALE
+#ifdef RPI_CONNECTED
 #include "stm32f4xx_3dprinter_rpi.h"
 #endif
 #include "motorcontrol.h"

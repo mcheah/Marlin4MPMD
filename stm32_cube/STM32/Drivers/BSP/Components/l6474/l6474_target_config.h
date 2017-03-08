@@ -150,12 +150,8 @@
 /// TVAL register value for device 1 (range 31.25mA to 4000mA)
 #define L6474_CONF_PARAM_TVAL_DEVICE_1  (875)
 /// TVAL register value for device 2 (range 31.25mA to 4000mA)
-#if defined(BICEPHALE)
-//#define L6474_CONF_PARAM_TVAL_DEVICE_2 (950)   --BDI--
 #define L6474_CONF_PARAM_TVAL_DEVICE_2 (1500)
-#else   
-#define L6474_CONF_PARAM_TVAL_DEVICE_2 (750)
-#endif
+//#define L6474_CONF_PARAM_TVAL_DEVICE_2 (750)
 /// TVAL register value for device 3 (range 31.25mA to 4000mA)
 #define L6474_CONF_PARAM_TVAL_DEVICE_3 (750)
 /// TVAL register value for device 4 (range 31.25mA to 4000mA)
@@ -233,11 +229,8 @@
 /// Overcurrent threshold settings for device 1 (OCD_TH register)
 #define L6474_CONF_PARAM_OCD_TH_DEVICE_1  (L6474_OCD_TH_1125mA)
 /// Overcurrent threshold settings for device 2 (OCD_TH register)
-#if defined(BICEPHALE)
 #define L6474_CONF_PARAM_OCD_TH_DEVICE_2  (L6474_OCD_TH_2250mA)
-#else   
-#define L6474_CONF_PARAM_OCD_TH_DEVICE_2  (L6474_OCD_TH_1125mA)
-#endif
+//#define L6474_CONF_PARAM_OCD_TH_DEVICE_2  (L6474_OCD_TH_1125mA)
 /// Overcurrent threshold settings for device 3 (OCD_TH register)
 #define L6474_CONF_PARAM_OCD_TH_DEVICE_3  (L6474_OCD_TH_1125mA)    
 /// Overcurrent threshold settings for device 4 (OCD_TH register)

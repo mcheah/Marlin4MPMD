@@ -105,6 +105,11 @@
 //#define SHOW_CUSTOM_BOOTSCREEN
 // @section machine
 
+// RASPBERRY PI connected
+// This indicate if a Raspberry Pi is connected to the board and so if the firmware shall wait
+// for it.
+#define RPI_CONNECTED
+
 // SERIAL_PORT selects which serial port should be used for communication with the host.
 // This allows the connection of wireless adapters (for instance) to non-default port pins.
 // Serial port 0 is still used by the Arduino bootloader regardless of this setting.
@@ -126,9 +131,8 @@
 
 // Optional custom name for your RepStrap or other custom machine
 // Displayed in the LCD "Ready" message
-#if defined(BICEPHALE)
-	#define CUSTOM_MACHINE_NAME "MarkOne"
-#endif
+#define CUSTOM_MACHINE_NAME "MarkOne"
+
 
 // Define this to set a unique identifier for this printer, (Used by some programs to differentiate between machines)
 // You can use an online service to generate a random UUID. (eg http://www.uuidgenerator.net/version4)
@@ -227,30 +231,19 @@
 //#define DUMMY_THERMISTOR_998_VALUE 25
 //#define DUMMY_THERMISTOR_999_VALUE 100
 // :{ '0': "Not used",'1':"100k / 4.7k - EPCOS",'2':"200k / 4.7k - ATC Semitec 204GT-2",'3':"Mendel-parts / 4.7k",'4':"10k !! do not use for a hotend. Bad resolution at high temp. !!",'5':"100K / 4.7k - ATC Semitec 104GT-2 (Used in ParCan & J-Head)",'6':"100k / 4.7k EPCOS - Not as accurate as Table 1",'7':"100k / 4.7k Honeywell 135-104LAG-J01",'8':"100k / 4.7k 0603 SMD Vishay NTCS0603E3104FXT",'9':"100k / 4.7k GE Sensing AL03006-58.2K-97-G1",'10':"100k / 4.7k RS 198-961",'11':"100k / 4.7k beta 3950 1%",'12':"100k / 4.7k 0603 SMD Vishay NTCS0603E3104FXT (calibrated for Makibox hot bed)",'13':"100k Hisens 3950  1% up to 300°C for hotend 'Simple ONE ' & hotend 'All In ONE'",'20':"PT100 (Ultimainboard V2.x)",'51':"100k / 1k - EPCOS",'52':"200k / 1k - ATC Semitec 204GT-2",'55':"100k / 1k - ATC Semitec 104GT-2 (Used in ParCan & J-Head)",'60':"100k Maker's Tool Works Kapton Bed Thermistor beta=3950",'66':"Dyze Design 4.7M High Temperature thermistor",'70':"the 100K thermistor found in the bq Hephestos 2",'71':"100k / 4.7k Honeywell 135-104LAF-J01",'147':"Pt100 / 4.7k",'1047':"Pt1000 / 4.7k",'110':"Pt100 / 1k (non-standard)",'1010':"Pt1000 / 1k (non standard)",'-3':"Thermocouple + MAX31855 (only for sensor 0)",'-2':"Thermocouple + MAX6675 (only for sensor 0)",'-1':"Thermocouple + AD595",'998':"Dummy 1",'999':"Dummy 2" }
-#if defined(BICEPHALE)
 #define TEMP_SENSOR_0 23
 #define TEMP_SENSOR_1 0
 #define TEMP_SENSOR_2 0
 #define TEMP_SENSOR_3 0
 #define TEMP_SENSOR_BED 23
-#else
-#define TEMP_SENSOR_0 24
-#define TEMP_SENSOR_1 24
-#define TEMP_SENSOR_2 24
-#define TEMP_SENSOR_3 0
-#define TEMP_SENSOR_BED 25
-#endif
+
 
 // This makes temp sensor 1 a redundant sensor for sensor 0. If the temperatures difference between these sensors is to high the print will be aborted.
 //#define TEMP_SENSOR_1_AS_REDUNDANT
 #define MAX_REDUNDANT_TEMP_SENSOR_DIFF 10
 
 // Extruder temperature must be close to target for this long before M109 returns success
-#if defined(BICEPHALE)
 #define TEMP_RESIDENCY_TIME 10  // (seconds)
-#else
-#define TEMP_RESIDENCY_TIME 5  // (seconds)
-#endif
 #define TEMP_HYSTERESIS 3       // (degC) range of +/- temperatures considered "close" to the target one
 #define TEMP_WINDOW     1       // (degC) Window around target to start the residency timer x degC early.
 
@@ -314,21 +307,11 @@
   //#define  DEFAULT_Ki 2.25
   //#define  DEFAULT_Kd 440
 
-  // Bicephale (OLD - BDI)
-#if defined(BICEPHALE)
+  // Bicephale MarkOne
   #define  DEFAULT_Kp 42.61
   #define  DEFAULT_Ki 5.70
   #define  DEFAULT_Kd 79.58
-/*
-  #define  DEFAULT_Kp 35.74
-  #define  DEFAULT_Ki 3.49
-  #define  DEFAULT_Kd 91.50
-*/
-#else
-	#define  DEFAULT_Kp 31.36
-	#define  DEFAULT_Ki 3.17
-	#define  DEFAULT_Kd 77.58
-#endif
+
 
 #endif // PIDTEMP
 
@@ -361,7 +344,7 @@
   #define PID_BED_INTEGRAL_DRIVE_MAX MAX_BED_POWER //limit for the integral term
 
   //120V 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
- //from BICEPHALE model
+ //from Bicephale model
     #define  DEFAULT_bedKp 403.80
     #define  DEFAULT_bedKi 75.83
     #define  DEFAULT_bedKd 537.55

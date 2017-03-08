@@ -410,27 +410,31 @@ void BSP_MiscStopInit(uint8_t id)
       /* Configure X_STOP pin */
       gpioPin = BSP_STOP_X_PIN;
       gpioPort = BSP_STOP_X_PORT;    
-#if ((!defined(MARLIN)) || (defined(BICEPHALE)))
-      GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+#if defined(STOP_X__PULL_UP)
+      GPIO_InitStruct.Pull = GPIO_PULLUP;
 #else
-      GPIO_InitStruct.Pull = GPIO_PULLUP;     
-#endif  
+      GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+#endif
       break;
     case 1:
       /* Configure Y_STOP pin */
       gpioPin = BSP_STOP_Y_PIN;
       gpioPort = BSP_STOP_Y_PORT;    
-#if ((!defined(MARLIN)) || (defined(BICEPHALE)))
-      GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+#if defined(STOP_Y__PULL_UP)
+      GPIO_InitStruct.Pull = GPIO_PULLUP;
 #else
-      GPIO_InitStruct.Pull = GPIO_PULLUP;     
-#endif  
+      GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+#endif
       break;      
     case 2:
       /* Configure Z_STOP pin */
       gpioPin = BSP_STOP_Z_PIN;
       gpioPort = BSP_STOP_Z_PORT;
-      GPIO_InitStruct.Pull = BSP_STOP_Z__PULL_MODE;
+#if defined(STOP_Z__PULL_UP)
+      GPIO_InitStruct.Pull = GPIO_PULLUP;
+#else
+      GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+#endif
       break;   
     case 3:
       /* Configure U_STOP pin */

@@ -40,13 +40,9 @@
 #define Y_STEP_PIN         5
 #define Y_DIR_PIN          6
 #define Y_ENABLE_PIN       -1
-#if defined(BICEPHALE)
-  #define Y_MIN_PIN          -1
-  #define Y_MAX_PIN          8
-#else
-  #define Y_MIN_PIN          8
-  #define Y_MAX_PIN          -1
-#endif
+#define Y_MIN_PIN          -1
+#define Y_MAX_PIN          8
+
 
 #define Z_STEP_PIN         10
 #define Z_DIR_PIN          11

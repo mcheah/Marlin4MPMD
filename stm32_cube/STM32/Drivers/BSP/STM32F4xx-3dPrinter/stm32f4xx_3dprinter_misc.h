@@ -60,13 +60,6 @@
 #define BSP_STOP_Y_PORT              (GPIOD)
 #define BSP_STOP_Z_PIN               (GPIO_PIN_10)
 #define BSP_STOP_Z_PORT              (GPIOD)
-
-#ifdef BL_TOUCH
-#define BSP_STOP_Z__PULL_MODE		 (GPIO_PULLUP)
-#else
-#define BSP_STOP_Z__PULL_MODE		 (GPIO_PULLDOWN)
-#endif
-
 #define BSP_STOP_U_PIN               (GPIO_PIN_11)
 #define BSP_STOP_U_PORT              (GPIOD)
 #define BSP_STOP_V_PIN               (GPIO_PIN_8)
