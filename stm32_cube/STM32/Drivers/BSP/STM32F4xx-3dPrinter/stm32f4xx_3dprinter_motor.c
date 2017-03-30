@@ -572,7 +572,7 @@ uint8_t BSP_MotorControlBoard_SpiInit(void)
  **********************************************************/
 uint8_t BSP_MotorControlBoard_SpiWriteBytes(uint8_t *pByteToTransmit, uint8_t *pReceivedByte, uint8_t nbDevices)
 {
-  HAL_StatusTypeDef status;
+  HAL_StatusTypeDef status = HAL_ERROR;
   uint32_t i;
   HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_CS_PORT, BSP_MOTOR_CONTROL_BOARD_CS_PIN, GPIO_PIN_RESET); 
   for (i = 0; i < nbDevices; i++)

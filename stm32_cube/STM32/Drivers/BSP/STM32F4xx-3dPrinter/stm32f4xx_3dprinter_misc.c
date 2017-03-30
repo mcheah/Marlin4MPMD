@@ -51,8 +51,8 @@
 #define HEAT_TIMER_PRESCALER  (1024)
 #define SERVO_TIMER_PRESCALER (8)
 #define HEAT_TIMER_FREQUENCY  (1000)
-/*  global constant ----------------------------------------------------------*/
 
+/*  global constant ----------------------------------------------------------*/
 GPIO_TypeDef* gArrayGpioPort[BSP_MISC_MAX_PIN_NUMBER] = {
   BSP_MOTOR_CONTROL_BOARD_PWM_X_PORT,    //X_STEP_PIN       0       
   BSP_MOTOR_CONTROL_BOARD_DIR_X_PORT,    //X_DIR_PIN        1
@@ -165,6 +165,24 @@ uint16_t gArrayGpioPin[BSP_MISC_MAX_PIN_NUMBER] = {
   BSP_HEAT_BED3_PIN                      //HEATER_BED3_PIN   
 };  
 
+/* Type definition ------------------------------------------------------------*/
+typedef struct {
+	 uint32_t 		gpioPin;
+	 GPIO_TypeDef* 	gpioPort;
+	 uint8_t		speed;
+	 uint8_t		up_val;
+	 uint8_t		count;
+	 uint8_t		level; /* Up = 1 ; down = 0 */
+	 uint8_t		activePwm;
+} tFanStruct;
+
+
+/* Global variable ------------------------------------------------------------*/
+static tFanStruct fanE1;
+static tFanStruct fanE2;
+static tFanStruct fanE3;
+
+
 /* Imported variables ---------------------------------------------------------*/
 extern TIM_HandleTypeDef hTimPwmX;
 extern TIM_HandleTypeDef hTimPwmY;
@@ -174,7 +192,6 @@ extern TIM_HandleTypeDef hTimPwmE2;
 extern TIM_HandleTypeDef hTimPwmE3;
 
 /* Private variables ---------------------------------------------------------*/
-
 TIM_HandleTypeDef hTimPwmHeatBed;
 TIM_HandleTypeDef hTimPwmHeatBed2;
 TIM_HandleTypeDef hTimPwmHeatBed3;
@@ -205,6 +222,7 @@ static uint8_t bspTickEnabled = 0;
 void BSP_MiscFlagInterruptHandler(void);
 void SystemClock_Config(void);
 
+
 /** @defgroup  STM32F4XX_3DPRINTER_MOTOR_Public_Functions
   * @{
   */   
@@ -216,6 +234,12 @@ void SystemClock_Config(void);
  **********************************************************/
 void BSP_MiscOverallInit(uint8_t nbDevices)
 {
+
+	/* Init fan struct */
+	memset( &fanE1, 0x0, sizeof(tFanStruct));
+	memset( &fanE2, 0x0, sizeof(tFanStruct));
+	memset( &fanE3, 0x0, sizeof(tFanStruct));
+
    /* STM32xx HAL library initialization */
   HAL_Init();
   
@@ -520,32 +544,41 @@ void BSP_MiscFanInit(uint8_t id)
   GPIO_InitTypeDef GPIO_InitStruct;
   uint32_t gpioPin;
   GPIO_TypeDef* gpioPort;
+  tFanStruct* pfan;
 
   switch (id)
   {
     case 0:
-      /* Configure E1 Fan pin */
-      gpioPin = BSP_FAN_E1_PIN;
-      gpioPort = BSP_FAN_E1_PORT;    
+    	/* Configure E1 Fan pin */
+    	gpioPin  = BSP_FAN_E1_PIN;
+    	gpioPort = BSP_FAN_E1_PORT;
+    	pfan = &fanE1;
       break;
     case 1:
       /* Configure E2 Fan pin */
-      gpioPin = BSP_FAN_E2_PIN;
-      gpioPort = BSP_FAN_E2_PORT;    
+    	gpioPin  = BSP_FAN_E2_PIN;
+    	gpioPort = BSP_FAN_E2_PORT;
+    	pfan = &fanE2;
       break;      
     case 2:
       /* Configure E3 Fan pin */
-      gpioPin = BSP_FAN_E3_PIN;
-      gpioPort = BSP_FAN_E3_PORT;      
+    	gpioPin  = BSP_FAN_E3_PIN;
+    	gpioPort = BSP_FAN_E3_PORT;
+    	pfan = &fanE3;
       break;   
     default:
       return;
   }
+
   GPIO_InitStruct.Pin = gpioPin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_MEDIUM;
-  HAL_GPIO_Init(gpioPort, &GPIO_InitStruct);      
+  HAL_GPIO_Init(gpioPort, &GPIO_InitStruct);
+
+  pfan->gpioPin  = gpioPin;
+  pfan->gpioPort = gpioPort;
+  pfan->activePwm   = 0;
 }
 
 /******************************************************//**
@@ -556,43 +589,120 @@ void BSP_MiscFanInit(uint8_t id)
  **********************************************************/
 void BSP_MiscFanSetSpeed(uint8_t id,uint8_t speed)
 {
- uint32_t gpioPin;
- GPIO_TypeDef* gpioPort;
+	tFanStruct* pfan;
 
 #ifndef MARLIN
- speed = 255; // Force speed to never stop the fan !!!
+	speed = 255; // Force speed to never stop the fan !!!
 #endif 
  
-  switch (id)
-  {
-    case 0:
-      /* Configure E1 Fan pin */
-      gpioPin = BSP_FAN_E1_PIN;
-      gpioPort = BSP_FAN_E1_PORT;    
-      break;
-    case 1:
-      /* Configure E2 Fan pin */
-      gpioPin = BSP_FAN_E2_PIN;
-      gpioPort = BSP_FAN_E2_PORT;    
-      break;      
-    case 2:
-      /* Configure E3 Fan pin */
-      gpioPin = BSP_FAN_E3_PIN;
-      gpioPort = BSP_FAN_E3_PORT;      
-      break;   
-    default:
-      return;
-  }  
+	if ( (speed>0) && (speed<50) )
+		speed = 50;
+
+	if( id == 0)
+    	/* Configure E1 Fan */
+    	pfan = &fanE1;
+	else if ( id == 1)
+    	/* Configure E2 Fan */
+    	pfan = &fanE2;
+	else if ( id == 2)
+		/* Configure E3 Fan */
+	    pfan = &fanE3;
+	else // Error case
+		return;
   
-  if (speed != 0)
+  if (speed == 0)
   {
-     HAL_GPIO_WritePin(gpioPort, gpioPin, GPIO_PIN_SET); 
+     HAL_GPIO_WritePin(pfan->gpioPort, pfan->gpioPin, GPIO_PIN_RESET);
+     pfan->activePwm = 0;
+     pfan->speed = speed;
   }
-  else
+  else if (speed == 255)
   {
-     HAL_GPIO_WritePin(gpioPort, gpioPin, GPIO_PIN_RESET); 
+     HAL_GPIO_WritePin(pfan->gpioPort, pfan->gpioPin, GPIO_PIN_SET);
+     pfan->activePwm = 0;
+     pfan->speed = speed;
+  }
+  /* Else : PWM */
+  else if( speed != pfan->speed)
+  {
+	  //HAL_GPIO_WritePin(pfan->gpioPort, pfan->gpioPin, GPIO_PIN_SET);
+	  pfan->speed = speed;
+	  pfan->up_val = (uint8_t)(speed / 5) - 1;
+	  pfan->count = pfan->up_val;
+	  pfan->level = 1; /* Up state*/
+	  pfan->activePwm = 1;
   }
 }
+
+
+/******************************************************//**
+ * @brief  Management of the Heats under IT
+ * @param[in] None
+ * @retval None
+ **********************************************************/
+void HAL_SYSTICK_Callback(void)
+{
+	if( fanE1.activePwm)
+	{
+		fanE1.count--;
+
+		if( !fanE1.count)
+		{
+			if(fanE1.level) /* signal level was high */
+			{
+				HAL_GPIO_WritePin(fanE1.gpioPort, fanE1.gpioPin, GPIO_PIN_RESET);
+				fanE1.count = 50 - fanE1.up_val;
+				fanE1.level = 0;
+			}
+			else/* signal level was low */
+			{
+				HAL_GPIO_WritePin(fanE1.gpioPort, fanE1.gpioPin, GPIO_PIN_SET);
+				fanE1.count = fanE1.up_val;
+				fanE1.level = 1;
+			}
+		}
+	}
+	else if( fanE2.activePwm)
+	{
+		fanE2.count--;
+		if( fanE2.count > 0)
+		{
+			if(fanE2.level) /* signal level was high */
+			{
+				HAL_GPIO_WritePin(fanE2.gpioPort, fanE2.gpioPin, GPIO_PIN_RESET);
+				fanE2.count = 100 - fanE2.up_val;
+				fanE2.level = 0;
+			}
+			else/* signal level was low */
+			{
+				HAL_GPIO_WritePin(fanE2.gpioPort, fanE2.gpioPin, GPIO_PIN_SET);
+				fanE2.count = fanE2.up_val;
+				fanE2.level = 1;
+			}
+		}
+	}
+	else if( fanE3.activePwm)
+	{
+		fanE3.count--;
+		if( fanE3.count > 0)
+		{
+			if(fanE3.level) /* signal level was high */
+			{
+				HAL_GPIO_WritePin(fanE3.gpioPort, fanE3.gpioPin, GPIO_PIN_RESET);
+				fanE3.count = 100 - fanE3.up_val;
+				fanE3.level = 0;
+			}
+			else/* signal level was low */
+			{
+				HAL_GPIO_WritePin(fanE3.gpioPort, fanE3.gpioPin, GPIO_PIN_SET);
+				fanE3.count = fanE3.up_val;
+				fanE3.level = 1;
+			}
+		}
+	}
+
+}
+
 
 /******************************************************//**
  * @brief  Initialisation of the Tick timer 
@@ -972,7 +1082,9 @@ void BSP_MiscHeatManualInit(uint8_t heatId)
     case 6:
       gpioPin = BSP_HEAT_BED3_PIN;
       gpioPort = BSP_HEAT_BED3_PORT; 
-      break;      
+      break;
+    default:
+    	return;
   }
   /* GPIO configuration */
     GPIO_InitStruct.Pin = gpioPin;
