@@ -1,5 +1,8 @@
+Intended as a port of the stm32F4 port of marlin from STMicro to be used on the monoprice mini delta.
+Since the MPMD is a stm32F0 based MCU, all code will need to be re-ported over to use the correct stm-cube libraries as well as updated pin mappings
 
-#Marlin4ST - v1.1.0
+
+#Marlin4MPMD - v1.1.0
 ------------------
 
 This repository proposes an example firmware for the ST Microelectronics 3D printer board STEVAL-3DP001V1.    
@@ -9,9 +12,10 @@ For other mechanics, you will need to update the file:  _stm32_cube\Middlewares\
 
 ###  Hardware and Software environment
   This example requires :
-  - a 3D printer board STEVAL-3DP001V1
-  - a 3D printer mechanic
+  - a monoprice mini delta printer with exposed SWD pins
 
+
+###  BELOW IS OUTDATED  ###
 ###  How to load the FW?
 A binary of the FW can be found under folder: _\stm32_cube\Binary_.
 To load it or to load your own binary into the 3D printer board, the easiest way is to use the mass storage interface provided by the embedded ST-LINK (simply drag and drop to disk). To use it, follow the procedure below:
