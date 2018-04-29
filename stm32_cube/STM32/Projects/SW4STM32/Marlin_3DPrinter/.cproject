@@ -20,29 +20,29 @@
 				<configuration artifactExtension="elf" artifactName="Marlin" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="fr.ac6.managedbuild.config.gnu.cross.exe.debug.$(DEBUG_CONFIG_UID) .2045969193.560069831" name="Debug" parent="fr.ac6.managedbuild.config.gnu.cross.exe.debug" postannouncebuildStep="Generate binary" postbuildStep="arm-none-eabi-objcopy -O binary &quot;${BuildArtifactFileBaseName}.elf&quot; &quot;${BuildArtifactFileBaseName}.bin&quot;">
 					<folderInfo id="fr.ac6.managedbuild.config.gnu.cross.exe.debug.$(DEBUG_CONFIG_UID) .2045969193.560069831." name="/" resourcePath="">
 						<toolChain id="fr.ac6.managedbuild.toolchain.gnu.cross.exe.debug.1477457879" name="Ac6 STM32 MCU GCC" superClass="fr.ac6.managedbuild.toolchain.gnu.cross.exe.debug">
-							<option id="fr.ac6.managedbuild.option.gnu.cross.prefix.1977522101" name="Prefix" superClass="fr.ac6.managedbuild.option.gnu.cross.prefix" value="arm-none-eabi-" valueType="string"/>
-							<option id="fr.ac6.managedbuild.option.gnu.cross.mcu.2019391894" name="Mcu" superClass="fr.ac6.managedbuild.option.gnu.cross.mcu" value="STM32F401VETx" valueType="string"/>
-							<option id="fr.ac6.managedbuild.option.gnu.cross.board.1255011244" name="Board" superClass="fr.ac6.managedbuild.option.gnu.cross.board" value="3D_Printer_V1" valueType="string"/>
-							<option id="fr.ac6.managedbuild.option.gnu.cross.instructionSet.1112419484" name="Instruction Set" superClass="fr.ac6.managedbuild.option.gnu.cross.instructionSet" value="fr.ac6.managedbuild.option.gnu.cross.instructionSet.thumbII" valueType="enumerated"/>
-							<option id="fr.ac6.managedbuild.option.gnu.cross.fpu.1293315846" name="Floating point hardware" superClass="fr.ac6.managedbuild.option.gnu.cross.fpu" value="fr.ac6.managedbuild.option.gnu.cross.fpu.fpv4-sp-d16" valueType="enumerated"/>
-							<option id="fr.ac6.managedbuild.option.gnu.cross.floatabi.308575155" name="Floating-point ABI" superClass="fr.ac6.managedbuild.option.gnu.cross.floatabi" value="fr.ac6.managedbuild.option.gnu.cross.floatabi.hard" valueType="enumerated"/>
+							<option id="fr.ac6.managedbuild.option.gnu.cross.prefix.1977522101" name="Prefix" superClass="fr.ac6.managedbuild.option.gnu.cross.prefix" useByScannerDiscovery="false" value="arm-none-eabi-" valueType="string"/>
+							<option id="fr.ac6.managedbuild.option.gnu.cross.mcu.2019391894" name="Mcu" superClass="fr.ac6.managedbuild.option.gnu.cross.mcu" useByScannerDiscovery="false" value="STM32F401VETx" valueType="string"/>
+							<option id="fr.ac6.managedbuild.option.gnu.cross.board.1255011244" name="Board" superClass="fr.ac6.managedbuild.option.gnu.cross.board" useByScannerDiscovery="false" value="3D_Printer_V1" valueType="string"/>
+							<option id="fr.ac6.managedbuild.option.gnu.cross.instructionSet.1112419484" name="Instruction Set" superClass="fr.ac6.managedbuild.option.gnu.cross.instructionSet" useByScannerDiscovery="false" value="fr.ac6.managedbuild.option.gnu.cross.instructionSet.thumbII" valueType="enumerated"/>
+							<option id="fr.ac6.managedbuild.option.gnu.cross.fpu.1293315846" name="Floating point hardware" superClass="fr.ac6.managedbuild.option.gnu.cross.fpu" useByScannerDiscovery="false" value="fr.ac6.managedbuild.option.gnu.cross.fpu.fpv4-sp-d16" valueType="enumerated"/>
+							<option id="fr.ac6.managedbuild.option.gnu.cross.floatabi.308575155" name="Floating-point ABI" superClass="fr.ac6.managedbuild.option.gnu.cross.floatabi" useByScannerDiscovery="false" value="fr.ac6.managedbuild.option.gnu.cross.floatabi.hard" valueType="enumerated"/>
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="fr.ac6.managedbuild.targetPlatform.gnu.cross.1760381169" isAbstract="false" osList="all" superClass="fr.ac6.managedbuild.targetPlatform.gnu.cross"/>
-							<builder buildPath="${workspace_loc:/ $(PROJECT_NAME)}/Debug" id="fr.ac6.managedbuild.builder.gnu.cross.1771646377" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" stopOnErr="true" superClass="fr.ac6.managedbuild.builder.gnu.cross"/>
+							<builder buildPath="${workspace_loc:/ $(PROJECT_NAME)}/Debug" id="fr.ac6.managedbuild.builder.gnu.cross.1771646377" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" stopOnErr="true" superClass="fr.ac6.managedbuild.builder.gnu.cross"/>
 							<tool id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.2146338052" name="MCU GCC Compiler" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler">
 								<option defaultValue="gnu.c.optimization.level.none" id="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level.114895637" name="Optimization Level" superClass="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" value="fr.ac6.managedbuild.gnu.c.optimization.level.debug" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.906751099" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.1906455268" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../Inc"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/BSP/Components/Common"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/STM32F4xx_HAL_Driver/Inc"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/CMSIS/Include"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/BSP/STM32F4xx-3dPrinter"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/BSP/MotorControl"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/BSP/Components/l6474"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../FatFs/src"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../../Marlin"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Projects/Inc"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/BSP/Components/Common"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/STM32F4xx_HAL_Driver/Inc"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/CMSIS/Include"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/CMSIS/Device/ST/STM32F4xx/Include"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/BSP/STM32F4xx-3dPrinter"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/BSP/MotorControl"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/BSP/Components/l6474"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/FatFs/src"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/Marlin"/>
 								</option>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.725618142" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="USE_HAL_DRIVER"/>
@@ -68,17 +68,17 @@
 								<option id="gnu.cpp.compiler.option.optimization.level.300604666" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.debugging.level.663696842" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1106439148" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/../Inc&quot;"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/BSP/Components/Common"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/STM32F4xx_HAL_Driver/Inc"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/CMSIS/Include"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/BSP/STM32F4xx-3dPrinter"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/BSP/MotorControl"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/BSP/Components/l6474"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../FatFs/src"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../../Marlin"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Projects/Inc"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/BSP/Components/Common"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/STM32F4xx_HAL_Driver/Inc"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/CMSIS/Include"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/CMSIS/Device/ST/STM32F4xx/Include"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/BSP/STM32F4xx-3dPrinter"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/BSP/MotorControl"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/BSP/Components/l6474"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/FatFs/src"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/Marlin"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.1408105883" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="USE_HAL_DRIVER"/>
@@ -112,7 +112,7 @@
 							</tool>
 							<tool id="fr.ac6.managedbuild.tool.gnu.archiver.1861292597" name="MCU GCC Archiver" superClass="fr.ac6.managedbuild.tool.gnu.archiver"/>
 							<tool id="fr.ac6.managedbuild.tool.gnu.cross.assembler.1387124580" name="MCU GCC Assembler" superClass="fr.ac6.managedbuild.tool.gnu.cross.assembler">
-								<option id="gnu.both.asm.option.include.paths.923490266" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+								<option id="gnu.both.asm.option.include.paths.923490266" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value=""/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1126636029" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
@@ -156,17 +156,17 @@
 								<option defaultValue="gnu.c.optimization.level.none" id="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level.2080089409" name="Optimization Level" superClass="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" value="fr.ac6.managedbuild.gnu.c.optimization.level.more" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.1425360461" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.none" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.1087239444" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../Inc"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/BSP/Components/Common"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/STM32F4xx_HAL_Driver/Inc"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/CMSIS/Include"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/BSP/STM32F4xx-3dPrinter"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/BSP/MotorControl"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/BSP/Components/l6474"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../FatFs/src"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../../Marlin"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Projects/Inc"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/BSP/Components/Common"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/STM32F4xx_HAL_Driver/Inc"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/CMSIS/Include"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/CMSIS/Device/ST/STM32F4xx/Include"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/BSP/STM32F4xx-3dPrinter"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/BSP/MotorControl"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/BSP/Components/l6474"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/FatFs/src"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/Marlin"/>
 								</option>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1732307235" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="USE_HAL_DRIVER"/>
@@ -191,17 +191,17 @@
 								<option id="gnu.cpp.compiler.option.optimization.level.1887626617" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.more" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.debugging.level.1403710663" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.49327063" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/../Inc&quot;"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/BSP/Components/Common"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/STM32F4xx_HAL_Driver/Inc"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/CMSIS/Include"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/BSP/STM32F4xx-3dPrinter"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/BSP/MotorControl"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../Drivers/BSP/Components/l6474"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../FatFs/src"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../../../Marlin"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Projects/Inc"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/BSP/Components/Common"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/STM32F4xx_HAL_Driver/Inc"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/CMSIS/Include"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/CMSIS/Device/ST/STM32F4xx/Include"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/BSP/STM32F4xx-3dPrinter"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/BSP/MotorControl"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/Drivers/BSP/Components/l6474"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/STM32/FatFs/src"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/stm32_cube/Marlin"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.1638495028" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="USE_HAL_DRIVER"/>
@@ -258,28 +258,40 @@
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="refreshScope" versionNumber="2">
-		<configuration configurationName="Release">
+		<configuration configurationName="Debug">
 			<resource resourceType="PROJECT" workspacePath="/Marlin"/>
 		</configuration>
-		<configuration configurationName="Debug">
+		<configuration configurationName="Release">
 			<resource resourceType="PROJECT" workspacePath="/Marlin"/>
 		</configuration>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		<scannerConfigBuildInfo instanceId="fr.ac6.managedbuild.config.gnu.cross.exe.debug.$(DEBUG_CONFIG_UID);fr.ac6.managedbuild.config.gnu.cross.exe.debug.$(DEBUG_CONFIG_UID).;fr.ac6.managedbuild.tool.gnu.cross.c.compiler.$(DEBUG_TOOL_COMPILER_UID);cdt.managedbuild.tool.gnu.c.compiler.input.$(DEBUG_TOOL_COMPILER_INPUT_UID)">
 			<autodiscovery enabled="false" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="fr.ac6.managedbuild.config.gnu.cross.exe.debug.$(DEBUG_CONFIG_UID) ;fr.ac6.managedbuild.config.gnu.cross.exe.debug.$(DEBUG_CONFIG_UID).;fr.ac6.managedbuild.tool.gnu.cross.cpp.compiler.$(UID);cdt.managedbuild.tool.gnu.cpp.compiler.input.246641659">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="fr.ac6.managedbuild.config.gnu.cross.exe.debug.$(DEBUG_CONFIG_UID) ;fr.ac6.managedbuild.config.gnu.cross.exe.debug.$(DEBUG_CONFIG_UID).;fr.ac6.managedbuild.tool.gnu.cross.c.compiler.$(DEBUG_TOOL_COMPILER_UID);cdt.managedbuild.tool.gnu.c.compiler.input.$(DEBUG_TOOL_COMPILER_INPUT_UID)">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="fr.ac6.managedbuild.config.gnu.cross.exe.debug.$(DEBUG_CONFIG_UID) ;fr.ac6.managedbuild.config.gnu.cross.exe.debug.$(DEBUG_CONFIG_UID).;fr.ac6.managedbuild.tool.gnu.cross.cpp.compiler.$(UID);cdt.managedbuild.tool.gnu.cpp.compiler.input.246641659">
+		<scannerConfigBuildInfo instanceId="fr.ac6.managedbuild.config.gnu.cross.exe.debug.$(DEBUG_CONFIG_UID) .2045969193.560069831;fr.ac6.managedbuild.config.gnu.cross.exe.debug.$(DEBUG_CONFIG_UID) .2045969193.560069831.;fr.ac6.managedbuild.tool.gnu.cross.c.compiler.2146338052;fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c.2038324150">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="fr.ac6.managedbuild.config.gnu.cross.exe.debug.$(DEBUG_CONFIG_UID) .2045969193.560069831;fr.ac6.managedbuild.config.gnu.cross.exe.debug.$(DEBUG_CONFIG_UID) .2045969193.560069831.;fr.ac6.managedbuild.tool.gnu.cross.cpp.compiler.638205309;cdt.managedbuild.tool.gnu.cpp.compiler.input.1455114266">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="fr.ac6.managedbuild.config.gnu.cross.exe.release.$(RELEASE_CONFIG_UID);fr.ac6.managedbuild.config.gnu.cross.exe.release.$(RELEASE_CONFIG_UID).;fr.ac6.managedbuild.tool.gnu.cross.c.compiler.$(RELEASE_TOOL_COMPILER_UID);cdt.managedbuild.tool.gnu.c.compiler.input.$(RELEASE_TOOL_COMPILER_INPUT_UID)">
 			<autodiscovery enabled="false" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="fr.ac6.managedbuild.config.gnu.cross.exe.debug.$(DEBUG_CONFIG_UID) .2045969193.560069831;fr.ac6.managedbuild.config.gnu.cross.exe.debug.$(DEBUG_CONFIG_UID) .2045969193.560069831.;fr.ac6.managedbuild.tool.gnu.cross.c.compiler.2146338052;cdt.managedbuild.tool.gnu.c.compiler.input.729592602">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="fr.ac6.managedbuild.config.gnu.cross.exe.debug.$(DEBUG_CONFIG_UID) .2045969193.560069831;fr.ac6.managedbuild.config.gnu.cross.exe.debug.$(DEBUG_CONFIG_UID) .2045969193.560069831.;fr.ac6.managedbuild.tool.gnu.cross.cpp.compiler.638205309;fr.ac6.managedbuild.tool.gnu.cross.cpp.compiler.input.cpp.359351322">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
 	</storageModule>
-	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 </cproject>
