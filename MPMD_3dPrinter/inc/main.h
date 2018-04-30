@@ -41,7 +41,13 @@
 #include "stm32f0xx_hal.h"
 #include "stm32f0xx_mpmd.h"
 #include "stdio.h"
-
+#include "stm32f0xx_3dprinter_misc.h"
+#include "stm32f0xx_3dprinter_motor.h"
+#include "stm32f0xx_3dprinter_uart.h"
+#include "stm32f0xx_3dprinter_adc.h"
+//#include "stm32f0xx_3dprinter_sd.h"
+//#include "stm32f0xx_3dprinter_wifi.h"
+#include "motorcontrol.h"
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* User can use this section to tailor UARTx/UARTx instance used and associated

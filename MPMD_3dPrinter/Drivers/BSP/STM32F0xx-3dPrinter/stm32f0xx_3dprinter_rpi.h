@@ -1,8 +1,10 @@
-/**
+/** 
   ******************************************************************************
-  * @file    stm32f0xx_it.h 
-  * @author  MCD Application Team
-  * @brief   This file contains the headers of the interrupt handlers.
+  * @file    stm32f0xx_3dPrinter_rpi.h
+  * @author  IPC Rennes
+  * @version V1.0.0
+  * @date    April 13, 2016
+  * @brief   Header for Raspberry Pi Mngt functions of 3D Printer BSP driver
   ******************************************************************************
   * @attention
   *
@@ -30,55 +32,45 @@
   * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   *
-  ******************************************************************************
-  */
-
+  ******************************************************************************  
+  */ 
+  
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32F0xx_IT_H
-#define __STM32F0xx_IT_H
+#ifndef __stm32f0XX_3DPRINTER_RPI_H
+#define __stm32f0XX_3DPRINTER_RPI_H
 
 #ifdef __cplusplus
  extern "C" {
-#endif 
+#endif
 
-/* Includes ------------------------------------------------------------------*/
-#include "main.h"
-/* Exported types ------------------------------------------------------------*/
-/* Exported constants --------------------------------------------------------*/
-/* Exported macro ------------------------------------------------------------*/
-/* Exported functions ------------------------------------------------------- */
+   /* Includes ---------------------------------------------------------------*/
+#include "stm32f0xx_hal.h"
+   
+/* Exported macros -----------------------------------------------------------*/
 
-void NMI_Handler(void);
-void HardFault_Handler(void);
-void SVC_Handler(void);
-void PendSV_Handler(void);
-void SysTick_Handler(void);
+/* Definition for RPi resources *********************************************/
+//TODO: remove RPI stuff since there's no connection pin available
+/// GPIO Pin used for the Raspberry Pi ready state pin
+#define BSP_RPI_READY_PIN               (GPIO_PIN_0)
+/// GPIO Port used for the Raspberry Pi ready state pin
+#define BSP_RPI_READY_PORT              (GPIOE)
 
-//void EXTI0_IRQHandler(void);
-//void EXTI1_IRQHandler(void);
-void EXTI0_1_IRQHandler(void);
 
-void TIM1_CC_IRQHandler(void);
-void TIM2_IRQHandler(void);
-void TIM3_IRQHandler(void);
-void TIM4_IRQHandler(void);
-void TIM6_IRQHandler(void);
-void TIM1_BRK_UP_TRG_COM_IRQHandler(void);
-void TIM1_UP_TIM10_IRQHandler(void);
-void TIM1_UP_TIM10_IRQHandler(void);
-void BSP_UART_DEBUG_IRQHandler(void);
-//void BSP_WIFI_UART_IRQHandler(void);
-void BSP_DMA_IRQHandler(void);
-void BSP_ADC_IRQHandler(void);
-void DMA1_CH1_IRQHandler(void);
-void DMA1_CH2_3_IRQHandler(void);
-//void SDIO_IRQHandler(void);
-//void BSP_WIFI_UART_DMA_TX_IRQHandler(void);
-//void BSP_WIFI_UART_DMA_RX_IRQHandler(void);
+   
+/* Exported types --- --------------------------------------------------------*/
+
+/* Exported variables  --------------------------------------------------------*/
+
+/* Exported functions --------------------------------------------------------*/
+void BSP_RPiGpioInit(void);
+void BSP_RPiWaitUntilReady(void);
+
+
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __STM32F0xx_IT_H */
+#endif /* __stm32f0XX_3DPRINTER_RPI_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

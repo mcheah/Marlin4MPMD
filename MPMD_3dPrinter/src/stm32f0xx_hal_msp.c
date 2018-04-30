@@ -45,7 +45,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-//#include "Marlin_export.h"
+#include "Marlin_export.h"
 
 /** @defgroup MSP_module
   * @brief HAL MSP module.
@@ -111,7 +111,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
     GPIO_InitStruct.Pin       = SPIx_SCK_PIN;
     GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull      = GPIO_NOPULL;
-    GPIO_InitStruct.Speed     = GPIO_SPEED_MEDIUM;
+    GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_MEDIUM;
     GPIO_InitStruct.Alternate = SPIx_SCK_AF;
     
     HAL_GPIO_Init(SPIx_SCK_GPIO_PORT, &GPIO_InitStruct);
@@ -143,7 +143,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
     GPIO_InitStruct.Pin       = SPI_USER_SCK_PIN;
     GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull      = GPIO_NOPULL;
-    GPIO_InitStruct.Speed     = GPIO_SPEED_MEDIUM;
+    GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_MEDIUM;
     GPIO_InitStruct.Alternate = SPI_USER_SCK_AF;
     
     HAL_GPIO_Init(SPI_USER_SCK_GPIO_PORT, &GPIO_InitStruct);
@@ -226,7 +226,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     GPIO_InitStruct.Pin = BSP_UART_DEBUG_TX_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = BSP_UART_DEBUG_TX_AF;
     HAL_GPIO_Init(BSP_UART_DEBUG_TX_PORT, &GPIO_InitStruct);
 
@@ -234,7 +234,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     GPIO_InitStruct.Pin = BSP_UART_DEBUG_RX_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = BSP_UART_DEBUG_RX_AF;
     HAL_GPIO_Init(BSP_UART_DEBUG_RX_PORT, &GPIO_InitStruct);
     
@@ -242,98 +242,99 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     HAL_NVIC_SetPriority(BSP_UART_DEBUG_IRQn, 3, 0);
     HAL_NVIC_EnableIRQ(BSP_UART_DEBUG_IRQn);    
   }
-  else  if(huart->Instance == BSP_WIFI_UART)
-  {
-    DMA_HandleTypeDef *pRxDmaHandle = &(gBspWifiData.rxDmaHandle);
-    DMA_HandleTypeDef *pTxDmaHandle = &(gBspWifiData.txDmaHandle);
-    
-    /* Peripheral clock enable */
-    __BSP_WIFI_UART_CLK_ENABLE();
-  
-    /* Enable GPIO TX/RX clock */
-    __BSP_WIFI_UART_CTS_GPIO_CLK_ENABLE();
-    __BSP_WIFI_UART_RTS_GPIO_CLK_ENABLE();
-    __BSP_WIFI_UART_TX_GPIO_CLK_ENABLE();
-    __BSP_WIFI_UART_RX_GPIO_CLK_ENABLE();
-    __BSP_WIFI_UART_DMA_CLK_ENABLE();
-    
-    /* USART CTS GPIO Configuration */
-    GPIO_InitStruct.Pin = BSP_WIFI_UART_CTS_PIN;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
-    GPIO_InitStruct.Alternate = BSP_WIFI_UART_CTS_AF;
-    HAL_GPIO_Init(BSP_WIFI_UART_CTS_PORT, &GPIO_InitStruct);    
-    
-    /* USART RTS GPIO Configuration */
-    GPIO_InitStruct.Pin = BSP_WIFI_UART_RTS_PIN;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
-    GPIO_InitStruct.Alternate = BSP_WIFI_UART_RTS_AF;
-    HAL_GPIO_Init(BSP_WIFI_UART_RTS_PORT, &GPIO_InitStruct);    
-    
-    /* USART TX GPIO Configuration */
-    GPIO_InitStruct.Pin = BSP_WIFI_UART_TX_PIN;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
-    GPIO_InitStruct.Alternate = BSP_WIFI_UART_TX_AF;
-    HAL_GPIO_Init(BSP_WIFI_UART_TX_PORT, &GPIO_InitStruct);
-
-    /* USART RX GPIO Configuration     */    
-    GPIO_InitStruct.Pin = BSP_WIFI_UART_RX_PIN;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
-    GPIO_InitStruct.Alternate = BSP_WIFI_UART_RX_AF;
-    HAL_GPIO_Init(BSP_WIFI_UART_RX_PORT, &GPIO_InitStruct);
-
-    pRxDmaHandle->Instance = BSP_WIFI_UART_DMA_RX;
-    pRxDmaHandle->Init.Channel = BSP_WIFI_UART_DMA_RX_CHANNEL;
-    pRxDmaHandle->Init.Direction = DMA_PERIPH_TO_MEMORY;
-    pRxDmaHandle->Init.PeriphInc = DMA_PINC_DISABLE;
-    pRxDmaHandle->Init.MemInc = DMA_MINC_ENABLE;
-    pRxDmaHandle->Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-    pRxDmaHandle->Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
-    pRxDmaHandle->Init.Mode = DMA_NORMAL;
-    pRxDmaHandle->Init.Priority = DMA_PRIORITY_HIGH;
-    pRxDmaHandle->Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-    pRxDmaHandle->Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
-    pRxDmaHandle->Init.MemBurst            = DMA_MBURST_INC4;
-    pRxDmaHandle->Init.PeriphBurst         = DMA_PBURST_INC4;     
-    HAL_DMA_Init(pRxDmaHandle);
-
-    __HAL_LINKDMA(huart, hdmarx, gBspWifiData.rxDmaHandle);
-    
-    pTxDmaHandle->Instance = BSP_WIFI_UART_DMA_TX;
-    pTxDmaHandle->Init.Channel = BSP_WIFI_UART_DMA_TX_CHANNEL;
-    pTxDmaHandle->Init.Direction = DMA_MEMORY_TO_PERIPH;
-    pTxDmaHandle->Init.PeriphInc = DMA_PINC_DISABLE;
-    pTxDmaHandle->Init.MemInc = DMA_MINC_ENABLE;
-    pTxDmaHandle->Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-    pTxDmaHandle->Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
-    pTxDmaHandle->Init.Mode = DMA_NORMAL;
-    pTxDmaHandle->Init.Priority = DMA_PRIORITY_LOW;
-    pTxDmaHandle->Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-    pTxDmaHandle->Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
-    pTxDmaHandle->Init.MemBurst            = DMA_MBURST_INC4;
-    pTxDmaHandle->Init.PeriphBurst         = DMA_PBURST_INC4;
-    HAL_DMA_Init(pTxDmaHandle);
-
-    __HAL_LINKDMA(huart, hdmatx, gBspWifiData.txDmaHandle);
-
-    HAL_NVIC_SetPriority(BSP_WIFI_UART_DMA_TX_IRQn, 4, 1);
-    HAL_NVIC_EnableIRQ(BSP_WIFI_UART_DMA_TX_IRQn);
-      
-    /* NVIC configuration for DMA transfer complete interrupt (USARTx_RX) */
-    HAL_NVIC_SetPriority(BSP_WIFI_UART_DMA_RX_IRQn, 4, 0);   
-    HAL_NVIC_EnableIRQ(BSP_WIFI_UART_DMA_RX_IRQn);
-    
-    /* Configure the NVIC for UART */
-    HAL_NVIC_SetPriority(BSP_WIFI_UART_IRQn, 4, 1);
-    HAL_NVIC_EnableIRQ(BSP_WIFI_UART_IRQn);    
-  }
+  //TODO: removing wifi stuff for now
+//  else  if(huart->Instance == BSP_WIFI_UART)
+//  {
+//    DMA_HandleTypeDef *pRxDmaHandle = &(gBspWifiData.rxDmaHandle);
+//    DMA_HandleTypeDef *pTxDmaHandle = &(gBspWifiData.txDmaHandle);
+//
+//    /* Peripheral clock enable */
+//    __BSP_WIFI_UART_CLK_ENABLE();
+//
+//    /* Enable GPIO TX/RX clock */
+//    __BSP_WIFI_UART_CTS_GPIO_CLK_ENABLE();
+//    __BSP_WIFI_UART_RTS_GPIO_CLK_ENABLE();
+//    __BSP_WIFI_UART_TX_GPIO_CLK_ENABLE();
+//    __BSP_WIFI_UART_RX_GPIO_CLK_ENABLE();
+//    __BSP_WIFI_UART_DMA_CLK_ENABLE();
+//
+//    /* USART CTS GPIO Configuration */
+//    GPIO_InitStruct.Pin = BSP_WIFI_UART_CTS_PIN;
+//    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+//    GPIO_InitStruct.Pull = GPIO_NOPULL;
+//    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+//    GPIO_InitStruct.Alternate = BSP_WIFI_UART_CTS_AF;
+//    HAL_GPIO_Init(BSP_WIFI_UART_CTS_PORT, &GPIO_InitStruct);
+//
+//    /* USART RTS GPIO Configuration */
+//    GPIO_InitStruct.Pin = BSP_WIFI_UART_RTS_PIN;
+//    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+//    GPIO_InitStruct.Pull = GPIO_NOPULL;
+//    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+//    GPIO_InitStruct.Alternate = BSP_WIFI_UART_RTS_AF;
+//    HAL_GPIO_Init(BSP_WIFI_UART_RTS_PORT, &GPIO_InitStruct);
+//
+//    /* USART TX GPIO Configuration */
+//    GPIO_InitStruct.Pin = BSP_WIFI_UART_TX_PIN;
+//    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+//    GPIO_InitStruct.Pull = GPIO_NOPULL;
+//    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+//    GPIO_InitStruct.Alternate = BSP_WIFI_UART_TX_AF;
+//    HAL_GPIO_Init(BSP_WIFI_UART_TX_PORT, &GPIO_InitStruct);
+//
+//    /* USART RX GPIO Configuration     */
+//    GPIO_InitStruct.Pin = BSP_WIFI_UART_RX_PIN;
+//    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+//    GPIO_InitStruct.Pull = GPIO_NOPULL;
+//    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+//    GPIO_InitStruct.Alternate = BSP_WIFI_UART_RX_AF;
+//    HAL_GPIO_Init(BSP_WIFI_UART_RX_PORT, &GPIO_InitStruct);
+//
+//    pRxDmaHandle->Instance = BSP_WIFI_UART_DMA_RX;
+//    pRxDmaHandle->Init.Channel = BSP_WIFI_UART_DMA_RX_CHANNEL;
+//    pRxDmaHandle->Init.Direction = DMA_PERIPH_TO_MEMORY;
+//    pRxDmaHandle->Init.PeriphInc = DMA_PINC_DISABLE;
+//    pRxDmaHandle->Init.MemInc = DMA_MINC_ENABLE;
+//    pRxDmaHandle->Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+//    pRxDmaHandle->Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+//    pRxDmaHandle->Init.Mode = DMA_NORMAL;
+//    pRxDmaHandle->Init.Priority = DMA_PRIORITY_HIGH;
+//    pRxDmaHandle->Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+//    pRxDmaHandle->Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
+//    pRxDmaHandle->Init.MemBurst            = DMA_MBURST_INC4;
+//    pRxDmaHandle->Init.PeriphBurst         = DMA_PBURST_INC4;
+//    HAL_DMA_Init(pRxDmaHandle);
+//
+//    __HAL_LINKDMA(huart, hdmarx, gBspWifiData.rxDmaHandle);
+//
+//    pTxDmaHandle->Instance = BSP_WIFI_UART_DMA_TX;
+//    pTxDmaHandle->Init.Channel = BSP_WIFI_UART_DMA_TX_CHANNEL;
+//    pTxDmaHandle->Init.Direction = DMA_MEMORY_TO_PERIPH;
+//    pTxDmaHandle->Init.PeriphInc = DMA_PINC_DISABLE;
+//    pTxDmaHandle->Init.MemInc = DMA_MINC_ENABLE;
+//    pTxDmaHandle->Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+//    pTxDmaHandle->Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+//    pTxDmaHandle->Init.Mode = DMA_NORMAL;
+//    pTxDmaHandle->Init.Priority = DMA_PRIORITY_LOW;
+//    pTxDmaHandle->Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+//    pTxDmaHandle->Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
+//    pTxDmaHandle->Init.MemBurst            = DMA_MBURST_INC4;
+//    pTxDmaHandle->Init.PeriphBurst         = DMA_PBURST_INC4;
+//    HAL_DMA_Init(pTxDmaHandle);
+//
+//    __HAL_LINKDMA(huart, hdmatx, gBspWifiData.txDmaHandle);
+//
+//    HAL_NVIC_SetPriority(BSP_WIFI_UART_DMA_TX_IRQn, 4, 1);
+//    HAL_NVIC_EnableIRQ(BSP_WIFI_UART_DMA_TX_IRQn);
+//
+//    /* NVIC configuration for DMA transfer complete interrupt (USARTx_RX) */
+//    HAL_NVIC_SetPriority(BSP_WIFI_UART_DMA_RX_IRQn, 4, 0);
+//    HAL_NVIC_EnableIRQ(BSP_WIFI_UART_DMA_RX_IRQn);
+//
+//    /* Configure the NVIC for UART */
+//    HAL_NVIC_SetPriority(BSP_WIFI_UART_IRQn, 4, 1);
+//    HAL_NVIC_EnableIRQ(BSP_WIFI_UART_IRQn);
+//  }
 }
 
 /**
@@ -362,31 +363,32 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
     /* Peripheral clock disable */
     __BSP_UART_DEBUG_CLK_DISABLE();
   }
-  else  if(huart->Instance== BSP_WIFI_UART)
-  {
-   /* Reset peripherals */
-    __BSP_WIFI_UART_FORCE_RESET();
-    __BSP_WIFI_UART_RELEASE_RESET();
-
-    /* Disable peripherals and GPIO Clocks */
-    HAL_GPIO_DeInit(BSP_WIFI_UART_CTS_PORT, BSP_WIFI_UART_CTS_PIN);
-    HAL_GPIO_DeInit(BSP_WIFI_UART_RTS_PORT, BSP_WIFI_UART_RTS_PIN);
-    HAL_GPIO_DeInit(BSP_WIFI_UART_TX_PORT, BSP_WIFI_UART_TX_PIN);
-    HAL_GPIO_DeInit(BSP_WIFI_UART_RX_PORT, BSP_WIFI_UART_RX_PIN);
-    
-    /* Disable the NVIC for UART */
-    HAL_NVIC_DisableIRQ(BSP_WIFI_UART_IRQn);
-
-    /* Peripheral clock disable */
-    __BSP_WIFI_UART_CLK_DISABLE();
-    
-        /* Peripheral DMA DeInit*/
-    HAL_DMA_DeInit(huart->hdmarx);
-    HAL_DMA_DeInit(huart->hdmatx);
-    
-    HAL_NVIC_DisableIRQ(BSP_WIFI_UART_DMA_TX_IRQn);
-    HAL_NVIC_DisableIRQ(BSP_WIFI_UART_DMA_RX_IRQn);
-  }
+  //TODO: removing wifi for now
+//  else  if(huart->Instance== BSP_WIFI_UART)
+//  {
+//   /* Reset peripherals */
+//    __BSP_WIFI_UART_FORCE_RESET();
+//    __BSP_WIFI_UART_RELEASE_RESET();
+//
+//    /* Disable peripherals and GPIO Clocks */
+//    HAL_GPIO_DeInit(BSP_WIFI_UART_CTS_PORT, BSP_WIFI_UART_CTS_PIN);
+//    HAL_GPIO_DeInit(BSP_WIFI_UART_RTS_PORT, BSP_WIFI_UART_RTS_PIN);
+//    HAL_GPIO_DeInit(BSP_WIFI_UART_TX_PORT, BSP_WIFI_UART_TX_PIN);
+//    HAL_GPIO_DeInit(BSP_WIFI_UART_RX_PORT, BSP_WIFI_UART_RX_PIN);
+//
+//    /* Disable the NVIC for UART */
+//    HAL_NVIC_DisableIRQ(BSP_WIFI_UART_IRQn);
+//
+//    /* Peripheral clock disable */
+//    __BSP_WIFI_UART_CLK_DISABLE();
+//
+//        /* Peripheral DMA DeInit*/
+//    HAL_DMA_DeInit(huart->hdmarx);
+//    HAL_DMA_DeInit(huart->hdmatx);
+//
+//    HAL_NVIC_DisableIRQ(BSP_WIFI_UART_DMA_TX_IRQn);
+//    HAL_NVIC_DisableIRQ(BSP_WIFI_UART_DMA_RX_IRQn);
+//  }
 }
 
 
@@ -407,7 +409,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
     GPIO_InitStruct.Pin = BSP_MOTOR_CONTROL_BOARD_PWM_X_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = BSP_MOTOR_CONTROL_BOARD_AFx_TIMx_PWM_X;
     HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_PWM_X_PORT, &GPIO_InitStruct);
 
@@ -426,7 +428,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
     GPIO_InitStruct.Pin = BSP_MOTOR_CONTROL_BOARD_PWM_Y_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = BSP_MOTOR_CONTROL_BOARD_AFx_TIMx_PWM_Y;
     HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_PWM_Y_PORT, &GPIO_InitStruct);
     
@@ -446,7 +448,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
     GPIO_InitStruct.Pin = BSP_MOTOR_CONTROL_BOARD_PWM_Z_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = BSP_MOTOR_CONTROL_BOARD_AFx_TIMx_PWM_Z;
     HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_PWM_Z_PORT, &GPIO_InitStruct);    
     
@@ -465,7 +467,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
     GPIO_InitStruct.Pin = BSP_MOTOR_CONTROL_BOARD_PWM_E1_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = BSP_MOTOR_CONTROL_BOARD_AFx_TIMx_PWM_E1;
     HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_PWM_E1_PORT, &GPIO_InitStruct);    
     
@@ -484,7 +486,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
     GPIO_InitStruct.Pin = BSP_MOTOR_CONTROL_BOARD_PWM_E2_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = BSP_MOTOR_CONTROL_BOARD_AFx_TIMx_PWM_E2;
     HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_PWM_E2_PORT, &GPIO_InitStruct);    
     
@@ -503,7 +505,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
     GPIO_InitStruct.Pin = BSP_MOTOR_CONTROL_BOARD_PWM_E3_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = BSP_MOTOR_CONTROL_BOARD_AFx_TIMx_PWM_E3;
     HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_PWM_E3_PORT, &GPIO_InitStruct);    
     
@@ -522,7 +524,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
     GPIO_InitStruct.Pin = BSP_HEAT_BED1_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = BSP_MISC_AFx_TIMx_PWM_HEAT_BED;
     HAL_GPIO_Init(BSP_HEAT_BED1_PORT, &GPIO_InitStruct);    
   }
@@ -535,7 +537,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
     GPIO_InitStruct.Pin = BSP_HEAT_BED2_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = BSP_MISC_AFx_TIMx_PWM_HEAT_BED2;
     HAL_GPIO_Init(BSP_HEAT_BED2_PORT, &GPIO_InitStruct);    
   }
@@ -548,7 +550,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
     GPIO_InitStruct.Pin = BSP_HEAT_BED3_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = BSP_MISC_AFx_TIMx_PWM_HEAT_BED3;
     HAL_GPIO_Init(BSP_HEAT_BED3_PORT, &GPIO_InitStruct);    
   }
@@ -561,7 +563,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
     GPIO_InitStruct.Pin = BSP_HEAT_E1_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = BSP_MISC_AFx_TIMx_PWM_HEAT_E1;
     HAL_GPIO_Init(BSP_HEAT_E1_PORT, &GPIO_InitStruct);    
   }  
@@ -574,7 +576,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
     GPIO_InitStruct.Pin = BSP_HEAT_E2_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = BSP_MISC_AFx_TIMx_PWM_HEAT_E2;
     HAL_GPIO_Init(BSP_HEAT_E2_PORT, &GPIO_InitStruct);    
   }  
@@ -587,7 +589,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
     GPIO_InitStruct.Pin = BSP_HEAT_E3_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = BSP_MISC_AFx_TIMx_PWM_HEAT_E3;
     HAL_GPIO_Init(BSP_HEAT_E3_PORT, &GPIO_InitStruct);    
 
@@ -884,10 +886,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   {
     BSP_MotorControl_FlagInterruptHandler();
   }
-  if (GPIO_Pin == BSP_SD_DETECT_PIN)
-  {
-    BSP_SD_DetectIT();
-  }
+  //TODO: removing SD card stuff for now
+//  if (GPIO_Pin == BSP_SD_DETECT_PIN)
+//  {
+//    BSP_SD_DetectIT();
+//  }
  }
 
 
@@ -943,7 +946,8 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
 
     /* Peripheral DMA init*/
     pDmaHandle->Instance = BSP_DMA;
-    pDmaHandle->Init.Channel = BSP_DMA_CHANNEL;
+    //TODO: adjust DMA init options
+//    pDmaHandle->Init.Channel = BSP_DMA_CHANNEL;
     pDmaHandle->Init.Direction = DMA_PERIPH_TO_MEMORY;
     pDmaHandle->Init.PeriphInc = DMA_PINC_DISABLE;
     pDmaHandle->Init.MemInc = DMA_MINC_ENABLE;
@@ -951,7 +955,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     pDmaHandle->Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
     pDmaHandle->Init.Mode = DMA_CIRCULAR;
     pDmaHandle->Init.Priority = DMA_PRIORITY_LOW;
-    pDmaHandle->Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+//    pDmaHandle->Init.FIFOMode = DMA_FIFOMODE_DISABLE;
     HAL_DMA_DeInit(pDmaHandle);  
     HAL_DMA_Init(pDmaHandle);
 
@@ -1030,8 +1034,10 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
     HAL_GPIO_Init(BSP_MISC_I2C_SDA_PORT, &GPIO_InitStruct);
     
     /* I2C settings */
-    hi2c->Init.ClockSpeed = BSP_MISC_I2C_CLOCK_SPEED;
-    hi2c->Init.DutyCycle = I2C_DUTYCYCLE_2;
+    //TODO: adjust I2C init settings
+    hi2c->Init.Timing = BSP_MISC_I2C_CLOCK_SPEED;
+//    hi2c->Init.ClockSpeed = BSP_MISC_I2C_CLOCK_SPEED;
+//    hi2c->Init.DutyCycle = I2C_DUTYCYCLE_2;
     hi2c->Init.OwnAddress1 = 0;
     hi2c->Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
     hi2c->Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;

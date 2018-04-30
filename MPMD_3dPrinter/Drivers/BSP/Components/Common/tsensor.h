@@ -1,12 +1,15 @@
 /**
   ******************************************************************************
-  * @file    stm32f0xx_it.h 
+  * @file    tsensor.h
   * @author  MCD Application Team
-  * @brief   This file contains the headers of the interrupt handlers.
+  * @version V1.2.1
+  * @date    02-December-2014
+  * @brief   This header file contains the functions prototypes for the
+  *          Temperature Sensor driver. 
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2016 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT(c) 2014 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -34,51 +37,71 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32F0xx_IT_H
-#define __STM32F0xx_IT_H
+#ifndef __TSENSOR_H
+#define __TSENSOR_H
 
 #ifdef __cplusplus
  extern "C" {
-#endif 
+#endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
-/* Exported types ------------------------------------------------------------*/
-/* Exported constants --------------------------------------------------------*/
-/* Exported macro ------------------------------------------------------------*/
-/* Exported functions ------------------------------------------------------- */
+#include <stdint.h>
 
-void NMI_Handler(void);
-void HardFault_Handler(void);
-void SVC_Handler(void);
-void PendSV_Handler(void);
-void SysTick_Handler(void);
+/** @addtogroup BSP
+  * @{
+  */
 
-//void EXTI0_IRQHandler(void);
-//void EXTI1_IRQHandler(void);
-void EXTI0_1_IRQHandler(void);
+/** @addtogroup Components
+  * @{
+  */
+    
+/** @addtogroup TSENSOR
+  * @{
+  */
 
-void TIM1_CC_IRQHandler(void);
-void TIM2_IRQHandler(void);
-void TIM3_IRQHandler(void);
-void TIM4_IRQHandler(void);
-void TIM6_IRQHandler(void);
-void TIM1_BRK_UP_TRG_COM_IRQHandler(void);
-void TIM1_UP_TIM10_IRQHandler(void);
-void TIM1_UP_TIM10_IRQHandler(void);
-void BSP_UART_DEBUG_IRQHandler(void);
-//void BSP_WIFI_UART_IRQHandler(void);
-void BSP_DMA_IRQHandler(void);
-void BSP_ADC_IRQHandler(void);
-void DMA1_CH1_IRQHandler(void);
-void DMA1_CH2_3_IRQHandler(void);
-//void SDIO_IRQHandler(void);
-//void BSP_WIFI_UART_DMA_TX_IRQHandler(void);
-//void BSP_WIFI_UART_DMA_RX_IRQHandler(void);
+/** @defgroup TSENSOR_Exported_Types
+  * @{
+  */ 
+/** 
+  * @brief  Temperature Sensor driver structure definition  
+  */
+typedef struct
+{
+  uint8_t AlertMode;            /* Alert Mode Temperature out of range*/
+  uint8_t ConversionMode;       /* Continuous/One Shot Mode */
+  uint8_t ConversionResolution; /* Temperature Resolution */
+  uint8_t ConversionRate;       /* Number of measure per second */
+  uint8_t TemperatureLimitHigh; /* High Temperature Limit Range */
+  uint8_t TemperatureLimitLow;  /* Low Temperature Limit Range */
+}TSENSOR_InitTypeDef;
+
+typedef struct
+{  
+  void       (*Init)(uint16_t, TSENSOR_InitTypeDef *);
+  uint8_t    (*IsReady)(uint16_t, uint32_t);
+  uint8_t    (*ReadStatus)(uint16_t);
+  uint16_t   (*ReadTemp)(uint16_t); 
+}TSENSOR_DrvTypeDef;
+/**
+  * @}
+  */
+
+/**
+  * @}
+  */
+
+/**
+  * @}
+  */
+
+/**
+  * @}
+  */
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __STM32F0xx_IT_H */
+#endif /* __TSENSOR_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

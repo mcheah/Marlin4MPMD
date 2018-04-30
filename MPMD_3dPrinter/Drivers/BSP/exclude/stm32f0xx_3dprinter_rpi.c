@@ -1,8 +1,11 @@
 /**
   ******************************************************************************
-  * @file    stm32f0xx_it.h 
-  * @author  MCD Application Team
-  * @brief   This file contains the headers of the interrupt handlers.
+  * @file    stm32f0xx_3dPrinter_rpi.c
+  * @author  IPC Rennes
+  * @version V1.0.0
+  * @date    April 13, 2016
+  * @brief   Functions dedicated to Raspberry Pi mngt of 3D Printer BSP driver
+  * @note    (C) COPYRIGHT 2016 STMicroelectronics
   ******************************************************************************
   * @attention
   *
@@ -33,52 +36,65 @@
   ******************************************************************************
   */
 
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32F0xx_IT_H
-#define __STM32F0xx_IT_H
-
-#ifdef __cplusplus
- extern "C" {
-#endif 
-
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
-/* Exported types ------------------------------------------------------------*/
-/* Exported constants --------------------------------------------------------*/
-/* Exported macro ------------------------------------------------------------*/
-/* Exported functions ------------------------------------------------------- */
+#include "stm32f0xx_3dprinter_rpi.h"
+#include "stm32f0xx_3dprinter_misc.h"
+#include "string.h"
+#include <stdio.h>
 
-void NMI_Handler(void);
-void HardFault_Handler(void);
-void SVC_Handler(void);
-void PendSV_Handler(void);
-void SysTick_Handler(void);
+/* Private defines -----------------------------------------------------------*/
 
-//void EXTI0_IRQHandler(void);
-//void EXTI1_IRQHandler(void);
-void EXTI0_1_IRQHandler(void);
+/* Private constant ----------------------------------------------------------*/
 
-void TIM1_CC_IRQHandler(void);
-void TIM2_IRQHandler(void);
-void TIM3_IRQHandler(void);
-void TIM4_IRQHandler(void);
-void TIM6_IRQHandler(void);
-void TIM1_BRK_UP_TRG_COM_IRQHandler(void);
-void TIM1_UP_TIM10_IRQHandler(void);
-void TIM1_UP_TIM10_IRQHandler(void);
-void BSP_UART_DEBUG_IRQHandler(void);
-//void BSP_WIFI_UART_IRQHandler(void);
-void BSP_DMA_IRQHandler(void);
-void BSP_ADC_IRQHandler(void);
-void DMA1_CH1_IRQHandler(void);
-void DMA1_CH2_3_IRQHandler(void);
-//void SDIO_IRQHandler(void);
-//void BSP_WIFI_UART_DMA_TX_IRQHandler(void);
-//void BSP_WIFI_UART_DMA_RX_IRQHandler(void);
-#ifdef __cplusplus
+/* Global variables ---------------------------------------------------------*/
+
+/* Private function -----------------------------------------------------------*/
+
+
+/******************************************************//**
+ * @brief  Initialisation of the GPIOs for RPi mngt
+ * @param None
+ * @retval None
+ **********************************************************/
+void BSP_RPiGpioInit(void)
+{
+  GPIO_InitTypeDef GPIO_InitStruct;
+    
+  GPIO_InitStruct.Pin = BSP_RPI_READY_PIN;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+  HAL_GPIO_Init(BSP_RPI_READY_PORT, &GPIO_InitStruct);
+
+  HAL_Delay(100);
+
 }
-#endif
 
-#endif /* __STM32F0xx_IT_H */
+
+ /******************************************************//**
+ * @brief Wait until Raspberry Pi is ready
+ * @param None
+ * @retval None
+ **********************************************************/
+void BSP_RPiWaitUntilReady(void)
+{
+	uint8_t exit_loop = 0;
+
+	while( !exit_loop) {
+
+		if( GPIO_PIN_RESET == HAL_GPIO_ReadPin(BSP_RPI_READY_PORT, BSP_RPI_READY_PIN))
+		{
+			HAL_Delay(100);
+
+			if( GPIO_PIN_RESET == HAL_GPIO_ReadPin(BSP_RPI_READY_PORT, BSP_RPI_READY_PIN))
+				exit_loop = 1;
+		}
+	}
+
+	// Wait 5 second more
+	HAL_Delay(5000);
+}        
+ 
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+

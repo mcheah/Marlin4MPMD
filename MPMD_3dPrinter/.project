@@ -37,56 +37,6 @@
 			<type>1</type>
 			<locationURI>copy_PARENT12/FatFs/src/ff.c</locationURI>
 		</link>
-		<link>
-			<name>Drivers/CMSIS/system_stm32f4xx.c</name>
-			<type>1</type>
-			<locationURI>copy_PARENT1/Src/system_stm32f4xx.c</locationURI>
-		</link>
-		<link>
-			<name>Drivers/BSP/MotorControl/motorcontrol.c</name>
-			<type>1</type>
-			<locationURI>copy_PARENT12/Drivers/BSP/MotorControl/motorcontrol.c</locationURI>
-		</link>
-		<link>
-			<name>Drivers/BSP/STM32F4xx-3dPrinter/stm32f4xx_3dprinter_adc.c</name>
-			<type>1</type>
-			<locationURI>copy_PARENT12/Drivers/BSP/STM32F4xx-3dPrinter/stm32f4xx_3dprinter_adc.c</locationURI>
-		</link>
-		<link>
-			<name>Drivers/BSP/STM32F4xx-3dPrinter/stm32f4xx_3dprinter_misc.c</name>
-			<type>1</type>
-			<locationURI>copy_PARENT12/Drivers/BSP/STM32F4xx-3dPrinter/stm32f4xx_3dprinter_misc.c</locationURI>
-		</link>
-		<link>
-			<name>Drivers/BSP/STM32F4xx-3dPrinter/stm32f4xx_3dprinter_motor.c</name>
-			<type>1</type>
-			<locationURI>copy_PARENT12/Drivers/BSP/STM32F4xx-3dPrinter/stm32f4xx_3dprinter_motor.c</locationURI>
-		</link>
-		<link>
-			<name>Drivers/BSP/STM32F4xx-3dPrinter/stm32f4xx_3dprinter_rpi.c</name>
-			<type>1</type>
-			<locationURI>copy_PARENT12/Drivers/BSP/STM32F4xx-3dPrinter/stm32f4xx_3dprinter_rpi.c</locationURI>
-		</link>
-		<link>
-			<name>Drivers/BSP/STM32F4xx-3dPrinter/stm32f4xx_3dprinter_sd.c</name>
-			<type>1</type>
-			<locationURI>copy_PARENT12/Drivers/BSP/STM32F4xx-3dPrinter/stm32f4xx_3dprinter_sd.c</locationURI>
-		</link>
-		<link>
-			<name>Drivers/BSP/STM32F4xx-3dPrinter/stm32f4xx_3dprinter_uart.c</name>
-			<type>1</type>
-			<locationURI>copy_PARENT12/Drivers/BSP/STM32F4xx-3dPrinter/stm32f4xx_3dprinter_uart.c</locationURI>
-		</link>
-		<link>
-			<name>Drivers/BSP/STM32F4xx-3dPrinter/stm32f4xx_3dprinter_wifi.c</name>
-			<type>1</type>
-			<locationURI>copy_PARENT12/Drivers/BSP/STM32F4xx-3dPrinter/stm32f4xx_3dprinter_wifi.c</locationURI>
-		</link>
-		<link>
-			<name>Drivers/BSP/Components/l6474/l6474.c</name>
-			<type>1</type>
-			<locationURI>copy_PARENT12/Drivers/BSP/Components/l6474/l6474.c</locationURI>
-		</link>
 	</linkedResources>
 	<variableList>
 		<variable>
