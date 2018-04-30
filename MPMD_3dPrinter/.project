@@ -26,18 +26,6 @@
 		<nature>fr.ac6.mcu.ide.core.MCUProjectNature</nature>
 		<nature>fr.ac6.mcu.ide.core.MCUSingleCoreProjectNature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>FatFs/diskio.c</name>
-			<type>1</type>
-			<locationURI>copy_PARENT12/FatFs/src/diskio.c</locationURI>
-		</link>
-		<link>
-			<name>FatFs/ff.c</name>
-			<type>1</type>
-			<locationURI>copy_PARENT12/FatFs/src/ff.c</locationURI>
-		</link>
-	</linkedResources>
 	<variableList>
 		<variable>
 			<name>copy_PARENT</name>

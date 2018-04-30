@@ -50,6 +50,8 @@
 #define Z_MIN_PIN          13
 #define Z_MAX_PIN          -1
 
+#define Z_MIN_PROBE_PIN	   13
+
 #define Y2_STEP_PIN        -1
 #define Y2_DIR_PIN         -1
 #define Y2_ENABLE_PIN      -1

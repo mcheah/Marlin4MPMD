@@ -171,6 +171,9 @@
   #include "pins_SAINSMART_2IN1.h"
 #elif MB(STM_3DPRINT)
   #include "pins_STM_3DPRINT.h"
+#elif (MB(STM_MPMD))
+//TODO:update this to have a different pins file
+  #include "pins_STM_3DPRINT.h"
 #else
   #error "Unknown MOTHERBOARD value set in Configuration.h"
 #endif

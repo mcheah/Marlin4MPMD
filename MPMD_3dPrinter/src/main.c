@@ -9,13 +9,13 @@
 */
 //Includes
 #include "main.h"
-//#include "Marlin_export.h"
+#include "Marlin_export.h"
 
 int main(void)
 {
-//	setup();
+	setup();
 	for(;;)
 	{
-//		loop();
+		loop();
 	}
 }

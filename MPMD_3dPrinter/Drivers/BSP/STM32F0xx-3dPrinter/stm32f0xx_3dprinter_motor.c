@@ -165,7 +165,7 @@ void BSP_MotorControlBoard_GpioInit(uint8_t nbDevices)
   __GPIOB_CLK_ENABLE(); 
   __GPIOC_CLK_ENABLE();
   __GPIOD_CLK_ENABLE();
-  __GPIOE_CLK_ENABLE();
+  __GPIOF_CLK_ENABLE();
 
   /* Configure L6474 - DIR pin for device 0 -------------------------------*/
   GPIO_InitStruct.Pin = BSP_MOTOR_CONTROL_BOARD_DIR_X_PIN;

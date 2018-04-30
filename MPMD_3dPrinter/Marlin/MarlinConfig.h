@@ -40,13 +40,13 @@
 
 // STM32 Platform-specific includes
 #include "Marlin_export.h"
-#include "stm32f4xx_hal.h"
-#include "stm32f4xx_3dprinter_misc.h"
-#include "stm32f4xx_3dprinter_uart.h"
-#include "stm32f4xx_3dprinter_adc.h"
-#include "stm32f4xx_3dprinter_wifi.h"
+#include "stm32f0xx_hal.h"
+#include "stm32f0xx_3dprinter_misc.h"
+#include "stm32f0xx_3dprinter_uart.h"
+#include "stm32f0xx_3dprinter_adc.h"
+#include "stm32f0xx_3dprinter_wifi.h"
 #ifdef RPI_CONNECTED
-#include "stm32f4xx_3dprinter_rpi.h"
+#include "stm32f0xx_3dprinter_rpi.h"
 #endif
 #include "motorcontrol.h"
 #include "ff.h" /* for FATS and FIL*/
