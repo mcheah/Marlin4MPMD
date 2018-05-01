@@ -95,38 +95,38 @@ extern void BSP_MotorControl_FlagInterruptHandler(void);
 void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
 {
   GPIO_InitTypeDef  GPIO_InitStruct;
-  
+
   if(hspi->Instance == SPIx)
-  {  
+  {
     /*##-1- Enable peripherals and GPIO Clocks #################################*/
     /* Enable GPIO TX/RX clock */
     SPIx_SCK_GPIO_CLK_ENABLE();
     SPIx_MISO_GPIO_CLK_ENABLE();
     SPIx_MOSI_GPIO_CLK_ENABLE();
     /* Enable SPI clock */
-    SPIx_CLK_ENABLE(); 
-    
-    /*##-2- Configure peripheral GPIO ##########################################*/  
+    SPIx_CLK_ENABLE();
+
+    /*##-2- Configure peripheral GPIO ##########################################*/
     /* SPI SCK GPIO pin configuration  */
     GPIO_InitStruct.Pin       = SPIx_SCK_PIN;
     GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull      = GPIO_NOPULL;
     GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_MEDIUM;
     GPIO_InitStruct.Alternate = SPIx_SCK_AF;
-    
+
     HAL_GPIO_Init(SPIx_SCK_GPIO_PORT, &GPIO_InitStruct);
-      
+
     /* SPI MISO GPIO pin configuration  */
     GPIO_InitStruct.Pin = SPIx_MISO_PIN;
     GPIO_InitStruct.Alternate = SPIx_MISO_AF;
-    
+
     HAL_GPIO_Init(SPIx_MISO_GPIO_PORT, &GPIO_InitStruct);
-    
+
     /* SPI MOSI GPIO pin configuration  */
     GPIO_InitStruct.Pin = SPIx_MOSI_PIN;
     GPIO_InitStruct.Alternate = SPIx_MOSI_AF;
-      
-    HAL_GPIO_Init(SPIx_MOSI_GPIO_PORT, &GPIO_InitStruct);   
+
+    HAL_GPIO_Init(SPIx_MOSI_GPIO_PORT, &GPIO_InitStruct);
   }
   else if (hspi->Instance == SPI_USER)
   {
@@ -136,34 +136,34 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
     SPI_USER_MISO_GPIO_CLK_ENABLE();
     SPI_USER_MOSI_GPIO_CLK_ENABLE();
     /* Enable SPI clock */
-    SPI_USER_CLK_ENABLE(); 
-    
-    /*##-2- Configure peripheral GPIO ##########################################*/  
+    SPI_USER_CLK_ENABLE();
+
+    /*##-2- Configure peripheral GPIO ##########################################*/
     /* SPI SCK GPIO pin configuration  */
     GPIO_InitStruct.Pin       = SPI_USER_SCK_PIN;
     GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull      = GPIO_NOPULL;
     GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_MEDIUM;
     GPIO_InitStruct.Alternate = SPI_USER_SCK_AF;
-    
+
     HAL_GPIO_Init(SPI_USER_SCK_GPIO_PORT, &GPIO_InitStruct);
-      
+
     /* SPI MISO GPIO pin configuration  */
     GPIO_InitStruct.Pin = SPI_USER_MISO_PIN;
     GPIO_InitStruct.Alternate = SPI_USER_MISO_AF;
-    
+
     HAL_GPIO_Init(SPI_USER_MISO_GPIO_PORT, &GPIO_InitStruct);
-    
+
     /* SPI MOSI GPIO pin configuration  */
     GPIO_InitStruct.Pin = SPI_USER_MOSI_PIN;
     GPIO_InitStruct.Alternate = SPI_USER_MOSI_AF;
-      
-    HAL_GPIO_Init(SPI_USER_MOSI_GPIO_PORT, &GPIO_InitStruct);      
+
+    HAL_GPIO_Init(SPI_USER_MOSI_GPIO_PORT, &GPIO_InitStruct);
   }
 }
 
 /**
-  * @brief SPI MSP De-Initialization 
+  * @brief SPI MSP De-Initialization
   *        This function frees the hardware resources used in this example:
   *          - Disable the Peripheral's clock
   *          - Revert GPIO configuration to its default state
@@ -173,7 +173,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
 void HAL_SPI_MspDeInit(SPI_HandleTypeDef *hspi)
 {
   if(hspi->Instance == SPIx)
-  {  
+  {
     /*##-1- Reset peripherals ##################################################*/
     SPIx_FORCE_RESET();
     SPIx_RELEASE_RESET();
@@ -198,7 +198,7 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef *hspi)
     /* Configure SPI MISO as alternate function  */
     HAL_GPIO_DeInit(SPI_USER_MISO_GPIO_PORT, SPI_USER_MISO_PIN);
     /* Configure SPI MOSI as alternate function  */
-    HAL_GPIO_DeInit(SPI_USER_MOSI_GPIO_PORT, SPI_USER_MOSI_PIN);    
+    HAL_GPIO_DeInit(SPI_USER_MOSI_GPIO_PORT, SPI_USER_MOSI_PIN);
   }
 }
 
@@ -1013,42 +1013,42 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
   * @param[in] hi2c I2C handle pointer
   * @retval None
   */
-void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
-{
-  GPIO_InitTypeDef GPIO_InitStruct;
-  if (hi2c->Instance == BSP_MISC_I2C)
-  {
-    /* I2C and GPIOs clock enable */
-    __BSP_MISC_I2C_CLK_ENABLE();
-    __BSP_MISC_I2C_SCL_GPIO_CLK_ENABLE();
-    __BSP_MISC_I2C_SDA_GPIO_CLK_ENABLE();
-    
-    /* I2C GPIO configuration */
-    GPIO_InitStruct.Pin = BSP_MISC_I2C_SCL_PIN;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
-    GPIO_InitStruct.Pull = GPIO_PULLUP;
-    GPIO_InitStruct.Alternate = BSP_MISC_AFx_I2C;
-    HAL_GPIO_Init(BSP_MISC_I2C_SCL_PORT, &GPIO_InitStruct);
-    
-    GPIO_InitStruct.Pin = BSP_MISC_I2C_SDA_PIN;
-    HAL_GPIO_Init(BSP_MISC_I2C_SDA_PORT, &GPIO_InitStruct);
-    
-    /* I2C settings */
-    //TODO: adjust I2C init settings
-    hi2c->Init.Timing = BSP_MISC_I2C_CLOCK_SPEED;
-//    hi2c->Init.ClockSpeed = BSP_MISC_I2C_CLOCK_SPEED;
-//    hi2c->Init.DutyCycle = I2C_DUTYCYCLE_2;
-    hi2c->Init.OwnAddress1 = 0;
-    hi2c->Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-    hi2c->Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-    hi2c->Init.OwnAddress2 = 0;
-    hi2c->Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-    hi2c->Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-    
-    /* I2C filtering */
-    HAL_I2CEx_ConfigAnalogFilter(hi2c, I2C_ANALOGFILTER_ENABLE);
-  }
-}
+//void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
+//{
+//  GPIO_InitTypeDef GPIO_InitStruct;
+//  if (hi2c->Instance == BSP_MISC_I2C)
+//  {
+//    /* I2C and GPIOs clock enable */
+//    __BSP_MISC_I2C_CLK_ENABLE();
+//    __BSP_MISC_I2C_SCL_GPIO_CLK_ENABLE();
+//    __BSP_MISC_I2C_SDA_GPIO_CLK_ENABLE();
+//
+//    /* I2C GPIO configuration */
+//    GPIO_InitStruct.Pin = BSP_MISC_I2C_SCL_PIN;
+//    GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
+//    GPIO_InitStruct.Pull = GPIO_PULLUP;
+//    GPIO_InitStruct.Alternate = BSP_MISC_AFx_I2C;
+//    HAL_GPIO_Init(BSP_MISC_I2C_SCL_PORT, &GPIO_InitStruct);
+//
+//    GPIO_InitStruct.Pin = BSP_MISC_I2C_SDA_PIN;
+//    HAL_GPIO_Init(BSP_MISC_I2C_SDA_PORT, &GPIO_InitStruct);
+//
+//    /* I2C settings */
+//    //TODO: adjust I2C init settings
+//    hi2c->Init.Timing = BSP_MISC_I2C_CLOCK_SPEED;
+////    hi2c->Init.ClockSpeed = BSP_MISC_I2C_CLOCK_SPEED;
+////    hi2c->Init.DutyCycle = I2C_DUTYCYCLE_2;
+//    hi2c->Init.OwnAddress1 = 0;
+//    hi2c->Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+//    hi2c->Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+//    hi2c->Init.OwnAddress2 = 0;
+//    hi2c->Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+//    hi2c->Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+//
+//    /* I2C filtering */
+//    HAL_I2CEx_ConfigAnalogFilter(hi2c, I2C_ANALOGFILTER_ENABLE);
+//  }
+//}
 
 /**
   * @brief I2C MSP De-Initialization 
@@ -1058,20 +1058,20 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
   * @param hi2c: I2C handle pointer
   * @retval None
   */
-void HAL_I2C_MspDeInit(I2C_HandleTypeDef *hi2c)
-{
-  /* Reset peripherals */
-  __BSP_MISC_I2C_FORCE_RESET();
-  __BSP_MISC_I2C_RELEASE_RESET();
-
-  /* Disable I2C clock */
-  /* GPIO clocks are left enabled as they can be used by other peripherals */
-  __BSP_MISC_I2C_CLK_DISABLE();
-  
-  /* I2C GPIOs deconfiguration */
-  HAL_GPIO_DeInit(BSP_MISC_I2C_SCL_PORT, BSP_MISC_I2C_SCL_PIN);
-  HAL_GPIO_DeInit(BSP_MISC_I2C_SDA_PORT, BSP_MISC_I2C_SDA_PIN);  
-}
+//void HAL_I2C_MspDeInit(I2C_HandleTypeDef *hi2c)
+//{
+//  /* Reset peripherals */
+//  __BSP_MISC_I2C_FORCE_RESET();
+//  __BSP_MISC_I2C_RELEASE_RESET();
+//
+//  /* Disable I2C clock */
+//  /* GPIO clocks are left enabled as they can be used by other peripherals */
+//  __BSP_MISC_I2C_CLK_DISABLE();
+//
+//  /* I2C GPIOs deconfiguration */
+//  HAL_GPIO_DeInit(BSP_MISC_I2C_SCL_PORT, BSP_MISC_I2C_SCL_PIN);
+//  HAL_GPIO_DeInit(BSP_MISC_I2C_SDA_PORT, BSP_MISC_I2C_SDA_PIN);
+//}
 
 /**
   * @}

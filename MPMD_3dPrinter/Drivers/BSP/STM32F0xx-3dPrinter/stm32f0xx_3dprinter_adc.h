@@ -44,81 +44,11 @@
  extern "C" {
 #endif
 
-/* Includes ------------------------------------------------------------------*/
-#include "stm32f0xx_hal.h"
-   
-/* Exported macros ------------------------------------------------------------*/
-
-/* Definition for ADC resources *********************************************/
-#define BSP_ADC                 (ADC1)
-#define __BSP_ADC_CLK_ENABLE()    __ADC1_CLK_ENABLE()
-#define __BSP_ADC_CLK_DISABLE()   __ADC1_CLK_DISABLE()   
-   
-#define __BSP_ADC_FORCE_RESET()      __ADC_FORCE_RESET()
-#define __BSP_ADC_RELEASE_RESET()    __ADC_RELEASE_RESET()   
-   
-#define BSP_ADC_CHANNEL_THERM_BED1   (ADC_CHANNEL_4)
-#define BSP_ADC_CHANNEL_THERM_E1    (ADC_CHANNEL_0)
-//TODO: remove unused thermister values, hardcode to 0 for now
-#define BSP_ADC_CHANNEL_THERM_E2    (ADC_CHANNEL_0)
-#define BSP_ADC_CHANNEL_THERM_E3    (ADC_CHANNEL_0)
-#define BSP_ADC_CHANNEL_THERM_BED2  (ADC_CHANNEL_0)
-#define BSP_ADC_CHANNEL_THERM_BED3 (ADC_CHANNEL_0)
-
-//Order ranks to have growing channels for compatibility with F0, L0...
-#define BSP_ADC_RANK_THERM_BED1   (5)
-#define BSP_ADC_RANK_THERM_E1    (1)
-#define BSP_ADC_RANK_THERM_E2    (2)
-#define BSP_ADC_RANK_THERM_E3    (3)
-#define BSP_ADC_RANK_THERM_BED2   (6)   
-#define BSP_ADC_RANK_THERM_BED3   (4)   
-
-/* Definition for  thermistor Pins */
-#define BSP_THERM_BED1_PIN              (GPIO_PIN_4)
-#define BSP_THERM_BED1_PORT             (GPIOA)
-#define BSP_THERM_BED2_PIN             (GPIO_PIN_4)
-#define BSP_THERM_BED2_PORT            (GPIOA)
-#define BSP_THERM_E1_PIN               (GPIO_PIN_0)
-#define BSP_THERM_E1_PORT              (GPIOA)
-#define BSP_THERM_E2_PIN               (GPIO_PIN_0)
-#define BSP_THERM_E2_PORT              (GPIOA)
-#define BSP_THERM_E3_PIN               (GPIO_PIN_0)
-#define BSP_THERM_E3_PORT              (GPIOA)
-#define BSP_THERM_BED3_PIN             (GPIO_PIN_0)
-#define BSP_THERM_BED3_PORT            (GPIOA)
-
-   /* Definition for IR Out Pin used for Z probing*/
-#define BSP_IR_OUT_PIN                 (GPIO_PIN_0)
-#define BSP_IR_OUT_PORT                (GPIOA)
-
-/* Definition of ADC NVIC resources */
-#define BSP_ADC_IRQn                   (ADC1_IRQn)
-#define BSP_ADC_IRQHandler             (ADC1_IRQHandler)
-   
-/* Definition for DMA resources used by ADC************************************/
-
-#define BSP_DMA                 (DMA1_Channel1_BASE)
-//DMA channels not re-mappable on F0
-//#define BSP_DMA_CHANNEL         (DMA_CHANNEL_0)
-#define __BSP_DMA_CLK_ENABLE()    __DMA1_CLK_ENABLE()
-
-#define BSP_DMA_IRQn            (DMA1_Channel1_IRQn)
-#define BSP_DMA_IRQHandler      (DMA1_Ch1_IRQHandler)
-   
-/* Exported types --- --------------------------------------------------------*/
-typedef struct BspAdcDataTag
-{
-  ADC_HandleTypeDef adcHandle;
-  DMA_HandleTypeDef dmaHandle;
-  uint8_t acquisitionDone;
-}BspAdcDataType;
-
-/* Exported variables  --------------------------------------------------------*/
-extern BspAdcDataType gBspAdcData;
-
-/* Exported functions --------------------------------------------------------*/
-void BSP_AdcHwInit(void);
-uint16_t BSP_AdcGetValue(uint8_t rankId);
+#ifdef STM32_MPMD
+#include "mpmd_3dPrinter_adc.h"
+#elif defined(NUCLEO_F070RB)
+#include "nucleo-f070rb_3dPrinter_adc.h"
+#endif
 
 #ifdef __cplusplus
 }

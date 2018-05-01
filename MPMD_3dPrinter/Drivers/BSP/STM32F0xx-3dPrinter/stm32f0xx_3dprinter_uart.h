@@ -44,81 +44,12 @@
  extern "C" {
 #endif
 
-   /* Includes ------------------------------------------------------------------*/
-#include "stm32f0xx_hal.h"
-   
-/* Exported macros ------------------------------------------------------------*/
-//TODO: we should probably adjust these to a smaller size
-#define UART_TX_BUFFER_SIZE (2048)
-#define UART_RX_BUFFER_SIZE (2048)
-   
-/* Definition for Usart resources *********************************************/
-
-#define BSP_UART_DEBUG                           (USART2)
-#define __BSP_UART_DEBUG_CLK_ENABLE()              __USART2_CLK_ENABLE()
-#define __BSP_UART_DEBUG_CLK_DISABLE()             __USART2_CLK_DISABLE()
-#define __BSP_UART_DEBUG_RX_GPIO_CLK_ENABLE()      __GPIOA_CLK_ENABLE()
-#define __BSP_UART_DEBUG_TX_GPIO_CLK_ENABLE()      __GPIOA_CLK_ENABLE()
-
-#define __BSP_UART_DEBUG_FORCE_RESET()             __USART2_FORCE_RESET()
-#define __BSP_UART_DEBUG_RELEASE_RESET()           __USART2_RELEASE_RESET()
-
-/* Definition for BSP_UART_DEBUG Pins */
-#define BSP_UART_DEBUG_TX_PIN               (GPIO_PIN_2)
-#define BSP_UART_DEBUG_TX_PORT              (GPIOA)
-#define BSP_UART_DEBUG_RX_PIN               (GPIO_PIN_3)
-#define BSP_UART_DEBUG_RX_PORT              (GPIOA)
-
-/* Definition for BSP_UART_DEBUG's NVIC */
-#define BSP_UART_DEBUG_IRQn                      (USART2_IRQn)
-#define BSP_UART_DEBUG_IRQHandler                USART2_IRQHandler
-
-#define BSP_UART_DEBUG_TX_AF                     (GPIO_AF1_USART2)
-#define BSP_UART_DEBUG_RX_AF                     (GPIO_AF1_USART2)
-   
-/* Exported types --- --------------------------------------------------------*/
-typedef struct BspUartDataTag
-{
-  volatile uint8_t rxWriteChar;
-  uint8_t *pRxBuffer;
-  volatile uint8_t *pRxWriteBuffer;
-  volatile uint8_t *pRxReadBuffer;
-  uint8_t *pTxBuffer;
-  volatile uint8_t *pTxWriteBuffer;
-  volatile uint8_t *pTxReadBuffer;
-  volatile uint8_t *pTxWrap;
-  volatile uint8_t newTxRequestInThePipe;
-  volatile uint8_t gCodeDataMode;
-  volatile uint16_t nbTxBytesOnGoing;
-  volatile ITStatus rxBusy;
-  volatile ITStatus txBusy;
-  void (*uartRxDataCallback)(uint8_t *,uint8_t);  
-  void (*uartTxDoneCallback)(void);  
-  UART_HandleTypeDef handle;
-  uint32_t debugNbRxFrames; 
-  uint32_t debugNbTxFrames;
-  volatile uint32_t nbBridgedBytes;
-}BspUartDataType;
-
-/* Exported variables  --------------------------------------------------------*/
-extern BspUartDataType gBspUartData;
-
-/* Exported functions --------------------------------------------------------*/
-uint8_t* BSP_UartIfGetFreeTxBuffer(void);
-void BSP_UartHwInit(uint32_t newBaudRate);
-void BSP_UartIfStart(void);
-void BSP_UartIfQueueTxData(uint8_t *pBuf, uint8_t nbData);
-void BSP_UartIfSendQueuedData(void);
-void BSP_UartAttachRxDataHandler(void (*callback)(uint8_t *, uint8_t));
-void BSP_UartAttachTxDoneCallback(void (*callback)(void));
-uint32_t BSP_UartPrintf(const char* format,...);
-uint32_t BSP_UartGetNbRxAvalaibleBytes(void);
-int8_t BSP_UartGetNextRxBytes(void);
-uint8_t BSP_UartIsTxOnGoing(void);
-#if defined(MARLIN)
-uint32_t BSP_UartCommandsFilter(char *pBufCmd, uint8_t nxRxBytes);
+#ifdef STM32_MPMD
+#include "mpmd_3dPrinter_uart.h"
+#elif defined(NUCLEO_F070RB)
+#include "nucleo-f070rb_3dPrinter_uart.h"
 #endif
-void BSP_UartLockingTx(uint8_t *pBuf, uint8_t nbData);
+
 #ifdef __cplusplus
 }
 #endif

@@ -39,7 +39,11 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f0xx_hal.h"
+#ifdef STM32_MPMD
 #include "stm32f0xx_mpmd.h"
+#elif defined(NUCLEO_F070RB)
+#include "stm32f0xx_nucleo.h"
+#endif
 #include "stdio.h"
 #include "stm32f0xx_3dprinter_misc.h"
 #include "stm32f0xx_3dprinter_motor.h"

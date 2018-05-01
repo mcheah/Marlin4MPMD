@@ -43,29 +43,11 @@
  extern "C" {
 #endif
 
-   /* Includes ---------------------------------------------------------------*/
-#include "stm32f0xx_hal.h"
-   
-/* Exported macros -----------------------------------------------------------*/
-
-/* Definition for RPi resources *********************************************/
-//TODO: remove RPI stuff since there's no connection pin available
-/// GPIO Pin used for the Raspberry Pi ready state pin
-#define BSP_RPI_READY_PIN               (GPIO_PIN_0)
-/// GPIO Port used for the Raspberry Pi ready state pin
-#define BSP_RPI_READY_PORT              (GPIOE)
-
-
-   
-/* Exported types --- --------------------------------------------------------*/
-
-/* Exported variables  --------------------------------------------------------*/
-
-/* Exported functions --------------------------------------------------------*/
-void BSP_RPiGpioInit(void);
-void BSP_RPiWaitUntilReady(void);
-
-
+#ifdef STM32_MPMD
+#include "mpmd_3dPrinter_rpi.h"
+#elif defined(NUCLEO_F070RB)
+#include "nucleo-f070rb_3dPrinter_rpi.h"
+#endif
 
 #ifdef __cplusplus
 }
