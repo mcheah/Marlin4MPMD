@@ -761,7 +761,7 @@ void setup_photpin() {
 
 void setup_powerhold() {
     //----- General BSP initilisation to use 5 motors */
-    BSP_MiscOverallInit(6);
+    BSP_MiscOverallInit(4);
 
     //----- Switch Step clock to SW mode (no used of PWMs)*/
     BSP_MiscSetStepClockToSwMode();
@@ -951,7 +951,7 @@ void setup() {
 
   // Load data from EEPROM if available (or use defaults)
   // This also updates variables in the planner, elsewhere
-  Config_RetrieveSettings();
+//  Config_RetrieveSettings();
 
   // Initialize current position based on home_offset
   memcpy(current_position, home_offset, sizeof(home_offset));

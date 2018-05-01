@@ -37,7 +37,11 @@
   */ 
   
 /* Includes ------------------------------------------------------------------*/
+#ifdef MOTOR_L6474
 #include "l6474.h"
+#elif defined(MOTOR_A4985)
+#include "A4985.h"
+#endif
 #include "stm32f0xx_3dprinter_motor.h"
 #include "motorcontrol.h"
 
@@ -233,7 +237,7 @@ void BSP_MotorControlBoard_GpioInit(uint8_t nbDevices)
   HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_RESET_E3_PORT, &GPIO_InitStruct);   
 
   BSP_MotorControlBoard_Reset();  
-
+  //TODO: check that this makes sense, because we may have different motor numbers
   if (nbDevices > 1) 
   {
     /* Configure L6474 - DIR pin for device  1 ----------------------------*/

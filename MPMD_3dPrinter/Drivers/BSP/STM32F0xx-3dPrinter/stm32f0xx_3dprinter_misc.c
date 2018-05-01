@@ -43,7 +43,13 @@
 #include "stm32f0xx_3dprinter_motor.h"
 #include "stm32f0xx_3dprinter_adc.h"
 #include "stm32f0xx_3dprinter_uart.h"
+
+#ifdef MOTOR_L6474
 #include "l6474.h"
+#elif defined(MOTOR_A4985)
+#include "A4985.h"
+#endif
+
 #include "string.h"
 #include <stdio.h>
 
@@ -259,10 +265,14 @@ void BSP_MiscOverallInit(uint8_t nbDevices)
   
   //----- Init of the Motor control library to use nB device */
   bspMiscNbMotorDevices = nbDevices;
+#ifdef MOTOR_L6474
   BSP_MotorControl_Init(BSP_MOTOR_CONTROL_BOARD_ID_L6474, nbDevices);
+#elif defined(MOTOR_A4985)
+  BSP_MotorControl_Init(BSP_MOTOR_CONTROL_BOARD_ID_A4985, nbDevices);
+#endif
   
   /* Attach the function MyFlagInterruptHandler (defined below) to the flag interrupt */
-  BSP_MotorControl_AttachFlagInterrupt(BSP_MiscFlagInterruptHandler);
+//  BSP_MotorControl_AttachFlagInterrupt(BSP_MiscFlagInterruptHandler);
 
   /* Attach the function Error_Handler (defined below) to the error Handler*/
   BSP_MotorControl_AttachErrorHandler(BSP_MiscErrorHandler); 
@@ -282,7 +292,7 @@ void BSP_MiscFlagInterruptHandler(void)
   {
     /* Get the value of the status register via the L6474 command GET_STATUS */
     statusRegister = BSP_MotorControl_CmdGetStatus(loop);
-    
+#ifdef MOTOR_L6474
     /* Check HIZ flag: if set, power brigdes are disabled */
     if ((statusRegister & L6474_STATUS_HIZ) == L6474_STATUS_HIZ)
     {
@@ -345,6 +355,7 @@ void BSP_MiscFlagInterruptHandler(void)
       //overcurrent detection 
       // Action to be customized          
     }
+#endif
   }
 }
 
@@ -1038,7 +1049,8 @@ void BSP_MiscSetOcdThreshold(uint8_t deviceId, uint32_t current)
 {
   int32_t currentThreshold = 375;
   uint32_t ocdThresholdParam = 0;
-  
+  //TODO:check functionality that this actually still does hwat it's supposed to
+#ifdef MOTOR_L6474
   while ((current >= currentThreshold) && (ocdThresholdParam < L6474_OCD_TH_6000mA))
   {
     currentThreshold += 375;
@@ -1046,6 +1058,7 @@ void BSP_MiscSetOcdThreshold(uint8_t deviceId, uint32_t current)
   }
   
   BSP_MotorControl_CmdSetParam(deviceId, L6474_OCD_TH, ocdThresholdParam);   
+#endif
 }
 
 /******************************************************//**

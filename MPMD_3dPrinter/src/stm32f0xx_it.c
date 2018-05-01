@@ -10,7 +10,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f0xx_it.h"
-#include "motorcontrol.h"
+//#include "motorcontrol.h"
 #include "stm32f0xx_3dprinter_uart.h"
 #include "stm32f0xx_3dprinter_sd.h"
 
@@ -60,7 +60,7 @@ void SysTick_Handler(void)
   */
 void EXTI0_1_IRQHandler(void)
 {
-	HAL_GPIO_EXTI_IRQHandler(BSP_MOTOR_CONTROL_BOARD_FLAG_PIN);
+//	HAL_GPIO_EXTI_IRQHandler(BSP_MOTOR_CONTROL_BOARD_FLAG_PIN);
 }
 
 /**

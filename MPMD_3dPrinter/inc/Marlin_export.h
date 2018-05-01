@@ -114,5 +114,12 @@ typedef uint8_t  byte;
 // __INLINE void TimerStService(void) {
 //
 // }
+// __INLINE void setup() {
+//
+// }
+//
+// __INLINE void loop() {
+//
+// }
 
 #endif

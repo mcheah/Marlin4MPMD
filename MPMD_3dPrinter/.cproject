@@ -37,11 +37,13 @@
 									<listOptionValue builtIn="false" value="DEBUG_ONGOING__N"/>
 									<listOptionValue builtIn="false" value="USE_HAL_LEGACY"/>
 									<listOptionValue builtIn="false" value="STM32_MPMD"/>
+									<listOptionValue builtIn="false" value="MOTOR_A4985"/>
 								</option>
 								<option id="gnu.c.compiler.option.include.paths.2124464761" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/HAL_Driver}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FatFs/src&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Drivers/BSP/Components/l6474&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Drivers/BSP/Components/A4985&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Drivers/BSP/Components/Common&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/STM32F0xx_mpmd}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/HAL_Driver/Inc}&quot;"/>
@@ -74,9 +76,11 @@
 									<listOptionValue builtIn="false" value="DEBUG_ONGOING__N"/>
 									<listOptionValue builtIn="false" value="USE_HAL_LEGACY"/>
 									<listOptionValue builtIn="false" value="STM32_MPMD"/>
+									<listOptionValue builtIn="false" value="MOTOR_A4985"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.282550689" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Drivers/BSP/Components/A4985&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FatFs/src&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Drivers/BSP/Components/l6474&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Drivers/BSP/Components/Common&quot;"/>
@@ -105,6 +109,7 @@
 							<tool id="fr.ac6.managedbuild.tool.gnu.cross.assembler.477945491" name="MCU GCC Assembler" superClass="fr.ac6.managedbuild.tool.gnu.cross.assembler">
 								<option id="gnu.both.asm.option.include.paths.1893703037" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/STM32F0xx_mpmd}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Drivers/BSP/Components/A4985&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FatFs/src&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Drivers/BSP/Components/Common&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Drivers/BSP/Components/l6474&quot;"/>
@@ -237,11 +242,13 @@
 									<listOptionValue builtIn="false" value="DEBUG_ONGOING__N"/>
 									<listOptionValue builtIn="false" value="USE_HAL_LEGACY"/>
 									<listOptionValue builtIn="false" value="STM32_MPMD"/>
+									<listOptionValue builtIn="false" value="MOTOR_A4985"/>
 								</option>
 								<option id="gnu.c.compiler.option.include.paths.467241798" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/HAL_Driver}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FatFs/src&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Drivers/BSP/Components/l6474&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Drivers/BSP/Components/A4985&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Drivers/BSP/Components/Common&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/STM32F0xx_mpmd}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/HAL_Driver/Inc}&quot;"/>
@@ -272,9 +279,11 @@
 									<listOptionValue builtIn="false" value="DEBUG_ONGOING__N"/>
 									<listOptionValue builtIn="false" value="USE_HAL_LEGACY"/>
 									<listOptionValue builtIn="false" value="STM32_MPMD"/>
+									<listOptionValue builtIn="false" value="MOTOR_A4985"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.73012466" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Drivers/BSP/Components/A4985&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FatFs/src&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Drivers/BSP/Components/l6474&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Drivers/BSP/Components/Common&quot;"/>
@@ -303,6 +312,7 @@
 							<tool id="fr.ac6.managedbuild.tool.gnu.cross.assembler.exe.release.1124097628" name="MCU GCC Assembler" superClass="fr.ac6.managedbuild.tool.gnu.cross.assembler.exe.release">
 								<option id="gnu.both.asm.option.include.paths.1891728064" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/STM32F0xx_mpmd}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Drivers/BSP/Components/A4985&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FatFs/src&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Drivers/BSP/Components/Common&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Drivers/BSP/Components/l6474&quot;"/>

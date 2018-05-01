@@ -104,6 +104,8 @@ __weak motorDrv_t* Powerstep01_GetMotorHandle(void){return ((motorDrv_t* )0);}
 __weak motorDrv_t* L6206_GetMotorHandle(void){return ((motorDrv_t* )0);}
 /// Get motor handle for L6208
 __weak motorDrv_t* L6208_GetMotorHandle(void){return ((motorDrv_t* )0);}
+/// Get motor handle for A4985
+__weak motorDrv_t* A4985_GetMotorHandle(void){return ((motorDrv_t* )0);}
 /**
  * @}
  */
@@ -216,6 +218,9 @@ void BSP_MotorControl_Init(uint16_t id, uint8_t nbDevices)
   else if (id == BSP_MOTOR_CONTROL_BOARD_ID_L6208)
   {
     motorDrvHandle = L6208_GetMotorHandle();
+  }
+  else if (id == BSP_MOTOR_CONTROL_BOARD_ID_A4985) {
+	  motorDrvHandle = A4985_GetMotorHandle();
   }
   else
   {

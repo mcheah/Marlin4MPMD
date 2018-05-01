@@ -76,6 +76,8 @@
 #define BSP_MOTOR_CONTROL_BOARD_ID_L6206 (6206)
 ///Motor control board id for L6208
 #define BSP_MOTOR_CONTROL_BOARD_ID_L6208 (6208)
+///Motor control board id for A4985
+#define BSP_MOTOR_CONTROL_BOARD_ID_A4985 (4985)
 /**
   * @}
   */
@@ -100,6 +102,8 @@ __weak motorDrv_t* L6474_GetMotorHandle(void);
 __weak motorDrv_t* Powerstep01_GetMotorHandle(void);
 __weak motorDrv_t* L6206_GetMotorHandle(void);
 __weak motorDrv_t* L6208_GetMotorHandle(void); 
+__weak motorDrv_t* A4985_GetMotorHandle(void);
+
 /**
   * @}
   */   

@@ -750,7 +750,7 @@ void Planner::check_axes_activity() {
             break;
             #if EXTRUDERS > 3
               case 3:
-                enable_e3();/local/brdirais/Development/MotionControl/04-GIT_IPC_SW/STM32/stm32_cube_BICEPHALE/Marlin/planner.cpp:814:28: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+                enable_e3();
 
                 g_uc_extruder_last_move[3] = (BLOCK_BUFFER_SIZE) * 2;
                 if (g_uc_extruder_last_move[0] == 0) disable_e0();
