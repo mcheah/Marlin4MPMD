@@ -1083,12 +1083,14 @@ void L6474_ApplySpeed(uint8_t deviceId, uint16_t newSpeed)
     case 3:
       BSP_MotorControlBoard_PwmE1SetFreq(newSpeed);
       break;
+#ifdef BSP_HEAT_E2_PIN
     case 4:
       BSP_MotorControlBoard_PwmE2SetFreq(newSpeed);
       break;
     case 5:
       BSP_MotorControlBoard_PwmE3SetFreq(newSpeed);
       break;
+#endif
     default:
       break; //ignore error
   }

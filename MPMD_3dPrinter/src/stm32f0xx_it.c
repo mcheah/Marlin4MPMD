@@ -23,13 +23,16 @@ extern TIM_HandleTypeDef hTimPwmX;
 extern TIM_HandleTypeDef hTimPwmY;
 extern TIM_HandleTypeDef hTimPwmZ;
 extern TIM_HandleTypeDef hTimPwmE1;
+#ifdef BSP_HEAT_E2_PIN
 extern TIM_HandleTypeDef hTimPwmE2;
 extern TIM_HandleTypeDef hTimPwmE3;
 extern TIM_HandleTypeDef hTimPwmE4;
+#endif//BSP_HEAT_E2_PIN
 extern TIM_HandleTypeDef hTimTick;
 extern TIM_HandleTypeDef hTimTick2;
+#ifdef BSP_SERVO0_PIN
 extern TIM_HandleTypeDef hTimServo;
-
+#endif//BSP_SERVO0_PIN
 extern BspAdcDataType gBspAdcData;
 //TODO: removing wifiData
 //extern BspWifiDataType gBspWifiData;
@@ -128,15 +131,18 @@ void TIM6_IRQHandler(void)
   * @param  None
   * @retval None
   */
+#ifdef BSP_FAN_E2_PIN
 void TIM1_BRK_UP_TRG_COM_IRQHandler(void)
 {
   HAL_TIM_IRQHandler(&hTimPwmE2);
 }
+#endif//BSP_FAN_E2_PIN
 /**
   * @brief  This function handles TIM1 interrupt request.
   * @param  None
   * @retval None
   */
+#if defined(BSP_FAN_E2_PIN) || defined(BSP_SERVO0_PIN)
 void TIM1_UP_TIM10_IRQHandler(void)
 {
 #ifdef MARLIN
@@ -145,6 +151,7 @@ void TIM1_UP_TIM10_IRQHandler(void)
   HAL_TIM_IRQHandler(&hTimPwmE3);
 #endif
 }
+#endif//(BSP_FAN_E2_PIN) || (BSP_SERVO0_PIN)
 /**
   * @brief  This function handles TIM1 interrupt request.
   * @param  None
@@ -211,20 +218,20 @@ void BSP_ADC_IRQHandler(void)
   * @retval None
   */
 //TODO: check that these DMA handlers match up
-void DMA1_CH1_IRQHandler(void)
-{
+//void DMA1_CH1_IRQHandler(void)
+//{
 //  BSP_SD_DMA_Rx_IRQHandler();
-}
+//}
 
 /**
   * @brief  This function handles DMA2 Stream 6 interrupt request.
   * @param  None
   * @retval None
   */
-void DMA1_CH2_3_IRQHandler(void)
-{
+//void DMA1_CH2_3_IRQHandler(void)
+//{
 //  BSP_SD_DMA_Tx_IRQHandler();
-}
+//}
 
 ///**
 //  * @brief  This function handles DMA RX interrupt request.

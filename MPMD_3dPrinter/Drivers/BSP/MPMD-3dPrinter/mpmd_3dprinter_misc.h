@@ -324,9 +324,11 @@ void BSP_MiscSetOcdThreshold(uint8_t deviceId, uint32_t current);
 void BSP_MiscHeatManualInit(uint8_t heatId);
 void BSP_MiscHeatPwmInit(uint8_t heatId);
 void BSP_MiscHeatPwmSetDutyCycle(uint8_t heatId, uint8_t newDuty);
+#ifdef BSP_SERVO0_PIN
 void  BSP_MotorControlBoard_ServoInit(void);
 void  BSP_MotorControlBoard_ServoSetTimerValue(uint32_t value);
 void  BSP_MotorControlBoard_ServoStop(void);
+#endif
 void BSP_MiscUserGpioInit(uint8_t id, uint32_t mode, uint32_t pull);
 
 #ifdef __cplusplus

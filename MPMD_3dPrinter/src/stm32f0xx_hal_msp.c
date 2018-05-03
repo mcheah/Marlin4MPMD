@@ -92,6 +92,7 @@ extern void BSP_MotorControl_FlagInterruptHandler(void);
   * @param[in] hspi SPI handle pointer
   * @retval None
   */
+#if defined(SPIx) || defined(SPI_USER)
 void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
 {
   GPIO_InitTypeDef  GPIO_InitStruct;
@@ -128,6 +129,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
 
     HAL_GPIO_Init(SPIx_MOSI_GPIO_PORT, &GPIO_InitStruct);
   }
+#ifdef SPI_USER
   else if (hspi->Instance == SPI_USER)
   {
     /*##-1- Enable peripherals and GPIO Clocks #################################*/
@@ -160,6 +162,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
 
     HAL_GPIO_Init(SPI_USER_MOSI_GPIO_PORT, &GPIO_InitStruct);
   }
+#endif//SPI_USER
 }
 
 /**
@@ -186,6 +189,7 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef *hspi)
     /* Configure SPI MOSI as alternate function  */
     HAL_GPIO_DeInit(SPIx_MOSI_GPIO_PORT, SPIx_MOSI_PIN);
   }
+#ifdef SPI_USER
   else if (hspi->Instance == SPI_USER)
   {
     /*##-1- Reset peripherals ##################################################*/
@@ -200,8 +204,9 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef *hspi)
     /* Configure SPI MOSI as alternate function  */
     HAL_GPIO_DeInit(SPI_USER_MOSI_GPIO_PORT, SPI_USER_MOSI_PIN);
   }
+#endif
 }
-
+#endif//SPIx || SPI_USER
 /**
   * @brief UArt MSP Initialization 
   *        This function configures the hardware resources used in this example: 
@@ -477,6 +482,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
     /* Enable the timer global Interrupt */
     HAL_NVIC_EnableIRQ(BSP_MOTOR_CONTROL_BOARD_PWM_E1_IRQn);  
   }
+#ifdef BSP_HEAT_E2_PIN
   else if(htim_pwm == &hTimPwmE2)
   {
     /* Peripheral clock enable */
@@ -515,6 +521,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
     /* Enable the timer global Interrupt */
     HAL_NVIC_EnableIRQ(BSP_MOTOR_CONTROL_BOARD_PWM_E3_IRQn);  
   }
+#endif//BSP_HEAT_E2_PIN
   else if(htim_pwm == &hTimPwmHeatBed)
   {
     /* Peripheral clock enable */
@@ -528,6 +535,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
     GPIO_InitStruct.Alternate = BSP_MISC_AFx_TIMx_PWM_HEAT_BED;
     HAL_GPIO_Init(BSP_HEAT_BED1_PORT, &GPIO_InitStruct);    
   }
+#ifdef BSP_HEAT_BED2_PIN
   else if(htim_pwm == &hTimPwmHeatBed2)
   {
     /* Peripheral clock enable */
@@ -554,6 +562,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
     GPIO_InitStruct.Alternate = BSP_MISC_AFx_TIMx_PWM_HEAT_BED3;
     HAL_GPIO_Init(BSP_HEAT_BED3_PORT, &GPIO_InitStruct);    
   }
+#endif//BSP_HEAT_BED2_PIN
   else if(htim_pwm == &hTimPwmHeatE1)
   {
     /* Peripheral clock enable */
@@ -567,6 +576,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
     GPIO_InitStruct.Alternate = BSP_MISC_AFx_TIMx_PWM_HEAT_E1;
     HAL_GPIO_Init(BSP_HEAT_E1_PORT, &GPIO_InitStruct);    
   }  
+#ifdef BSP_HEAT_E2_PIN
   else if(htim_pwm == &hTimPwmHeatE2)
   {
     /* Peripheral clock enable */
@@ -594,6 +604,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
     HAL_GPIO_Init(BSP_HEAT_E3_PORT, &GPIO_InitStruct);    
 
   }
+#endif//BSP_HEAT_E2_PIN
 }
 
 /**
@@ -649,6 +660,7 @@ void HAL_TIM_PWM_MspDeInit(TIM_HandleTypeDef* htim_pwm)
     /* Disable the timer global Interrupt */
     HAL_NVIC_DisableIRQ(BSP_MOTOR_CONTROL_BOARD_PWM_E1_IRQn);    
   }
+#ifdef BSP_HEAT_E2_PIN
   else if (htim_pwm == &hTimPwmE2)
   {
     //Do not disable clock as timer can be used by other functionality    
@@ -671,6 +683,7 @@ void HAL_TIM_PWM_MspDeInit(TIM_HandleTypeDef* htim_pwm)
     /* Disable the timer global Interrupt */
     HAL_NVIC_DisableIRQ(BSP_MOTOR_CONTROL_BOARD_PWM_E3_IRQn);       
   }
+#endif//BSP_HEAT_E2_PIN
   else if(htim_pwm == &hTimPwmHeatBed)
   {
     //Do not disable clock as timer can be used by other functionality
@@ -679,6 +692,7 @@ void HAL_TIM_PWM_MspDeInit(TIM_HandleTypeDef* htim_pwm)
     /* GPIO Deconfiguration */
     HAL_GPIO_DeInit(BSP_HEAT_BED1_PORT, BSP_HEAT_BED1_PIN);
   }
+#ifdef BSP_HEAT_BED2_PIN
   else if(htim_pwm == &hTimPwmHeatBed2)
   {
     //Do not disable clock as timer can be used by other functionality
@@ -695,6 +709,7 @@ void HAL_TIM_PWM_MspDeInit(TIM_HandleTypeDef* htim_pwm)
     /* GPIO Deconfiguration */
     HAL_GPIO_DeInit(BSP_HEAT_BED3_PORT, BSP_HEAT_BED3_PIN);
   }
+#endif//BSP_HEAT_BED2_PIN
   else if(htim_pwm == &hTimPwmHeatE1)
   {
     //Do not disable clock as timer can be used by other functionality 
@@ -703,6 +718,7 @@ void HAL_TIM_PWM_MspDeInit(TIM_HandleTypeDef* htim_pwm)
     /* GPIO Deconfiguration */
     HAL_GPIO_DeInit(BSP_HEAT_E1_PORT, BSP_HEAT_E1_PIN);    
   }
+#ifdef BSP_HEAT_E2_PIN
   else if(htim_pwm == &hTimPwmHeatE2)
   {
     //Do not disable clock as timer can be used by other functionality 
@@ -719,6 +735,7 @@ void HAL_TIM_PWM_MspDeInit(TIM_HandleTypeDef* htim_pwm)
     /* GPIO Deconfiguration */
     HAL_GPIO_DeInit(BSP_HEAT_E3_PORT, BSP_HEAT_E3_PIN);    
   }
+#endif//BSP_HEAT_E2_PIN
 }
 
 /**
@@ -760,6 +777,7 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
       BSP_MotorControl_StepClockHandler(3);
     }
   }
+#ifdef BSP_HEAT_E2_PIN
   if ((htim->Instance == BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E2)&& (htim->Channel == BSP_MOTOR_CONTROL_BOARD_HAL_ACT_CHAN_TIMER_PWM_E2))
   {
     HAL_GPIO_TogglePin(BSP_MOTOR_CONTROL_BOARD_PWM_E2_PORT, BSP_MOTOR_CONTROL_BOARD_PWM_E2_PIN);
@@ -769,6 +787,7 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
       BSP_MotorControl_StepClockHandler(4);
     }
   }
+#endif
 #ifndef MARLIN
   if ((htim->Instance == BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E3)&& (htim->Channel == BSP_MOTOR_CONTROL_BOARD_HAL_ACT_CHAN_TIMER_PWM_E3))
   {
@@ -789,7 +808,7 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
 #endif    
     
   }
-#ifdef MARLIN
+#if defined(MARLIN) && defined(BSP_SERVO0_PIN)
   if ((htim->Instance == BSP_MISC_TIMER_SERVO)&& (htim->Channel == BSP_MISC_HAL_ACT_CHAN_TIMER_SERVO))
   {
     TimerStService();
@@ -828,6 +847,7 @@ void HAL_TIM_OC_MspInit(TIM_HandleTypeDef* htim_oc)
     HAL_NVIC_SetPriority(BSP_MISC_TICK2_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(BSP_MISC_TICK2_IRQn);
   }  
+#ifdef BSP_SERVO0_PIN
   if(htim_oc->Instance == BSP_MISC_TIMER_SERVO)
   {
     /* Peripheral clock enable */
@@ -841,7 +861,8 @@ void HAL_TIM_OC_MspInit(TIM_HandleTypeDef* htim_oc)
     HAL_NVIC_SetPriority(BSP_MISC_SERVO_IRQn, 1, 0);
     HAL_NVIC_EnableIRQ(BSP_MISC_SERVO_IRQn);
   } 
-#endif  
+#endif//BSP_SERVO0_PIN
+#endif//MARLIN
 }
 
 void HAL_TIM_OC_MspDeInit(TIM_HandleTypeDef* htim_oc)
@@ -864,6 +885,7 @@ void HAL_TIM_OC_MspDeInit(TIM_HandleTypeDef* htim_oc)
     /* Peripheral interrupt Deinit*/
     HAL_NVIC_DisableIRQ(BSP_MISC_TICK2_IRQn);
   }  
+#ifdef BSP_SERVO0_PIN
   if(htim_oc->Instance == BSP_MISC_TIMER_SERVO)
   {
     /* Peripheral clock disable */
@@ -872,7 +894,8 @@ void HAL_TIM_OC_MspDeInit(TIM_HandleTypeDef* htim_oc)
     /* Peripheral interrupt Deinit*/
     HAL_NVIC_DisableIRQ(BSP_MISC_SERVO_IRQn);
   }    
-#endif  
+#endif//BSP_SERVO0_PIN
+#endif//MARLIN
 }
 
 /**

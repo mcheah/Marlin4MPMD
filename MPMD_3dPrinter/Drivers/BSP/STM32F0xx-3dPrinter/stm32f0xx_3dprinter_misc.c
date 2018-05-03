@@ -84,9 +84,9 @@ GPIO_TypeDef* gArrayGpioPort[BSP_MISC_MAX_PIN_NUMBER] = {
   BSP_MOTOR_CONTROL_BOARD_PWM_E1_PORT,   //E0_STEP_PIN     
   BSP_MOTOR_CONTROL_BOARD_DIR_E1_PORT,   //E0_DIR_PIN      
   BSP_MOTOR_CONTROL_BOARD_RESET_E1_PORT, //E0_ENABLE_PIN   
-  BSP_MOTOR_CONTROL_BOARD_PWM_E2_PORT,   //E1_STEP_PIN     
-  BSP_MOTOR_CONTROL_BOARD_DIR_E2_PORT,   //E1_DIR_PIN      25
-  BSP_MOTOR_CONTROL_BOARD_RESET_E2_PORT, //E1_ENABLE_PIN   
+  0,//BSP_MOTOR_CONTROL_BOARD_PWM_E2_PORT,   //E1_STEP_PIN
+  0,//BSP_MOTOR_CONTROL_BOARD_DIR_E2_PORT,   //E1_DIR_PIN      25
+  0,//BSP_MOTOR_CONTROL_BOARD_RESET_E2_PORT, //E1_ENABLE_PIN
   0,                                     //SDPOWER         
   0,                                     //SDSS            
   0,                                     //LED_PIN        
@@ -94,25 +94,26 @@ GPIO_TypeDef* gArrayGpioPort[BSP_MISC_MAX_PIN_NUMBER] = {
   0,                                     //PS_ON_PIN      
   0,                                     //KILL_PIN        
   BSP_HEAT_E1_PORT,                      //HEATER_0_PIN    
-  BSP_HEAT_E2_PORT,                      //HEATER_1_PIN    
-  BSP_HEAT_E3_PORT,                      //HEATER_2_PIN    35
+//TODO: make this a conditional compile to avoid hard-coding
+  0,//BSP_HEAT_E2_PORT,                      //HEATER_1_PIN
+  0,//BSP_HEAT_E3_PORT,                      //HEATER_2_PIN    35
   BSP_THERM_E1_PORT,                     //TEMP_0_PIN      
-  BSP_THERM_E2_PORT,                     //TEMP_1_PIN      
-  BSP_THERM_E3_PORT,                     //TEMP_2_PIN      
+  0,//BSP_THERM_E2_PORT,                     //TEMP_1_PIN
+  0,//BSP_THERM_E3_PORT,                     //TEMP_2_PIN
   BSP_HEAT_BED1_PORT,                     //HEATER_BED_PIN  
   BSP_THERM_BED1_PORT,                    //TEMP_BED_PIN    40
-  BSP_SERVO0_PORT,                       //SERVO0_PIN      
+  0,//BSP_SERVO0_PORT,                       //SERVO0_PIN
   0,                                     //SERVO1_PIN  
   0,                                     //SERVO2_PIN  
   0,                                     //SERVO3_PIN 
-  BSP_MOTOR_CONTROL_BOARD_PWM_E3_PORT,   //E2_STEP_PIN     45
-  BSP_MOTOR_CONTROL_BOARD_DIR_E3_PORT,   //E2_DIR_PIN 
-  BSP_MOTOR_CONTROL_BOARD_RESET_E3_PORT,  //E2_ENABLE_PIN  
-  BSP_STOP_U_PORT,                        //U_MIN_PIN  
-  BSP_STOP_V_PORT,                        //V_MIN_PIN  
-  BSP_STOP_W_PORT,                         //W_MIN_PIN   50
-  BSP_HEAT_BED2_PORT,                     //HEATER_BED2_PIN   
-  BSP_HEAT_BED3_PORT                      //HEATER_BED3_PIN       
+  0,//BSP_MOTOR_CONTROL_BOARD_PWM_E3_PORT,   //E2_STEP_PIN     45
+  0,//BSP_MOTOR_CONTROL_BOARD_DIR_E3_PORT,   //E2_DIR_PIN
+  0,//BSP_MOTOR_CONTROL_BOARD_RESET_E3_PORT,  //E2_ENABLE_PIN
+  0,//BSP_STOP_U_PORT,                        //U_MIN_PIN
+  0,//BSP_STOP_V_PORT,                        //V_MIN_PIN
+  0,//BSP_STOP_W_PORT,                         //W_MIN_PIN   50
+  0,//BSP_HEAT_BED2_PORT,                     //HEATER_BED2_PIN
+  0,//BSP_HEAT_BED3_PORT                      //HEATER_BED3_PIN
 };  
 
 uint16_t gArrayGpioPin[BSP_MISC_MAX_PIN_NUMBER] = {
@@ -140,9 +141,9 @@ uint16_t gArrayGpioPin[BSP_MISC_MAX_PIN_NUMBER] = {
   BSP_MOTOR_CONTROL_BOARD_PWM_E1_PIN,   //E0_STEP_PIN     
   BSP_MOTOR_CONTROL_BOARD_DIR_E1_PIN,   //E0_DIR_PIN             
   BSP_MOTOR_CONTROL_BOARD_RESET_E1_PIN, //E0_ENABLE_PIN       
-  BSP_MOTOR_CONTROL_BOARD_PWM_E2_PIN,   //E1_STEP_PIN     
-  BSP_MOTOR_CONTROL_BOARD_DIR_E2_PIN,   //E1_DIR_PIN       25
-  BSP_MOTOR_CONTROL_BOARD_RESET_E2_PIN, //E1_ENABLE_PIN   
+  0,//BSP_MOTOR_CONTROL_BOARD_PWM_E2_PIN,   //E1_STEP_PIN
+  0,//BSP_MOTOR_CONTROL_BOARD_DIR_E2_PIN,   //E1_DIR_PIN       25
+  0,//BSP_MOTOR_CONTROL_BOARD_RESET_E2_PIN, //E1_ENABLE_PIN
   0,                                    //SDPOWER         
   0,                                    //SDSS            
   0,                                    //LED_PIN        
@@ -150,25 +151,25 @@ uint16_t gArrayGpioPin[BSP_MISC_MAX_PIN_NUMBER] = {
   0,                                    //PS_ON_PIN  
   0,                                    //KILL_PIN        
   BSP_HEAT_E1_PIN,                      //HEATER_0_PIN    
-  BSP_HEAT_E2_PIN,                      //HEATER_1_PIN    
-  BSP_HEAT_E3_PIN,                      //HEATER_2_PIN     35    
+  0,//BSP_HEAT_E2_PIN,                      //HEATER_1_PIN
+  0,//BSP_HEAT_E3_PIN,                      //HEATER_2_PIN     35
   BSP_THERM_E1_PIN,                     //TEMP_0_PIN      
-  BSP_THERM_E2_PIN,                     //TEMP_1_PIN      
-  BSP_THERM_E3_PIN,                     //TEMP_2_PIN      
+  0,//BSP_THERM_E2_PIN,                     //TEMP_1_PIN
+  0,//BSP_THERM_E3_PIN,                     //TEMP_2_PIN
   BSP_HEAT_BED1_PIN,                     //HEATER_BED_PIN   
   BSP_THERM_BED1_PIN,                    //TEMP_BED_PIN     40    
-  BSP_SERVO0_PIN,                       //SERVO0_PIN      
+  0,//BSP_SERVO0_PIN,                       //SERVO0_PIN
   0,                                    //SERVO1_PIN  
   0,                                    //SERVO2_PIN  
   0,                                    //SERVO3_PIN  
-  BSP_MOTOR_CONTROL_BOARD_PWM_E3_PIN,   //E2_STEP_PIN      45
-  BSP_MOTOR_CONTROL_BOARD_DIR_E3_PIN,   //E2_DIR_PIN 
-  BSP_MOTOR_CONTROL_BOARD_RESET_E3_PIN, //E2_ENABLE_PIN  
-  BSP_STOP_U_PIN,                       //U_MIN_PIN  
-  BSP_STOP_V_PIN,                       //V_MIN_PIN  
-  BSP_STOP_W_PIN,                        //W_MIN_PIN     50   
-  BSP_HEAT_BED2_PIN,                     //HEATER_BED2_PIN   
-  BSP_HEAT_BED3_PIN                      //HEATER_BED3_PIN   
+  0,//BSP_MOTOR_CONTROL_BOARD_PWM_E3_PIN,   //E2_STEP_PIN      45
+  0,//BSP_MOTOR_CONTROL_BOARD_DIR_E3_PIN,   //E2_DIR_PIN
+  0,//BSP_MOTOR_CONTROL_BOARD_RESET_E3_PIN, //E2_ENABLE_PIN
+  0,//BSP_STOP_U_PIN,                       //U_MIN_PIN
+  0,//BSP_STOP_V_PIN,                       //V_MIN_PIN
+  0,//BSP_STOP_W_PIN,                        //W_MIN_PIN     50
+  0,//BSP_HEAT_BED2_PIN,                     //HEATER_BED2_PIN
+  0,//BSP_HEAT_BED3_PIN                      //HEATER_BED3_PIN
 };  
 
 /* Type definition ------------------------------------------------------------*/
@@ -472,35 +473,36 @@ void BSP_MiscStopInit(uint8_t id)
       GPIO_InitStruct.Pull = GPIO_PULLDOWN;
 #endif
       break;   
-    case 3:
-      /* Configure U_STOP pin */
-      gpioPin = BSP_STOP_U_PIN;
-      gpioPort = BSP_STOP_U_PORT;    
-#ifndef MARLIN
-      GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-#else
-      GPIO_InitStruct.Pull = GPIO_PULLUP;     
-#endif
-      break;  
-    case 4:
-      /* Configure V_STOP pin */
-      gpioPin = BSP_STOP_V_PIN;
-      gpioPort = BSP_STOP_V_PORT;    
-#ifndef MARLIN
-      GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-#else
-      GPIO_InitStruct.Pull = GPIO_PULLUP;     
-#endif
-      break;  
-    case 5:
-      /* Configure W_STOP pin */
-      gpioPin = BSP_STOP_W_PIN;
-      gpioPort = BSP_STOP_W_PORT;    
-#ifndef MARLIN
-      GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-#else
-      GPIO_InitStruct.Pull = GPIO_PULLUP;     
-#endif
+//TODO: make this a conditional compile
+//    case 3:
+//      /* Configure U_STOP pin */
+//      gpioPin = BSP_STOP_U_PIN;
+//      gpioPort = BSP_STOP_U_PORT;
+//#ifndef MARLIN
+//      GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+//#else
+//      GPIO_InitStruct.Pull = GPIO_PULLUP;
+//#endif
+//      break;
+//    case 4:
+//      /* Configure V_STOP pin */
+//      gpioPin = BSP_STOP_V_PIN;
+//      gpioPort = BSP_STOP_V_PORT;
+//#ifndef MARLIN
+//      GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+//#else
+//      GPIO_InitStruct.Pull = GPIO_PULLUP;
+//#endif
+//      break;
+//    case 5:
+//      /* Configure W_STOP pin */
+//      gpioPin = BSP_STOP_W_PIN;
+//      gpioPort = BSP_STOP_W_PORT;
+//#ifndef MARLIN
+//      GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+//#else
+//      GPIO_InitStruct.Pull = GPIO_PULLUP;
+//#endif
       break;        
     default:
       return;
@@ -566,6 +568,7 @@ void BSP_MiscFanInit(uint8_t id)
     	gpioPort = BSP_FAN_E1_PORT;
     	pfan = &fanE1;
       break;
+#ifdef BSP_FAN_E2_PIN
     case 1:
       /* Configure E2 Fan pin */
     	gpioPin  = BSP_FAN_E2_PIN;
@@ -578,6 +581,7 @@ void BSP_MiscFanInit(uint8_t id)
     	gpioPort = BSP_FAN_E3_PORT;
     	pfan = &fanE3;
       break;   
+#endif
     default:
       return;
   }
@@ -971,6 +975,7 @@ void BSP_MiscSetStepClockToSwMode(void)
         gpioPin = BSP_MOTOR_CONTROL_BOARD_PWM_E1_PIN;
         gpioPort = BSP_MOTOR_CONTROL_BOARD_PWM_E1_PORT;            
         break;
+#ifdef BSP_HEAT_E2_PIN
       case 4:
         pHTim = &hTimPwmE2;
         pHTim->Instance = BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E2;
@@ -983,6 +988,7 @@ void BSP_MiscSetStepClockToSwMode(void)
         gpioPin = BSP_MOTOR_CONTROL_BOARD_PWM_E3_PIN;
         gpioPort = BSP_MOTOR_CONTROL_BOARD_PWM_E3_PORT;            
         break;
+#endif//BSP_HEAT_E2_PIN
     }
     HAL_TIM_PWM_DeInit(pHTim);
   
@@ -1025,6 +1031,7 @@ void BSP_MiscGenerateStepClockPulse(uint8_t deviceId)
       gpioPin = BSP_MOTOR_CONTROL_BOARD_PWM_E1_PIN;
       gpioPort = BSP_MOTOR_CONTROL_BOARD_PWM_E1_PORT;            
       break;
+#ifdef BSP_HEAT_E2_PIN
     case 4:
       gpioPin = BSP_MOTOR_CONTROL_BOARD_PWM_E2_PIN;
       gpioPort = BSP_MOTOR_CONTROL_BOARD_PWM_E2_PORT;             
@@ -1033,6 +1040,7 @@ void BSP_MiscGenerateStepClockPulse(uint8_t deviceId)
       gpioPin = BSP_MOTOR_CONTROL_BOARD_PWM_E3_PIN;
       gpioPort = BSP_MOTOR_CONTROL_BOARD_PWM_E3_PORT;            
       break;
+#endif//BSP_HEAT_E2_PIN
   }  
   
   HAL_GPIO_WritePin(gpioPort, gpioPin, GPIO_PIN_SET); 
@@ -1083,6 +1091,7 @@ void BSP_MiscHeatManualInit(uint8_t heatId)
       gpioPin = BSP_HEAT_E1_PIN;
       gpioPort = BSP_HEAT_E1_PORT; 
       break;
+#ifdef BSP_HEAT_E2_PIN
     case 2:
       gpioPin = BSP_HEAT_E2_PIN;
       gpioPort = BSP_HEAT_E2_PORT; 
@@ -1091,6 +1100,8 @@ void BSP_MiscHeatManualInit(uint8_t heatId)
       gpioPin = BSP_HEAT_E3_PIN;
       gpioPort = BSP_HEAT_E3_PORT; 
       break;
+#endif//BSP_HEAT_E2_PIN
+#ifdef BSP_HEAT_BED2_PIN
     case 5:
       gpioPin = BSP_HEAT_BED2_PIN;
       gpioPort = BSP_HEAT_BED2_PORT; 
@@ -1099,6 +1110,7 @@ void BSP_MiscHeatManualInit(uint8_t heatId)
       gpioPin = BSP_HEAT_BED3_PIN;
       gpioPort = BSP_HEAT_BED3_PORT; 
       break;
+#endif//BSP_HEAT_BED2_PIN
     default:
     	return;
   }
@@ -1139,6 +1151,7 @@ void BSP_MiscHeatPwmInit(uint8_t heatId)
       pHTim->Instance = BSP_MISC_TIMER_PWM_HEAT_E1;
       channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_E1;
       break;
+#ifdef BSP_HEAT_E2_PIN
     case 2:
       pHTim = &hTimPwmHeatE2;
       pHTim->Instance = BSP_MISC_TIMER_PWM_HEAT_E2;
@@ -1149,6 +1162,8 @@ void BSP_MiscHeatPwmInit(uint8_t heatId)
       pHTim->Instance = BSP_MISC_TIMER_PWM_HEAT_E3;
       channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_E3;
       break;
+#endif//BSP_HEAT_E2_PIN
+#ifdef BSP_HEAT_BED2_PIN
     case 5:
       pHTim = &hTimPwmHeatBed2;
       pHTim->Instance = BSP_MISC_TIMER_PWM_HEAT_BED2;
@@ -1159,6 +1174,7 @@ void BSP_MiscHeatPwmInit(uint8_t heatId)
       pHTim->Instance = BSP_MISC_TIMER_PWM_HEAT_BED3;
       channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_BED3;
       break;
+#endif//BSP_HEAT_BED2_PIN
   }
   period = (sysFreq/ (HEAT_TIMER_PRESCALER * HEAT_TIMER_FREQUENCY)) - 1;
   
@@ -1206,6 +1222,7 @@ void BSP_MiscHeatPwmSetDutyCycle(uint8_t heatId, uint8_t newDuty)
       pHTim = &hTimPwmHeatE1;
       channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_E1;
       break;
+#ifdef BSP_HEAT_E2_PIN
     case 2:
       pHTim = &hTimPwmHeatE2;
       channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_E2;
@@ -1214,6 +1231,8 @@ void BSP_MiscHeatPwmSetDutyCycle(uint8_t heatId, uint8_t newDuty)
       pHTim = &hTimPwmHeatE3;
       channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_E3;
       break;
+#endif//BSP_HEAT_E2_PIN
+#ifdef BSP_HEAT_BED2_PIN
     case 5:
       pHTim = &hTimPwmHeatBed2;
       channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_BED2;
@@ -1222,6 +1241,7 @@ void BSP_MiscHeatPwmSetDutyCycle(uint8_t heatId, uint8_t newDuty)
       pHTim = &hTimPwmHeatBed3;
       channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_BED3;
       break;
+#endif
   }
   
   if (newDuty == 0) 
@@ -1242,6 +1262,7 @@ void BSP_MiscHeatPwmSetDutyCycle(uint8_t heatId, uint8_t newDuty)
  * @retval None
  * @note None
  **********************************************************/
+#ifdef BSP_SERVO0_PIN
 void  BSP_MotorControlBoard_ServoInit(void)
 {
   static TIM_OC_InitTypeDef sConfigOC;
@@ -1304,7 +1325,7 @@ void  BSP_MotorControlBoard_ServoStop(void)
   HAL_TIM_OC_Stop_IT(&hTimServo, BSP_MISC_CHAN_TIMER_SERVO);
   HAL_GPIO_WritePin(BSP_SERVO0_PORT, BSP_SERVO0_PIN, GPIO_PIN_SET);   
 }
-
+#endif
 /******************************************************//**
  * @brief  Initialisation of the user GPIOs
  * @param[in] id 0 for USER_1, 1 for USER_2, 2 for USER_3, 3 for USER_4
@@ -1313,6 +1334,7 @@ void  BSP_MotorControlBoard_ServoStop(void)
  * @param[in] pull GPIO_NOPULL, GPIO_PULLUP, GPIO_PULLDOWN
  * @retval None
  **********************************************************/
+#ifdef BSP_USER_1_PIN
 void BSP_MiscUserGpioInit(uint8_t id, uint32_t mode, uint32_t pull)
 {
   GPIO_InitTypeDef GPIO_InitStruct;
@@ -1350,6 +1372,7 @@ void BSP_MiscUserGpioInit(uint8_t id, uint32_t mode, uint32_t pull)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
   HAL_GPIO_Init(gpioPort, &GPIO_InitStruct);      
 }
+#endif
 
 
 /**

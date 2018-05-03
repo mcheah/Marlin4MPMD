@@ -75,7 +75,9 @@
   * @{
   */       
 /// SPI handler declaration
+#ifdef MOTOR_L6474
 static SPI_HandleTypeDef SpiHandle;
+#endif//MOTOR_L6474
 /// Timer handler for PWMX
 TIM_HandleTypeDef hTimPwmX;
 /// Timer handler for PWMY
@@ -84,10 +86,12 @@ TIM_HandleTypeDef hTimPwmY;
 TIM_HandleTypeDef hTimPwmZ;
 /// Timer handler for PWME1
 TIM_HandleTypeDef hTimPwmE1;
+#ifdef BSP_HEAT_E2_PIN
 /// Timer handler for PWME2
 TIM_HandleTypeDef hTimPwmE2;
 /// Timer handler for PWME3
 TIM_HandleTypeDef hTimPwmE3;
+#endif//BSP_HEAT_E2_PIN
 
 /**
   * @}
@@ -105,9 +109,11 @@ void BSP_MotorControlBoard_PwmXSetFreq(uint16_t newFreq); //Set PWM_X frequency 
 void BSP_MotorControlBoard_PwmYSetFreq(uint16_t newFreq); //Set PWM_Y frequency and start it  
 void BSP_MotorControlBoard_PwmZSetFreq(uint16_t newFreq); //Set PWM_Z frequency and start it
 void BSP_MotorControlBoard_PwmE1SetFreq(uint16_t newFreq); //Set PWM_E1 frequency and start it
+#ifdef BSP_HEAT_E2_PIN
 void BSP_MotorControlBoard_PwmE2SetFreq(uint16_t newFreq); //Set PWM_E2 frequency and start it
 void BSP_MotorControlBoard_PwmE3SetFreq(uint16_t newFreq); //Set PWM_E3 frequency and start it
 void BSP_MotorControlBoard_PwmE4SetFreq(uint16_t newFreq); //Set PWM_E4 frequency and start it
+#endif
 void BSP_MotorControlBoard_PwmInit(uint8_t deviceId);    //Init the PWM of the specified device
 void BSP_MotorControlBoard_PwmStop(uint8_t deviceId);    //Stop the PWM of the specified device
 void BSP_MotorControlBoard_ReleaseReset(void);           //Reset the L6474 reset pin 
@@ -192,13 +198,14 @@ void BSP_MotorControlBoard_GpioInit(uint8_t nbDevices)
   HAL_NVIC_EnableIRQ(BSP_MOTOR_CONTROL_BOARD_FLAG_IRQn);    
 
   /* Configure L6474 - CS pin ---------------------------------------------*/
+#ifdef MOTOR_L6474
   GPIO_InitStruct.Pin = BSP_MOTOR_CONTROL_BOARD_CS_PIN;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
   HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_CS_PORT, &GPIO_InitStruct);
   HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_CS_PORT, BSP_MOTOR_CONTROL_BOARD_CS_PIN, GPIO_PIN_SET); 
-  
+#endif//MOTOR_L6474
   /* Configure L6474 - STBY/RESET pin -------------------------------------*/
   GPIO_InitStruct.Pin = BSP_MOTOR_CONTROL_BOARD_RESET_X_PIN;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -223,7 +230,7 @@ void BSP_MotorControlBoard_GpioInit(uint8_t nbDevices)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
   HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_RESET_E1_PORT, &GPIO_InitStruct);    
-
+#ifdef BSP_HEAT_E2_PIN
   GPIO_InitStruct.Pin = BSP_MOTOR_CONTROL_BOARD_RESET_E2_PIN;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -235,7 +242,7 @@ void BSP_MotorControlBoard_GpioInit(uint8_t nbDevices)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
   HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_RESET_E3_PORT, &GPIO_InitStruct);   
-
+#endif//BSP_HEAT_E2_PIN
   BSP_MotorControlBoard_Reset();  
   //TODO: check that this makes sense, because we may have different motor numbers
   if (nbDevices > 1) 
@@ -265,6 +272,7 @@ void BSP_MotorControlBoard_GpioInit(uint8_t nbDevices)
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
     HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_DIR_E1_PORT, &GPIO_InitStruct);    
   }  
+#ifdef BSP_HEAT_E2_PIN
     if (nbDevices > 4) 
   {
     /* Configure L6474 - DIR pin for device  4 ----------------------------*/
@@ -283,6 +291,7 @@ void BSP_MotorControlBoard_GpioInit(uint8_t nbDevices)
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
     HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_DIR_E3_PORT, &GPIO_InitStruct);    
   }  
+#endif
 }
 
 /******************************************************//**
@@ -352,6 +361,7 @@ void BSP_MotorControlBoard_PwmE1SetFreq(uint16_t newFreq)
  * @retval None
  * @note The frequency is directly the current speed of the device
  **********************************************************/
+#ifdef BSP_HEAT_E2_PIN
 void BSP_MotorControlBoard_PwmE2SetFreq(uint16_t newFreq)
 {
   uint32_t sysFreq = HAL_RCC_GetSysClockFreq();
@@ -376,7 +386,7 @@ void BSP_MotorControlBoard_PwmE3SetFreq(uint16_t newFreq)
   __HAL_TIM_SetCompare(&hTimPwmE3, BSP_MOTOR_CONTROL_BOARD_CHAN_TIMER_PWM_E3, period >> 1);
   HAL_TIM_PWM_Start_IT(&hTimPwmE3, BSP_MOTOR_CONTROL_BOARD_CHAN_TIMER_PWM_E3);  
 }
-
+#endif//BSP_HEAT_E2_PIN
 /******************************************************//**
  * @brief  Initialises the PWM uses by the specified device
  * @param[in] deviceId (from 0 to 2)
@@ -416,6 +426,7 @@ void BSP_MotorControlBoard_PwmInit(uint8_t deviceId)
       pHTim->Instance = BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E1;
       channel = BSP_MOTOR_CONTROL_BOARD_CHAN_TIMER_PWM_E1;
       break;
+#ifdef BSP_HEAT_E2_PIN
     case 4:
       pHTim = &hTimPwmE2;
       pHTim->Instance = BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E2;
@@ -426,6 +437,7 @@ void BSP_MotorControlBoard_PwmInit(uint8_t deviceId)
       pHTim->Instance = BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E3;
       channel = BSP_MOTOR_CONTROL_BOARD_CHAN_TIMER_PWM_E3;
       break;
+#endif//BSP_HEAT_E2_PIN
   }
   pHTim->Init.Prescaler = TIMER_PRESCALER -1;
   pHTim->Init.CounterMode = TIM_COUNTERMODE_UP;
@@ -465,12 +477,14 @@ void BSP_MotorControlBoard_PwmStop(uint8_t deviceId)
     case 3:
        HAL_TIM_PWM_Stop(&hTimPwmE1,BSP_MOTOR_CONTROL_BOARD_CHAN_TIMER_PWM_E1);
       break;
+#ifdef BSP_HEAT_E2_PIN
     case 4:
        HAL_TIM_PWM_Stop(&hTimPwmE2,BSP_MOTOR_CONTROL_BOARD_CHAN_TIMER_PWM_E2);
       break;
     case 5:
        HAL_TIM_PWM_Stop(&hTimPwmE3,BSP_MOTOR_CONTROL_BOARD_CHAN_TIMER_PWM_E3);
       break;
+#endif
   default:
       break;//ignore error
   }
@@ -486,9 +500,11 @@ void BSP_MotorControlBoard_ReleaseReset(void)
   HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_X_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_X_PIN, GPIO_PIN_SET); 
   HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_Y_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_Y_PIN, GPIO_PIN_SET); 
   HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_Z_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_Z_PIN, GPIO_PIN_SET); 
-  HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_E1_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_E1_PIN, GPIO_PIN_SET); 
+  HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_E1_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_E1_PIN, GPIO_PIN_SET);
+#ifdef BSP_HEAT_E2_PIN
   HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_E2_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_E2_PIN, GPIO_PIN_SET); 
   HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_E3_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_E3_PIN, GPIO_PIN_SET);
+#endif//BSP_HEAT_E2_PIN
 }
 
 /******************************************************//**
@@ -501,9 +517,11 @@ void BSP_MotorControlBoard_Reset(void)
   HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_X_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_X_PIN, GPIO_PIN_RESET); 
   HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_Y_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_Y_PIN, GPIO_PIN_RESET); 
   HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_Z_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_Z_PIN, GPIO_PIN_RESET); 
-  HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_E1_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_E1_PIN, GPIO_PIN_RESET); 
+  HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_E1_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_E1_PIN, GPIO_PIN_RESET);
+#ifdef BSP_HEAT_E2_PIN
   HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_E2_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_E2_PIN, GPIO_PIN_RESET); 
   HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_E3_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_E3_PIN, GPIO_PIN_RESET);
+#endif//BSP_HEAT_E2_PIN
 }
 
 /******************************************************//**
@@ -516,12 +534,14 @@ void BSP_MotorControlBoard_SetDirectionGpio(uint8_t deviceId, uint8_t gpioState)
 {
   switch (deviceId)
   {
+#ifdef BSP_HEAT_E2_PIN
     case 5: 
       HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_DIR_E3_PORT, BSP_MOTOR_CONTROL_BOARD_DIR_E3_PIN, (GPIO_PinState)gpioState); 
       break;
     case 4:
       HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_DIR_E2_PORT, BSP_MOTOR_CONTROL_BOARD_DIR_E2_PIN, (GPIO_PinState)gpioState); 
       break;
+#endif//BSP_HEAT_E2_PIN
     case 3: 
       HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_DIR_E1_PORT, BSP_MOTOR_CONTROL_BOARD_DIR_E1_PIN, (GPIO_PinState)gpioState); 
       break;
@@ -544,6 +564,7 @@ void BSP_MotorControlBoard_SetDirectionGpio(uint8_t deviceId, uint8_t gpioState)
  * @param None
  * @retval HAL_OK if SPI transaction is OK, HAL_KO else
  **********************************************************/
+#ifdef MOTOR_L6474
 uint8_t BSP_MotorControlBoard_SpiInit(void)
 {
   HAL_StatusTypeDef status;
@@ -594,6 +615,7 @@ uint8_t BSP_MotorControlBoard_SpiWriteBytes(uint8_t *pByteToTransmit, uint8_t *p
   
   return (uint8_t) status;  
 }
+#endif
 
 
 /**
