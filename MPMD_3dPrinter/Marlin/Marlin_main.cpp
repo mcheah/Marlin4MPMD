@@ -288,7 +288,7 @@ static bool cmdForWifi = false;
 
 bool Running = true;
 
-uint8_t marlin_debug_flags = DEBUG_NONE;
+uint8_t marlin_debug_flags = DEBUG_INFO | DEBUG_LEVELING;
 
 float current_position[NUM_AXIS] = { 0.0 };
 static float destination[NUM_AXIS] = { 0.0 };

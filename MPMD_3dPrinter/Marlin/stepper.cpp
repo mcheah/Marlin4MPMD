@@ -246,8 +246,8 @@ volatile long Stepper::endstops_trigsteps[3];
                )
 */
 // Some useful constants
-
-#define ENABLE_STEPPER_DRIVER_INTERRUPT()   BSP_MiscTickSetFreq(1000)
+#define STEPPER_NOMINAL_FREQ				10000
+#define ENABLE_STEPPER_DRIVER_INTERRUPT()   BSP_MiscTickSetFreq(STEPPER_NOMINAL_FREQ)
 #define DISABLE_STEPPER_DRIVER_INTERRUPT() BSP_MiscTickStop()
 /* BDI  -- To suppress :
 #define ENABLE_STEPPER_DRIVER_INTERRUPT()  SBI(TIMSK1, OCIE1A)
@@ -330,7 +330,7 @@ void Stepper::StepperHandler()
       if ((cleaning_buffer_counter == 1) && (SD_FINISHED_STEPPERRELEASE)) enqueue_and_echo_commands_P(PSTR(SD_FINISHED_RELEASECOMMAND));
     #endif
     cleaning_buffer_counter--;
-    BSP_MiscTickSetFreq(1000); //1ms wait
+    BSP_MiscTickSetFreq(STEPPER_NOMINAL_FREQ); //1ms wait
     //  BDI  -- OCR1A = 200;
     return;
   }
@@ -356,7 +356,7 @@ void Stepper::StepperHandler()
       #if ENABLED(Z_LATE_ENABLE)
         if (current_block->steps[Z_AXIS] > 0) {
           enable_z();
-          BSP_MiscTickSetFreq(1000); //1kHz
+          BSP_MiscTickSetFreq(STEPPER_NOMINAL_FREQ); //1kHz
           // OCR1A = 2000; //1ms wait  -- BDI : To supp
           return;
         }
@@ -367,7 +367,7 @@ void Stepper::StepperHandler()
       // #endif
     }
     else {
-      BSP_MiscTickSetFreq(1000); //1kHz
+      BSP_MiscTickSetFreq(STEPPER_NOMINAL_FREQ); //1kHz
       // OCR1A = 2000; // 1kHz.  -- BDI : To supp
     }
   }

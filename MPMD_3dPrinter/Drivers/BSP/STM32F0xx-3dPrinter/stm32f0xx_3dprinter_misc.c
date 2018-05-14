@@ -819,15 +819,15 @@ void BSP_MiscTickSetFreq(uint32_t newFreq)
 
   uint32_t timPeriod;
   uint32_t timerCnt = hTimTick.Instance->CNT;
-  if(newFreq > 10000) { 
-    // If newFreq > 20kHz >> step 4 times
-    newFreq = (newFreq >> 2)&0x3fff;
-  }
-  else if(newFreq > 5000) 
-  { 
-    // If newFreq > 10kHz >> step 2 times
-    newFreq = (newFreq >> 1)&0x7fff;
-  }
+//  if(newFreq > 10000) {
+//    // If newFreq > 20kHz >> step 4 times
+//    newFreq = (newFreq >> 2)&0x3fff;
+//  }
+//  else if(newFreq > 5000)
+//  {
+//    // If newFreq > 10kHz >> step 2 times
+//    newFreq = (newFreq >> 1)&0x7fff;
+//  }
   
   timPeriod = (HAL_RCC_GetSysClockFreq()/ (TICK_TIMER_PRESCALER * (uint32_t)newFreq));
   if (timPeriod < 100) timPeriod = 100;
