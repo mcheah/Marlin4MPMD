@@ -186,28 +186,33 @@ typedef struct {
 
 /* Global variable ------------------------------------------------------------*/
 static tFanStruct fanE1;
+#ifdef BSP_HEAT_E2_PIN
 static tFanStruct fanE2;
 static tFanStruct fanE3;
-
+#endif//BSP_HEAT_E2_PIN
 
 /* Imported variables ---------------------------------------------------------*/
 extern TIM_HandleTypeDef hTimPwmX;
 extern TIM_HandleTypeDef hTimPwmY;
 extern TIM_HandleTypeDef hTimPwmZ;
 extern TIM_HandleTypeDef hTimPwmE1;
+#ifdef BSP_HEAT_E2_PIN
 extern TIM_HandleTypeDef hTimPwmE2;
 extern TIM_HandleTypeDef hTimPwmE3;
-
+#endif//BSP_HEAT_E2_PIN
 /* Private variables ---------------------------------------------------------*/
 TIM_HandleTypeDef hTimPwmHeatBed;
+#ifdef BSP_HEAT_BED2_PIN
 TIM_HandleTypeDef hTimPwmHeatBed2;
 TIM_HandleTypeDef hTimPwmHeatBed3;
+#endif//BSP_HEAT_BED2_PIN
 TIM_HandleTypeDef hTimPwmHeatE1;
+#ifdef BSP_HEAT_E2_PIN
 TIM_HandleTypeDef hTimPwmHeatE2;
 TIM_HandleTypeDef hTimPwmHeatE3;
-
+#endif//BSP_HEAT_E2_PIN
 /// Number of motor devices
-uint8_t bspMiscNbMotorDevices = 0;
+uint8_t bspMiscNbMotorDevices = 4;
 
 /// Number of the last error
 static volatile uint16_t bspMiscLastError;
@@ -244,9 +249,10 @@ void BSP_MiscOverallInit(uint8_t nbDevices)
 
 	/* Init fan struct */
 	memset( &fanE1, 0x0, sizeof(tFanStruct));
+#ifdef BSP_HEAT_E2_PIN
 	memset( &fanE2, 0x0, sizeof(tFanStruct));
 	memset( &fanE3, 0x0, sizeof(tFanStruct));
-
+#endif//BSP_HEAT_E2_PIN
    /* STM32xx HAL library initialization */
   HAL_Init();
   
@@ -617,12 +623,14 @@ void BSP_MiscFanSetSpeed(uint8_t id,uint8_t speed)
 	if( id == 0)
     	/* Configure E1 Fan */
     	pfan = &fanE1;
+#ifdef BSP_HEAT_E2_PIN
 	else if ( id == 1)
     	/* Configure E2 Fan */
     	pfan = &fanE2;
 	else if ( id == 2)
 		/* Configure E3 Fan */
 	    pfan = &fanE3;
+#endif//BSP_HEAT_E2_PIN
 	else // Error case
 		return;
   
@@ -678,6 +686,7 @@ void HAL_SYSTICK_Callback(void)
 			}
 		}
 	}
+#ifdef BSP_HEAT_E2_PIN
 	else if( fanE2.activePwm)
 	{
 		fanE2.count--;
@@ -716,6 +725,7 @@ void HAL_SYSTICK_Callback(void)
 			}
 		}
 	}
+#endif//BSP_HEAT_E2_PIN
 
 }
 

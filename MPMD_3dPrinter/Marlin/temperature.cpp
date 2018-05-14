@@ -789,7 +789,11 @@ void Temperature::manage_heater() {
       }
     #else // !PIDTEMPBED && !BED_LIMIT_SWITCHING
       // Check if temperature is within the correct range
+#if defined(BED_MINTEMP) && defined(BED_MAXTEMP)
       if (current_temperature_bed > BED_MINTEMP && current_temperature_bed < BED_MAXTEMP) {
+#else
+      if(1) {
+#endif
         soft_pwm_bed = current_temperature_bed < target_temperature_bed ? MAX_BED_POWER >> 1 : 0;
       }
       else {
@@ -1737,6 +1741,7 @@ void Temperature::TemperatureHandler(void)
     raw_temp_bed_value = 0;
 
     #if HAS_TEMP_0 && DISABLED(HEATER_0_USES_MAX6675)
+#if defined(HEATER_0_MAXTEMP) && defined(HEATER_0_MINTEMP)
       #if HEATER_0_RAW_LO_TEMP > HEATER_0_RAW_HI_TEMP
         #define GE0 <=
       #else
@@ -1753,6 +1758,7 @@ void Temperature::TemperatureHandler(void)
         else
           consecutive_low_temperature_error[0] = 0;
       #endif
+#endif
     #endif
 
     #if HAS_TEMP_1 && HOTENDS > 1
@@ -1818,8 +1824,10 @@ void Temperature::TemperatureHandler(void)
       #else
         #define GEBED >=
       #endif
+#if defined(BED_MINTEMP) && defined(BED_MAXTEMP)
       if (current_temperature_bed_raw GEBED bed_maxttemp_raw) _temp_error(-1, PSTR(MSG_T_MAXTEMP), PSTR(MSG_ERR_MAXTEMP_BED));
       if (bed_minttemp_raw GEBED current_temperature_bed_raw) _temp_error(-1, PSTR(MSG_T_MINTEMP), PSTR(MSG_ERR_MINTEMP_BED));
+#endif
     #endif
 
   } // temp_count >= OVERSAMPLENR

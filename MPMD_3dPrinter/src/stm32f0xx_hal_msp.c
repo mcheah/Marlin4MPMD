@@ -813,12 +813,13 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
   {
     TimerStService();
   }    
-  
+#endif
+#ifdef MARLIN
   if ((htim->Instance == BSP_MISC_TIMER_TICK2)&& (htim->Channel == BSP_MISC_HAL_ACT_CHAN_TIMER_TICK2))
   {
     IsrTemperatureHandler();
   }  
-#endif      
+#endif
 }
 
 void HAL_TIM_OC_MspInit(TIM_HandleTypeDef* htim_oc)
@@ -936,17 +937,23 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(BSP_THERM_BED1_PORT, &GPIO_InitStruct);
-
+#ifdef BSP_THERM_BED2_PIN
     GPIO_InitStruct.Pin = BSP_THERM_BED2_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(BSP_THERM_BED2_PORT, &GPIO_InitStruct);
-    
+
+    GPIO_InitStruct.Pin = BSP_THERM_BED3_PIN;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(BSP_THERM_BED3_PORT, &GPIO_InitStruct);
+#endif//BSP_THERM_BED2_PIN
     GPIO_InitStruct.Pin = BSP_THERM_E1_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(BSP_THERM_E1_PORT, &GPIO_InitStruct);
 
+#ifdef BSP_THERM_E2_PIN
     GPIO_InitStruct.Pin = BSP_THERM_E2_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -956,11 +963,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(BSP_THERM_E3_PORT, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = BSP_THERM_BED3_PIN;
-    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(BSP_THERM_BED3_PORT, &GPIO_InitStruct);    
+#endif//BSP_THERM_E2_PIN
     
     GPIO_InitStruct.Pin = BSP_IR_OUT_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
@@ -979,7 +982,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     pDmaHandle->Init.Mode = DMA_CIRCULAR;
     pDmaHandle->Init.Priority = DMA_PRIORITY_LOW;
 //    pDmaHandle->Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-    HAL_DMA_DeInit(pDmaHandle);  
+    HAL_DMA_DeInit(pDmaHandle);
     HAL_DMA_Init(pDmaHandle);
 
     __HAL_LINKDMA(hadc,DMA_Handle,gBspAdcData.dmaHandle);
@@ -1008,11 +1011,15 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
     
     /* ADC GPIO Deconfiguration    */
     HAL_GPIO_DeInit(BSP_THERM_BED1_PORT, BSP_THERM_BED1_PIN);
+#ifdef BSP_THERM_BED2_PIN
     HAL_GPIO_DeInit(BSP_THERM_BED2_PORT, BSP_THERM_BED2_PIN);
     HAL_GPIO_DeInit(BSP_THERM_BED3_PORT, BSP_THERM_BED3_PIN);
+#endif//BSP_THERM_BED2_PIN
     HAL_GPIO_DeInit(BSP_THERM_E1_PORT, BSP_THERM_E1_PIN);
+#ifdef BSP_THERM_E2_PIN
     HAL_GPIO_DeInit(BSP_THERM_E2_PORT, BSP_THERM_E2_PIN);
     HAL_GPIO_DeInit(BSP_THERM_E3_PORT, BSP_THERM_E3_PIN);
+#endif//BSP_THERM_E2_PIN
     HAL_GPIO_DeInit(BSP_IR_OUT_PORT, BSP_IR_OUT_PIN);
     
     /* Peripheral DMA DeInit*/

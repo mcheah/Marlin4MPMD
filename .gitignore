@@ -458,3 +458,4 @@
 RemoteSystemsTempFiles/
 # Debug files
 *.dSYM/
+blank/

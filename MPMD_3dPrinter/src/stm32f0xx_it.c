@@ -61,10 +61,10 @@ void SysTick_Handler(void)
   * @param  None
   * @retval None
   */
-void EXTI0_1_IRQHandler(void)
-{
-//	HAL_GPIO_EXTI_IRQHandler(BSP_MOTOR_CONTROL_BOARD_FLAG_PIN);
-}
+//void EXTI0_1_IRQHandler(void)
+//{
+////	HAL_GPIO_EXTI_IRQHandler(BSP_MOTOR_CONTROL_BOARD_FLAG_PIN);
+//}
 
 /**
   * @brief  This function handles interrupt for External lines 10 to 15
@@ -82,45 +82,45 @@ void EXTI0_1_IRQHandler(void)
   * @param  None
   * @retval None
   */
-void TIM1_CC_IRQHandler(void)
-{
-  HAL_TIM_IRQHandler(&hTimPwmX);
-}
+//void TIM1_CC_IRQHandler(void)
+//{
+////  HAL_TIM_IRQHandler(&hTimPwmX);
+//}
 /**
   * @brief  This function handles TIM2 interrupt request.
   * @param  None
   * @retval None
   */
-void TIM2_IRQHandler(void)
-{
-  HAL_TIM_IRQHandler(&hTimPwmY);
-}
+//void TIM2_IRQHandler(void)
+//{
+////  HAL_TIM_IRQHandler(&hTimPwmY);
+//}
 /**
   * @brief  This function handles TIM3 interrupt request.
   * @param  None
   * @retval None
   */
-void TIM3_IRQHandler(void)
-{
-  HAL_TIM_IRQHandler(&hTimPwmZ);
-}
+//void TIM3_IRQHandler(void)
+//{
+////  HAL_TIM_IRQHandler(&hTimPwmZ);
+//}
 /**
   * @brief  This function handles TIM4 interrupt request.
   * @param  None
   * @retval None
   */
-void TIM4_IRQHandler(void)
-{
-  HAL_TIM_IRQHandler(&hTimPwmE1);
-}
+//void TIM4_IRQHandler(void)
+//{
+////  HAL_TIM_IRQHandler(&hTimPwmE1);
+//}
 
 /**
 * @brief This function handles TIM5 global interrupt.
 */
 //TODO: check that these timer handler's match up with that they should be doing
-void TIM6_IRQHandler(void)
+void TIM3_IRQHandler(void)
 {
-  HAL_NVIC_ClearPendingIRQ(TIM6_IRQn);
+  HAL_NVIC_ClearPendingIRQ(TIM3_IRQn);
   HAL_TIM_IRQHandler(&hTimTick);
 
 }
@@ -157,6 +157,11 @@ void TIM1_UP_TIM10_IRQHandler(void)
   * @param  None
   * @retval None
   */
+void TIM14_IRQHandler(void)
+{
+	HAL_NVIC_ClearPendingIRQ(TIM14_IRQn);
+	HAL_TIM_IRQHandler(&hTimTick2);
+}
 //void TIM1_BRK_UP_TRG_COM_IRQHandler(void)
 //{
 //#ifdef MARLIN
@@ -199,7 +204,7 @@ void BSP_UART_DEBUG_IRQHandler(void)
 */
 void BSP_DMA_IRQHandler(void)
 {
-  //HAL_NVIC_ClearPendingIRQ(BSP_DMA_IRQn);
+  HAL_NVIC_ClearPendingIRQ(BSP_DMA_IRQn);
   HAL_DMA_IRQHandler(&(gBspAdcData.dmaHandle));
 }
 
@@ -208,7 +213,7 @@ void BSP_DMA_IRQHandler(void)
 */
 void BSP_ADC_IRQHandler(void)
 {
-  //HAL_NVIC_ClearPendingIRQ(BSP_ADC_IRQn);
+  HAL_NVIC_ClearPendingIRQ(BSP_ADC_IRQn);
   HAL_ADC_IRQHandler(&(gBspAdcData.adcHandle));
 }
 

@@ -48,30 +48,31 @@
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
 
-void NMI_Handler(void);
-void HardFault_Handler(void);
-void SVC_Handler(void);
-void PendSV_Handler(void);
+//void NMI_Handler(void);
+//void HardFault_Handler(void);
+//void SVC_Handler(void);
+//void PendSV_Handler(void);
 void SysTick_Handler(void);
 
 //void EXTI0_IRQHandler(void);
 //void EXTI1_IRQHandler(void);
-void EXTI0_1_IRQHandler(void);
+//void EXTI0_1_IRQHandler(void);
 
-void TIM1_CC_IRQHandler(void);
-void TIM2_IRQHandler(void);
+//void TIM1_CC_IRQHandler(void);
+//void TIM2_IRQHandler(void);
 void TIM3_IRQHandler(void);
 void TIM4_IRQHandler(void);
 void TIM6_IRQHandler(void);
-void TIM1_BRK_UP_TRG_COM_IRQHandler(void);
-void TIM1_UP_TIM10_IRQHandler(void);
-void TIM1_UP_TIM10_IRQHandler(void);
+//void TIM1_BRK_UP_TRG_COM_IRQHandler(void);
+//void TIM1_UP_TIM10_IRQHandler(void);
+//void TIM1_UP_TIM10_IRQHandler(void);
+void TIM14_IRQHandler(void);
 void BSP_UART_DEBUG_IRQHandler(void);
 //void BSP_WIFI_UART_IRQHandler(void);
 void BSP_DMA_IRQHandler(void);
 void BSP_ADC_IRQHandler(void);
-void DMA1_CH1_IRQHandler(void);
-void DMA1_CH2_3_IRQHandler(void);
+//void DMA1_CH1_IRQHandler(void);
+//void DMA1_CH2_3_IRQHandler(void);
 //void SDIO_IRQHandler(void);
 //void BSP_WIFI_UART_DMA_TX_IRQHandler(void);
 //void BSP_WIFI_UART_DMA_RX_IRQHandler(void);

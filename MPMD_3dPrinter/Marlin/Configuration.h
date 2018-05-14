@@ -233,9 +233,9 @@
 // :{ '0': "Not used",'1':"100k / 4.7k - EPCOS",'2':"200k / 4.7k - ATC Semitec 204GT-2",'3':"Mendel-parts / 4.7k",'4':"10k !! do not use for a hotend. Bad resolution at high temp. !!",'5':"100K / 4.7k - ATC Semitec 104GT-2 (Used in ParCan & J-Head)",'6':"100k / 4.7k EPCOS - Not as accurate as Table 1",'7':"100k / 4.7k Honeywell 135-104LAG-J01",'8':"100k / 4.7k 0603 SMD Vishay NTCS0603E3104FXT",'9':"100k / 4.7k GE Sensing AL03006-58.2K-97-G1",'10':"100k / 4.7k RS 198-961",'11':"100k / 4.7k beta 3950 1%",'12':"100k / 4.7k 0603 SMD Vishay NTCS0603E3104FXT (calibrated for Makibox hot bed)",'13':"100k Hisens 3950  1% up to 300°C for hotend 'Simple ONE ' & hotend 'All In ONE'",'20':"PT100 (Ultimainboard V2.x)",'51':"100k / 1k - EPCOS",'52':"200k / 1k - ATC Semitec 204GT-2",'55':"100k / 1k - ATC Semitec 104GT-2 (Used in ParCan & J-Head)",'60':"100k Maker's Tool Works Kapton Bed Thermistor beta=3950",'66':"Dyze Design 4.7M High Temperature thermistor",'70':"the 100K thermistor found in the bq Hephestos 2",'71':"100k / 4.7k Honeywell 135-104LAF-J01",'147':"Pt100 / 4.7k",'1047':"Pt1000 / 4.7k",'110':"Pt100 / 1k (non-standard)",'1010':"Pt1000 / 1k (non standard)",'-3':"Thermocouple + MAX31855 (only for sensor 0)",'-2':"Thermocouple + MAX6675 (only for sensor 0)",'-1':"Thermocouple + AD595",'998':"Dummy 1",'999':"Dummy 2" }
 //TODO: verify these temp sensor values vs the mpmd
 #define TEMP_SENSOR_0 23
-#define TEMP_SENSOR_1 0
-#define TEMP_SENSOR_2 0
-#define TEMP_SENSOR_3 0
+//#define TEMP_SENSOR_1 0
+//#define TEMP_SENSOR_2 0
+//#define TEMP_SENSOR_3 0
 #define TEMP_SENSOR_BED 23
 
 
@@ -257,18 +257,18 @@
 // to check that the wiring to the thermistor is not broken.
 // Otherwise this would lead to the heater being powered on all the time.
 #define HEATER_0_MINTEMP 5
-#define HEATER_1_MINTEMP 5
-#define HEATER_2_MINTEMP 5
-#define HEATER_3_MINTEMP 5
+//#define HEATER_1_MINTEMP 5
+//#define HEATER_2_MINTEMP 5
+//#define HEATER_3_MINTEMP 5
 #define BED_MINTEMP 5
 
 // When temperature exceeds max temp, your heater will be switched off.
 // This feature exists to protect your hotend from overheating accidentally, but *NOT* from thermistor short/failure!
 // You should use MINTEMP for thermistor short/failure protection.
 #define HEATER_0_MAXTEMP 275
-#define HEATER_1_MAXTEMP 275
-#define HEATER_2_MAXTEMP 275
-#define HEATER_3_MAXTEMP 275
+//#define HEATER_1_MAXTEMP 275
+//#define HEATER_2_MAXTEMP 275
+//#define HEATER_3_MAXTEMP 275
 #define BED_MAXTEMP 90
 
 //===========================================================================
@@ -277,7 +277,8 @@
 // PID Tuning Guide here: http://reprap.org/wiki/PID_Tuning
 
 // Comment the following line to disable PID and enable bang-bang.
-#define PIDTEMP
+//TODO: re-enable PID temp control
+//#define PIDTEMP
 #define BANG_MAX 255 // limits current to nozzle while in bang-bang mode; 255=full current
 #define PID_MAX BANG_MAX // limits current to nozzle while PID is active (see PID_FUNCTIONAL_RANGE below); 255=full current
 #if ENABLED(PIDTEMP)
@@ -414,7 +415,8 @@
 //============================== Delta Settings =============================
 //===========================================================================
 // Enable DELTA kinematics and most of the default configuration for Deltas
-#define DELTA
+//TODO: Re-enable Delta mode once low level drivers are verified
+//#define DELTA
 //TODO: check vs MPMD settings
 #if ENABLED(DELTA)
 
@@ -473,7 +475,8 @@
 #define USE_ZMAX_PLUG
 
 // coarse Endstop Settings
-#define ENDSTOPPULLUPS // Comment this out (using // at the start of the line) to disable the endstop pullup resistors
+//TODO: Verify vs MPMD hardware
+//#define ENDSTOPPULLUPS // Comment this out (using // at the start of the line) to disable the endstop pullup resistors
 
 #if DISABLED(ENDSTOPPULLUPS)
   // fine endstop settings: Individual pullups. will be ignored if ENDSTOPPULLUPS is defined
@@ -724,8 +727,8 @@
 //===========================================================================
 
 // @section bedlevel
-
-#define AUTO_BED_LEVELING_FEATURE // Delete the comment to enable (remove // at the start of the line)
+//TODO: re-enable later
+//#define AUTO_BED_LEVELING_FEATURE // Delete the comment to enable (remove // at the start of the line)
 
 // Enable this feature to get detailed logging of G28, G29, M48, etc.
 // Logging is off by default. Enable this logging feature with 'M111 S32'.
@@ -822,6 +825,9 @@
 
 // Homing speeds (mm/m)
   // Delta only homes to Z
+#ifndef DELTA
+#define HOMING_FEEDRATE_XY (50*60)
+#endif
   #define HOMING_FEEDRATE_Z  (200*60)
 
 //

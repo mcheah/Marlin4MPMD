@@ -45,8 +45,9 @@
 /* Private constant ----------------------------------------------------------*/
 #define ADC_ERROR_TAG        (0x2000)
 #define ADC_ERROR(error)     BSP_MiscErrorHandler(error|ADC_ERROR_TAG)
-
-#define BSP_ADC_CONVERTED_VALUES_BUFFER_SIZE (6)
+//TODO: update this to correspond to the correct number of
+//#define BSP_ADC_CONVERTED_VALUES_BUFFER_SIZE (6)
+#define BSP_ADC_CONVERTED_VALUES_BUFFER_SIZE (2)
     
 /* Global variables ---------------------------------------------------------*/
 BspAdcDataType gBspAdcData;
@@ -88,7 +89,8 @@ void BSP_AdcHwInit(void)
   pAdc->adcHandle.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
   pAdc->adcHandle.Init.DMAContinuousRequests = ENABLE;
   //TODO: verify this
-  pAdc->adcHandle.Init.Overrun = ADC_OVR_DATA_PRESERVED;
+  pAdc->adcHandle.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
+//  pAdc->adcHandle.Init.Overrun = ADC_OVR_DATA_PRESERVED;
 //  pAdc->adcHandle.Init.SamplingTimeCommon =
   
     
@@ -117,7 +119,7 @@ void BSP_AdcHwInit(void)
     /* Channel configuration error */
     ADC_ERROR(3);
   }
-  
+#ifdef BSP_THERM_E2_PIN
   /* Configure ADC for E2 thermistor */
   sConfig.Channel = BSP_ADC_CHANNEL_THERM_E2;
   sConfig.Rank = BSP_ADC_RANK_THERM_E2;
@@ -137,7 +139,8 @@ void BSP_AdcHwInit(void)
     /* Channel configuration error */
     ADC_ERROR(5);
   }
-
+#endif
+#ifdef BSP_THERM_BED2_PIN
    /* Configure ADC for BED2 thermistor */
   sConfig.Channel = BSP_ADC_CHANNEL_THERM_BED2;
   sConfig.Rank = BSP_ADC_RANK_THERM_BED2;
@@ -157,6 +160,7 @@ void BSP_AdcHwInit(void)
     /* Channel configuration error */
     ADC_ERROR(7);
   }  
+#endif
 
   /* Start conversion */
   if (HAL_ADC_Start_DMA(&pAdc->adcHandle,
@@ -164,7 +168,7 @@ void BSP_AdcHwInit(void)
                          BSP_ADC_CONVERTED_VALUES_BUFFER_SIZE)   != HAL_OK)  
   {
       ADC_ERROR(8);
-  } 
+  }
     
 }
 

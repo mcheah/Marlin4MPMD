@@ -760,7 +760,7 @@ void setup_photpin() {
 }
 
 void setup_powerhold() {
-    //----- General BSP initilisation to use 5 motors */
+    //----- General BSP initialization to use 4 motors */
     BSP_MiscOverallInit(4);
 
     //----- Switch Step clock to SW mode (no used of PWMs)*/
@@ -4785,7 +4785,11 @@ inline void gcode_M109() {
     if (no_wait_for_cooling || code_seen('R')) {
       thermalManager.setTargetBed(code_value_temp_abs());
       #if ENABLED(PRINTJOB_TIMER_AUTOSTART)
+#ifdef BED_MINTEMP
         if (code_value_temp_abs() > BED_MINTEMP) {
+#else
+        if(1) {
+#endif
           /**
           * We start the timer when 'heating and waiting' command arrives, LCD
           * functions never wait. Cooling down managed by extruders.

@@ -501,7 +501,7 @@ uint32_t BSP_UartGetNbRxAvalaibleBytes(void)
   }  
   
   //waitline feed to have a complete line before processing bytes
-  if ((int8_t)(*writePtr) != 0XA)
+  if ((*writePtr) != '\r' && (*writePtr) != '\n')
     return (0);
   
   int32_t nxRxBytes = pUart->pRxWriteBuffer - pUart->pRxReadBuffer;
