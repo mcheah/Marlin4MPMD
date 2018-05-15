@@ -496,6 +496,8 @@ void Planner::check_axes_activity() {
       #endif
     #else
       #if HAS_FAN0
+        if(thermalManager.current_temperature[0] > EXTRUDER_AUTO_FAN_TEMPERATURE)
+        	NOLESS( CALC_FAN_SPEED(0),EXTRUDER_AUTO_FAN_SPEED);
         BSP_MiscFanSetSpeed(0, CALC_FAN_SPEED(0));
       #endif
       #if HAS_FAN1

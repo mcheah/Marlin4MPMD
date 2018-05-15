@@ -51,53 +51,59 @@
 
 /* Definition for IR ON Pin used for Z probing*/
  //TODO: remove IR pin or rename to bed switch probe
-#define BSP_IR_ON_PIN               (GPIO_PIN_7)
-#define BSP_IR_ON_PORT              (GPIOB)
+//#define BSP_IR_ON_PIN               (GPIO_PIN_7)
+//#define BSP_IR_ON_PORT              (GPIOB)
 
 /* Definition for Stops */
  //TODO: remove unused optical stops
 #define BSP_STOP_X_PIN               (GPIO_PIN_13)
 #define BSP_STOP_X_PORT              (GPIOC)
+#define STOP_X__PULL_UP
 #define BSP_STOP_Y_PIN               (GPIO_PIN_14)
 #define BSP_STOP_Y_PORT              (GPIOC)
+#define STOP_Y__PULL_UP
 #define BSP_STOP_Z_PIN               (GPIO_PIN_15)
 #define BSP_STOP_Z_PORT              (GPIOC)
-#define BSP_STOP_U_PIN               (GPIO_PIN_13)
-#define BSP_STOP_U_PORT              (GPIOC)
-#define BSP_STOP_V_PIN               (GPIO_PIN_13)
-#define BSP_STOP_V_PORT              (GPIOC)
-#define BSP_STOP_W_PIN               (GPIO_PIN_13)
-#define BSP_STOP_W_PORT              (GPIOC)
+#define STOP_Z__PULL_UP
+//#define BSP_STOP_U_PIN               (GPIO_PIN_13)
+//#define BSP_STOP_U_PORT              (GPIOC)
+//#define BSP_STOP_V_PIN               (GPIO_PIN_13)
+//#define BSP_STOP_V_PORT              (GPIOC)
+#define BSP_STOP_W_PIN               (GPIO_PIN_7)
+#define BSP_STOP_W_PORT              (GPIOB)
+#define STOP_W__PULL_UP
 
 /* Definition for Heats*/
  //TODO: removed unused heaters
 #define BSP_HEAT_BED1_PIN              (GPIO_PIN_5)
 #define BSP_HEAT_BED1_PORT             (GPIOA)
-#define BSP_HEAT_BED2_PIN             (GPIO_PIN_5)
-#define BSP_HEAT_BED2_PORT            (GPIOA)
-#define BSP_HEAT_BED3_PIN             (GPIO_PIN_5)
-#define BSP_HEAT_BED3_PORT            (GPIOA)
+//#define BSP_HEAT_BED2_PIN             (GPIO_PIN_5)
+//#define BSP_HEAT_BED2_PORT            (GPIOA)
+//#define BSP_HEAT_BED3_PIN             (GPIO_PIN_5)
+//#define BSP_HEAT_BED3_PORT            (GPIOA)
 #define BSP_HEAT_E1_PIN               (GPIO_PIN_1)
 #define BSP_HEAT_E1_PORT              (GPIOA)
-#define BSP_HEAT_E2_PIN               (GPIO_PIN_1)
-#define BSP_HEAT_E2_PORT              (GPIOA)
-#define BSP_HEAT_E3_PIN               (GPIO_PIN_1)
-#define BSP_HEAT_E3_PORT              (GPIOA)
+//#define BSP_HEAT_E2_PIN               (GPIO_PIN_1)
+//#define BSP_HEAT_E2_PORT              (GPIOA)
+//#define BSP_HEAT_E3_PIN               (GPIO_PIN_1)
+//#define BSP_HEAT_E3_PORT              (GPIOA)
 
 /* Definition for FAN 0*/
 //TODO: remove unused fans
+#define BSP_FAN_PWM_FREQ			(75) //Desired PWM frequency in hertz
+
 #define BSP_FAN_E1_PIN              (GPIO_PIN_8)
 #define BSP_FAN_E1_PORT             (GPIOA)
-#define BSP_FAN_E2_PIN              (GPIO_PIN_8)
-#define BSP_FAN_E2_PORT             (GPIOA)
-#define BSP_FAN_E3_PIN              (GPIO_PIN_8)
-#define BSP_FAN_E3_PORT             (GPIOA)
+//#define BSP_FAN_E2_PIN              (GPIO_PIN_8)
+//#define BSP_FAN_E2_PORT             (GPIOA)
+//#define BSP_FAN_E3_PIN              (GPIO_PIN_8)
+//#define BSP_FAN_E3_PORT             (GPIOA)
 
 
 /* Definition for Servo 0*/
 //TODO: removed unused servo
-#define BSP_SERVO0_PIN               (GPIO_PIN_8)
-#define BSP_SERVO0_PORT              (GPIOA)
+//#define BSP_SERVO0_PIN               (GPIO_PIN_8)
+//#define BSP_SERVO0_PORT              (GPIOA)
    
 /* Definition for Tick timer */
 /// Timer used for Tick
@@ -143,31 +149,31 @@
 /// PWM_HEAT_BED GPIO alternate function 
 #define BSP_MISC_AFx_TIMx_PWM_HEAT_BED               (GPIO_AF2_TIM1)
 
-/// Timer used for PWM_HEAT_BED2
-#define BSP_MISC_TIMER_PWM_HEAT_BED2                  (TIM1)
-/// Channel Timer used for PWM_HEAT_BED2
-#define BSP_MISC_CHAN_TIMER_PWM_HEAT_BED2                  (TIM_CHANNEL_1)
-/// HAL Active Channel Timer used for PWM_HEAT_BED2
-#define BSP_MISC_HAL_ACT_CHAN_TIMER_PWM_HEAT_BED2     (HAL_TIM_ACTIVE_CHANNEL_1)
-/// Timer Clock Enable for PWM_HEAT_BED2
-#define __BSP_MISC_TIMER_PWM_HEAT_BED2_CLCK_ENABLE()  __TIM1_CLK_ENABLE()
-/// Timer Clock Disable for PWM_HEAT_BED2
-#define __BSP_MISC_TIMER_PWM_HEAT_BED2_CLCK_DISABLE() __TIM1_CLK_DISABLE()
-/// PWM_HEAT_BED2 GPIO alternate function 
-#define BSP_MISC_AFx_TIMx_PWM_HEAT_BED2               (GPIO_AF2_TIM1)
+///// Timer used for PWM_HEAT_BED2
+//#define BSP_MISC_TIMER_PWM_HEAT_BED2                  (TIM1)
+///// Channel Timer used for PWM_HEAT_BED2
+//#define BSP_MISC_CHAN_TIMER_PWM_HEAT_BED2                  (TIM_CHANNEL_1)
+///// HAL Active Channel Timer used for PWM_HEAT_BED2
+//#define BSP_MISC_HAL_ACT_CHAN_TIMER_PWM_HEAT_BED2     (HAL_TIM_ACTIVE_CHANNEL_1)
+///// Timer Clock Enable for PWM_HEAT_BED2
+//#define __BSP_MISC_TIMER_PWM_HEAT_BED2_CLCK_ENABLE()  __TIM1_CLK_ENABLE()
+///// Timer Clock Disable for PWM_HEAT_BED2
+//#define __BSP_MISC_TIMER_PWM_HEAT_BED2_CLCK_DISABLE() __TIM1_CLK_DISABLE()
+///// PWM_HEAT_BED2 GPIO alternate function
+//#define BSP_MISC_AFx_TIMx_PWM_HEAT_BED2               (GPIO_AF2_TIM1)
 
-/// Timer used for PWM_HEAT_BED3
-#define BSP_MISC_TIMER_PWM_HEAT_BED3                  (GPIO_AF2_TIM1)
-/// Channel Timer used for PWM_HEAT_BED3
-#define BSP_MISC_CHAN_TIMER_PWM_HEAT_BED3                  (TIM_CHANNEL_1)
-/// HAL Active Channel Timer used for PWM_HEAT_BED3
-#define BSP_MISC_HAL_ACT_CHAN_TIMER_PWM_HEAT_BED3     (HAL_TIM_ACTIVE_CHANNEL_1)
-/// Timer Clock Enable for PWM_HEAT_BED3
-#define __BSP_MISC_TIMER_PWM_HEAT_BED3_CLCK_ENABLE()  __TIM1_CLK_ENABLE()
-/// Timer Clock Disable for PWM_HEAT_BED3
-#define __BSP_MISC_TIMER_PWM_HEAT_BED3_CLCK_DISABLE() __TIM1_CLK_DISABLE()
-/// PWM_HEAT_BED3 GPIO alternate function 
-#define BSP_MISC_AFx_TIMx_PWM_HEAT_BED3               (GPIO_AF2_TIM1)
+///// Timer used for PWM_HEAT_BED3
+//#define BSP_MISC_TIMER_PWM_HEAT_BED3                  (GPIO_AF2_TIM1)
+///// Channel Timer used for PWM_HEAT_BED3
+//#define BSP_MISC_CHAN_TIMER_PWM_HEAT_BED3                  (TIM_CHANNEL_1)
+///// HAL Active Channel Timer used for PWM_HEAT_BED3
+//#define BSP_MISC_HAL_ACT_CHAN_TIMER_PWM_HEAT_BED3     (HAL_TIM_ACTIVE_CHANNEL_1)
+///// Timer Clock Enable for PWM_HEAT_BED3
+//#define __BSP_MISC_TIMER_PWM_HEAT_BED3_CLCK_ENABLE()  __TIM1_CLK_ENABLE()
+///// Timer Clock Disable for PWM_HEAT_BED3
+//#define __BSP_MISC_TIMER_PWM_HEAT_BED3_CLCK_DISABLE() __TIM1_CLK_DISABLE()
+///// PWM_HEAT_BED3 GPIO alternate function
+//#define BSP_MISC_AFx_TIMx_PWM_HEAT_BED3               (GPIO_AF2_TIM1)
    
 /// Timer used for PWM_HEAT_E1
 #define BSP_MISC_TIMER_PWM_HEAT_E1                  (TIM15)
@@ -182,112 +188,112 @@
 /// PWM_HEAT_E1 GPIO alternate function 
 #define BSP_MISC_AFx_TIMx_PWM_HEAT_E1               (GPIO_AF3_TIM15)
    
-/// Timer used for PWM_HEAT_E2
-#define BSP_MISC_TIMER_PWM_HEAT_E2                  (TIM15)
-/// Channel Timer used for PWM_HEAT_E2
-#define BSP_MISC_CHAN_TIMER_PWM_HEAT_E2                  (TIM_CHANNEL_1)
-/// HAL Active Channel Timer used for PWM_HEAT_E2
-#define BSP_MISC_HAL_ACT_CHAN_TIMER_PWM_HEAT_E2     (HAL_TIM_ACTIVE_CHANNEL_1)
-/// Timer Clock Enable for PWM_HEAT_E2
-#define __BSP_MISC_TIMER_PWM_HEAT_E2_CLCK_ENABLE()  __TIM15_CLK_ENABLE()
-/// Timer Clock Disable for PWM_HEAT_E2
-#define __BSP_MISC_TIMER_PWM_HEAT_E2_CLCK_DISABLE() __TIM15_CLK_DISABLE()
-/// PWM_HEAT_E2 GPIO alternate function 
-#define BSP_MISC_AFx_TIMx_PWM_HEAT_E2               (GPIO_AF3_TIM15)
+///// Timer used for PWM_HEAT_E2
+//#define BSP_MISC_TIMER_PWM_HEAT_E2                  (TIM15)
+///// Channel Timer used for PWM_HEAT_E2
+//#define BSP_MISC_CHAN_TIMER_PWM_HEAT_E2                  (TIM_CHANNEL_1)
+///// HAL Active Channel Timer used for PWM_HEAT_E2
+//#define BSP_MISC_HAL_ACT_CHAN_TIMER_PWM_HEAT_E2     (HAL_TIM_ACTIVE_CHANNEL_1)
+///// Timer Clock Enable for PWM_HEAT_E2
+//#define __BSP_MISC_TIMER_PWM_HEAT_E2_CLCK_ENABLE()  __TIM15_CLK_ENABLE()
+///// Timer Clock Disable for PWM_HEAT_E2
+//#define __BSP_MISC_TIMER_PWM_HEAT_E2_CLCK_DISABLE() __TIM15_CLK_DISABLE()
+///// PWM_HEAT_E2 GPIO alternate function
+//#define BSP_MISC_AFx_TIMx_PWM_HEAT_E2               (GPIO_AF3_TIM15)
 
-/// Timer used for PWM_HEAT_E3
-#define BSP_MISC_TIMER_PWM_HEAT_E3                  (TIM15)
-/// Channel Timer used for PWM_HEAT_E3
-#define BSP_MISC_CHAN_TIMER_PWM_HEAT_E3                  (TIM_CHANNEL_1)
-/// HAL Active Channel Timer used for PWM_HEAT_E3
-#define BSP_MISC_HAL_ACT_CHAN_TIMER_PWM_HEAT_E3     (HAL_TIM_ACTIVE_CHANNEL_1)
-/// Timer Clock Enable for PWM_HEAT_E3
-#define __BSP_MISC_TIMER_PWM_HEAT_E3_CLCK_ENABLE()  __TIM15_CLK_ENABLE()
-/// Timer Clock Disable for PWM_HEAT_E3
-#define __BSP_MISC_TIMER_PWM_HEAT_E3_CLCK_DISABLE() __TIM15_CLK_DISABLE()
-/// PWM_HEAT_E3 GPIO alternate function 
-#define BSP_MISC_AFx_TIMx_PWM_HEAT_E3               (GPIO_AF3_TIM15)
+///// Timer used for PWM_HEAT_E3
+//#define BSP_MISC_TIMER_PWM_HEAT_E3                  (TIM15)
+///// Channel Timer used for PWM_HEAT_E3
+//#define BSP_MISC_CHAN_TIMER_PWM_HEAT_E3                  (TIM_CHANNEL_1)
+///// HAL Active Channel Timer used for PWM_HEAT_E3
+//#define BSP_MISC_HAL_ACT_CHAN_TIMER_PWM_HEAT_E3     (HAL_TIM_ACTIVE_CHANNEL_1)
+///// Timer Clock Enable for PWM_HEAT_E3
+//#define __BSP_MISC_TIMER_PWM_HEAT_E3_CLCK_ENABLE()  __TIM15_CLK_ENABLE()
+///// Timer Clock Disable for PWM_HEAT_E3
+//#define __BSP_MISC_TIMER_PWM_HEAT_E3_CLCK_DISABLE() __TIM15_CLK_DISABLE()
+///// PWM_HEAT_E3 GPIO alternate function
+//#define BSP_MISC_AFx_TIMx_PWM_HEAT_E3               (GPIO_AF3_TIM15)
 
-//TODO: rmeove servo support
+//TODO: remove servo support
 /// Timer used for Servo (marlin only)
-#define BSP_MISC_TIMER_SERVO                      (TIM1)
-/// Channel Timer used for PWM_HEAT_E4
-#define BSP_MISC_CHAN_TIMER_SERVO                 (TIM_CHANNEL_1)
-/// HAL Active Channel Timer used for PWM_HEAT_E4
-#define BSP_MISC_HAL_ACT_CHAN_TIMER_SERVO         (HAL_TIM_ACTIVE_CHANNEL_1)
-/// Timer Clock Enable for PWM_HEAT_E4
-#define __BSP_MISC_TIMER_SERVO_CLCK_ENABLE()       __TIM1_CLK_ENABLE()
-/// Timer Clock Disable for PWM_HEAT_E4
-#define __BSP_MISC_TIMER_SERVO_CLCK_DISABLE()     __TIM1_CLK_DISABLE()
-/// PWM_HEAT_E4 GPIO alternate function 
-#define BSP_MISC_AFx_TIMx_SERVO                    (GPIO_AF2_TIM1)
-   /// SERVO global interrupt
-#define BSP_MISC_SERVO_IRQn                    (TIM1_BRK_UP_TRG_COM_IRQn)
+//#define BSP_MISC_TIMER_SERVO                      (TIM1)
+///// Channel Timer used for PWM_HEAT_E4
+//#define BSP_MISC_CHAN_TIMER_SERVO                 (TIM_CHANNEL_1)
+///// HAL Active Channel Timer used for PWM_HEAT_E4
+//#define BSP_MISC_HAL_ACT_CHAN_TIMER_SERVO         (HAL_TIM_ACTIVE_CHANNEL_1)
+///// Timer Clock Enable for PWM_HEAT_E4
+//#define __BSP_MISC_TIMER_SERVO_CLCK_ENABLE()       __TIM1_CLK_ENABLE()
+///// Timer Clock Disable for PWM_HEAT_E4
+//#define __BSP_MISC_TIMER_SERVO_CLCK_DISABLE()     __TIM1_CLK_DISABLE()
+///// PWM_HEAT_E4 GPIO alternate function
+//#define BSP_MISC_AFx_TIMx_SERVO                    (GPIO_AF2_TIM1)
+//   /// SERVO global interrupt
+//#define BSP_MISC_SERVO_IRQn                    (TIM1_BRK_UP_TRG_COM_IRQn)
   
 //TODO: remove user SPI
 /// User SPI (in example for LCD)
-#define SPI_USER                             (SPI2) 
-/// SPI clock enable
-#define SPI_USER_CLK_ENABLE()                __SPI2_CLK_ENABLE()
-/// SPI SCK enable
-#define SPI_USER_SCK_GPIO_CLK_ENABLE()       __GPIOB_CLK_ENABLE()
-/// SPI MISO enable
-#define SPI_USER_MISO_GPIO_CLK_ENABLE()      __GPIOB_CLK_ENABLE() 
-/// SPI MOSI enable
-#define SPI_USER_MOSI_GPIO_CLK_ENABLE()      __GPIOB_CLK_ENABLE() 
-/// SPI Force reset
-#define SPI_USER_FORCE_RESET()               __SPI2_FORCE_RESET()
-/// SPI Release reset
-#define SPI_USER_RELEASE_RESET()             __SPI2_RELEASE_RESET()
-/// SPI SCK pin
-#define SPI_USER_NSS_PIN                     (GPIO_PIN_12)
-/// SPI SCK port
-#define SPI_USER_NSS_GPIO_PORT               (GPIOB)
-/// SPI SCK pin
-#define SPI_USER_SCK_PIN                     (GPIO_PIN_13)
-/// SPI SCK port
-#define SPI_USER_SCK_GPIO_PORT               (GPIOB)
-/// SPI MISO pin 
-#define SPI_USER_MISO_PIN                    (GPIO_PIN_14)
-/// SPI MISO port
-#define SPI_USER_MISO_GPIO_PORT              (GPIOB)
-/// SPI MOSI pin
-#define SPI_USER_MOSI_PIN                    (GPIO_PIN_15)
-/// SPI MOSI port
-#define SPI_USER_MOSI_GPIO_PORT              (GPIOB)
-/// SPI_SCK alternate function   
-#define SPI_USER_SCK_AF                      (GPIO_AF5_SPI2)   
-/// SPI MISO AF 
-#define SPI_USER_MISO_AF                     (SPI_USER_SCK_AF)
-/// SPI MOSI AF
-#define SPI_USER_MOSI_AF                     (SPI_USER_SCK_AF)
+//#define SPI_USER                             (SPI2)
+///// SPI clock enable
+//#define SPI_USER_CLK_ENABLE()                __SPI2_CLK_ENABLE()
+///// SPI SCK enable
+//#define SPI_USER_SCK_GPIO_CLK_ENABLE()       __GPIOB_CLK_ENABLE()
+///// SPI MISO enable
+//#define SPI_USER_MISO_GPIO_CLK_ENABLE()      __GPIOB_CLK_ENABLE()
+///// SPI MOSI enable
+//#define SPI_USER_MOSI_GPIO_CLK_ENABLE()      __GPIOB_CLK_ENABLE()
+///// SPI Force reset
+//#define SPI_USER_FORCE_RESET()               __SPI2_FORCE_RESET()
+///// SPI Release reset
+//#define SPI_USER_RELEASE_RESET()             __SPI2_RELEASE_RESET()
+///// SPI SCK pin
+//#define SPI_USER_NSS_PIN                     (GPIO_PIN_12)
+///// SPI SCK port
+//#define SPI_USER_NSS_GPIO_PORT               (GPIOB)
+///// SPI SCK pin
+//#define SPI_USER_SCK_PIN                     (GPIO_PIN_13)
+///// SPI SCK port
+//#define SPI_USER_SCK_GPIO_PORT               (GPIOB)
+///// SPI MISO pin
+//#define SPI_USER_MISO_PIN                    (GPIO_PIN_14)
+///// SPI MISO port
+//#define SPI_USER_MISO_GPIO_PORT              (GPIOB)
+///// SPI MOSI pin
+//#define SPI_USER_MOSI_PIN                    (GPIO_PIN_15)
+///// SPI MOSI port
+//#define SPI_USER_MOSI_GPIO_PORT              (GPIOB)
+///// SPI_SCK alternate function
+//#define SPI_USER_SCK_AF                      (GPIO_AF5_SPI2)
+///// SPI MISO AF
+//#define SPI_USER_MISO_AF                     (SPI_USER_SCK_AF)
+///// SPI MOSI AF
+//#define SPI_USER_MOSI_AF                     (SPI_USER_SCK_AF)
    
 //TODO: remove user GPIO's
 /// User GPIOs
-#define BSP_USER_1_PIN                       (GPIO_PIN_0)
-#define BSP_USER_1_PORT                      (GPIOA)
-#define BSP_USER_2_PIN                       (GPIO_PIN_0)
-#define BSP_USER_2_PORT                      (GPIOA)
-#define BSP_USER_3_PIN                       (GPIO_PIN_0)
-#define BSP_USER_3_PORT                      (GPIOA)
-#define BSP_USER_4_PIN                       (GPIO_PIN_0)
-#define BSP_USER_4_PORT                      (GPIOA)
+//#define BSP_USER_1_PIN                       (GPIO_PIN_0)
+//#define BSP_USER_1_PORT                      (GPIOA)
+//#define BSP_USER_2_PIN                       (GPIO_PIN_0)
+//#define BSP_USER_2_PORT                      (GPIOA)
+//#define BSP_USER_3_PIN                       (GPIO_PIN_0)
+//#define BSP_USER_3_PORT                      (GPIOA)
+//#define BSP_USER_4_PIN                       (GPIO_PIN_0)
+//#define BSP_USER_4_PORT                      (GPIOA)
 
 //TODO: remove I2C
 /// User I2C (in example for LCD)
-#define BSP_MISC_I2C                         (I2C1)
-#define __BSP_MISC_I2C_CLK_ENABLE()          __I2C1_CLK_ENABLE()
-#define __BSP_MISC_I2C_CLK_DISABLE()         __I2C1_CLK_DISABLE()
-#define __BSP_MISC_I2C_FORCE_RESET()         __I2C1_FORCE_RESET()
-#define __BSP_MISC_I2C_RELEASE_RESET()       __I2C1_RELEASE_RESET()
-#define __BSP_MISC_I2C_SCL_GPIO_CLK_ENABLE() __GPIOB_CLK_ENABLE()   
-#define __BSP_MISC_I2C_SDA_GPIO_CLK_ENABLE() __GPIOB_CLK_ENABLE()
-#define BSP_MISC_I2C_SCL_PIN                 (GPIO_PIN_6)
-#define BSP_MISC_I2C_SCL_PORT                (GPIOB)
-#define BSP_MISC_I2C_SDA_PIN                 (GPIO_PIN_7)
-#define BSP_MISC_I2C_SDA_PORT                (GPIOB)
-#define BSP_MISC_AFx_I2C                     (GPIO_AF1_I2C1)
-#define BSP_MISC_I2C_CLOCK_SPEED             (100000)
+//#define BSP_MISC_I2C                         (I2C1)
+//#define __BSP_MISC_I2C_CLK_ENABLE()          __I2C1_CLK_ENABLE()
+//#define __BSP_MISC_I2C_CLK_DISABLE()         __I2C1_CLK_DISABLE()
+//#define __BSP_MISC_I2C_FORCE_RESET()         __I2C1_FORCE_RESET()
+//#define __BSP_MISC_I2C_RELEASE_RESET()       __I2C1_RELEASE_RESET()
+//#define __BSP_MISC_I2C_SCL_GPIO_CLK_ENABLE() __GPIOB_CLK_ENABLE()
+//#define __BSP_MISC_I2C_SDA_GPIO_CLK_ENABLE() __GPIOB_CLK_ENABLE()
+//#define BSP_MISC_I2C_SCL_PIN                 (GPIO_PIN_6)
+//#define BSP_MISC_I2C_SCL_PORT                (GPIOB)
+//#define BSP_MISC_I2C_SDA_PIN                 (GPIO_PIN_7)
+//#define BSP_MISC_I2C_SDA_PORT                (GPIOB)
+//#define BSP_MISC_AFx_I2C                     (GPIO_AF1_I2C1)
+//#define BSP_MISC_I2C_CLOCK_SPEED             (100000)
    
 //TODO: double check this value to make sure that it matches the pin array
 //This effectively does the arduino pin mapping
@@ -295,7 +301,7 @@
 
 //TODO: review this value
 //Tick timer prescaler
-#define TICK_TIMER_PRESCALER  (32)
+#define TICK_TIMER_PRESCALER  (1)
    
 /* Exported constants --------------------------------------------------------*/
 extern GPIO_TypeDef* gArrayGpioPort[BSP_MISC_MAX_PIN_NUMBER];
@@ -324,11 +330,9 @@ void BSP_MiscSetOcdThreshold(uint8_t deviceId, uint32_t current);
 void BSP_MiscHeatManualInit(uint8_t heatId);
 void BSP_MiscHeatPwmInit(uint8_t heatId);
 void BSP_MiscHeatPwmSetDutyCycle(uint8_t heatId, uint8_t newDuty);
-#ifdef BSP_SERVO0_PIN
 void  BSP_MotorControlBoard_ServoInit(void);
 void  BSP_MotorControlBoard_ServoSetTimerValue(uint32_t value);
 void  BSP_MotorControlBoard_ServoStop(void);
-#endif
 void BSP_MiscUserGpioInit(uint8_t id, uint32_t mode, uint32_t pull);
 
 #ifdef __cplusplus

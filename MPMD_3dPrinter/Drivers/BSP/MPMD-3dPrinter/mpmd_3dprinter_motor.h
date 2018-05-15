@@ -143,39 +143,39 @@
 /// PWM_E1 frequency rescaler (1 for HW PWM, 2 for SW PWM)   
 #define BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E1_FREQ_RESCALER    (1)   
    
-/// Timer used for PWM_E2
-#define BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E2                  (TIM17)
-/// Channel Timer used for PWM_E2
-#define BSP_MOTOR_CONTROL_BOARD_CHAN_TIMER_PWM_E2             (TIM_CHANNEL_1)
-/// HAL Active Channel Timer used for PWM_E2
-#define BSP_MOTOR_CONTROL_BOARD_HAL_ACT_CHAN_TIMER_PWM_E2     (HAL_TIM_ACTIVE_CHANNEL_1)
-/// Timer Clock Enable for PWM_E2
-#define __BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E2_CLCK_ENABLE()  __TIM17_CLK_ENABLE()
-/// Timer Clock Disable for PWM_E2
-#define __BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E2_CLCK_DISABLE() __TIM17_CLK_DISABLE()
-/// PWM_E2 global interrupt
-#define BSP_MOTOR_CONTROL_BOARD_PWM_E2_IRQn             (TIM17_IRQn)
-/// PWM_E2 GPIO alternate function 
-#define BSP_MOTOR_CONTROL_BOARD_AFx_TIMx_PWM_E2               (GPIO_AF2_TIM17)
-/// PWM_E2 frequency rescaler (1 for HW PWM, 2 for SW PWM)   
-#define BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E2_FREQ_RESCALER    (1)   
-
-/// Timer used for PWM_E3
-#define BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E3                  (TIM17)
-/// Channel Timer used for PWM_E3
-#define BSP_MOTOR_CONTROL_BOARD_CHAN_TIMER_PWM_E3             (TIM_CHANNEL_1)
-/// HAL Active Channel Timer used for PWM_E3
-#define BSP_MOTOR_CONTROL_BOARD_HAL_ACT_CHAN_TIMER_PWM_E3     (HAL_TIM_ACTIVE_CHANNEL_1)
-/// Timer Clock Enable for PWM_E3
-#define __BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E3_CLCK_ENABLE()  __TIM17_CLK_ENABLE()
-/// Timer Clock Disable for PWM_E3
-#define __BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E3_CLCK_DISABLE() __TIM17_CLK_DISABLE()
-/// PWM_E3 global interrupt
-#define BSP_MOTOR_CONTROL_BOARD_PWM_E3_IRQn             (TIM17_IRQn)
-/// PWM_E3 GPIO alternate function 
-#define BSP_MOTOR_CONTROL_BOARD_AFx_TIMx_PWM_E3               (GPIO_AF2_TIM17)
-/// PWM_E3 frequency rescaler (1 for HW PWM, 2 for SW PWM)   
-#define BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E3_FREQ_RESCALER    (1)   
+///// Timer used for PWM_E2
+//#define BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E2                  (TIM17)
+///// Channel Timer used for PWM_E2
+//#define BSP_MOTOR_CONTROL_BOARD_CHAN_TIMER_PWM_E2             (TIM_CHANNEL_1)
+///// HAL Active Channel Timer used for PWM_E2
+//#define BSP_MOTOR_CONTROL_BOARD_HAL_ACT_CHAN_TIMER_PWM_E2     (HAL_TIM_ACTIVE_CHANNEL_1)
+///// Timer Clock Enable for PWM_E2
+//#define __BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E2_CLCK_ENABLE()  __TIM17_CLK_ENABLE()
+///// Timer Clock Disable for PWM_E2
+//#define __BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E2_CLCK_DISABLE() __TIM17_CLK_DISABLE()
+///// PWM_E2 global interrupt
+//#define BSP_MOTOR_CONTROL_BOARD_PWM_E2_IRQn             (TIM17_IRQn)
+///// PWM_E2 GPIO alternate function
+//#define BSP_MOTOR_CONTROL_BOARD_AFx_TIMx_PWM_E2               (GPIO_AF2_TIM17)
+///// PWM_E2 frequency rescaler (1 for HW PWM, 2 for SW PWM)
+//#define BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E2_FREQ_RESCALER    (1)
+//
+///// Timer used for PWM_E3
+//#define BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E3                  (TIM17)
+///// Channel Timer used for PWM_E3
+//#define BSP_MOTOR_CONTROL_BOARD_CHAN_TIMER_PWM_E3             (TIM_CHANNEL_1)
+///// HAL Active Channel Timer used for PWM_E3
+//#define BSP_MOTOR_CONTROL_BOARD_HAL_ACT_CHAN_TIMER_PWM_E3     (HAL_TIM_ACTIVE_CHANNEL_1)
+///// Timer Clock Enable for PWM_E3
+//#define __BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E3_CLCK_ENABLE()  __TIM17_CLK_ENABLE()
+///// Timer Clock Disable for PWM_E3
+//#define __BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E3_CLCK_DISABLE() __TIM17_CLK_DISABLE()
+///// PWM_E3 global interrupt
+//#define BSP_MOTOR_CONTROL_BOARD_PWM_E3_IRQn             (TIM17_IRQn)
+///// PWM_E3 GPIO alternate function
+//#define BSP_MOTOR_CONTROL_BOARD_AFx_TIMx_PWM_E3               (GPIO_AF2_TIM17)
+///// PWM_E3 frequency rescaler (1 for HW PWM, 2 for SW PWM)
+//#define BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E3_FREQ_RESCALER    (1)
   
  /**
 * @}
@@ -214,15 +214,15 @@
 /// GPIO port used for the L6474 step clock pin of device 3
 #define BSP_MOTOR_CONTROL_BOARD_PWM_E1_PORT  (GPIOA)
 
-/// GPIO Pin used for the L6474 step clock pin of device 4
-#define BSP_MOTOR_CONTROL_BOARD_PWM_E2_PIN   (GPIO_PIN_5)
-/// GPIO port used for the L6474 step clock pin of device 4
-#define BSP_MOTOR_CONTROL_BOARD_PWM_E2_PORT  (GPIOF)
-
-/// GPIO Pin used for the L6474 step clock pin of device 5
-#define BSP_MOTOR_CONTROL_BOARD_PWM_E3_PIN   (GPIO_PIN_8)
-/// GPIO port used for the L6474 step clock pin of device 5
-#define BSP_MOTOR_CONTROL_BOARD_PWM_E3_PORT  (GPIOB)
+///// GPIO Pin used for the L6474 step clock pin of device 4
+//#define BSP_MOTOR_CONTROL_BOARD_PWM_E2_PIN   (GPIO_PIN_5)
+///// GPIO port used for the L6474 step clock pin of device 4
+//#define BSP_MOTOR_CONTROL_BOARD_PWM_E2_PORT  (GPIOF)
+//
+///// GPIO Pin used for the L6474 step clock pin of device 5
+//#define BSP_MOTOR_CONTROL_BOARD_PWM_E3_PIN   (GPIO_PIN_8)
+///// GPIO port used for the L6474 step clock pin of device 5
+//#define BSP_MOTOR_CONTROL_BOARD_PWM_E3_PORT  (GPIOB)
    
 /// GPIO Pin used for the L6474 direction pin of device 0                      *
 #define BSP_MOTOR_CONTROL_BOARD_DIR_X_PIN  (GPIO_PIN_13)
@@ -244,15 +244,15 @@
 /// GPIO port used for the L6474 direction pin of device 3                     *
 #define BSP_MOTOR_CONTROL_BOARD_DIR_E1_PORT  (GPIOA)
    
-/// GPIO Pin used for the L6474 direction pin of device 4
-#define BSP_MOTOR_CONTROL_BOARD_DIR_E2_PIN   (GPIO_PIN_6)
-/// GPIO port used for the L6474 direction pin of device 4
-#define BSP_MOTOR_CONTROL_BOARD_DIR_E2_PORT  (GPIOF)
-
-/// GPIO Pin used for the L6474 direction pin of device 5
-#define BSP_MOTOR_CONTROL_BOARD_DIR_E3_PIN   (GPIO_PIN_2)
-/// GPIO port used for the L6474 direction pin of device 5
-#define BSP_MOTOR_CONTROL_BOARD_DIR_E3_PORT  (GPIOF)
+///// GPIO Pin used for the L6474 direction pin of device 4
+//#define BSP_MOTOR_CONTROL_BOARD_DIR_E2_PIN   (GPIO_PIN_6)
+///// GPIO port used for the L6474 direction pin of device 4
+//#define BSP_MOTOR_CONTROL_BOARD_DIR_E2_PORT  (GPIOF)
+//
+///// GPIO Pin used for the L6474 direction pin of device 5
+//#define BSP_MOTOR_CONTROL_BOARD_DIR_E3_PIN   (GPIO_PIN_2)
+///// GPIO port used for the L6474 direction pin of device 5
+//#define BSP_MOTOR_CONTROL_BOARD_DIR_E3_PORT  (GPIOF)
 //TODO: rename RESET to enable etc.  Although all are shared so who knows
 /// GPIO Pin used for the L6474 reset pin (device 0)                           *
 #define BSP_MOTOR_CONTROL_BOARD_RESET_X_PIN  (GPIO_PIN_10)
@@ -274,70 +274,70 @@
 /// GPIO port used for the L6474 reset pin (device 3)                          *
 #define BSP_MOTOR_CONTROL_BOARD_RESET_E1_PORT (GPIOB)
    
-/// GPIO Pin used for the L6474 reset pin (device 4)
-#define BSP_MOTOR_CONTROL_BOARD_RESET_E2_PIN  (GPIO_PIN_10)
-/// GPIO port used for the L6474 reset pin (device 4)
-#define BSP_MOTOR_CONTROL_BOARD_RESET_E2_PORT (GPIOB)
-
-/// GPIO Pin used for the L6474 reset pin (device 5)
-#define BSP_MOTOR_CONTROL_BOARD_RESET_E3_PIN  (GPIO_PIN_10)
-/// GPIO port used for the L6474 reset pin (device 5)
-#define BSP_MOTOR_CONTROL_BOARD_RESET_E3_PORT (GPIOB)
-//TODO: remove SPI support since we are not using L6474
-/// GPIO Pin used for the L6474 SPI chip select pin
-#define BSP_MOTOR_CONTROL_BOARD_CS_PIN  (GPIO_PIN_4)
-/// GPIO port used for the L6474 SPI chip select  pin
-#define BSP_MOTOR_CONTROL_BOARD_CS_PORT (GPIOA)
+///// GPIO Pin used for the L6474 reset pin (device 4)
+//#define BSP_MOTOR_CONTROL_BOARD_RESET_E2_PIN  (GPIO_PIN_10)
+///// GPIO port used for the L6474 reset pin (device 4)
+//#define BSP_MOTOR_CONTROL_BOARD_RESET_E2_PORT (GPIOB)
+//
+///// GPIO Pin used for the L6474 reset pin (device 5)
+//#define BSP_MOTOR_CONTROL_BOARD_RESET_E3_PIN  (GPIO_PIN_10)
+///// GPIO port used for the L6474 reset pin (device 5)
+//#define BSP_MOTOR_CONTROL_BOARD_RESET_E3_PORT (GPIOB)
+////TODO: remove SPI support since we are not using L6474
+///// GPIO Pin used for the L6474 SPI chip select pin
+//#define BSP_MOTOR_CONTROL_BOARD_CS_PIN  (GPIO_PIN_4)
+///// GPIO port used for the L6474 SPI chip select  pin
+//#define BSP_MOTOR_CONTROL_BOARD_CS_PORT (GPIOA)
 
 /* Definition for SPIx clock resources */
 
 /// Used SPI
-#define SPIx                             (SPI1)
-
-/// SPI clock enable
-#define SPIx_CLK_ENABLE()                __SPI1_CLK_ENABLE()
-
-/// SPI SCK enable
-#define SPIx_SCK_GPIO_CLK_ENABLE()       __GPIOA_CLK_ENABLE()
-
-/// SPI MISO enable
-#define SPIx_MISO_GPIO_CLK_ENABLE()      __GPIOA_CLK_ENABLE() 
-
-/// SPI MOSI enable
-#define SPIx_MOSI_GPIO_CLK_ENABLE()      __GPIOA_CLK_ENABLE() 
-
-/// SPI Force reset
-#define SPIx_FORCE_RESET()               __SPI1_FORCE_RESET()
-
-/// SPI Release reset
-#define SPIx_RELEASE_RESET()             __SPI1_RELEASE_RESET()
-
-/// SPI SCK pin
-#define SPIx_SCK_PIN                     (GPIO_PIN_5)
-
-/// SPI SCK port
-#define SPIx_SCK_GPIO_PORT               (GPIOA)
-
-/// SPI MISO pin 
-#define SPIx_MISO_PIN                    (GPIO_PIN_6)
-
-/// SPI MISO port
-#define SPIx_MISO_GPIO_PORT              (GPIOA)
-
-/// SPI MOSI pin
-#define SPIx_MOSI_PIN                    (GPIO_PIN_7)
-
-/// SPI MOSI port
-#define SPIx_MOSI_GPIO_PORT              (GPIOA)
-
-/// SPI_SCK alternate function   
-#define SPIx_SCK_AF                      (GPIO_AF2_TIM1)
-   
-/// SPI MISO AF 
-#define SPIx_MISO_AF                     (SPIx_SCK_AF)
-
-/// SPI MOSI AF
-#define SPIx_MOSI_AF                     (SPIx_SCK_AF)
+//#define SPIx                             (SPI1)
+//
+///// SPI clock enable
+//#define SPIx_CLK_ENABLE()                __SPI1_CLK_ENABLE()
+//
+///// SPI SCK enable
+//#define SPIx_SCK_GPIO_CLK_ENABLE()       __GPIOA_CLK_ENABLE()
+//
+///// SPI MISO enable
+//#define SPIx_MISO_GPIO_CLK_ENABLE()      __GPIOA_CLK_ENABLE()
+//
+///// SPI MOSI enable
+//#define SPIx_MOSI_GPIO_CLK_ENABLE()      __GPIOA_CLK_ENABLE()
+//
+///// SPI Force reset
+//#define SPIx_FORCE_RESET()               __SPI1_FORCE_RESET()
+//
+///// SPI Release reset
+//#define SPIx_RELEASE_RESET()             __SPI1_RELEASE_RESET()
+//
+///// SPI SCK pin
+//#define SPIx_SCK_PIN                     (GPIO_PIN_5)
+//
+///// SPI SCK port
+//#define SPIx_SCK_GPIO_PORT               (GPIOA)
+//
+///// SPI MISO pin
+//#define SPIx_MISO_PIN                    (GPIO_PIN_6)
+//
+///// SPI MISO port
+//#define SPIx_MISO_GPIO_PORT              (GPIOA)
+//
+///// SPI MOSI pin
+//#define SPIx_MOSI_PIN                    (GPIO_PIN_7)
+//
+///// SPI MOSI port
+//#define SPIx_MOSI_GPIO_PORT              (GPIOA)
+//
+///// SPI_SCK alternate function
+//#define SPIx_SCK_AF                      (GPIO_AF2_TIM1)
+//
+///// SPI MISO AF
+//#define SPIx_MISO_AF                     (SPIx_SCK_AF)
+//
+///// SPI MOSI AF
+//#define SPIx_MOSI_AF                     (SPIx_SCK_AF)
 
 /**
   * @}

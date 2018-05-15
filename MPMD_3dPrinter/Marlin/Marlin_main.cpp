@@ -773,6 +773,7 @@ void setup_powerhold() {
     BSP_MiscStopInit(0);
     BSP_MiscStopInit(1);
     BSP_MiscStopInit(2);
+    BSP_MiscStopInit(5);
 
 #if defined(U_MIN_PIN) && U_MIN_PIN > -1
     BSP_MiscStopInit(3);

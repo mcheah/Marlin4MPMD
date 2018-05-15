@@ -51,23 +51,27 @@
 
 /* Definition for IR ON Pin used for Z probing*/
  //TODO: remove IR pin or rename to bed switch probe
-#define BSP_IR_ON_PIN               (GPIO_PIN_7)
-#define BSP_IR_ON_PORT              (GPIOB)
+//#define BSP_IR_ON_PIN               (GPIO_PIN_7)
+//#define BSP_IR_ON_PORT              (GPIOB)
 
 /* Definition for Stops */
  //TODO: remove unused optical stops
 #define BSP_STOP_X_PIN               (GPIO_PIN_13)
 #define BSP_STOP_X_PORT              (GPIOC)
+#define STOP_X__PULL_UP
 #define BSP_STOP_Y_PIN               (GPIO_PIN_14)
 #define BSP_STOP_Y_PORT              (GPIOC)
+#define STOP_Y__PULL_UP
 #define BSP_STOP_Z_PIN               (GPIO_PIN_15)
 #define BSP_STOP_Z_PORT              (GPIOC)
+#define STOP_Z__PULL_UP
 //#define BSP_STOP_U_PIN               (GPIO_PIN_13)
 //#define BSP_STOP_U_PORT              (GPIOC)
 //#define BSP_STOP_V_PIN               (GPIO_PIN_13)
 //#define BSP_STOP_V_PORT              (GPIOC)
-//#define BSP_STOP_W_PIN               (GPIO_PIN_13)
-//#define BSP_STOP_W_PORT              (GPIOC)
+#define BSP_STOP_W_PIN               (GPIO_PIN_7)
+#define BSP_STOP_W_PORT              (GPIOB)
+#define STOP_W__PULL_UP
 
 /* Definition for Heats*/
  //TODO: removed unused heaters
@@ -86,6 +90,8 @@
 
 /* Definition for FAN 0*/
 //TODO: remove unused fans
+#define BSP_FAN_PWM_FREQ			(75) //Desired PWM frequency in hertz
+
 #define BSP_FAN_E1_PIN              (GPIO_PIN_8)
 #define BSP_FAN_E1_PORT             (GPIOA)
 //#define BSP_FAN_E2_PIN              (GPIO_PIN_8)

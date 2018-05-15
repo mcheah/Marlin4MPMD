@@ -63,18 +63,18 @@ GPIO_TypeDef* gArrayGpioPort[BSP_MISC_MAX_PIN_NUMBER] = {
   BSP_MOTOR_CONTROL_BOARD_PWM_X_PORT,    //X_STEP_PIN       0       
   BSP_MOTOR_CONTROL_BOARD_DIR_X_PORT,    //X_DIR_PIN        1
   BSP_MOTOR_CONTROL_BOARD_RESET_X_PORT,  //X_ENABLE_PIN    
-  BSP_STOP_X_PORT,                       //X_MIN_PIN
-  0,                                     //X_MAX_PIN
+  0,                       //X_MIN_PIN
+  BSP_STOP_X_PORT,                                     //X_MAX_PIN
   BSP_MOTOR_CONTROL_BOARD_PWM_Y_PORT,    //Y_STEP_PIN       5
   BSP_MOTOR_CONTROL_BOARD_DIR_Y_PORT,    //Y_DIR_PIN       
   BSP_MOTOR_CONTROL_BOARD_RESET_Y_PORT,  //Y_ENABLE_PIN    
-  BSP_STOP_Y_PORT,                       //Y_MIN_PIN       
-  0,                                     //Y_MAX_PIN       
+  0,                       //Y_MIN_PIN
+  BSP_STOP_Y_PORT,                                     //Y_MAX_PIN
   BSP_MOTOR_CONTROL_BOARD_PWM_Z_PORT,    //Z_STEP_PIN      10
   BSP_MOTOR_CONTROL_BOARD_DIR_Z_PORT,    //Z_DIR_PIN       
   BSP_MOTOR_CONTROL_BOARD_RESET_Z_PORT,  //Z_ENABLE_PIN    
-  BSP_STOP_Z_PORT,                       //Z_MIN_PIN       
-  0,                                     //Z_MAX_PIN       
+  BSP_STOP_W_PORT,                       //Z_MIN_PIN
+  BSP_STOP_Z_PORT,                                     //Z_MAX_PIN
   0,                                     //Y2_STEP_PIN     15
   0,                                     //Y2_DIR_PIN      
   0,                                     //Y2_ENABLE_PIN   
@@ -120,18 +120,18 @@ uint16_t gArrayGpioPin[BSP_MISC_MAX_PIN_NUMBER] = {
   BSP_MOTOR_CONTROL_BOARD_PWM_X_PIN,    //X_STEP_PIN        0       
   BSP_MOTOR_CONTROL_BOARD_DIR_X_PIN,    //X_DIR_PIN         1
   BSP_MOTOR_CONTROL_BOARD_RESET_X_PIN,  //X_ENABLE_PIN    
-  BSP_STOP_X_PIN,                       //X_MIN_PIN
-  0,                                    //X_MAX_PIN
+  0,                       				//X_MIN_PIN
+  BSP_STOP_X_PIN,                                    //X_MAX_PIN
   BSP_MOTOR_CONTROL_BOARD_PWM_Y_PIN,    //Y_STEP_PIN        5
   BSP_MOTOR_CONTROL_BOARD_DIR_Y_PIN,    //Y_DIR_PIN               
   BSP_MOTOR_CONTROL_BOARD_RESET_Y_PIN,  //Y_ENABLE_PIN    
-  BSP_STOP_Y_PIN,                       //Y_MIN_PIN       
-  0,                                    //Y_MAX_PIN       
+  0,                       				//Y_MIN_PIN
+  BSP_STOP_Y_PIN,                                    //Y_MAX_PIN
   BSP_MOTOR_CONTROL_BOARD_PWM_Z_PIN,    //Z_STEP_PIN       10
   BSP_MOTOR_CONTROL_BOARD_DIR_Z_PIN,    //Z_DIR_PIN       
   BSP_MOTOR_CONTROL_BOARD_RESET_Z_PIN,  //Z_ENABLE_PIN    
-  BSP_STOP_Z_PIN,                       //Z_MIN_PIN       
-  0,                                    //Z_MAX_PIN       
+  BSP_STOP_W_PIN,                       //Z_MIN_PIN
+  BSP_STOP_Z_PIN,                       //Z_MAX_PIN
   0,                                    //Y2_STEP_PIN      15
   0,                                    //Y2_DIR_PIN      
   0,                                    //Y2_ENABLE_PIN   
@@ -406,6 +406,7 @@ void BSP_MiscErrorHandler(uint16_t error)
  * @param None
  * @retval None
  **********************************************************/
+#ifdef BSP_IR_ON_PIN
 void BSP_MiscInitZProbeInit(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct;
@@ -435,7 +436,7 @@ void BSP_MiscInitZProbeEnable(uint8_t enable)
     HAL_GPIO_WritePin(BSP_IR_ON_PORT, BSP_IR_ON_PIN, GPIO_PIN_SET); 
   }
 }
-
+#endif
 /******************************************************//**
  * @brief  Initialisation of the stops
  * @param[in] id 0 for X_Stop, 1 for Y_Stop, 2 for Z_Stop
@@ -455,8 +456,10 @@ void BSP_MiscStopInit(uint8_t id)
       gpioPort = BSP_STOP_X_PORT;    
 #if defined(STOP_X__PULL_UP)
       GPIO_InitStruct.Pull = GPIO_PULLUP;
-#else
+#elif defined(STOP_X__PULL_DOWN)
       GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+#else
+      GPIO_InitStruct.Pull = GPIO_NOPULL;
 #endif
       break;
     case 1:
@@ -465,8 +468,10 @@ void BSP_MiscStopInit(uint8_t id)
       gpioPort = BSP_STOP_Y_PORT;    
 #if defined(STOP_Y__PULL_UP)
       GPIO_InitStruct.Pull = GPIO_PULLUP;
-#else
+#elif defined(STOP_Y__PULL_DOWN)
       GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+#else
+      GPIO_InitStruct.Pull = GPIO_NOPULL;
 #endif
       break;      
     case 2:
@@ -475,8 +480,10 @@ void BSP_MiscStopInit(uint8_t id)
       gpioPort = BSP_STOP_Z_PORT;
 #if defined(STOP_Z__PULL_UP)
       GPIO_InitStruct.Pull = GPIO_PULLUP;
-#else
+#elif defined(STOP_Z__PULL_DOWN)
       GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+#else
+      GPIO_InitStruct.Pull = GPIO_NOPULL;
 #endif
       break;   
 //TODO: make this a conditional compile
@@ -500,15 +507,17 @@ void BSP_MiscStopInit(uint8_t id)
 //      GPIO_InitStruct.Pull = GPIO_PULLUP;
 //#endif
 //      break;
-//    case 5:
-//      /* Configure W_STOP pin */
-//      gpioPin = BSP_STOP_W_PIN;
-//      gpioPort = BSP_STOP_W_PORT;
-//#ifndef MARLIN
-//      GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-//#else
-//      GPIO_InitStruct.Pull = GPIO_PULLUP;
-//#endif
+    case 5:
+      /* Configure W_STOP pin */
+      gpioPin = BSP_STOP_W_PIN;
+      gpioPort = BSP_STOP_W_PORT;
+#if defined(STOP_W__PULL_UP)
+      GPIO_InitStruct.Pull = GPIO_PULLUP;
+#elif defined(STOP_W__PULL_DOWN)
+      GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+#else
+      GPIO_InitStruct.Pull = GPIO_NOPULL;
+#endif
       break;        
     default:
       return;
@@ -603,6 +612,7 @@ void BSP_MiscFanInit(uint8_t id)
   pfan->activePwm   = 0;
 }
 
+#define BSP_FAN_PWM_COUNTS ((uint8_t) (1000/BSP_FAN_PWM_FREQ))
 /******************************************************//**
  * @brief  Initialisation of the Heats
  * @param[in] id 0 for E1_FAN, 1 for E2, 2 for E3, 3 for E4
@@ -651,13 +661,12 @@ void BSP_MiscFanSetSpeed(uint8_t id,uint8_t speed)
   {
 	  //HAL_GPIO_WritePin(pfan->gpioPort, pfan->gpioPin, GPIO_PIN_SET);
 	  pfan->speed = speed;
-	  pfan->up_val = (uint8_t)(speed / 5) - 1;
+	  pfan->up_val = (uint8_t)((speed * BSP_FAN_PWM_COUNTS)/255);
 	  pfan->count = pfan->up_val;
 	  pfan->level = 1; /* Up state*/
 	  pfan->activePwm = 1;
   }
 }
-
 
 /******************************************************//**
  * @brief  Management of the Heats under IT
@@ -675,7 +684,7 @@ void HAL_SYSTICK_Callback(void)
 			if(fanE1.level) /* signal level was high */
 			{
 				HAL_GPIO_WritePin(fanE1.gpioPort, fanE1.gpioPin, GPIO_PIN_RESET);
-				fanE1.count = 50 - fanE1.up_val;
+				fanE1.count = BSP_FAN_PWM_COUNTS - fanE1.up_val;
 				fanE1.level = 0;
 			}
 			else/* signal level was low */
