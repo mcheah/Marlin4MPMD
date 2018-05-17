@@ -840,7 +840,7 @@ void BSP_MiscTickSetFreq(uint32_t newFreq)
   
   timPeriod = (HAL_RCC_GetSysClockFreq()/ (TICK_TIMER_PRESCALER * (uint32_t)newFreq));
   if (timPeriod < 100) timPeriod = 100;
-  
+  if (timPeriod > 0xFFFF) timPeriod = 0xFFFF;
   __HAL_TIM_SetCompare(&hTimTick, BSP_MISC_CHAN_TIMER_TICK, timerCnt + timPeriod);
   
   if (bspTickEnabled == 0)

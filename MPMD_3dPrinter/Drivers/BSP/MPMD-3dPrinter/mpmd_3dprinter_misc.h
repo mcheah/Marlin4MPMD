@@ -301,7 +301,7 @@
 
 //TODO: review this value
 //Tick timer prescaler
-#define TICK_TIMER_PRESCALER  (1)
+#define TICK_TIMER_PRESCALER  (32)
    
 /* Exported constants --------------------------------------------------------*/
 extern GPIO_TypeDef* gArrayGpioPort[BSP_MISC_MAX_PIN_NUMBER];

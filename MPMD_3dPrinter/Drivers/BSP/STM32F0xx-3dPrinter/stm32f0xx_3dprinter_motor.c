@@ -183,7 +183,7 @@ void BSP_MotorControlBoard_GpioInit(uint8_t nbDevices)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
   HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_DIR_X_PORT, &GPIO_InitStruct);
-  
+  //TODO: remove flag pin since we're not using it
   /* Configure L6474 - Flag pin -------------------------------------------*/
   GPIO_InitStruct.Pin = BSP_MOTOR_CONTROL_BOARD_FLAG_PIN;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;

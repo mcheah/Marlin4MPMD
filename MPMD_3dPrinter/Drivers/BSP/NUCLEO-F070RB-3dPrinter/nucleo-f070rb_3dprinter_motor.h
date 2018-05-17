@@ -76,70 +76,70 @@
 #define BSP_MOTOR_CONTROL_BOARD_FLAG_IRQn           (EXTI4_15_IRQn)
 //TODO: change timers to unused timers to avoid contention
 /// Timer used for PWM_X
-#define BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_X                   (TIM1)
+#define BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_X                   (TIM7)
 /// Channel Timer used for PWM_X
 #define BSP_MOTOR_CONTROL_BOARD_CHAN_TIMER_PWM_X              (TIM_CHANNEL_1)
 /// HAL Active Channel Timer used for PWM_X
 #define BSP_MOTOR_CONTROL_BOARD_HAL_ACT_CHAN_TIMER_PWM_X      (HAL_TIM_ACTIVE_CHANNEL_1)
 /// Timer Clock Enable for PWM1
-#define __BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_X_CLCK_ENABLE()   __TIM1_CLK_ENABLE()
+#define __BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_X_CLCK_ENABLE()   __TIM7_CLK_ENABLE()
 /// Timer Clock Disable for PWM1
-#define __BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_X_CLCK_DISABLE()  __TIM1_CLK_DISABLE()
+#define __BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_X_CLCK_DISABLE()  __TIM7_CLK_DISABLE()
 /// PWM_X global interrupt
-#define BSP_MOTOR_CONTROL_BOARD_PWM_X_IRQn                    (TIM1_CC_IRQn)      
+#define BSP_MOTOR_CONTROL_BOARD_PWM_X_IRQn                    (TIM7_IRQn)
 /// PWM1 GPIO alternate function 
-#define BSP_MOTOR_CONTROL_BOARD_AFx_TIMx_PWM_X                (GPIO_AF2_TIM1)
+#define BSP_MOTOR_CONTROL_BOARD_AFx_TIMx_PWM_X                (GPIO_AF0_TIM17)
 /// PWM1 frequency rescaler (1 for HW PWM, 2 for SW PWM)
 #define BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_X_FREQ_RESCALER            (1)  
    
 /// Timer used for PWM_Y
-#define BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_Y                   (TIM3)
+#define BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_Y                   (TIM7)
 /// Channel Timer used for PWM_Y
 #define BSP_MOTOR_CONTROL_BOARD_CHAN_TIMER_PWM_Y              (TIM_CHANNEL_1)
 /// HAL Active Channel Timer used for PWM_Y
 #define BSP_MOTOR_CONTROL_BOARD_HAL_ACT_CHAN_TIMER_PWM_Y      (HAL_TIM_ACTIVE_CHANNEL_1)
 /// Timer Clock Enable for PWM_Y
-#define __BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_Y_CLCK_ENABLE()   __TIM3_CLK_ENABLE()
+#define __BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_Y_CLCK_ENABLE()   __TIM7_CLK_ENABLE()
 /// Timer Clock Disable for PWM_Y
-#define __BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_Y_CLCK_DISABLE()  __TIM3_CLK_DISABLE()
+#define __BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_Y_CLCK_DISABLE()  __TIM7_CLK_DISABLE()
 /// PWM_Y global interrupt
-#define BSP_MOTOR_CONTROL_BOARD_PWM_Y_IRQn                    (TIM3_IRQn)
+#define BSP_MOTOR_CONTROL_BOARD_PWM_Y_IRQn                    (TIM7_IRQn)
 /// PWM_Y GPIO alternate function 
-#define BSP_MOTOR_CONTROL_BOARD_AFx_TIMx_PWM_Y                 (GPIO_AF0_TIM3)
+#define BSP_MOTOR_CONTROL_BOARD_AFx_TIMx_PWM_Y                 (GPIO_AF0_TIM17)
 /// PWM_Y frequency rescaler (1 for HW PWM, 2 for SW PWM)
 #define BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_Y_FREQ_RESCALER           (1)    
    
 /// Timer used for PWM_Z
-#define BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_Z                   (TIM14)
+#define BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_Z                   (TIM7)
 /// Channel Timer used for PWM_Z
 #define BSP_MOTOR_CONTROL_BOARD_CHAN_TIMER_PWM_Z              (TIM_CHANNEL_1)
 /// HAL Active Channel Timer used for PWM_Z
 #define BSP_MOTOR_CONTROL_BOARD_HAL_ACT_CHAN_TIMER_PWM_Z      (HAL_TIM_ACTIVE_CHANNEL_1)
 /// Timer Clock Enable for PWM_Z
-#define __BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_Z_CLCK_ENABLE()    __TIM14_CLK_ENABLE()
+#define __BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_Z_CLCK_ENABLE()    __TIM7_CLK_ENABLE()
 /// Timer Clock Disable for PWM_Z
-#define __BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_Z_CLCK_DISABLE()   __TIM14_CLK_DISABLE()
+#define __BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_Z_CLCK_DISABLE()   __TIM7_CLK_DISABLE()
 /// PWM_Z global interrupt
-#define BSP_MOTOR_CONTROL_BOARD_PWM_Z_IRQn              (TIM14_IRQn)
+#define BSP_MOTOR_CONTROL_BOARD_PWM_Z_IRQn              (TIM7_IRQn)
 /// PWM_Z GPIO alternate function 
-#define BSP_MOTOR_CONTROL_BOARD_AFx_TIMx_PWM_Z                (GPIO_AF0_TIM14)
+#define BSP_MOTOR_CONTROL_BOARD_AFx_TIMx_PWM_Z                (GPIO_AF0_TIM17)
 /// PWM_Z frequency rescaler (1 for HW PWM, 2 for SW PWM)   
 #define BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_Z_FREQ_RESCALER     (1)
 
 /// Timer used for PWM_E1
-#define BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E1                  (TIM15)
+#define BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E1                  (TIM7)
 /// Channel Timer used for PWM_E1
 #define BSP_MOTOR_CONTROL_BOARD_CHAN_TIMER_PWM_E1             (TIM_CHANNEL_1)
 /// HAL Active Channel Timer used for PWM_E1
 #define BSP_MOTOR_CONTROL_BOARD_HAL_ACT_CHAN_TIMER_PWM_E1     (HAL_TIM_ACTIVE_CHANNEL_1)
 /// Timer Clock Enable for PWM_E1
-#define __BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E1_CLCK_ENABLE()  __TIM15_CLK_ENABLE()
+#define __BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E1_CLCK_ENABLE()  __TIM7_CLK_ENABLE()
 /// Timer Clock Disable for PWM_E1
-#define __BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E1_CLCK_DISABLE() __TIM15_CLK_DISABLE()
+#define __BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E1_CLCK_DISABLE() __TIM7_CLK_DISABLE()
 /// PWM_E1 global interrupt
-#define BSP_MOTOR_CONTROL_BOARD_PWM_E1_IRQn             (TIM15_IRQn)
+#define BSP_MOTOR_CONTROL_BOARD_PWM_E1_IRQn             (TIM7_IRQn)
 /// PWM_E1 GPIO alternate function 
-#define BSP_MOTOR_CONTROL_BOARD_AFx_TIMx_PWM_E1               (GPIO_AF0_TIM15)
+#define BSP_MOTOR_CONTROL_BOARD_AFx_TIMx_PWM_E1               (GPIO_AF0_TIM17)
 /// PWM_E1 frequency rescaler (1 for HW PWM, 2 for SW PWM)   
 #define BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E1_FREQ_RESCALER    (1)   
    
@@ -270,7 +270,7 @@
 #define BSP_MOTOR_CONTROL_BOARD_RESET_Z_PORT (GPIOB)
    
 /// GPIO Pin used for the L6474 reset pin (device 3)                           *
-#define BSP_MOTOR_CONTROL_BOARD_RESET_E1_PIN  (GPIO_PIN_10)
+#define BSP_MOTOR_CONTROL_BOARD_RESET_E1_PIN  (GPIO_PIN_0)
 /// GPIO port used for the L6474 reset pin (device 3)                          *
 #define BSP_MOTOR_CONTROL_BOARD_RESET_E1_PORT (GPIOB)
    
