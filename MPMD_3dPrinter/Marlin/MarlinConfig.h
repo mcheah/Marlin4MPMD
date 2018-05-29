@@ -50,7 +50,7 @@
 //#endif
 #include "motorcontrol.h"
 #include "ff.h" /* for FATS and FIL*/
-
+#include "arm_math.h"
 // -STM32
 
 #include "Conditionals_post.h"

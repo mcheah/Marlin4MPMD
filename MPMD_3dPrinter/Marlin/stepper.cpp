@@ -246,7 +246,7 @@ volatile long Stepper::endstops_trigsteps[3];
                )
 */
 // Some useful constants
-#define STEPPER_NOMINAL_FREQ				10000
+#define STEPPER_NOMINAL_FREQ				1000
 #define ENABLE_STEPPER_DRIVER_INTERRUPT()   BSP_MiscTickSetFreq(STEPPER_NOMINAL_FREQ)
 #define DISABLE_STEPPER_DRIVER_INTERRUPT() BSP_MiscTickStop()
 /* BDI  -- To suppress :

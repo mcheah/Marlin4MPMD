@@ -373,7 +373,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
       // Rx buffer is full 
       UART_ERROR(7);
     }    
-    
+    HAL_UART_Transmit(UartHandle,&(pUart->rxWriteChar),1,500);
     if (pUart->uartRxDataCallback != 0)
     {
       pUart->uartRxDataCallback((uint8_t *)pUart->pRxReadBuffer,pUart->pRxWriteBuffer - pUart->pRxReadBuffer);

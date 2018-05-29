@@ -1236,6 +1236,58 @@ const short temptable_72[][2] PROGMEM = {
   { 1017 * OVERSAMPLENR,   0 } // safety
 };
 #endif
+
+#if ANY_THERMISTOR_IS(73) // mpmd 100k EPCOS 4.7k, 3.3V, adjusted
+const short temptable_73[][2] PROGMEM = {
+  {   8 * OVERSAMPLENR,  325 },
+  {   16 * OVERSAMPLENR, 301 },
+  {   32 * OVERSAMPLENR, 261 },
+  {   47 * OVERSAMPLENR, 239 },
+  {   63 * OVERSAMPLENR, 219 },
+  {   78 * OVERSAMPLENR, 208 },
+  {   93 * OVERSAMPLENR, 197 },
+  {  109 * OVERSAMPLENR, 189 },
+  {  117 * OVERSAMPLENR, 185 },
+  {  125 * OVERSAMPLENR, 182 },
+  {  140 * OVERSAMPLENR, 176 },
+  {  156 * OVERSAMPLENR, 170 },
+  {  187 * OVERSAMPLENR, 163 },
+  {  218 * OVERSAMPLENR, 156 },
+  {  248 * OVERSAMPLENR, 149 },
+  {  280 * OVERSAMPLENR, 141 },
+  {  311 * OVERSAMPLENR, 134 },
+  {  342 * OVERSAMPLENR, 130 },
+  {  372 * OVERSAMPLENR, 125 },
+  {  404 * OVERSAMPLENR, 121 },
+  {  436 * OVERSAMPLENR, 116 },
+  {  465 * OVERSAMPLENR, 111 },
+  {  497 * OVERSAMPLENR, 107 },
+  {  528 * OVERSAMPLENR, 104 },
+  {  559 * OVERSAMPLENR, 100 },
+  {  588 * OVERSAMPLENR,  96 },
+  {  622 * OVERSAMPLENR,  92 },
+  {  651 * OVERSAMPLENR,  88 },
+  {  684 * OVERSAMPLENR,  83 },
+  {  714 * OVERSAMPLENR,  79 },
+  {  744 * OVERSAMPLENR,  75 },
+  {  776 * OVERSAMPLENR,  71 },
+  {  807 * OVERSAMPLENR,  65 },
+  {  837 * OVERSAMPLENR,  59 },
+  {  870 * OVERSAMPLENR,  53 },
+  {  901 * OVERSAMPLENR,  47 },
+  {  931 * OVERSAMPLENR,  41 },
+  {  939 * OVERSAMPLENR,  38 },
+  {  946 * OVERSAMPLENR,  36 },
+  {  955 * OVERSAMPLENR,  33 },
+  {  962 * OVERSAMPLENR,  31 },
+  {  969 * OVERSAMPLENR,  28 },
+  {  976 * OVERSAMPLENR,  24 },
+  {  986 * OVERSAMPLENR,  19 },
+  {  994 * OVERSAMPLENR,  15 },
+  { 1011 * OVERSAMPLENR,   5 },
+  { 1016 * OVERSAMPLENR,   0 } // safety
+};
+#endif
 // Pt1000 and Pt100 handling
 //
 // Rt=R0*(1+a*T+b*T*T) [for T>0]

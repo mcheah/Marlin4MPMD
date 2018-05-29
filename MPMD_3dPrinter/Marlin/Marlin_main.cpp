@@ -7795,7 +7795,7 @@ void clamp_to_software_endstops(float target[3]) {
       RAW_Y_POSITION(in_cartesian[Y_AXIS]),
       RAW_Z_POSITION(in_cartesian[Z_AXIS])
     };
-
+#if 0
     delta[TOWER_1] = sqrt(delta_diagonal_rod_2_tower_1
                           - sq(delta_tower1_x - cartesian[X_AXIS])
                           - sq(delta_tower1_y - cartesian[Y_AXIS])
@@ -7808,6 +7808,23 @@ void clamp_to_software_endstops(float target[3]) {
                           - sq(delta_tower3_x - cartesian[X_AXIS])
                           - sq(delta_tower3_y - cartesian[Y_AXIS])
                          ) + cartesian[Z_AXIS];
+#else
+    arm_sqrt_f32((delta_diagonal_rod_2_tower_1
+                          - sq(delta_tower1_x - cartesian[X_AXIS])
+                          - sq(delta_tower1_y - cartesian[Y_AXIS])
+                         ),&(delta[TOWER_1]));
+    delta[TOWER_1]+=cartesian[Z_AXIS];
+    arm_sqrt_f32((delta_diagonal_rod_2_tower_2
+                          - sq(delta_tower2_x - cartesian[X_AXIS])
+                          - sq(delta_tower2_y - cartesian[Y_AXIS])
+                         ),&(delta[TOWER_2]));
+    delta[TOWER_2]+=cartesian[Z_AXIS];
+    arm_sqrt_f32((delta_diagonal_rod_2_tower_3
+                          - sq(delta_tower3_x - cartesian[X_AXIS])
+                          - sq(delta_tower3_y - cartesian[Y_AXIS])
+                         ),&(delta[TOWER_3]));
+    delta[TOWER_3]+=cartesian[Z_AXIS];
+#endif
     /**
     SERIAL_ECHOPGM("cartesian x="); SERIAL_ECHO(cartesian[X_AXIS]);
     SERIAL_ECHOPGM(" y="); SERIAL_ECHO(cartesian[Y_AXIS]);
@@ -8036,7 +8053,9 @@ void mesh_line_to_destination(float fr_mm_m, uint8_t x_splits = 0xff, uint8_t y_
     if (cartesian_mm < 0.000001) cartesian_mm = abs(difference[E_AXIS]);
     if (cartesian_mm < 0.000001) return false;
     float _feedrate_mm_s = MMM_TO_MMS_SCALED(feedrate_mm_m);
-    float seconds = cartesian_mm / _feedrate_mm_s;
+    // Fail if attempting move outside printable radius
+    if (!position_is_reachable_xy(target[X_AXIS], target[Y_AXIS])) return true;
+    seconds = cartesian_mm / _feedrate_mm_s;
     int steps = max(1, int(delta_segments_per_second * seconds));
     float inv_steps = 1.0/steps;
 
@@ -8059,8 +8078,13 @@ void mesh_line_to_destination(float fr_mm_m, uint8_t x_splits = 0xff, uint8_t y_
 
       //DEBUG_POS("prepare_kinematic_move_to", target);
       //DEBUG_POS("prepare_kinematic_move_to", delta);
-
-      planner.buffer_line(delta[X_AXIS], delta[Y_AXIS], delta[Z_AXIS], target[E_AXIS], _feedrate_mm_s, active_extruder);
+      if(!isnanf(delta[X_AXIS]) && !isnanf(delta[Y_AXIS]) && !isnanf(delta[Z_AXIS]))
+      {
+    	  moveStarted = true;
+    	  planner.buffer_line(delta[X_AXIS], delta[Y_AXIS], delta[Z_AXIS], target[E_AXIS], _feedrate_mm_s, active_extruder);
+      }
+      else
+    	  return true;
     }
     return true;
   }

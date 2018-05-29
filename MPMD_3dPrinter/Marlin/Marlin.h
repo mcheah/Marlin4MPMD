@@ -389,4 +389,63 @@ inline void do_blocking_move_to_x(float x, float fr_mm_m=0.0);
 inline void do_blocking_move_to_z(float z, float fr_mm_m=0.0);
 inline void do_blocking_move_to_xy(float x, float y, float fr_mm_m=0.0);
 
+
+/**
+ * position_is_reachable family of functions
+ */
+
+#if IS_KINEMATIC // (DELTA or SCARA)
+
+  #if IS_SCARA
+    extern const float L1, L2;
+  #endif
+
+  inline bool position_is_reachable_raw_xy(const float &rx, const float &ry) {
+    #if ENABLED(DELTA)
+      return HYPOT2(rx, ry) <= sq(DELTA_PRINTABLE_RADIUS);
+    #elif IS_SCARA
+      #if MIDDLE_DEAD_ZONE_R > 0
+        const float R2 = HYPOT2(rx - SCARA_OFFSET_X, ry - SCARA_OFFSET_Y);
+        return R2 >= sq(float(MIDDLE_DEAD_ZONE_R)) && R2 <= sq(L1 + L2);
+      #else
+        return HYPOT2(rx - SCARA_OFFSET_X, ry - SCARA_OFFSET_Y) <= sq(L1 + L2);
+      #endif
+    #else // CARTESIAN
+      // To be migrated from MakerArm branch in future
+    #endif
+  }
+
+  inline bool position_is_reachable_by_probe_raw_xy(const float &rx, const float &ry) {
+
+    // Both the nozzle and the probe must be able to reach the point.
+    // This won't work on SCARA since the probe offset rotates with the arm.
+
+    return position_is_reachable_raw_xy(rx, ry)
+        && position_is_reachable_raw_xy(rx - X_PROBE_OFFSET_FROM_EXTRUDER, ry - Y_PROBE_OFFSET_FROM_EXTRUDER);
+  }
+
+#else // CARTESIAN
+
+  inline bool position_is_reachable_raw_xy(const float &rx, const float &ry) {
+      // Add 0.001 margin to deal with float imprecision
+      return WITHIN(rx, X_MIN_POS - 0.001, X_MAX_POS + 0.001)
+          && WITHIN(ry, Y_MIN_POS - 0.001, Y_MAX_POS + 0.001);
+  }
+
+  inline bool position_is_reachable_by_probe_raw_xy(const float &rx, const float &ry) {
+      // Add 0.001 margin to deal with float imprecision
+      return WITHIN(rx, MIN_PROBE_X - 0.001, MAX_PROBE_X + 0.001)
+          && WITHIN(ry, MIN_PROBE_Y - 0.001, MAX_PROBE_Y + 0.001);
+  }
+
+#endif // CARTESIAN
+
+FORCE_INLINE bool position_is_reachable_by_probe_xy(const float &lx, const float &ly) {
+  return position_is_reachable_by_probe_raw_xy(RAW_X_POSITION(lx), RAW_Y_POSITION(ly));
+}
+
+FORCE_INLINE bool position_is_reachable_xy(const float &lx, const float &ly) {
+  return position_is_reachable_raw_xy(RAW_X_POSITION(lx), RAW_Y_POSITION(ly));
+}
+
 #endif //MARLIN_H

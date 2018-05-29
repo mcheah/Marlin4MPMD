@@ -1107,8 +1107,7 @@ void Planner::check_axes_activity() {
   LOOP_XYZE(i) position[i] = target[i];
 
   recalculate();
-
-  stepper.wake_up();
+//  stepper.wake_up();
 
 } // buffer_line()
 

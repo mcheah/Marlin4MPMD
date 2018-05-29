@@ -232,11 +232,11 @@
 //#define DUMMY_THERMISTOR_999_VALUE 100
 // :{ '0': "Not used",'1':"100k / 4.7k - EPCOS",'2':"200k / 4.7k - ATC Semitec 204GT-2",'3':"Mendel-parts / 4.7k",'4':"10k !! do not use for a hotend. Bad resolution at high temp. !!",'5':"100K / 4.7k - ATC Semitec 104GT-2 (Used in ParCan & J-Head)",'6':"100k / 4.7k EPCOS - Not as accurate as Table 1",'7':"100k / 4.7k Honeywell 135-104LAG-J01",'8':"100k / 4.7k 0603 SMD Vishay NTCS0603E3104FXT",'9':"100k / 4.7k GE Sensing AL03006-58.2K-97-G1",'10':"100k / 4.7k RS 198-961",'11':"100k / 4.7k beta 3950 1%",'12':"100k / 4.7k 0603 SMD Vishay NTCS0603E3104FXT (calibrated for Makibox hot bed)",'13':"100k Hisens 3950  1% up to 300°C for hotend 'Simple ONE ' & hotend 'All In ONE'",'20':"PT100 (Ultimainboard V2.x)",'51':"100k / 1k - EPCOS",'52':"200k / 1k - ATC Semitec 204GT-2",'55':"100k / 1k - ATC Semitec 104GT-2 (Used in ParCan & J-Head)",'60':"100k Maker's Tool Works Kapton Bed Thermistor beta=3950",'66':"Dyze Design 4.7M High Temperature thermistor",'70':"the 100K thermistor found in the bq Hephestos 2",'71':"100k / 4.7k Honeywell 135-104LAF-J01",'147':"Pt100 / 4.7k",'1047':"Pt1000 / 4.7k",'110':"Pt100 / 1k (non-standard)",'1010':"Pt1000 / 1k (non standard)",'-3':"Thermocouple + MAX31855 (only for sensor 0)",'-2':"Thermocouple + MAX6675 (only for sensor 0)",'-1':"Thermocouple + AD595",'998':"Dummy 1",'999':"Dummy 2" }
 //TODO: verify these temp sensor values vs the mpmd
-#define TEMP_SENSOR_0 72
+#define TEMP_SENSOR_0 73
 //#define TEMP_SENSOR_1 0
 //#define TEMP_SENSOR_2 0
 //#define TEMP_SENSOR_3 0
-#define TEMP_SENSOR_BED 72
+#define TEMP_SENSOR_BED 73
 
 
 // This makes temp sensor 1 a redundant sensor for sensor 0. If the temperatures difference between these sensors is to high the print will be aborted.
@@ -416,7 +416,7 @@
 //===========================================================================
 // Enable DELTA kinematics and most of the default configuration for Deltas
 //TODO: Re-enable Delta mode once low level drivers are verified
-//#define DELTA
+#define DELTA
 //TODO: check vs MPMD settings
 #if ENABLED(DELTA)
 
@@ -428,23 +428,24 @@
   // NOTE NB all values for DELTA_* values MUST be floating point, so always have a decimal point in them
 
   // Center-to-center distance of the holes in the diagonal push rods.
-  #define DELTA_DIAGONAL_ROD 250.0 // mm
+  #define DELTA_DIAGONAL_ROD 120.8 // mm
 
   // Horizontal offset from middle of printer to smooth rod center.
-  #define DELTA_SMOOTH_ROD_OFFSET 175.0 // mm
+//  #define DELTA_SMOOTH_ROD_OFFSET 108 // mm
 
   // Horizontal offset of the universal joints on the end effector.
-  #define DELTA_EFFECTOR_OFFSET 33.0 // mm
+//  #define DELTA_EFFECTOR_OFFSET 27.0 // mm
 
   // Horizontal offset of the universal joints on the carriages.
-  #define DELTA_CARRIAGE_OFFSET 18.0 // mm
+//  #define DELTA_CARRIAGE_OFFSET 16.0 // mm
 
   // Horizontal distance bridged by diagonal push rods when effector is centered.
-  #define DELTA_RADIUS (DELTA_SMOOTH_ROD_OFFSET-(DELTA_EFFECTOR_OFFSET)-(DELTA_CARRIAGE_OFFSET))
+//  #define DELTA_RADIUS (DELTA_SMOOTH_ROD_OFFSET-(DELTA_EFFECTOR_OFFSET)-(DELTA_CARRIAGE_OFFSET))
+//  #define DELTA_RADIUS 63.25
+	#define DELTA_RADIUS 63.90
 
   // Print surface diameter/2 minus unreachable space (avoid collisions with vertical towers).
-  #define DELTA_PRINTABLE_RADIUS 140.0
-
+  #define DELTA_PRINTABLE_RADIUS 60.0
   // Delta calibration menu
   // uncomment to add three points calibration menu option.
   // See http://minow.blogspot.com/index.html#4918805519571907051
@@ -553,7 +554,7 @@
 #define Z_PROBE_OFFSET_FROM_EXTRUDER 0 //  Z offset: -below +above  [the nozzle]
 
 // X and Y axis travel speed (mm/m) between probes
-#define XY_PROBE_SPEED 4000
+#define XY_PROBE_SPEED (30*60)
 // Speed for the first approach when double-probing (with PROBE_DOUBLE_TOUCH)
 #define Z_PROBE_SPEED_FAST HOMING_FEEDRATE_Z
 // Speed for the "accurate" probe of each point
@@ -615,8 +616,8 @@
 //
 // Probe Raise options provide clearance for the probe to deploy, stow, and travel.
 //
-#define Z_RAISE_PROBE_DEPLOY_STOW 5 // Raise to make room for the probe to deploy / stow
-#define Z_RAISE_BETWEEN_PROBINGS 5  // Raise between probing points.
+#define Z_RAISE_PROBE_DEPLOY_STOW 15 // Raise to make room for the probe to deploy / stow
+#define Z_RAISE_BETWEEN_PROBINGS 15  // Raise between probing points.
 
 //
 // For M851 give a range for adjusting the Z probe offset
@@ -648,8 +649,8 @@
 
 // Invert the stepper direction. Change (or reverse the motor connector) if an axis goes the wrong way.
 // For Bicephale
-#define INVERT_X_DIR true
-#define INVERT_Y_DIR true
+#define INVERT_X_DIR false
+#define INVERT_Y_DIR false
 #define INVERT_Z_DIR false
 //#define INVERT_X_DIR false
 //#define INVERT_Y_DIR true
@@ -671,9 +672,9 @@
 // ENDSTOP SETTINGS:
 // Sets direction of endstops when homing; 1=MAX, -1=MIN
 // :[-1,1]
-#define X_HOME_DIR -1
-#define Y_HOME_DIR -1
-#define Z_HOME_DIR -1
+#define X_HOME_DIR 1
+#define Y_HOME_DIR 1
+#define Z_HOME_DIR 1
 
 #define min_software_endstops false // BDI => true // If true, axis won't move to coordinates less than HOME_POS.
 #define max_software_endstops false // BDI => true  // If true, axis won't move to coordinates greater than the defined lengths below.
@@ -686,8 +687,10 @@
 #define Z_MIN_POS 0
 #define X_MAX_POS 60
 #define Y_MAX_POS 60 //200
-#define Z_MAX_POS 120 //200
+#define Z_MAX_POS 130 //200
 
+//#define MAX_RAD (sqrt(sq(X_MAX_POS)+sq(Y_MAX_POS))))
+#define MAX_RAD 60
 //===========================================================================
 //========================= Filament Runout Sensor ==========================
 //===========================================================================
@@ -729,7 +732,7 @@
 
 // @section bedlevel
 //TODO: re-enable later
-//#define AUTO_BED_LEVELING_FEATURE // Delete the comment to enable (remove // at the start of the line)
+#define AUTO_BED_LEVELING_FEATURE // Delete the comment to enable (remove // at the start of the line)
 
 // Enable this feature to get detailed logging of G28, G29, M48, etc.
 // Logging is off by default. Enable this logging feature with 'M111 S32'.
@@ -767,7 +770,7 @@
   // Compensate by interpolating between the nearest four Z probe values for each point.
   // Useful for deltas where the print surface may appear like a bowl or dome shape.
   // Works best with AUTO_BED_LEVELING_GRID_POINTS 5 or higher.
-  #define AUTO_BED_LEVELING_GRID_POINTS 9
+  #define AUTO_BED_LEVELING_GRID_POINTS 3
 
   #else  // !AUTO_BED_LEVELING_GRID
 
@@ -807,7 +810,7 @@
 // For DELTA this is the top-center of the Cartesian print volume.
 //#define MANUAL_X_HOME_POS 0
 //#define MANUAL_Y_HOME_POS 0
-#define MANUAL_Z_HOME_POS 150 // Distance between the nozzle to printbed after homing
+#define MANUAL_Z_HOME_POS 130 // Distance between the nozzle to printbed after homing
 
 // Use "Z Safe Homing" to avoid homing with a Z probe outside the bed area.
 //
@@ -829,7 +832,7 @@
 #ifndef DELTA
 #define HOMING_FEEDRATE_XY (50*60)
 #endif
-  #define HOMING_FEEDRATE_Z  (200*60)
+  #define HOMING_FEEDRATE_Z  (100*60)
 
 //
 // MOVEMENT SETTINGS
@@ -838,7 +841,14 @@
 
 // default settings
 //TODO: adjust these settings
-#define DEFAULT_AXIS_STEPS_PER_UNIT   {56.50,56.50,56.50,48.50}  // default steps per unit for Ultimaker
+#define MOTOR_STEPS_PER_REVOLUTION	  200.0//(360/1.8)
+#define MOTOR_MICROSTEPS_COUNT		  8.0
+#define MOTOR_PULLEY_TEETH_COUNT	  14.0
+#define MOTOR_BELT_PITCH_MM			  2.0
+#define MOTOR_DEFAULT_STEPS_PER_UNIT  (MOTOR_STEPS_PER_REVOLUTION * MOTOR_MICROSTEPS_COUNT / MOTOR_PULLEY_TEETH_COUNT / MOTOR_BELT_PITCH_MM)
+#define MOTOR_EXTRUDER_RADIUS		  5.5
+#define MOTOR_DEFAULT_EXTRUDER_STEPS_PER_UNIT	(MOTOR_STEPS_PER_REVOLUTION *MOTOR_MICROSTEPS_COUNT / (2*pi*MOTOR_EXTRUDER_RADIUS)
+#define DEFAULT_AXIS_STEPS_PER_UNIT   {MOTOR_DEFAULT_STEPS_PER_UNIT,MOTOR_DEFAULT_STEPS_PER_UNIT,MOTOR_DEFAULT_STEPS_PER_UNIT,48.50}  // default steps per unit for Ultimaker
 #define DEFAULT_MAX_FEEDRATE          {150, 150, 150, 50}    // (mm/sec)
 #define DEFAULT_MAX_ACCELERATION      {800,800,800,10000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for Skeinforge 40+, for older versions raise them a lot.
 

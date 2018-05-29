@@ -63,6 +63,7 @@
 #define ENABLED(b) _CAT(SWITCH_ENABLED_, b)
 #define DISABLED(b) (!_CAT(SWITCH_ENABLED_, b))
 
+#define WITHIN(V,L,H) ((V) >= (L) && (V) <= (H))
 #define NUMERIC(a) ((a) >= '0' && '9' >= (a))
 #define NUMERIC_SIGNED(a) (NUMERIC(a) || (a) == '-')
 #define COUNT(a) (sizeof(a)/sizeof(*a))

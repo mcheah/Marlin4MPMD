@@ -38,6 +38,7 @@
 									<listOptionValue builtIn="false" value="USE_HAL_LEGACY"/>
 									<listOptionValue builtIn="false" value="MOTOR_A4985"/>
 									<listOptionValue builtIn="false" value="STM32_MPMD"/>
+									<listOptionValue builtIn="false" value="ARM_MATH_CM0"/>
 								</option>
 								<option id="gnu.c.compiler.option.include.paths.2124464761" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/HAL_Driver}&quot;"/>
@@ -77,6 +78,7 @@
 									<listOptionValue builtIn="false" value="USE_HAL_LEGACY"/>
 									<listOptionValue builtIn="false" value="MOTOR_A4985"/>
 									<listOptionValue builtIn="false" value="STM32_MPMD"/>
+									<listOptionValue builtIn="false" value="ARM_MATH_CM0"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.282550689" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/inc&quot;"/>
@@ -243,6 +245,7 @@
 									<listOptionValue builtIn="false" value="USE_HAL_LEGACY"/>
 									<listOptionValue builtIn="false" value="MOTOR_A4985"/>
 									<listOptionValue builtIn="false" value="STM32_MPMD"/>
+									<listOptionValue builtIn="false" value="ARM_MATH_CM0"/>
 								</option>
 								<option id="gnu.c.compiler.option.include.paths.467241798" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/HAL_Driver}&quot;"/>
@@ -280,6 +283,7 @@
 									<listOptionValue builtIn="false" value="USE_HAL_LEGACY"/>
 									<listOptionValue builtIn="false" value="MOTOR_A4985"/>
 									<listOptionValue builtIn="false" value="STM32_MPMD"/>
+									<listOptionValue builtIn="false" value="ARM_MATH_CM0"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.73012466" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/inc&quot;"/>

@@ -87,7 +87,7 @@ typedef uint8_t  byte;
 #define sprintf_P sprintf
 #define min(a,b) (((a)<(b))?(a):(b))
 #define max(a,b) (((a)>(b))?(a):(b))
-#define sq(x)  (x*x)
+#define sq(x)  ((x)*(x))
 #define _BV(bit) (1<<(bit))
 
 #define square(x) ((x) * (x))
