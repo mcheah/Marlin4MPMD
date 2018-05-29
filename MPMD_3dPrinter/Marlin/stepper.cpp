@@ -58,6 +58,14 @@
   #include <SPI.h>
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "stopwatch2.h"
+#ifdef __cplusplus
+}
+#endif
+
 Stepper stepper; // Singleton
 
 // public:
@@ -323,6 +331,7 @@ void IsrStepperHandler() { Stepper::StepperHandler(); }
 
 void Stepper::StepperHandler()
 {
+  uint32_t stepperISR_start = StopWatch_Start();
   if (cleaning_buffer_counter) {
     current_block = NULL;
     planner.discard_current_block();
@@ -653,7 +662,10 @@ void Stepper::StepperHandler()
     if (step_events_completed >= current_block->step_event_count) {
       current_block = NULL;
       planner.discard_current_block();
+      move_totalMS = HAL_GetTick() - move_startMS;
     }
+    //  if(moveStarted)
+    	  stepperISR_ticks += StopWatch_Elapsed(stepperISR_start);
   }
 }
 

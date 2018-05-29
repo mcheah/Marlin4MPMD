@@ -46,6 +46,13 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "Marlin_export.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "stopwatch2.h"
+#ifdef __cplusplus
+}
+#endif
 
 /** @defgroup MSP_module
   * @brief HAL MSP module.
@@ -1102,6 +1109,25 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
 //  HAL_GPIO_DeInit(BSP_MISC_I2C_SCL_PORT, BSP_MISC_I2C_SCL_PIN);
 //  HAL_GPIO_DeInit(BSP_MISC_I2C_SDA_PORT, BSP_MISC_I2C_SDA_PIN);
 //}
+
+void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
+{
+	  /*##-1- Enable peripherals and GPIO Clocks #################################*/
+	if(htim->Instance==TIMx)
+	{
+	  /* TIMx Peripheral clock enable */
+	  TIMx_CLK_ENABLE();
+
+	  /*##-2- Configure the NVIC for TIMx ########################################*/
+	  /* Set Interrupt Group Priority */
+	  HAL_NVIC_SetPriority(TIMx_IRQn, 4, 0);
+
+	  /* Enable the TIMx global Interrupt */
+	  HAL_NVIC_EnableIRQ(TIMx_IRQn);
+	}
+}
+
+
 
 /**
   * @}

@@ -289,6 +289,16 @@ float code_value_temp_abs();
 float code_value_temp_diff();
 
 #if ENABLED(DELTA)
+volatile extern uint32_t PKMT1_ticks;
+volatile extern uint32_t PKMT2_ticks;
+volatile extern uint32_t IK_Ticks;
+volatile extern uint32_t buffline_Ticks;
+volatile extern uint32_t idle_Ticks;
+volatile extern uint32_t stepperISR_ticks;
+volatile extern uint32_t tempISR_ticks;
+volatile extern bool moveStarted;
+volatile extern uint32_t move_startMS;
+volatile extern uint32_t move_totalMS;
   extern float delta[3];
   extern float endstop_adj[3]; // axis[n].endstop_adj
   extern float delta_radius;

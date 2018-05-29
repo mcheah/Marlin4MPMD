@@ -30,6 +30,14 @@
 #include "thermistortables.h"
 #include "language.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "stopwatch2.h"
+#ifdef __cplusplus
+}
+#endif
+
 #if ENABLED(USE_WATCHDOG)
   #include "watchdog.h"
 #endif
@@ -1397,6 +1405,7 @@ void Temperature::isr() {
 void IsrTemperatureHandler() { Temperature::TemperatureHandler(); }
 void Temperature::TemperatureHandler(void)
 {
+  uint32_t tempISR_start = StopWatch_Start();
   static unsigned char temp_count = 0;
   static TempState temp_state = StartupDelay;
   static unsigned char pwm_count = _BV(SOFT_PWM_SCALE);
@@ -1831,7 +1840,8 @@ void Temperature::TemperatureHandler(void)
       if (bed_minttemp_raw GEBED current_temperature_bed_raw) _temp_error(-1, PSTR(MSG_T_MINTEMP), PSTR(MSG_ERR_MINTEMP_BED));
 #endif
     #endif
-
+      if(moveStarted)
+    	  tempISR_ticks += StopWatch_Elapsed(tempISR_start);
   } // temp_count >= OVERSAMPLENR
 
   #if ENABLED(BABYSTEPPING)

@@ -65,6 +65,14 @@
 #include "ultralcd.h"
 #include "language.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "stopwatch2.h"
+#ifdef __cplusplus
+}
+#endif
+
 #if ENABLED(MESH_BED_LEVELING)
   #include "mesh_bed_leveling.h"
 #endif
@@ -540,12 +548,18 @@ void Planner::check_axes_activity() {
   void Planner::buffer_line(const float& x, const float& y, const float& z, const float& e, float fr_mm_s, const uint8_t extruder)
 #endif  // AUTO_BED_LEVELING_FEATURE
 {
+  uint32_t buffline_start = StopWatch_Start();
   // Calculate the buffer head after we push this byte
   int next_buffer_head = next_block_index(block_buffer_head);
 
   // If the buffer is full: good! That means we are well ahead of the robot.
   // Rest here until there is room in the buffer.
-  while (block_buffer_tail == next_buffer_head) idle();
+  uint32_t idle_start = StopWatch_Start();
+  while (block_buffer_tail == next_buffer_head)
+  {
+	  idle();
+  }
+  idle_Ticks += StopWatch_Elapsed(idle_start);
 
   #if ENABLED(MESH_BED_LEVELING)
     if (mbl.active())
@@ -554,6 +568,10 @@ void Planner::check_axes_activity() {
     apply_rotation_xyz(bed_level_matrix, x, y, z);
   #endif
 
+  if((block_buffer_tail - block_buffer_head)>10)
+  {
+	  float temppx = 0;
+  }
   // The target position of the tool in absolute steps
   // Calculate target position in absolute steps
   //this should be done after the wait, because otherwise a M92 code within the gcode disrupts this calculation somehow
@@ -1107,6 +1125,7 @@ void Planner::check_axes_activity() {
   LOOP_XYZE(i) position[i] = target[i];
 
   recalculate();
+  buffline_Ticks += StopWatch_Elapsed(buffline_start);
 //  stepper.wake_up();
 
 } // buffer_line()

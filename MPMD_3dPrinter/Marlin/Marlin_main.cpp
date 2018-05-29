@@ -86,6 +86,14 @@
   #include "twibus.h"
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "stopwatch2.h"
+#ifdef __cplusplus
+}
+#endif
+
 char crlfcrlfBuf[4];
 int crlfcrlfIndex;
 
@@ -7789,7 +7797,7 @@ void clamp_to_software_endstops(float target[3]) {
   }
 
   void inverse_kinematics(const float in_cartesian[3]) {
-
+  uint32_t IK_start = StopWatch_Start();
     const float cartesian[3] = {
       RAW_X_POSITION(in_cartesian[X_AXIS]),
       RAW_Y_POSITION(in_cartesian[Y_AXIS]),
@@ -7834,6 +7842,7 @@ void clamp_to_software_endstops(float target[3]) {
     SERIAL_ECHOPGM(" b="); SERIAL_ECHO(delta[TOWER_2]);
     SERIAL_ECHOPGM(" c="); SERIAL_ECHOLN(delta[TOWER_3]);
     */
+    IK_Ticks += StopWatch_Elapsed(IK_start);
   }
 
   float delta_safe_distance_from_top() {
@@ -8044,9 +8053,31 @@ void mesh_line_to_destination(float fr_mm_m, uint8_t x_splits = 0xff, uint8_t y_
 #endif  // MESH_BED_LEVELING
 
 #if ENABLED(DELTA) || ENABLED(SCARA)
-
+volatile uint32_t PKMT1_ticks = 0;
+volatile uint32_t PKMT2_ticks = 0;
+volatile uint32_t IK_Ticks = 0;
+volatile uint32_t buffline_Ticks = 0;
+volatile uint32_t idle_Ticks = 0;
+volatile uint32_t stepperISR_ticks = 0;
+volatile uint32_t tempISR_ticks = 0;
+volatile uint32_t move_ticks = 0;
+volatile uint32_t move_startMS = 0;
+volatile uint32_t move_totalMS = 0;
+volatile bool moveStarted=false;
+volatile float seconds = 0;
   inline bool prepare_kinematic_move_to(float target[NUM_AXIS]) {
-    float difference[NUM_AXIS];
+	//Zero out ticks on new move
+	PKMT1_ticks = 0;
+	PKMT2_ticks = 0;
+	IK_Ticks = 0;
+	buffline_Ticks = 0;
+	idle_Ticks = 0;
+	stepperISR_ticks = 0;
+	tempISR_ticks = 0;
+	move_ticks = 0;
+	move_startMS = HAL_GetTick();
+	uint32_t PKMT1_start = StopWatch_Start();
+	float difference[NUM_AXIS];
     LOOP_XYZE(i) difference[i] = target[i] - current_position[i];
 
     float cartesian_mm = sqrt(sq(difference[X_AXIS]) + sq(difference[Y_AXIS]) + sq(difference[Z_AXIS]));
@@ -8062,14 +8093,14 @@ void mesh_line_to_destination(float fr_mm_m, uint8_t x_splits = 0xff, uint8_t y_
     // SERIAL_ECHOPGM("mm="); SERIAL_ECHO(cartesian_mm);
     // SERIAL_ECHOPGM(" seconds="); SERIAL_ECHO(seconds);
     // SERIAL_ECHOPGM(" steps="); SERIAL_ECHOLN(steps);
-
+    PKMT1_ticks = StopWatch_Elapsed(PKMT1_start);
     for (int s = 1; s <= steps; s++) {
-
+      uint32_t PKMT2_start = StopWatch_Start();
       float fraction = float(s) * inv_steps;
 
       LOOP_XYZE(i)
         target[i] = current_position[i] + difference[i] * fraction;
-
+      PKMT2_ticks += StopWatch_Elapsed(PKMT2_start);
       inverse_kinematics(target);
 
       #if ENABLED(DELTA) && ENABLED(AUTO_BED_LEVELING_FEATURE)
@@ -8086,6 +8117,8 @@ void mesh_line_to_destination(float fr_mm_m, uint8_t x_splits = 0xff, uint8_t y_
       else
     	  return true;
     }
+    moveStarted = false;
+    move_ticks = StopWatch_Elapsed(PKMT1_start);
     return true;
   }
 
