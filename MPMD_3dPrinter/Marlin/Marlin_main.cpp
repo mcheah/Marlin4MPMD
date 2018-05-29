@@ -8048,14 +8048,14 @@ void mesh_line_to_destination(float fr_mm_m, uint8_t x_splits = 0xff, uint8_t y_
   inline bool prepare_kinematic_move_to(float target[NUM_AXIS]) {
     float difference[NUM_AXIS];
     LOOP_XYZE(i) difference[i] = target[i] - current_position[i];
-
+    float seconds = 0;
     float cartesian_mm = sqrt(sq(difference[X_AXIS]) + sq(difference[Y_AXIS]) + sq(difference[Z_AXIS]));
     if (cartesian_mm < 0.000001) cartesian_mm = abs(difference[E_AXIS]);
     if (cartesian_mm < 0.000001) return false;
     float _feedrate_mm_s = MMM_TO_MMS_SCALED(feedrate_mm_m);
     // Fail if attempting move outside printable radius
     if (!position_is_reachable_xy(target[X_AXIS], target[Y_AXIS])) return true;
-    seconds = cartesian_mm / _feedrate_mm_s;
+    	seconds = cartesian_mm / _feedrate_mm_s;
     int steps = max(1, int(delta_segments_per_second * seconds));
     float inv_steps = 1.0/steps;
 
