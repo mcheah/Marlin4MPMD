@@ -75,7 +75,7 @@ void BSP_AdcHwInit(void)
   pAdc->adcHandle.Init.Resolution = ADC_RESOLUTION_10B;
   pAdc->adcHandle.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   pAdc->adcHandle.Init.ScanConvMode = ENABLE;
-  pAdc->adcHandle.Init.EOCSelection = ADC_EOC_SEQ_CONV;
+  pAdc->adcHandle.Init.EOCSelection = 0X0000;
   //TODO: check these lowpower registers to see if this is valid
   pAdc->adcHandle.Init.LowPowerAutoWait = DISABLE;
   pAdc->adcHandle.Init.LowPowerAutoPowerOff = DISABLE;
@@ -103,7 +103,7 @@ void BSP_AdcHwInit(void)
   /* Configure ADC for bed thermistor */
   sConfig.Channel = BSP_ADC_CHANNEL_THERM_BED1;
   sConfig.Rank = BSP_ADC_RANK_THERM_BED1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_71CYCLES_5;
+  sConfig.SamplingTime = ADC_SAMPLETIME_239CYCLES_5;
   if (HAL_ADC_ConfigChannel(&pAdc->adcHandle, &sConfig) != HAL_OK)
   {
     /* Channel configuration error */
@@ -113,7 +113,7 @@ void BSP_AdcHwInit(void)
   /* Configure ADC for E1 thermistor */
   sConfig.Channel = BSP_ADC_CHANNEL_THERM_E1;
   sConfig.Rank = BSP_ADC_RANK_THERM_E1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_71CYCLES_5;
+  sConfig.SamplingTime = ADC_SAMPLETIME_239CYCLES_5;
   if (HAL_ADC_ConfigChannel(&pAdc->adcHandle, &sConfig) != HAL_OK)
   {
     /* Channel configuration error */

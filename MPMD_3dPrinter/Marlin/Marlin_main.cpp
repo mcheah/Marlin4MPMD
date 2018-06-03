@@ -464,7 +464,7 @@ static uint8_t target_extruder;
   float cartesian_position[3] = { 0 };
   #define SIN_60 0.8660254037844386
   #define COS_60 0.5
-  float endstop_adj[3] = { 0 };
+  float endstop_adj[3] = { DELTA_ENDSTOP_ADJ_X, DELTA_ENDSTOP_ADJ_Y, DELTA_ENDSTOP_ADJ_Z };
   // these are the default values, can be overriden with M665
   float delta_radius = DELTA_RADIUS;
   float delta_tower1_x = -SIN_60 * (delta_radius + DELTA_RADIUS_TRIM_TOWER_1); // front left tower
@@ -903,8 +903,8 @@ void setup() {
   #endif
 #endif
 
-    BSP_UartHwInit(BAUDRATE);
-    BSP_UartIfStart();
+//    BSP_UartHwInit(BAUDRATE);
+//    BSP_UartIfStart();
     MYSERIAL.begin(BAUDRATE);
     SERIAL_PROTOCOLLNPGM("start");
     SERIAL_ECHO_START;
@@ -8080,7 +8080,6 @@ void mesh_line_to_destination(float fr_mm_m, uint8_t x_splits = 0xff, uint8_t y_
       //DEBUG_POS("prepare_kinematic_move_to", delta);
       if(!isnanf(delta[X_AXIS]) && !isnanf(delta[Y_AXIS]) && !isnanf(delta[Z_AXIS]))
       {
-    	  moveStarted = true;
     	  planner.buffer_line(delta[X_AXIS], delta[Y_AXIS], delta[Z_AXIS], target[E_AXIS], _feedrate_mm_s, active_extruder);
       }
       else

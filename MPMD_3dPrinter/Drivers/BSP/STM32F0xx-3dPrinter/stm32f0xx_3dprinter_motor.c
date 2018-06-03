@@ -192,7 +192,7 @@ void BSP_MotorControlBoard_GpioInit(uint8_t nbDevices)
   HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_FLAG_PORT, &GPIO_InitStruct);
   
  /* Set Priority of External Line Interrupt used for the Flag interrupt*/ 
-  HAL_NVIC_SetPriority(BSP_MOTOR_CONTROL_BOARD_FLAG_IRQn, 7, 0);
+  HAL_NVIC_SetPriority(BSP_MOTOR_CONTROL_BOARD_FLAG_IRQn, 3, 0);
     
   /* Enable the External Line Interrupt used for the Flag interrupt*/
   HAL_NVIC_EnableIRQ(BSP_MOTOR_CONTROL_BOARD_FLAG_IRQn);    

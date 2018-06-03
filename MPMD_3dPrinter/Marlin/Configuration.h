@@ -296,8 +296,8 @@
   // If you are using a pre-configured hotend then you can use one of the value sets by uncommenting it
   // Ultimaker
   #define  DEFAULT_Kp 20
-  #define  DEFAULT_Ki 0.02
-  #define  DEFAULT_Kd 250
+  #define  DEFAULT_Ki 1.60
+  #define  DEFAULT_Kd 56.77
 
   // MakerGear
   //#define  DEFAULT_Kp 7.0
@@ -354,9 +354,9 @@
   //120V 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
   //from FOPDT model - kp=.39 Tp=405 Tdead=66, Tc set to 79.2, aggressive factor of .15 (vs .1, 1, 10)
 //TODO: replace these values from MPMD
-  #define  DEFAULT_bedKp 10.00
-  #define  DEFAULT_bedKi 0.02
-  #define  DEFAULT_bedKd 305.4
+  #define  DEFAULT_bedKp 80.00
+  #define  DEFAULT_bedKi 12.71
+  #define  DEFAULT_bedKd 300
 
   //120V 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
   //from pidautotune
@@ -442,7 +442,12 @@
   // Horizontal distance bridged by diagonal push rods when effector is centered.
 //  #define DELTA_RADIUS (DELTA_SMOOTH_ROD_OFFSET-(DELTA_EFFECTOR_OFFSET)-(DELTA_CARRIAGE_OFFSET))
 //  #define DELTA_RADIUS 63.25
-	#define DELTA_RADIUS 63.90
+//	#define DELTA_RADIUS 63.90
+	#define DELTA_RADIUS 63.50
+
+	#define DELTA_ENDSTOP_ADJ_X 0.0
+	#define DELTA_ENDSTOP_ADJ_Y -0.50
+	#define DELTA_ENDSTOP_ADJ_Z -0.90
 
   // Print surface diameter/2 minus unreachable space (avoid collisions with vertical towers).
   #define DELTA_PRINTABLE_RADIUS 60.0

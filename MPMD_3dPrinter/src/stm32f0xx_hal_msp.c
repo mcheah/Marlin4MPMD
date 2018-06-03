@@ -244,7 +244,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     HAL_GPIO_Init(BSP_UART_DEBUG_RX_PORT, &GPIO_InitStruct);
     
     /* Configure the NVIC for UART */
-    HAL_NVIC_SetPriority(BSP_UART_DEBUG_IRQn, 3, 0);
+    HAL_NVIC_SetPriority(BSP_UART_DEBUG_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(BSP_UART_DEBUG_IRQn);    
   }
   //TODO: removing wifi stuff for now
@@ -419,7 +419,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
     HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_PWM_X_PORT, &GPIO_InitStruct);
 
     /* Set Interrupt Group Priority of Timer Interrupt*/ 
-    HAL_NVIC_SetPriority(BSP_MOTOR_CONTROL_BOARD_PWM_X_IRQn, 6, 0);
+    HAL_NVIC_SetPriority(BSP_MOTOR_CONTROL_BOARD_PWM_X_IRQn, 3, 0);
     
     /* Enable the timer global Interrupt */
     HAL_NVIC_EnableIRQ(BSP_MOTOR_CONTROL_BOARD_PWM_X_IRQn);  
@@ -438,7 +438,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
     HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_PWM_Y_PORT, &GPIO_InitStruct);
     
     /* Set Interrupt Group Priority of Timer Interrupt*/ 
-    HAL_NVIC_SetPriority(BSP_MOTOR_CONTROL_BOARD_PWM_Y_IRQn, 6, 0);
+    HAL_NVIC_SetPriority(BSP_MOTOR_CONTROL_BOARD_PWM_Y_IRQn, 3, 0);
     
     /* Enable the timer2 global Interrupt */
     HAL_NVIC_EnableIRQ(BSP_MOTOR_CONTROL_BOARD_PWM_Y_IRQn);    
@@ -458,7 +458,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
     HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_PWM_Z_PORT, &GPIO_InitStruct);    
     
     /* Set Interrupt Group Priority of Timer Interrupt*/ 
-    HAL_NVIC_SetPriority(BSP_MOTOR_CONTROL_BOARD_PWM_Z_IRQn, 5, 0);
+    HAL_NVIC_SetPriority(BSP_MOTOR_CONTROL_BOARD_PWM_Z_IRQn, 3, 0);
     
     /* Enable the timer global Interrupt */
     HAL_NVIC_EnableIRQ(BSP_MOTOR_CONTROL_BOARD_PWM_Z_IRQn);  
@@ -477,7 +477,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
     HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_PWM_E1_PORT, &GPIO_InitStruct);    
     
     /* Set Interrupt Group Priority of Timer Interrupt*/ 
-    HAL_NVIC_SetPriority(BSP_MOTOR_CONTROL_BOARD_PWM_E1_IRQn, 5, 0);
+    HAL_NVIC_SetPriority(BSP_MOTOR_CONTROL_BOARD_PWM_E1_IRQn, 3, 0);
     
     /* Enable the timer global Interrupt */
     HAL_NVIC_EnableIRQ(BSP_MOTOR_CONTROL_BOARD_PWM_E1_IRQn);  
@@ -832,7 +832,7 @@ void HAL_TIM_OC_MspInit(TIM_HandleTypeDef* htim_oc)
     /* Peripheral interrupt init*/
     /* Sets the priority grouping field */
     //HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_3);   BDI : not needed. Done once at startup
-    HAL_NVIC_SetPriority(BSP_MISC_TICK_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(BSP_MISC_TICK_IRQn, 3, 0);
     HAL_NVIC_EnableIRQ(BSP_MISC_TICK_IRQn);
   }
 #ifdef MARLIN
@@ -845,7 +845,7 @@ void HAL_TIM_OC_MspInit(TIM_HandleTypeDef* htim_oc)
     /* Sets the priority grouping field */
     //HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_0);  BDI
     //HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_3);  BDI : not needed. Done once at startup
-    HAL_NVIC_SetPriority(BSP_MISC_TICK2_IRQn, 5, 0);
+    HAL_NVIC_SetPriority(BSP_MISC_TICK2_IRQn, 2, 0);
     HAL_NVIC_EnableIRQ(BSP_MISC_TICK2_IRQn);
   }  
 #ifdef BSP_SERVO0_PIN
@@ -987,12 +987,12 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
 
     __HAL_LINKDMA(hadc,DMA_Handle,gBspAdcData.dmaHandle);
 
-    HAL_NVIC_SetPriority(BSP_DMA_IRQn, 7, 1);
+    HAL_NVIC_SetPriority(BSP_DMA_IRQn, 3, 0);
     HAL_NVIC_EnableIRQ(BSP_DMA_IRQn);
     
     /* Peripheral interrupt init*/
     /* Sets the priority grouping field */
-    HAL_NVIC_SetPriority(BSP_ADC_IRQn, 7, 0);
+    HAL_NVIC_SetPriority(BSP_ADC_IRQn, 3, 0);
     HAL_NVIC_EnableIRQ(BSP_ADC_IRQn);
   }
 
