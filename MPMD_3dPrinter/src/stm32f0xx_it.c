@@ -13,12 +13,17 @@
 //#include "motorcontrol.h"
 #include "stm32f0xx_3dprinter_uart.h"
 #include "stm32f0xx_3dprinter_sd.h"
-
+#include "usbd_core.h"
+#include "usbd_desc.h"
+#include "usbd_cdc.h"
+#include "usbd_cdc_interface.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
+//UART_HandleTypeDef *UartHandle = &(gBspUartData.handle);
+
 extern TIM_HandleTypeDef hTimPwmX;
 extern TIM_HandleTypeDef hTimPwmY;
 extern TIM_HandleTypeDef hTimPwmZ;
@@ -34,6 +39,9 @@ extern TIM_HandleTypeDef hTimTick2;
 extern TIM_HandleTypeDef hTimServo;
 #endif//BSP_SERVO0_PIN
 extern BspAdcDataType gBspAdcData;
+extern PCD_HandleTypeDef hpcd;
+extern TIM_HandleTypeDef TimHandle;
+extern UART_HandleTypeDef *UartHandle;
 //TODO: removing wifiData
 //extern BspWifiDataType gBspWifiData;
 /* Private function prototypes -----------------------------------------------*/
@@ -268,3 +276,44 @@ void BSP_ADC_IRQHandler(void)
 //{
 //  BSP_SD_IRQHandler();
 //}
+
+/**
+  * @brief  This function handles USB Handler.
+  * @param  None
+  * @retval None
+  */
+void USB_IRQHandler(void)
+{
+  HAL_PCD_IRQHandler(&hpcd);
+}
+
+/**
+  * @brief  This function handles DMA interrupt request.
+  * @param  None
+  * @retval None
+  */
+void USARTx_DMA_TX_RX_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(UartHandle->hdmatx);
+}
+
+/**
+  * @brief  This function handles UART interrupt request.
+  * @param  None
+  * @retval None
+  */
+void USARTx_IRQHandler(void)
+{
+  HAL_UART_IRQHandler(UartHandle);
+}
+
+/**
+  * @brief  This function handles TIM interrupt request.
+  * @param  None
+  * @retval None
+  */
+void TIMx_IRQHandler(void)
+{
+  HAL_TIM_IRQHandler(&TimHandle);
+}
+

@@ -1,26 +1,44 @@
 /**
   ******************************************************************************
-  * @file    usbd_CONF.h
+  * @file    USB_Device/CDC_Standalone/Inc/usbd_conf.h
   * @author  MCD Application Team
-  * @version V2.4.2
-  * @date    11-December-2015
-  * @brief   Header file for the usbd_CONF.c file
+  * @brief   General low level driver configuration
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT 2015 STMicroelectronics</center></h2>
+  * <h2><center>&copy; Copyright (c) 2016 STMicroelectronics International N.V.
+  * All rights reserved.</center></h2>
   *
-  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
-  * You may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at:
+  * Redistribution and use in source and binary forms, with or without
+  * modification, are permitted, provided that the following conditions are met:
   *
-  *        http://www.st.com/software_license_agreement_liberty_v2
+  * 1. Redistribution of source code must retain the above copyright notice,
+  *    this list of conditions and the following disclaimer.
+  * 2. Redistributions in binary form must reproduce the above copyright notice,
+  *    this list of conditions and the following disclaimer in the documentation
+  *    and/or other materials provided with the distribution.
+  * 3. Neither the name of STMicroelectronics nor the names of other
+  *    contributors to this software may be used to endorse or promote products
+  *    derived from this software without specific written permission.
+  * 4. This software, including modifications and/or derivative works of this
+  *    software, must execute solely and exclusively on microcontroller or
+  *    microprocessor devices manufactured by or for STMicroelectronics.
+  * 5. Redistribution and use of this software other than as permitted under
+  *    this license is void and will automatically terminate your rights under
+  *    this license.
   *
-  * Unless required by applicable law or agreed to in writing, software 
-  * distributed under the License is distributed on an "AS IS" BASIS, 
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
+  * THIS SOFTWARE IS PROVIDED BY STMICROELECTRONICS AND CONTRIBUTORS "AS IS"
+  * AND ANY EXPRESS, IMPLIED OR STATUTORY WARRANTIES, INCLUDING, BUT NOT
+  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+  * PARTICULAR PURPOSE AND NON-INFRINGEMENT OF THIRD PARTY INTELLECTUAL PROPERTY
+  * RIGHTS ARE DISCLAIMED TO THE FULLEST EXTENT PERMITTED BY LAW. IN NO EVENT
+  * SHALL STMICROELECTRONICS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+  * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   *
   ******************************************************************************
   */
@@ -29,69 +47,46 @@
 #ifndef __USBD_CONF_H
 #define __USBD_CONF_H
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f0xx.h"  /* replace 'stm32xxx' with your HAL driver header filename, ex: stm32f4xx.h */
+#include "stm32f0xx_hal.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/** @addtogroup STM32_USB_DEVICE_LIBRARY
-  * @{
-  */
-  
-/** @defgroup USBD_CONF
-  * @brief USB device low level driver configuration file
-  * @{
-  */ 
-
-/** @defgroup USBD_CONF_Exported_Defines
-  * @{
-  */ 
-
+/* Exported types ------------------------------------------------------------*/
+/* Exported constants --------------------------------------------------------*/
+/* Common Config */
 #define USBD_MAX_NUM_INTERFACES               1
 #define USBD_MAX_NUM_CONFIGURATION            1
 #define USBD_MAX_STR_DESC_SIZ                 0x100
 #define USBD_SUPPORT_USER_STRING              0 
 #define USBD_SELF_POWERED                     1
-#define USBD_DEBUG_LEVEL                      2
+#define USBD_DEBUG_LEVEL                      0
 
-/* MSC Class Config */
-#define MSC_MEDIA_PACKET                       8192   
+/* Exported macro ------------------------------------------------------------*/
+/* Memory management macros */
 
-/* CDC Class Config */
-#define USBD_CDC_INTERVAL                      2000  
+/* For footprint reasons and since only one allocation is handled in the CDC class
+   driver, the malloc/free is changed into a static allocation method */
 
- /* DFU Class Config */
-#define USBD_DFU_MAX_ITF_NUM                   1
-#define USBD_DFU_XFERS_IZE                     1024
+void *USBD_static_malloc(uint32_t size);
+void USBD_static_free(void *p);
 
- /* AUDIO Class Config */
-#define USBD_AUDIO_FREQ                       22100 
+#define MAX_STATIC_ALLOC_SIZE     140 /*CDC Class Driver Structure size*/
 
-/** @defgroup USBD_Exported_Macros
-  * @{
-  */ 
+#define USBD_malloc               (uint32_t *)USBD_static_malloc
+#define USBD_free                 USBD_static_free
+#define USBD_memset               /* Not used */
+#define USBD_memcpy               /* Not used */
 
- /* Memory management macros */   
-#define USBD_malloc               malloc
-#define USBD_free                 free
-#define USBD_memset               memset
-#define USBD_memcpy               memcpy
     
- /* DEBUG macros */  
-
-  
+/* DEBUG macros */
 #if (USBD_DEBUG_LEVEL > 0)
 #define  USBD_UsrLog(...)   printf(__VA_ARGS__);\
                             printf("\n");
 #else
 #define USBD_UsrLog(...)   
-#endif 
-                            
+#endif
                             
 #if (USBD_DEBUG_LEVEL > 1)
 
@@ -101,8 +96,7 @@
 #else
 #define USBD_ErrLog(...)   
 #endif 
-                            
-                            
+
 #if (USBD_DEBUG_LEVEL > 2)                         
 #define  USBD_DbgLog(...)   printf("DEBUG : ") ;\
                             printf(__VA_ARGS__);\
@@ -110,60 +104,9 @@
 #else
 #define USBD_DbgLog(...)                         
 #endif
-                            
-/**
-  * @}
-  */ 
- 
-    
-    
-/**
-  * @}
-  */ 
 
-
-/** @defgroup USBD_CONF_Exported_Types
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
-
-/** @defgroup USBD_CONF_Exported_Macros
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
-/** @defgroup USBD_CONF_Exported_Variables
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
-/** @defgroup USBD_CONF_Exported_FunctionsPrototype
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
-#ifdef __cplusplus
-}
-#endif
+/* Exported functions ------------------------------------------------------- */
 
 #endif /* __USBD_CONF_H */
 
-
-/**
-  * @}
-  */ 
-
-/**
-  * @}
-  */ 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-

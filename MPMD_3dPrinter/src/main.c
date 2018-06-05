@@ -10,6 +10,8 @@
 //Includes
 #include "main.h"
 #include "Marlin_export.h"
+/* Private variables ---------------------------------------------------------*/
+USBD_HandleTypeDef USBD_Device;
 
 int main(void)
 {

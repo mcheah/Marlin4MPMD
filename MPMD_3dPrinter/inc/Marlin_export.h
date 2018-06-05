@@ -40,7 +40,10 @@
 #define MARLIN_EXPORT_H
 
 #include <inttypes.h>
-
+#include "usbd_core.h"
+#include "usbd_desc.h"
+#include "usbd_cdc.h"
+#include "usbd_cdc_interface.h"
 #ifdef __cplusplus
  extern "C" {
 #endif 
@@ -121,5 +124,7 @@ typedef uint8_t  byte;
 // __INLINE void loop() {
 //
 // }
+
+extern USBD_HandleTypeDef USBD_Device;
 
 #endif
