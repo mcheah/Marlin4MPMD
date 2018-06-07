@@ -812,7 +812,8 @@ uint8_t  USBD_CDC_SetTxBuffer  (USBD_HandleTypeDef   *pdev,
                                 uint16_t length)
 {
   USBD_CDC_HandleTypeDef   *hcdc = (USBD_CDC_HandleTypeDef*) pdev->pClassData;
-  
+  uint32_t count=0;
+  while(hcdc->TxState!=0) { count++; }
   hcdc->TxBuffer = pbuff;
   hcdc->TxLength = length;  
   

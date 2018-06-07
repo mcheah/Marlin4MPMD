@@ -894,18 +894,6 @@ void setup() {
     disableStepperDrivers();
 #endif
 
-  /* Init Device Library */
-  USBD_Init(&USBD_Device, &VCP_Desc, 0);
-
-  /* Add Supported Class */
-  USBD_RegisterClass(&USBD_Device, &USBD_CDC);
-
-  /* Add CDC Interface Class */
-  USBD_CDC_RegisterInterface(&USBD_Device, &USBD_CDC_fops);
-
-  /* Start Device Process */
-  USBD_Start(&USBD_Device);
-
 #if !defined(DEBUG_ONGOING)
   #if defined(WITH_RPI_DETECTION)
     BSP_RPiGpioInit();
@@ -1311,7 +1299,11 @@ void get_available_commands() {
   get_serial_commands();
 
   //Kick uart tx queue
+#if 0
   BSP_UartIfSendQueuedData();
+#else
+//  BSP_CdcIfSendQueuedData();
+#endif
 
   #if ENABLED(SDSUPPORT)
     get_sdcard_commands();
@@ -7757,7 +7749,13 @@ void FlushSerialRequestResend() {
 
 void ok_to_send() {
   refresh_cmd_timeout();
-  if (!send_ok[cmd_queue_index_r]) return;
+#if 0
+  if (!send_ok[cmd_queue_index_r] ||
+		  MYSERIAL.available() >= (2*(UART_RX_BUFFER_SIZE-MAX_CMD_SIZE)) ) return;
+#else
+  if (!send_ok[cmd_queue_index_r] ||
+		  MYSERIAL.available() >= (2*(CDC_RX_BUFFER_SIZE-MAX_CMD_SIZE)) ) return;
+#endif
   SERIAL_PROTOCOLPGM(MSG_OK);
   #if ENABLED(ADVANCED_OK)
     char* p = command_queue[cmd_queue_index_r];

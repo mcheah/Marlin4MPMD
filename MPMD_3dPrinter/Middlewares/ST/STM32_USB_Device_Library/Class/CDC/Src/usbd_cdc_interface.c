@@ -54,7 +54,8 @@
   * @brief usbd core module
   * @{
   */ 
-
+/* Exported functions --------------------------------------------------------*/
+void BSP_CDC_RxCpltCallback(uint8_t* Buf, uint32_t *Len);
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 #define APP_RX_DATA_SIZE  64
@@ -79,11 +80,12 @@ uint32_t UserTxBufPtrOut = 0; /* Increment this pointer or roll it back to
                                  start address when data are sent over USB */
 
 /* UART handler declaration */
-UART_HandleTypeDef *UartHandle = &(gBspUartData.handle);
+//UART_HandleTypeDef *UartHandle = &(gBspUartData.handle);
 /* TIM handler declaration */
 TIM_HandleTypeDef    TimHandle;
 /* USB handler declaration */
 //extern USBD_HandleTypeDef  USBD_Device;
+USBD_CDC_HandleTypeDef   *pCDC_Device = (USBD_CDC_HandleTypeDef*) &USBD_Device.pClassData;
 
 /* Private function prototypes -----------------------------------------------*/
 static int8_t CDC_Itf_Init     (void);
@@ -121,33 +123,16 @@ static int8_t CDC_Itf_Init(void)
       - Parity      = No parity
       - BaudRate    = 115200 baud
       - Hardware flow control disabled (RTS and CTS signals) */
-  UartHandle->Instance        = BSP_UART_DEBUG;
-  UartHandle->Init.BaudRate   = 115200;
-  UartHandle->Init.WordLength = UART_WORDLENGTH_8B;
-  UartHandle->Init.StopBits   = UART_STOPBITS_1;
-  UartHandle->Init.Parity     = UART_PARITY_NONE;
-  UartHandle->Init.HwFlowCtl  = UART_HWCONTROL_NONE;
-  UartHandle->Init.Mode       = UART_MODE_TX_RX;
 //  for(uint32_t i=0; i<0.010*48e6;i++)
 //  {
 //	  volatile bool = 1;
 //  }
-  if(HAL_UART_Init(UartHandle) != HAL_OK)
-  {
     /* Initialization Error */
-    Error_Handler();
-  }
-  unsigned char temp[20] = "Hello World\r\n";
-  volatile HAL_StatusTypeDef err = HAL_UART_Transmit(UartHandle,temp,sizeof(temp),500);
 
   
   /*##-2- Put UART peripheral in IT reception process ########################*/
   /* Any data received will be stored in "UserTxBuffer" buffer  */
-  if(HAL_UART_Receive_IT(UartHandle, (uint8_t *)UserTxBuffer, 1) != HAL_OK)
-  {
     /* Transfer error in reception process */
-    Error_Handler();
-  }
   
   /*##-3- Configure the TIM Base generation  #################################*/
   TIM_Config();
@@ -176,11 +161,11 @@ static int8_t CDC_Itf_Init(void)
 static int8_t CDC_Itf_DeInit(void)
 {
   /* DeInitialize the UART peripheral */
-  if(HAL_UART_DeInit(UartHandle) != HAL_OK)
-  {
+//  if(HAL_UART_DeInit(UartHandle) != HAL_OK)
+//  {
     /* Initialization Error */
-    Error_Handler();
-  }
+//    Error_Handler();
+//  }
   return (USBD_OK);
 }
 
@@ -217,14 +202,6 @@ static int8_t CDC_Itf_Control (uint8_t cmd, uint8_t* pbuf, uint16_t length)
     break;
 
   case CDC_SET_LINE_CODING:
-    LineCoding.bitrate    = (uint32_t)(pbuf[0] | (pbuf[1] << 8) |\
-                            (pbuf[2] << 16) | (pbuf[3] << 24));
-    LineCoding.format     = pbuf[4];
-    LineCoding.paritytype = pbuf[5];
-    LineCoding.datatype   = pbuf[6];
-    
-    /* Set the new configuration */
-    ComPort_Config();
     break;
 
   case CDC_GET_LINE_CODING:
@@ -276,17 +253,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     }
     
     buffptr = UserTxBufPtrOut;
-    
-    USBD_CDC_SetTxBuffer(&USBD_Device, (uint8_t*)&UserTxBuffer[buffptr], buffsize);
-    
-    if(USBD_CDC_TransmitPacket(&USBD_Device) == USBD_OK)
-    {
-      UserTxBufPtrOut += buffsize;
-      if (UserTxBufPtrOut == APP_RX_DATA_SIZE)
-      {
-        UserTxBufPtrOut = 0;
-      }
-    }
   }
 }
 
@@ -321,8 +287,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 static int8_t CDC_Itf_Receive(uint8_t* Buf, uint32_t *Len)
 {
 //	HAL_UART_Transmit(UartHandle,Buf,*Len,500);
-  HAL_UART_Transmit_DMA(UartHandle, Buf, *Len);
-  return (USBD_OK);
 }
 
 /**
@@ -343,81 +307,6 @@ static int8_t CDC_Itf_Receive(uint8_t* Buf, uint32_t *Len)
   * @retval None.
   * @note   When a configuration is not supported, a default value is used.
   */
-static void ComPort_Config(void)
-{
-  if(HAL_UART_DeInit(UartHandle) != HAL_OK)
-  {
-    /* Initialization Error */
-    Error_Handler();
-  }
-  
-  /* set the Stop bit */
-  switch (LineCoding.format)
-  {
-  case 0:
-    UartHandle->Init.StopBits = UART_STOPBITS_1;
-    break;
-  case 2:
-    UartHandle->Init.StopBits = UART_STOPBITS_2;
-    break;
-  default :
-    UartHandle->Init.StopBits = UART_STOPBITS_1;
-    break;
-  }
-  
-  /* set the parity bit*/
-  switch (LineCoding.paritytype)
-  {
-  case 0:
-    UartHandle->Init.Parity = UART_PARITY_NONE;
-    break;
-  case 1:
-    UartHandle->Init.Parity = UART_PARITY_ODD;
-    break;
-  case 2:
-    UartHandle->Init.Parity = UART_PARITY_EVEN;
-    break;
-  default :
-    UartHandle->Init.Parity = UART_PARITY_NONE;
-    break;
-  }
-  
-  /*set the data type : only 8bits and 9bits is supported */
-  switch (LineCoding.datatype)
-  {
-  case 0x07:
-    /* With this configuration a parity (Even or Odd) must be set */
-    UartHandle->Init.WordLength = UART_WORDLENGTH_8B;
-    break;
-  case 0x08:
-    if(UartHandle->Init.Parity == UART_PARITY_NONE)
-    {
-      UartHandle->Init.WordLength = UART_WORDLENGTH_8B;
-    }
-    else 
-    {
-      UartHandle->Init.WordLength = UART_WORDLENGTH_9B;
-    }
-    
-    break;
-  default :
-    UartHandle->Init.WordLength = UART_WORDLENGTH_8B;
-    break;
-  }
-  
-  UartHandle->Init.BaudRate = LineCoding.bitrate;
-  UartHandle->Init.HwFlowCtl  = UART_HWCONTROL_NONE;
-  UartHandle->Init.Mode       = UART_MODE_TX_RX;
-  
-  if(HAL_UART_Init(UartHandle) != HAL_OK)
-  {
-    /* Initialization Error */
-    Error_Handler();
-  }
-
-  /* Start reception: provide the buffer pointer with offset and the buffer size */
-  HAL_UART_Receive_IT(UartHandle, (uint8_t *)(UserTxBuffer + UserTxBufPtrIn), 1);
-}
 
 /**
   * @brief  TIM_Config: Configure TIMx timer
@@ -425,10 +314,10 @@ static void ComPort_Config(void)
   * @retval None.
   */
 static void TIM_Config(void)
-{  
+{
   /* Set TIMx instance */
   TimHandle.Instance = TIMx;
-  
+
   /* Initialize TIM3 peripheral as follow:
        + Period = 10000 - 1
        + Prescaler = ((SystemCoreClock/2)/10000) - 1
@@ -465,6 +354,10 @@ static void TIM_Config(void)
   */
 static void Error_Handler(void)
 {
+	while(1) {
+		BSP_LED_Toggle(LED_RED);
+		HAL_Delay(500);
+	}
   /* Add your own code here */
 }
 

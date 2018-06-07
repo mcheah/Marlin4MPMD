@@ -10,11 +10,14 @@
 //Includes
 #include "main.h"
 #include "Marlin_export.h"
+
 /* Private variables ---------------------------------------------------------*/
-USBD_HandleTypeDef USBD_Device;
 
 int main(void)
 {
+    BSP_LED_Init(LED_GREEN);
+    BSP_LED_Init(LED_RED);
+    BSP_LED_Init(LED_BLUE);
 	setup();
 	for(;;)
 	{

@@ -41,7 +41,6 @@ extern TIM_HandleTypeDef hTimServo;
 extern BspAdcDataType gBspAdcData;
 extern PCD_HandleTypeDef hpcd;
 extern TIM_HandleTypeDef TimHandle;
-extern UART_HandleTypeDef *UartHandle;
 //TODO: removing wifiData
 //extern BspWifiDataType gBspWifiData;
 /* Private function prototypes -----------------------------------------------*/
@@ -189,11 +188,12 @@ void TIM14_IRQHandler(void)
   * @Note   This function is redefined in "main.h" and related to DMA
   *         used for USART data transmission
   */
+#if 0
 void BSP_UART_DEBUG_IRQHandler(void)
 {
   HAL_UART_IRQHandler(&gBspUartData.handle);
 }
-
+#endif
 /**
   * @brief  This function handles UART interrupt request for wifi module.
   * @param  None
@@ -292,6 +292,7 @@ void USB_IRQHandler(void)
   * @param  None
   * @retval None
   */
+#if 0
 void USARTx_DMA_TX_RX_IRQHandler(void)
 {
   HAL_DMA_IRQHandler(UartHandle->hdmatx);
@@ -306,7 +307,7 @@ void USARTx_IRQHandler(void)
 {
   HAL_UART_IRQHandler(UartHandle);
 }
-
+#endif
 /**
   * @brief  This function handles TIM interrupt request.
   * @param  None

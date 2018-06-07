@@ -114,8 +114,13 @@ MarlinSerial::MarlinSerial() { }
 // Public Methods //////////////////////////////////////////////////////////////
 
 void MarlinSerial::begin(long baud) {
-	  BSP_UartHwInit(baud);
-	  BSP_UartIfStart();
+#if 0
+	BSP_UartHwInit(baud);
+	BSP_UartIfStart();
+#else
+	BSP_CdcHwInit(baud);
+	BSP_CdcIfStart();
+#endif
 }
 
 void MarlinSerial::end() {}
@@ -134,7 +139,11 @@ int MarlinSerial::peek(void) {
 }
 
 int MarlinSerial::read(void) {
+#if 0
 	return BSP_UartGetNextRxBytes();
+#else
+	return BSP_CdcGetNextRxBytes();
+#endif
 }
 
 #if 0  // BDI

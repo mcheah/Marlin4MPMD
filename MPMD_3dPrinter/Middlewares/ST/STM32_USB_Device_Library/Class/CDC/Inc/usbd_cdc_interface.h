@@ -88,8 +88,9 @@
 /* Definition for TIMx clock resources */
 #define TIMx                             TIM6
 #define TIMx_CLK_ENABLE                  __HAL_RCC_TIM6_CLK_ENABLE
-#define TIMx_FORCE_RESET()               __HAL_RCC_TIM6_FORCE_RESET()
-#define TIMx_RELEASE_RESET()             __HAL_RCC_TIM6_RELEASE_RESET()
+//TODO: revisit this, this seems like a bug in the STM example but setting it to TIM6 breaks things
+#define TIMx_FORCE_RESET()               /*__HAL_RCC_TIM6_FORCE_RESET()*/
+#define TIMx_RELEASE_RESET()             /*__HAL_RCC_TIM6_RELEASE_RESET()*/
 
 /* Definition for TIMx's NVIC */
 #define TIMx_IRQn                        TIM6_IRQn
@@ -103,6 +104,9 @@ extern USBD_CDC_ItfTypeDef  USBD_CDC_fops;
 
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
+uint8_t CDC_Itf_SetTxBuffer(uint8_t *Buf, uint32_t *Len);
+uint8_t CDC_Itf_Transmit(uint32_t *Len);
+
 #endif /* __USBD_CDC_IF_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

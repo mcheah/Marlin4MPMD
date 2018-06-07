@@ -49,8 +49,8 @@
    
 /* Exported macros ------------------------------------------------------------*/
 //TODO: we should probably adjust these to a smaller size
-#define UART_TX_BUFFER_SIZE (128)
-#define UART_RX_BUFFER_SIZE (128)
+#define UART_TX_BUFFER_SIZE (1024)
+#define UART_RX_BUFFER_SIZE (64)
    
 /* Definition for Usart resources *********************************************/
 
