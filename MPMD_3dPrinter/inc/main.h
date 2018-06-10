@@ -73,7 +73,7 @@
 //#define UARTx_RX_PIN                    GPIO_PIN_3
 //#define UARTx_RX_GPIO_PORT              GPIOA
 //#define UARTx_RX_AF                     GPIO_AF1_USART2
-
+//#define STM32_USE_BOOTLOADER
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
 

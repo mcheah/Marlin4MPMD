@@ -11,6 +11,7 @@
 #include "main.h"
 #include "Marlin_export.h"
 //Private defines
+#ifdef STM32_USE_BOOTLOADER
 #define APPLICATION_ADDRESS     (uint32_t)0x08002000
 //#define APPLICATION_ADDRESS		  (uint32_t)0x08000000
 //Private variables
@@ -34,10 +35,13 @@ static inline void remapVectorTable(void)
 		 IWDG->RLR = 0x0000AAAAU;
 	 __HAL_RCC_APB2_RELEASE_RESET();
 }
+#endif
 
 int main(void)
 {
+#ifdef STM32_USE_BOOTLOADER
 	remapVectorTable();
+#endif
 	setup();
 	for(;;)
 	{
