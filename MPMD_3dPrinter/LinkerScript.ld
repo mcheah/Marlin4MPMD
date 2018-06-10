@@ -61,12 +61,13 @@ _Min_Stack_Size = 0x400; /* required amount of stack */
 /* Memories definition */
 MEMORY
 {
-  RAM (xrw)		: ORIGIN = 0x20000000, LENGTH = 16K
-  ROM (rx)		: ORIGIN = 0x8000000, LENGTH = 128K 
+VTRAM (xrw)	: ORIGIN = 0x20000000, LENGTH = 0xc0/*Vector table Ram*/
+  RAM (xrw)		: ORIGIN = 0x200000c0, LENGTH = 16K - 0xc0
+  ROM (rx)		: ORIGIN = 0x8002000, LENGTH = 120K
+  /*ROM (rx)		: ORIGIN = 0x8000000, LENGTH = 120K*/
   
 }
-/*TODO: replace these values once we have optimized to fit*/
-/*Artificially increasing the ROM length to allow compilation*/
+
 /* Sections */
 SECTIONS
 {
@@ -201,4 +202,6 @@ SECTIONS
   }
 
   .ARM.attributes 0 : { *(.ARM.attributes) }
+  /* RAM space for hte vector table */
+  .RAMVectorTable(NOLOAD): {*(.RAMVectorTable)} > VTRAM
 }
