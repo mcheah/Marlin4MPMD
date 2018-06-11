@@ -143,17 +143,18 @@ class MarlinSerial { //: public Stream
     int peek(void);
     int read(void);
     void flush(void);
-#if 0
+#ifndef STM32_USE_USB_CDC
     FORCE_INLINE int available(void) {return (BSP_UartGetNbRxAvalaibleBytes());}
 #else
     FORCE_INLINE int available(void) {return (BSP_CdcGetNbRxAvalaibleBytes());}
-#endif
+#endif //STM32_USE_USB_CDC
+
     FORCE_INLINE void checkRx(void) {}
-#if 0
+#ifndef STM32_USE_USB_CDC
     FORCE_INLINE void write(uint8_t c) { /*BSP_UartLockingTx*/BSP_UartIfQueueTxData(&c, 1); }
 #else
     FORCE_INLINE void write(uint8_t c) { /*BSP_UartLockingTx*/BSP_CdcIfQueueTxData(&c, 1); }
-#endif
+#endif //STM32_USE_USB_CDC
 
 #if !defined(NO_WIFI)
     FORCE_INLINE void buildCmdReply(char c)
@@ -176,11 +177,11 @@ class MarlinSerial { //: public Stream
     FORCE_INLINE void write(const char* str) { while (*str) write(*str++); }
     FORCE_INLINE void write(const uint8_t* buffer, size_t size) { while (size--) write(*buffer++); }
     FORCE_INLINE void print(const char* str) { write(str); }
-#if 0
+#ifndef STM32_USE_USB_CDC
     FORCE_INLINE void printn(uint8_t *str, uint8_t nbData) { /*BSP_UartLockingTx*/BSP_UartIfQueueTxData(str, nbData); }
 #else
     FORCE_INLINE void printn(uint8_t *str, uint8_t nbData) { /*BSP_UartLockingTx*/BSP_CdcIfQueueTxData(str, nbData); }
-#endif
+#endif //STM32_USE_USB_CDC
 
 
     void print(char, int = BYT);

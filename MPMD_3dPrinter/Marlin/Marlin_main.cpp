@@ -1299,11 +1299,11 @@ void get_available_commands() {
   get_serial_commands();
 
   //Kick uart tx queue
-#if 0
+#ifndef STM32_USE_USB_CDC
   BSP_UartIfSendQueuedData();
-#else
+#else //CDC automatically sends the queue right away
 //  BSP_CdcIfSendQueuedData();
-#endif
+#endif //STM32_USE_USB_CDC
 
   #if ENABLED(SDSUPPORT)
     get_sdcard_commands();
@@ -7749,13 +7749,14 @@ void FlushSerialRequestResend() {
 
 void ok_to_send() {
   refresh_cmd_timeout();
-#if 0
+#ifndef STM32_USE_USB_CDC
   if (!send_ok[cmd_queue_index_r] ||
 		  MYSERIAL.available() >= (2*(UART_RX_BUFFER_SIZE-MAX_CMD_SIZE)) ) return;
 #else
   if (!send_ok[cmd_queue_index_r] ||
 		  MYSERIAL.available() >= (2*(CDC_RX_BUFFER_SIZE-MAX_CMD_SIZE)) ) return;
-#endif
+#endif //STM32_USE_USB_CDC
+    
   SERIAL_PROTOCOLPGM(MSG_OK);
   #if ENABLED(ADVANCED_OK)
     char* p = command_queue[cmd_queue_index_r];

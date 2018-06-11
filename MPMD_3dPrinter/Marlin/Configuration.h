@@ -110,6 +110,9 @@
 // for it.
 //#define RPI_CONNECTED
 
+// USE USB CDC Serial Interface.  Comment this line out to use USART2 directly instead.
+// Useful if Raspberry Pi GPIO's are hooked directly to UART interface for faster data transfer
+#define STM32_USE_USB_CDC
 // SERIAL_PORT selects which serial port should be used for communication with the host.
 // This allows the connection of wireless adapters (for instance) to non-default port pins.
 // Serial port 0 is still used by the Arduino bootloader regardless of this setting.

@@ -22,7 +22,6 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-//UART_HandleTypeDef *UartHandle = &(gBspUartData.handle);
 
 extern TIM_HandleTypeDef hTimPwmX;
 extern TIM_HandleTypeDef hTimPwmY;
@@ -188,12 +187,10 @@ void TIM14_IRQHandler(void)
   * @Note   This function is redefined in "main.h" and related to DMA
   *         used for USART data transmission
   */
-#if 0
 void BSP_UART_DEBUG_IRQHandler(void)
 {
   HAL_UART_IRQHandler(&gBspUartData.handle);
 }
-#endif
 /**
   * @brief  This function handles UART interrupt request for wifi module.
   * @param  None
@@ -287,27 +284,6 @@ void USB_IRQHandler(void)
   HAL_PCD_IRQHandler(&hpcd);
 }
 
-/**
-  * @brief  This function handles DMA interrupt request.
-  * @param  None
-  * @retval None
-  */
-#if 0
-void USARTx_DMA_TX_RX_IRQHandler(void)
-{
-  HAL_DMA_IRQHandler(UartHandle->hdmatx);
-}
-
-/**
-  * @brief  This function handles UART interrupt request.
-  * @param  None
-  * @retval None
-  */
-void USARTx_IRQHandler(void)
-{
-  HAL_UART_IRQHandler(UartHandle);
-}
-#endif
 /**
   * @brief  This function handles TIM interrupt request.
   * @param  None

@@ -121,6 +121,4 @@ typedef uint8_t  byte;
 //
 // }
 
-//extern USBD_HandleTypeDef USBD_Device;
-
 #endif
