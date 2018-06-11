@@ -676,6 +676,8 @@ static inline void refresh(void)
 	volatile uint32_t *IWDG_RLR = &(IWDG->RLR);
 	 if(*IWDG_RLR)
 		*IWDG_KR = 0x0000AAAAU;
+}
+
 /******************************************************//**
  * @brief  Management of the Heats under IT
  * @param[in] None
