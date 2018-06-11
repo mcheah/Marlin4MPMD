@@ -253,6 +253,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     }
     
     buffptr = UserTxBufPtrOut;
+    CDC_Itf_SetTxBuffer((uint8_t*)&UserTxBuffer[buffptr], buffsize);
+    CDC_Itf_Transmit(buffsize);
   }
 }
 
@@ -287,6 +289,35 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 static int8_t CDC_Itf_Receive(uint8_t* Buf, uint32_t *Len)
 {
 //	HAL_UART_Transmit(UartHandle,Buf,*Len,500);
+//  HAL_UART_Transmit_DMA(UartHandle, Buf, *Len);
+//	CDC_Itf_SetTxBuffer(Buf,*Len);
+//    CDC_Itf_Transmit();
+    BSP_CDC_RxCpltCallback(Buf,Len);
+    USBD_CDC_ReceivePacket(&USBD_Device);
+    return (USBD_OK);
+}
+
+uint8_t CDC_Itf_SetTxBuffer(uint8_t *Buf, uint32_t *Len)
+{
+    USBD_CDC_SetTxBuffer(&USBD_Device, Buf, *Len);
+}
+
+uint8_t CDC_Itf_Transmit(uint32_t *Len)
+{
+	uint8_t ret;
+	ret = USBD_CDC_TransmitPacket(&USBD_Device);
+    if(ret == USBD_OK)
+    {
+      UserTxBufPtrOut += *Len;
+      if (UserTxBufPtrOut == APP_RX_DATA_SIZE)
+      {
+        UserTxBufPtrOut = 0;
+      }
+    }
+    else {
+    	Error_Handler();
+    }
+    return ret;
 }
 
 /**
