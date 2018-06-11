@@ -399,6 +399,8 @@ void BSP_MiscErrorHandler(uint16_t error)
   /* Infinite loop */
   while(1)
   {
+	  BSP_LED_Toggle(LED_BLUE);
+	  HAL_Delay(100);
   }
 }
 /******************************************************//**
@@ -668,6 +670,14 @@ void BSP_MiscFanSetSpeed(uint8_t id,uint8_t speed)
   }
 }
 
+static inline void refresh(void)
+{
+	volatile uint32_t *IWDG_KR = &(IWDG->KR);
+	volatile uint32_t *IWDG_RLR = &(IWDG->RLR);
+	 if(*IWDG_RLR)
+		*IWDG_KR = 0x0000AAAAU;
+}
+
 /******************************************************//**
  * @brief  Management of the Heats under IT
  * @param[in] None
@@ -675,6 +685,7 @@ void BSP_MiscFanSetSpeed(uint8_t id,uint8_t speed)
  **********************************************************/
 void HAL_SYSTICK_Callback(void)
 {
+	refresh();
 	if( fanE1.activePwm)
 	{
 		fanE1.count--;
