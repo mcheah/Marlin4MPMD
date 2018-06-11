@@ -393,8 +393,11 @@ void BSP_MiscErrorHandler(uint16_t error)
   BSP_MiscHeatManualInit(3);
 #endif  
   
-  
+// #ifndef STM32_USE_USB_CDC
   BSP_UartLockingTx((uint8_t *)&errorTxt, sizeof(errorTxt));
+// #else
+  BSP_CdcLockingTx((uint8_t *)&errorTxt, sizeof(errorTxt));
+// #endif //STM32_USE_USB_CDC
   
   /* Infinite loop */
   while(1)

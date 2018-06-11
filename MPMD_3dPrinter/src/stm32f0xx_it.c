@@ -13,12 +13,16 @@
 //#include "motorcontrol.h"
 #include "stm32f0xx_3dprinter_uart.h"
 #include "stm32f0xx_3dprinter_sd.h"
-
+#include "usbd_core.h"
+#include "usbd_desc.h"
+#include "usbd_cdc.h"
+#include "usbd_cdc_interface.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
+
 extern TIM_HandleTypeDef hTimPwmX;
 extern TIM_HandleTypeDef hTimPwmY;
 extern TIM_HandleTypeDef hTimPwmZ;
@@ -34,6 +38,8 @@ extern TIM_HandleTypeDef hTimTick2;
 extern TIM_HandleTypeDef hTimServo;
 #endif//BSP_SERVO0_PIN
 extern BspAdcDataType gBspAdcData;
+extern PCD_HandleTypeDef hpcd;
+extern TIM_HandleTypeDef TimHandle;
 //TODO: removing wifiData
 //extern BspWifiDataType gBspWifiData;
 /* Private function prototypes -----------------------------------------------*/
@@ -185,7 +191,6 @@ void BSP_UART_DEBUG_IRQHandler(void)
 {
   HAL_UART_IRQHandler(&gBspUartData.handle);
 }
-
 /**
   * @brief  This function handles UART interrupt request for wifi module.
   * @param  None
@@ -268,3 +273,24 @@ void BSP_ADC_IRQHandler(void)
 //{
 //  BSP_SD_IRQHandler();
 //}
+
+/**
+  * @brief  This function handles USB Handler.
+  * @param  None
+  * @retval None
+  */
+void USB_IRQHandler(void)
+{
+  HAL_PCD_IRQHandler(&hpcd);
+}
+
+/**
+  * @brief  This function handles TIM interrupt request.
+  * @param  None
+  * @retval None
+  */
+void TIMx_IRQHandler(void)
+{
+  HAL_TIM_IRQHandler(&TimHandle);
+}
+

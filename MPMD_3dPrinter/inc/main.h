@@ -51,7 +51,13 @@
 #include "stm32f0xx_3dprinter_adc.h"
 //#include "stm32f0xx_3dprinter_sd.h"
 //#include "stm32f0xx_3dprinter_wifi.h"
+#include "stm32f0xx_3dprinter_cdc.h"
 #include "motorcontrol.h"
+#include "usbd_core.h"
+#include "usbd_desc.h"
+#include "usbd_cdc.h"
+#include "usbd_cdc_interface.h"
+
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* User can use this section to tailor UARTx/UARTx instance used and associated
@@ -76,6 +82,8 @@
 //#define STM32_USE_BOOTLOADER
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
+/* Exported Variables --------------------------------------------------------*/
+extern USBD_HandleTypeDef USBD_Device;
 
 #endif /* __MAIN_H */
 

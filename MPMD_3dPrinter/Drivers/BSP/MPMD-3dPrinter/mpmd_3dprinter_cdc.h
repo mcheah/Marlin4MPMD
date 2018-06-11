@@ -1,6 +1,6 @@
 /** 
   ******************************************************************************
-  * @file    mpmd_3dPrinter_uart.h
+  * @file    mpmd_3dPrinter_cdc.h
   * @author  IPC Rennes
   * @version V1.0.0
   * @date    January 29, 2015
@@ -37,8 +37,8 @@
   */ 
   
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MPMD_3DPRINTER_UART_H
-#define __MPMD_3DPRINTER_UART_H
+#ifndef __MPMD_3DPRINTER_CDC_H
+#define __MPMD_3DPRINTER_CDC_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -49,8 +49,8 @@
    
 /* Exported macros ------------------------------------------------------------*/
 //TODO: we should probably adjust these to a smaller size
-#define UART_TX_BUFFER_SIZE (1024)
-#define UART_RX_BUFFER_SIZE (64)
+#define CDC_TX_BUFFER_SIZE (64)
+#define CDC_RX_BUFFER_SIZE (256)
    
 /* Definition for Usart resources *********************************************/
 
@@ -77,52 +77,52 @@
 #define BSP_UART_DEBUG_RX_AF                     (GPIO_AF1_USART2)
    
 /* Exported types --- --------------------------------------------------------*/
-typedef struct BspUartDataTag
-{
-  volatile uint8_t rxWriteChar;
-  uint8_t *pRxBuffer;
-  volatile uint8_t *pRxWriteBuffer;
-  volatile uint8_t *pRxReadBuffer;
-  uint8_t *pTxBuffer;
-  volatile uint8_t *pTxWriteBuffer;
-  volatile uint8_t *pTxReadBuffer;
-  volatile uint8_t *pTxWrap;
-  volatile uint8_t newTxRequestInThePipe;
-  volatile uint8_t gCodeDataMode;
-  volatile uint16_t nbTxBytesOnGoing;
-  volatile ITStatus rxBusy;
-  volatile ITStatus txBusy;
-  void (*uartRxDataCallback)(uint8_t *,uint8_t);  
-  void (*uartTxDoneCallback)(void);  
-  UART_HandleTypeDef handle;
-  uint32_t debugNbRxFrames; 
-  uint32_t debugNbTxFrames;
-  volatile uint32_t nbBridgedBytes;
-}BspUartDataType;
+//typedef struct BspUartDataTag
+//{
+//  volatile uint8_t rxWriteChar;
+//  uint8_t *pRxBuffer;
+//  volatile uint8_t *pRxWriteBuffer;
+//  volatile uint8_t *pRxReadBuffer;
+//  uint8_t *pTxBuffer;
+//  volatile uint8_t *pTxWriteBuffer;
+//  volatile uint8_t *pTxReadBuffer;
+//  volatile uint8_t *pTxWrap;
+//  volatile uint8_t newTxRequestInThePipe;
+//  volatile uint8_t gCodeDataMode;
+//  volatile uint16_t nbTxBytesOnGoing;
+//  volatile ITStatus rxBusy;
+//  volatile ITStatus txBusy;
+//  void (*uartRxDataCallback)(uint8_t *,uint8_t);
+//  void (*uartTxDoneCallback)(void);
+//  UART_HandleTypeDef handle;
+//  uint32_t debugNbRxFrames;
+//  uint32_t debugNbTxFrames;
+//  volatile uint32_t nbBridgedBytes;
+//}BspUartDataType;
 
 /* Exported variables  --------------------------------------------------------*/
-extern BspUartDataType gBspUartData;
+//extern BspUartDataType gBspUartData;
 
 /* Exported functions --------------------------------------------------------*/
-uint8_t* BSP_UartIfGetFreeTxBuffer(void);
-void BSP_UartHwInit(uint32_t newBaudRate);
-void BSP_UartIfStart(void);
-void BSP_UartIfQueueTxData(uint8_t *pBuf, uint8_t nbData);
-void BSP_UartIfSendQueuedData(void);
-void BSP_UartAttachRxDataHandler(void (*callback)(uint8_t *, uint8_t));
-void BSP_UartAttachTxDoneCallback(void (*callback)(void));
-uint32_t BSP_UartPrintf(const char* format,...);
-uint32_t BSP_UartGetNbRxAvalaibleBytes(void);
-int8_t BSP_UartGetNextRxBytes(void);
-uint8_t BSP_UartIsTxOnGoing(void);
+uint8_t* BSP_CdcIfGetFreeTxBuffer(void);
+void BSP_CdcHwInit(uint32_t newBaudRate);
+void BSP_CdcIfStart(void);
+void BSP_CdcIfQueueTxData(uint8_t *pBuf, uint8_t nbData);
+void BSP_CdcIfSendQueuedData(uint32_t Len);
+void BSP_CdcAttachRxDataHandler(void (*callback)(uint8_t *, uint8_t));
+void BSP_CdcAttachTxDoneCallback(void (*callback)(void));
+uint32_t BSP_CdcPrintf(const char* format,...);
+uint32_t BSP_CdcGetNbRxAvalaibleBytes(void);
+int8_t BSP_CdcGetNextRxBytes(void);
+uint8_t BSP_CdcIsTxOnGoing(void);
 #if defined(MARLIN)
-uint32_t BSP_UartCommandsFilter(char *pBufCmd, uint8_t nxRxBytes);
+uint32_t BSP_CdcCommandsFilter(char *pBufCmd, uint8_t nxRxBytes);
 #endif
-void BSP_UartLockingTx(uint8_t *pBuf, uint8_t nbData);
+void BSP_CdcLockingTx(uint8_t *pBuf, uint8_t nbData);
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __MPMD_3DPRINTER_UART_H */
+#endif /* __MPMD_3DPRINTER_CDC_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
