@@ -832,7 +832,7 @@ void HAL_TIM_OC_MspInit(TIM_HandleTypeDef* htim_oc)
     /* Peripheral interrupt init*/
     /* Sets the priority grouping field */
     //HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_3);   BDI : not needed. Done once at startup
-    HAL_NVIC_SetPriority(BSP_MISC_TICK_IRQn, 3, 0);
+    HAL_NVIC_SetPriority(BSP_MISC_TICK_IRQn, 1, 0);
     HAL_NVIC_EnableIRQ(BSP_MISC_TICK_IRQn);
   }
 #ifdef MARLIN
@@ -845,7 +845,7 @@ void HAL_TIM_OC_MspInit(TIM_HandleTypeDef* htim_oc)
     /* Sets the priority grouping field */
     //HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_0);  BDI
     //HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_3);  BDI : not needed. Done once at startup
-    HAL_NVIC_SetPriority(BSP_MISC_TICK2_IRQn, 2, 0);
+    HAL_NVIC_SetPriority(BSP_MISC_TICK2_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(BSP_MISC_TICK2_IRQn);
   }  
 #ifdef BSP_SERVO0_PIN

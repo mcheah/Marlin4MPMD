@@ -197,8 +197,8 @@ HAL_StatusTypeDef HAL_PCD_Init(PCD_HandleTypeDef *hpcd)
  hpcd->Instance->BTABLE = BTABLE_ADDRESS;
   
   /*set wInterrupt_Mask global variable*/
- wInterrupt_Mask = USB_CNTR_CTRM  | USB_CNTR_WKUPM | USB_CNTR_SUSPM | USB_CNTR_ERRM \
-   | USB_CNTR_SOFM | USB_CNTR_ESOFM | USB_CNTR_RESETM;
+ wInterrupt_Mask = USB_CNTR_CTRM  | USB_CNTR_WKUPM | USB_CNTR_SUSPM /*| USB_CNTR_ERRM*/ \
+   /*| USB_CNTR_SOFM | USB_CNTR_ESOFM*/ | USB_CNTR_RESETM;
   
   /*Set interrupt mask*/
   hpcd->Instance->CNTR = wInterrupt_Mask;
@@ -342,7 +342,7 @@ void HAL_PCD_IRQHandler(PCD_HandleTypeDef *hpcd)
     HAL_PCD_SetAddress(hpcd, 0U);
   }
 
-  if (__HAL_PCD_GET_FLAG (hpcd, USB_ISTR_PMAOVR))
+  /*if (__HAL_PCD_GET_FLAG (hpcd, USB_ISTR_PMAOVR))
   {
     __HAL_PCD_CLEAR_FLAG(hpcd, USB_ISTR_PMAOVR);    
   }
@@ -350,7 +350,7 @@ void HAL_PCD_IRQHandler(PCD_HandleTypeDef *hpcd)
   if (__HAL_PCD_GET_FLAG (hpcd, USB_ISTR_ERR))
   {
     __HAL_PCD_CLEAR_FLAG(hpcd, USB_ISTR_ERR); 
-  }
+  }*/
 
   if (__HAL_PCD_GET_FLAG (hpcd, USB_ISTR_WKUP))
   {
@@ -358,8 +358,8 @@ void HAL_PCD_IRQHandler(PCD_HandleTypeDef *hpcd)
     hpcd->Instance->CNTR &= (uint16_t)(~(USB_CNTR_LPMODE));
 
     /*set wInterrupt_Mask global variable*/
-    wInterrupt_Mask = USB_CNTR_CTRM  | USB_CNTR_WKUPM | USB_CNTR_SUSPM | USB_CNTR_ERRM \
-      | USB_CNTR_ESOFM | USB_CNTR_RESETM;
+    wInterrupt_Mask = USB_CNTR_CTRM  | USB_CNTR_WKUPM | USB_CNTR_SUSPM /*| USB_CNTR_ERRM*/ \
+      /*| USB_CNTR_ESOFM*/ | USB_CNTR_RESETM;
     
     /*Set interrupt mask*/
     hpcd->Instance->CNTR = wInterrupt_Mask;
@@ -384,17 +384,17 @@ void HAL_PCD_IRQHandler(PCD_HandleTypeDef *hpcd)
     }
   }
 
-  if (__HAL_PCD_GET_FLAG (hpcd, USB_ISTR_SOF))
-  {
-    __HAL_PCD_CLEAR_FLAG(hpcd, USB_ISTR_SOF); 
-    HAL_PCD_SOFCallback(hpcd);
-  }
-
-  if (__HAL_PCD_GET_FLAG (hpcd, USB_ISTR_ESOF))
-  {
-    /* clear ESOF flag in ISTR */
-    __HAL_PCD_CLEAR_FLAG(hpcd, USB_ISTR_ESOF); 
-  }
+//  if (__HAL_PCD_GET_FLAG (hpcd, USB_ISTR_SOF))
+//  {
+//    __HAL_PCD_CLEAR_FLAG(hpcd, USB_ISTR_SOF);
+//    HAL_PCD_SOFCallback(hpcd);
+//  }
+//
+//  if (__HAL_PCD_GET_FLAG (hpcd, USB_ISTR_ESOF))
+//  {
+//    /* clear ESOF flag in ISTR */
+//    __HAL_PCD_CLEAR_FLAG(hpcd, USB_ISTR_ESOF);
+//  }
 }
 
 /**

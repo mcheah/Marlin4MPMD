@@ -48,6 +48,7 @@
 #define RADIANS(d) ((d)*M_PI/180.0)
 #define DEGREES(r) ((r)*180.0/M_PI)
 #define HYPOT(x,y) sqrt(sq(x)+sq(y))
+#define ARMHYPOT(x,y,dest) arm_sqrt_f32((sq(x)+sq(y)),dest)
 
 // Macros to contrain values
 #define NOLESS(v,n) do{ if (v < n) v = n; }while(0)

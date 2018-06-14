@@ -2357,19 +2357,29 @@ static void clean_up_after_endstop_or_probe_move() {
       if (bed_level[x][y] != 0.0) {
         return;  // Don't overwrite good values.
       }
+//TODO: Verify that this doesn't break non 3 bed leveling grid points
+//Pretty sure this gets fixed in later versions of Marlin, but hard-coding this for now
+#if AUTO_BED_LEVELING_GRID_POINTS!=3
       float a = 2 * bed_level[x + xdir][y] - bed_level[x + xdir * 2][y]; // Left to right.
       float b = 2 * bed_level[x][y + ydir] - bed_level[x][y + ydir * 2]; // Front to back.
       float c = 2 * bed_level[x + xdir][y + ydir] - bed_level[x + xdir * 2][y + ydir * 2]; // Diagonal.
-      float median = c;  // Median is robust (ignores outliers).
-      if (a < b) {
-        if (b < c) median = b;
-        if (c < a) median = a;
-      }
-      else {  // b <= a
-        if (c < b) median = b;
-        if (a < c) median = a;
-      }
-      bed_level[x][y] = median;
+#else
+      float a = bed_level[x + xdir][y]; // Left to right.
+      float b = bed_level[x][y + ydir]; // Front to back.
+      float c = bed_level[x + xdir][y + ydir]; // Diagonal.
+#endif
+      float mean = (a + b + c)/3.0;
+//      float median = c;  // Median is robust (ignores outliers).
+//      if (a < b) {
+//        if (b < c) median = b;
+//        if (c < a) median = a;
+//      }
+//      else {  // b <= a
+//        if (c < b) median = b;
+//        if (a < c) median = a;
+//      }
+//      bed_level[x][y] = median;
+      bed_level[x][y] = mean;
     }
 
     /**
@@ -2377,14 +2387,19 @@ static void clean_up_after_endstop_or_probe_move() {
      * using linear extrapolation, away from the center.
      */
     static void extrapolate_unprobed_bed_level() {
-      int half = (AUTO_BED_LEVELING_GRID_POINTS - 1) / 2;
+      uint8_t half = (AUTO_BED_LEVELING_GRID_POINTS - 1) / 2;
       for (int y = 0; y <= half; y++) {
         for (int x = 0; x <= half; x++) {
-          if (x + y < 3) continue;
-          extrapolate_one_point(half - x, half - y, x > 1 ? +1 : 0, y > 1 ? +1 : 0);
-          extrapolate_one_point(half + x, half - y, x > 1 ? -1 : 0, y > 1 ? +1 : 0);
-          extrapolate_one_point(half - x, half + y, x > 1 ? +1 : 0, y > 1 ? -1 : 0);
-          extrapolate_one_point(half + x, half + y, x > 1 ? -1 : 0, y > 1 ? -1 : 0);
+        	uint8_t x1 = half-x;
+        	uint8_t x2 = half+x;
+        	uint8_t y1 = half-y;
+        	uint8_t y2 = half+y;
+//TODO: revisit what this statement was for initially, probably related to GRID_POINTS>3
+//          if (x + y < 3) continue;
+          extrapolate_one_point(x1, y1, +1, +1);
+          extrapolate_one_point(x2, y1, -1, +1);
+          extrapolate_one_point(x1, y2, +1, -1);
+          extrapolate_one_point(x2, y2, -1, -1);
         }
       }
     }

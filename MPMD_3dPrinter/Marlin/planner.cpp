@@ -817,7 +817,8 @@ void Planner::check_axes_activity() {
     block->millimeters = fabs(delta_mm[E_AXIS]);
   }
   else {
-    block->millimeters = sqrt(
+	  arm_sqrt_f32(
+     (
       #if ENABLED(COREXY)
         sq(delta_mm[X_HEAD]) + sq(delta_mm[Y_HEAD]) + sq(delta_mm[Z_AXIS])
       #elif ENABLED(COREXZ)
@@ -827,7 +828,8 @@ void Planner::check_axes_activity() {
       #else
         sq(delta_mm[X_AXIS]) + sq(delta_mm[Y_AXIS]) + sq(delta_mm[Z_AXIS])
       #endif
-    );
+    )
+	,&(block->millimeters));
   }
   float inverse_millimeters = 1.0 / block->millimeters;  // Inverse millimeters to remove multiple divides
 
@@ -1027,8 +1029,9 @@ void Planner::check_axes_activity() {
     float dsx = current_speed[X_AXIS] - previous_speed[X_AXIS],
           dsy = current_speed[Y_AXIS] - previous_speed[Y_AXIS],
           dsz = fabs(csz - previous_speed[Z_AXIS]),
-          dse = fabs(cse - previous_speed[E_AXIS]),
-          jerk = HYPOT(dsx, dsy);
+          dse = fabs(cse - previous_speed[E_AXIS]);
+    float jerk;
+    ARMHYPOT(dsx,dsy,&jerk);
 
     //    if ((fabs(previous_speed[X_AXIS]) > 0.0001) || (fabs(previous_speed[Y_AXIS]) > 0.0001)) {
     vmax_junction = block->nominal_speed;
