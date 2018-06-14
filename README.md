@@ -2,7 +2,7 @@ This is a port of [Marlin4ST](https://github.com/St3dPrinter/Marlin4ST) to work 
 The motivation for this project was to correct some of the issues with the stock firmware of the printer, most notably the slow communication speed over USB, the inconsistent heater controls, disablement of the some of the safety features, and some of the delta calibrations.  The stock firmware is closed-source although it seems to be based off of Marlin, and as as result there's now way of confirming there are no hidden bugs or issues.
 
 ###  How to load the Firmware on a stock printer?
-The binary of the Marlin4MPMD firmware is found under firmware binaries\firmware.bin.  Also in this folder is the two stock firmwares as provided by [mpmdelta.com](https://www.mpminidelta.com/firmware/motion_controller), these can be re-loaded at any time by the following instructions.
+The binary of the Marlin4MPMD firmware is found under firmware binaries\firmware.bin.  Also in this folder is the two stock firmwares as provided by [mpminidelta.com](https://www.mpminidelta.com/firmware/motion_controller), these can be re-loaded at any time by the following instructions.
 To load the binary onto your printer:
 - Rename the firmware to firmware.bin, copy onto the SD card that came with your printer (or any appropriate <2GB FAT32 formatted microSD card).
 - Eject the SD card safely from your computer.
