@@ -3,6 +3,8 @@ The motivation for this project was to correct some of the issues with the stock
 That said, this is development firmware that has been tested only handful of times by me on two printers.  Relevant Marlin safety features have been turned on, but there is no guarantee it is bug free.  
 USE AT YOUR OWN RISK! 3d printers have been known to fail and cause fires while unattended.  I cannot be responsible for any failures as a result of using this software, although unlikely, Monoprice may use this as an excuse to void your warranty if you brick your printer (this is extremely unlikely).
 
+There is currently a known issue where the stock 12V/5A power supply will trigger a thermal shutdown if too much current is drawn over a long period of time, which will reset the printer.  The stock firmware gets around this by limiting the bed heater power and preventing it from heating while the extruder is heating.  I am not doing that currently, so it is recommended to upgrade to a 8A or better power supply to run this firmware.
+
 ###  How to load the Firmware on a stock printer?
 The binary of the Marlin4MPMD firmware is found under firmware binaries\firmware.bin.  Also in this folder is the two stock firmwares as provided by [mpminidelta.com](https://www.mpminidelta.com/firmware/motion_controller), these can be re-loaded at any time by the following instructions.
 To load the binary onto your printer:
