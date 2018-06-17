@@ -285,21 +285,29 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   uint32_t buffptr;
   uint32_t buffsize;
-  
+
   if(UserTxBufPtrOut != UserTxBufPtrIn)
   {
     if(UserTxBufPtrOut > UserTxBufPtrIn) /* rollback */
     {
-      buffsize = APP_RX_DATA_SIZE - UserTxBufPtrOut;
+      buffsize = APP_TX_DATA_SIZE - UserTxBufPtrOut;
     }
-    else 
+    else
     {
       buffsize = UserTxBufPtrIn - UserTxBufPtrOut;
     }
-    
+
     buffptr = UserTxBufPtrOut;
-    CDC_Itf_SetTxBuffer((uint8_t*)&UserTxBuffer[buffptr], buffsize);
-    CDC_Itf_Transmit(buffsize);
+
+    USBD_CDC_SetTxBuffer(&USBD_Device, (uint8_t*)&UserTxBuffer[buffptr], buffsize);
+    if(USBD_CDC_TransmitPacket(&USBD_Device) == USBD_OK)
+    {
+      UserTxBufPtrOut += buffsize;
+      if (UserTxBufPtrOut == APP_TX_DATA_SIZE)
+      {
+        UserTxBufPtrOut = 0;
+      }
+    }
   }
 }
 
