@@ -76,8 +76,8 @@ extern TIM_HandleTypeDef hTimPwmHeatE3;
 /* Private variables ---------------------------------------------------------*/
     
 /* Private function prototypes -----------------------------------------------*/
-extern void BSP_MotorControl_StepClockHandler(uint8_t deviceId); 
-extern void BSP_MotorControl_FlagInterruptHandler(void);
+//extern void BSP_MotorControl_StepClockHandler(uint8_t deviceId);
+//extern void BSP_MotorControl_FlagInterruptHandler(void);
 /* Private functions ---------------------------------------------------------*/
 
 /** @defgroup HAL_MSP_Private_Functions
@@ -745,6 +745,7 @@ void HAL_TIM_PWM_MspDeInit(TIM_HandleTypeDef* htim_pwm)
   */
 void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
 {
+#if 0
   if ((htim->Instance == BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_X)&& (htim->Channel == BSP_MOTOR_CONTROL_BOARD_HAL_ACT_CHAN_TIMER_PWM_X))
   {
     if (BSP_MotorControl_GetDeviceState(0) != INACTIVE)
@@ -777,6 +778,7 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
       BSP_MotorControl_StepClockHandler(3);
     }
   }
+#endif
 #ifdef BSP_HEAT_E2_PIN
   if ((htim->Instance == BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E2)&& (htim->Channel == BSP_MOTOR_CONTROL_BOARD_HAL_ACT_CHAN_TIMER_PWM_E2))
   {
@@ -932,18 +934,18 @@ void HAL_TIM_OC_MspDeInit(TIM_HandleTypeDef* htim_oc)
   * @param[in] GPIO_Pin pin number
   * @retval None
   */
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-  if (GPIO_Pin == BSP_MOTOR_CONTROL_BOARD_FLAG_PIN)
-  {
-    BSP_MotorControl_FlagInterruptHandler();
-  }
-  //TODO: removing SD card stuff for now
-//  if (GPIO_Pin == BSP_SD_DETECT_PIN)
-//  {
-//    BSP_SD_DetectIT();
-//  }
- }
+//void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+//{
+////  if (GPIO_Pin == BSP_MOTOR_CONTROL_BOARD_FLAG_PIN)
+////  {
+////    BSP_MotorControl_FlagInterruptHandler();
+////  }
+//  //TODO: removing SD card stuff for now
+////  if (GPIO_Pin == BSP_SD_DETECT_PIN)
+////  {
+////    BSP_SD_DetectIT();
+////  }
+// }
 
 
 void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)

@@ -38,6 +38,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "A4985.h"
+#include "stm32f0xx_3dprinter_motor.h"
+#include "motorcontrol.h"
 
 /* Private constants  ---------------------------------------------------------*/
 
@@ -201,12 +203,182 @@ motorDrv_t   A4985Drv =
 /** @defgroup Device_Control_Functions
   * @{
   */   
+/******************************************************//**
+ * @brief  Resets the L6474 (reset pin set to low) of all devices
+ * @param  None
+ * @retval None
+ **********************************************************/
+void BSP_MotorControlBoard_Reset(void)
+{
+  HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_X_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_X_PIN, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_Y_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_Y_PIN, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_Z_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_Z_PIN, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_E1_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_E1_PIN, GPIO_PIN_RESET);
+#ifdef BSP_HEAT_E2_PIN
+  HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_E2_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_E2_PIN, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_E3_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_E3_PIN, GPIO_PIN_RESET);
+#endif//BSP_HEAT_E2_PIN
+}
 
 /******************************************************//**
+ * @brief  Releases the L6474 reset (pin set to High) of all devices
+ * @param  None
+ * @retval None
+ **********************************************************/
+void BSP_MotorControlBoard_ReleaseReset(void)
+{
+  HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_X_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_X_PIN, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_Y_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_Y_PIN, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_Z_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_Z_PIN, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_E1_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_E1_PIN, GPIO_PIN_SET);
+#ifdef BSP_HEAT_E2_PIN
+  HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_E2_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_E2_PIN, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_E3_PORT, BSP_MOTOR_CONTROL_BOARD_RESET_E3_PIN, GPIO_PIN_SET);
+#endif//BSP_HEAT_E2_PIN
+}
+
+/******************************************************//**
+ * @brief  Initiliases the GPIOs used by the L6474s
+ * @param[in] nbDevices number of L6474 devices
+ * @retval None
+  **********************************************************/
+void BSP_MotorControlBoard_GpioInit(uint8_t nbDevices)
+{
+   GPIO_InitTypeDef GPIO_InitStruct;
+
+  /* GPIO Ports Clock Enable */
+  __GPIOA_CLK_ENABLE();
+  __GPIOB_CLK_ENABLE();
+  __GPIOC_CLK_ENABLE();
+  __GPIOD_CLK_ENABLE();
+  __GPIOF_CLK_ENABLE();
+
+  /* Configure L6474 - DIR pin for device 0 -------------------------------*/
+  GPIO_InitStruct.Pin = BSP_MOTOR_CONTROL_BOARD_DIR_X_PIN;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+  HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_DIR_X_PORT, &GPIO_InitStruct);
+  //TODO: remove flag pin since we're not using it
+  /* Configure L6474 - Flag pin -------------------------------------------*/
+  GPIO_InitStruct.Pin = BSP_MOTOR_CONTROL_BOARD_FLAG_PIN;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+  HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_FLAG_PORT, &GPIO_InitStruct);
+
+ /* Set Priority of External Line Interrupt used for the Flag interrupt*/
+  HAL_NVIC_SetPriority(BSP_MOTOR_CONTROL_BOARD_FLAG_IRQn, 3, 0);
+
+  /* Enable the External Line Interrupt used for the Flag interrupt*/
+  HAL_NVIC_EnableIRQ(BSP_MOTOR_CONTROL_BOARD_FLAG_IRQn);
+
+  /* Configure L6474 - CS pin ---------------------------------------------*/
+#ifdef MOTOR_L6474
+  GPIO_InitStruct.Pin = BSP_MOTOR_CONTROL_BOARD_CS_PIN;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+  HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_CS_PORT, &GPIO_InitStruct);
+  HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_CS_PORT, BSP_MOTOR_CONTROL_BOARD_CS_PIN, GPIO_PIN_SET);
+#endif//MOTOR_L6474
+  /* Configure L6474 - STBY/RESET pin -------------------------------------*/
+  GPIO_InitStruct.Pin = BSP_MOTOR_CONTROL_BOARD_RESET_X_PIN;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+  HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_RESET_X_PORT, &GPIO_InitStruct);
+  HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_X_PORT,BSP_MOTOR_CONTROL_BOARD_RESET_X_PIN,GPIO_PIN_SET);
+
+  GPIO_InitStruct.Pin = BSP_MOTOR_CONTROL_BOARD_RESET_Y_PIN;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+  HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_RESET_Y_PORT, &GPIO_InitStruct);
+  HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_Y_PORT,BSP_MOTOR_CONTROL_BOARD_RESET_Y_PIN,GPIO_PIN_SET);
+
+  GPIO_InitStruct.Pin = BSP_MOTOR_CONTROL_BOARD_RESET_Z_PIN;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+  HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_RESET_Z_PORT, &GPIO_InitStruct);
+  HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_Z_PORT,BSP_MOTOR_CONTROL_BOARD_RESET_Z_PIN,GPIO_PIN_SET);
+
+  GPIO_InitStruct.Pin = BSP_MOTOR_CONTROL_BOARD_RESET_E1_PIN;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+  HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_RESET_E1_PORT, &GPIO_InitStruct);
+  HAL_GPIO_WritePin(BSP_MOTOR_CONTROL_BOARD_RESET_E1_PORT,BSP_MOTOR_CONTROL_BOARD_RESET_E1_PIN,GPIO_PIN_SET);
+
+#ifdef BSP_HEAT_E2_PIN
+  GPIO_InitStruct.Pin = BSP_MOTOR_CONTROL_BOARD_RESET_E2_PIN;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+  HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_RESET_E2_PORT, &GPIO_InitStruct);
+
+  GPIO_InitStruct.Pin = BSP_MOTOR_CONTROL_BOARD_RESET_E3_PIN;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+  HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_RESET_E3_PORT, &GPIO_InitStruct);
+#endif//BSP_HEAT_E2_PIN
+  BSP_MotorControlBoard_ReleaseReset();
+  //TODO: check that this makes sense, because we may have different motor numbers
+  if (nbDevices > 1)
+  {
+    /* Configure L6474 - DIR pin for device  1 ----------------------------*/
+    GPIO_InitStruct.Pin = BSP_MOTOR_CONTROL_BOARD_DIR_Y_PIN;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+    HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_DIR_Y_PORT, &GPIO_InitStruct);
+  }
+  if (nbDevices > 2)
+  {
+    /* Configure L6474 - DIR pin for device  2 ----------------------------*/
+    GPIO_InitStruct.Pin = BSP_MOTOR_CONTROL_BOARD_DIR_Z_PIN;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+    HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_DIR_Z_PORT, &GPIO_InitStruct);
+  }
+  if (nbDevices > 3)
+  {
+    /* Configure L6474 - DIR pin for device  3 ----------------------------*/
+    GPIO_InitStruct.Pin = BSP_MOTOR_CONTROL_BOARD_DIR_E1_PIN;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+    HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_DIR_E1_PORT, &GPIO_InitStruct);
+  }
+#ifdef BSP_HEAT_E2_PIN
+    if (nbDevices > 4)
+  {
+    /* Configure L6474 - DIR pin for device  4 ----------------------------*/
+    GPIO_InitStruct.Pin = BSP_MOTOR_CONTROL_BOARD_DIR_E2_PIN;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+    HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_DIR_E2_PORT, &GPIO_InitStruct);
+  }
+  if (nbDevices > 5)
+  {
+    /* Configure L6474 - DIR pin for device  5 ----------------------------*/
+    GPIO_InitStruct.Pin = BSP_MOTOR_CONTROL_BOARD_DIR_E3_PIN;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+    HAL_GPIO_Init(BSP_MOTOR_CONTROL_BOARD_DIR_E3_PORT, &GPIO_InitStruct);
+  }
+#endif
+}
+/******************************************************//**
  * @brief  Attaches a user callback to the error Handler.
- * The call back will be then called each time the library 
+ * The call back will be then called each time the library
  * detects an error
- * @param[in] callback Name of the callback to attach 
+ * @param[in] callback Name of the callback to attach
  * to the error Hanlder
  * @retval None
  **********************************************************/
@@ -217,11 +389,11 @@ void A4985_AttachErrorHandler(void (*callback)(uint16_t))
 
 /******************************************************//**
  * @brief  Attaches a user callback to the flag Interrupt
- * The call back will be then called each time the status 
- * flag pin will be pulled down due to the occurrence of 
- * a programmed alarms ( OCD, thermal pre-warning or 
+ * The call back will be then called each time the status
+ * flag pin will be pulled down due to the occurrence of
+ * a programmed alarms ( OCD, thermal pre-warning or
  * shutdown, UVLO, wrong command, non-performable command)
- * @param[in] callback Name of the callback to attach 
+ * @param[in] callback Name of the callback to attach
  * to the Flag Interrupt
  * @retval None
  **********************************************************/
@@ -229,6 +401,8 @@ void A4985_AttachFlagInterrupt(void (*callback)(void))
 {
   flagInterruptCallback = (void (*)())callback;
 }
+
+
 
 /******************************************************//**
  * @brief Starts the A4985 library
@@ -278,7 +452,8 @@ void A4985_Init(uint8_t nbDevices)
 //  BSP_MotorControlBoard_ReleaseReset();
   
   /* Let a delay after reset */
-  BSP_MotorControlBoard_Delay(1); 
+  HAL_Delay(1);
+//  BSP_MotorControlBoard_Delay(1);
   
   /* Set all registers and context variables to the predefined values from A4985_target_config.h */
 //  A4985_SetDeviceParamsToPredefinedValues();

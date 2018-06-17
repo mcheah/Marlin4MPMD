@@ -231,7 +231,7 @@ TIM_HandleTypeDef hTimServo;
 static uint8_t bspTickEnabled = 0;
 
 /* Imported function ----------------------------------------------------------*/
-void BSP_MiscFlagInterruptHandler(void);
+//void BSP_MiscFlagInterruptHandler(void);
 void SystemClock_Config(void);
 
 
@@ -275,14 +275,15 @@ void BSP_MiscOverallInit(uint8_t nbDevices)
 #ifdef MOTOR_L6474
   BSP_MotorControl_Init(BSP_MOTOR_CONTROL_BOARD_ID_L6474, nbDevices);
 #elif defined(MOTOR_A4985)
-  BSP_MotorControl_Init(BSP_MOTOR_CONTROL_BOARD_ID_A4985, nbDevices);
+  A4985_Init(nbDevices);
+//  BSP_MotorControl_Init(BSP_MOTOR_CONTROL_BOARD_ID_A4985, nbDevices);
 #endif
   
   /* Attach the function MyFlagInterruptHandler (defined below) to the flag interrupt */
 //  BSP_MotorControl_AttachFlagInterrupt(BSP_MiscFlagInterruptHandler);
 
   /* Attach the function Error_Handler (defined below) to the error Handler*/
-  BSP_MotorControl_AttachErrorHandler(BSP_MiscErrorHandler); 
+//  BSP_MotorControl_AttachErrorHandler(BSP_MiscErrorHandler);
 }
 
 /******************************************************//**
@@ -290,81 +291,81 @@ void BSP_MiscOverallInit(uint8_t nbDevices)
  * @param None
  * @retval None
  **********************************************************/
-void BSP_MiscFlagInterruptHandler(void)
-{
-  uint16_t statusRegister;
-  uint8_t loop;
-  
-  for (loop =0; loop < bspMiscNbMotorDevices; loop++)
-  {
-    /* Get the value of the status register via the L6474 command GET_STATUS */
-    statusRegister = BSP_MotorControl_CmdGetStatus(loop);
-#ifdef MOTOR_L6474
-    /* Check HIZ flag: if set, power brigdes are disabled */
-    if ((statusRegister & L6474_STATUS_HIZ) == L6474_STATUS_HIZ)
-    {
-      // HIZ state
-      // Action to be customized            
-    }
-
-    /* Check direction bit */
-    if ((statusRegister & L6474_STATUS_DIR) == L6474_STATUS_DIR)
-    {
-      // Forward direction is set
-      // Action to be customized            
-    }  
-    else
-    {
-      // Backward direction is set
-      // Action to be customized            
-    }  
-
-    /* Check NOTPERF_CMD flag: if set, the command received by SPI can't be performed */
-    /* This often occures when a command is sent to the L6474 */
-    /* while it is in HIZ state */
-    if ((statusRegister & L6474_STATUS_NOTPERF_CMD) == L6474_STATUS_NOTPERF_CMD)
-    {
-        // Command received by SPI can't be performed
-       // Action to be customized            
-    }  
-
-    /* Check WRONG_CMD flag: if set, the command does not exist */
-    if ((statusRegister & L6474_STATUS_WRONG_CMD) == L6474_STATUS_WRONG_CMD)
-    {
-       //command received by SPI does not exist 
-       // Action to be customized          
-    }  
-
-    /* Check UVLO flag: if not set, there is an undervoltage lock-out */
-    if ((statusRegister & L6474_STATUS_UVLO) == 0)
-    {
-       //undervoltage lock-out 
-       // Action to be customized          
-    }  
-
-    /* Check TH_WRN flag: if not set, the thermal warning threshold is reached */
-    if ((statusRegister & L6474_STATUS_TH_WRN) == 0)
-    {
-      //thermal warning threshold is reached
-      // Action to be customized          
-    }    
-
-    /* Check TH_SHD flag: if not set, the thermal shut down threshold is reached */
-    if ((statusRegister & L6474_STATUS_TH_SD) == 0)
-    {
-      //thermal shut down threshold is reached 
-      // Action to be customized          
-    }    
-
-    /* Check OCD  flag: if not set, there is an overcurrent detection */
-    if ((statusRegister & L6474_STATUS_OCD) == 0)
-    {
-      //overcurrent detection 
-      // Action to be customized          
-    }
-#endif
-  }
-}
+//void BSP_MiscFlagInterruptHandler(void)
+//{
+//  uint16_t statusRegister;
+//  uint8_t loop;
+//
+//  for (loop =0; loop < bspMiscNbMotorDevices; loop++)
+//  {
+//    /* Get the value of the status register via the L6474 command GET_STATUS */
+////    statusRegister = BSP_MotorControl_CmdGetStatus(loop);
+//#ifdef MOTOR_L6474
+//    /* Check HIZ flag: if set, power brigdes are disabled */
+//    if ((statusRegister & L6474_STATUS_HIZ) == L6474_STATUS_HIZ)
+//    {
+//      // HIZ state
+//      // Action to be customized
+//    }
+//
+//    /* Check direction bit */
+//    if ((statusRegister & L6474_STATUS_DIR) == L6474_STATUS_DIR)
+//    {
+//      // Forward direction is set
+//      // Action to be customized
+//    }
+//    else
+//    {
+//      // Backward direction is set
+//      // Action to be customized
+//    }
+//
+//    /* Check NOTPERF_CMD flag: if set, the command received by SPI can't be performed */
+//    /* This often occures when a command is sent to the L6474 */
+//    /* while it is in HIZ state */
+//    if ((statusRegister & L6474_STATUS_NOTPERF_CMD) == L6474_STATUS_NOTPERF_CMD)
+//    {
+//        // Command received by SPI can't be performed
+//       // Action to be customized
+//    }
+//
+//    /* Check WRONG_CMD flag: if set, the command does not exist */
+//    if ((statusRegister & L6474_STATUS_WRONG_CMD) == L6474_STATUS_WRONG_CMD)
+//    {
+//       //command received by SPI does not exist
+//       // Action to be customized
+//    }
+//
+//    /* Check UVLO flag: if not set, there is an undervoltage lock-out */
+//    if ((statusRegister & L6474_STATUS_UVLO) == 0)
+//    {
+//       //undervoltage lock-out
+//       // Action to be customized
+//    }
+//
+//    /* Check TH_WRN flag: if not set, the thermal warning threshold is reached */
+//    if ((statusRegister & L6474_STATUS_TH_WRN) == 0)
+//    {
+//      //thermal warning threshold is reached
+//      // Action to be customized
+//    }
+//
+//    /* Check TH_SHD flag: if not set, the thermal shut down threshold is reached */
+//    if ((statusRegister & L6474_STATUS_TH_SD) == 0)
+//    {
+//      //thermal shut down threshold is reached
+//      // Action to be customized
+//    }
+//
+//    /* Check OCD  flag: if not set, there is an overcurrent detection */
+//    if ((statusRegister & L6474_STATUS_OCD) == 0)
+//    {
+//      //overcurrent detection
+//      // Action to be customized
+//    }
+//#endif
+//  }
+//}
 
 
 /******************************************************//**
@@ -541,35 +542,35 @@ void BSP_MiscStopInit(uint8_t id)
  * @param[in] id 0 for X_Stop, 1 for Y_Stop, 2 for Z_Stop
   * @retval status 0 if GPIO is set, 1 if it reset
  **********************************************************/
-uint8_t BSP_MiscStopGetStatus(uint8_t id)
-{
-  uint32_t gpioPin;
-  GPIO_TypeDef* gpioPort;
-  uint8_t status = 0;
-  
-  switch (id)
-  {
-    case 0:
-      /* Configure X_STOP pin */
-      gpioPin = BSP_STOP_X_PIN;
-      gpioPort = BSP_STOP_X_PORT;    
-      break;
-    case 1:
-      /* Configure Y_STOP pin */
-      gpioPin = BSP_STOP_Y_PIN;
-      gpioPort = BSP_STOP_Y_PORT;    
-      break;      
-    case 2:
-      /* Configure Z_STOP pin */
-      gpioPin = BSP_STOP_Z_PIN;
-      gpioPort = BSP_STOP_Z_PORT;    
-      break;   
-    default:
-      return (status);
-  }
-  status = !((uint8_t) HAL_GPIO_ReadPin(gpioPort, gpioPin)); 
-  return (status);
-}
+//uint8_t BSP_MiscStopGetStatus(uint8_t id)
+//{
+//  uint32_t gpioPin;
+//  GPIO_TypeDef* gpioPort;
+//  uint8_t status = 0;
+//
+//  switch (id)
+//  {
+//    case 0:
+//      /* Configure X_STOP pin */
+//      gpioPin = BSP_STOP_X_PIN;
+//      gpioPort = BSP_STOP_X_PORT;
+//      break;
+//    case 1:
+//      /* Configure Y_STOP pin */
+//      gpioPin = BSP_STOP_Y_PIN;
+//      gpioPort = BSP_STOP_Y_PORT;
+//      break;
+//    case 2:
+//      /* Configure Z_STOP pin */
+//      gpioPin = BSP_STOP_Z_PIN;
+//      gpioPort = BSP_STOP_Z_PORT;
+//      break;
+//    default:
+//      return (status);
+//  }
+//  status = !((uint8_t) HAL_GPIO_ReadPin(gpioPort, gpioPin));
+//  return (status);
+//}
 
 /******************************************************//**
  * @brief  Initialisation of the Heats
@@ -988,26 +989,26 @@ void BSP_MiscSetStepClockToSwMode(void)
     {
       case 0:
       default:
-        pHTim = &hTimPwmX;
-        pHTim->Instance = BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_X;
+//        pHTim = &hTimPwmX;
+//        pHTim->Instance = BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_X;
         gpioPin = BSP_MOTOR_CONTROL_BOARD_PWM_X_PIN;
         gpioPort = BSP_MOTOR_CONTROL_BOARD_PWM_X_PORT;
         break;
       case  1:
-        pHTim = &hTimPwmY;
-        pHTim->Instance = BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_Y;
+//        pHTim = &hTimPwmY;
+//        pHTim->Instance = BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_Y;
         gpioPin = BSP_MOTOR_CONTROL_BOARD_PWM_Y_PIN;
         gpioPort = BSP_MOTOR_CONTROL_BOARD_PWM_Y_PORT;        
         break;
       case 2:
-        pHTim = &hTimPwmZ;
-        pHTim->Instance = BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_Z;
+//        pHTim = &hTimPwmZ;
+//        pHTim->Instance = BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_Z;
         gpioPin = BSP_MOTOR_CONTROL_BOARD_PWM_Z_PIN;
         gpioPort = BSP_MOTOR_CONTROL_BOARD_PWM_Z_PORT;           
         break;
       case 3:
-        pHTim = &hTimPwmE1;
-        pHTim->Instance = BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E1;
+//        pHTim = &hTimPwmE1;
+//        pHTim->Instance = BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E1;
         gpioPin = BSP_MOTOR_CONTROL_BOARD_PWM_E1_PIN;
         gpioPort = BSP_MOTOR_CONTROL_BOARD_PWM_E1_PORT;            
         break;
@@ -1026,7 +1027,7 @@ void BSP_MiscSetStepClockToSwMode(void)
         break;
 #endif//BSP_HEAT_E2_PIN
     }
-    HAL_TIM_PWM_DeInit(pHTim);
+//    HAL_TIM_PWM_DeInit(pHTim);
   
   /* GPIO configuration */
     GPIO_InitStruct.Pin = gpioPin;
@@ -1043,45 +1044,45 @@ void BSP_MiscSetStepClockToSwMode(void)
  * @param None
  * @retval None
 **********************************************************/
-void BSP_MiscGenerateStepClockPulse(uint8_t deviceId)
-{
-  uint32_t gpioPin;
-  GPIO_TypeDef* gpioPort;  
-
-  switch (deviceId)
-  {
-    case 0:
-    default:
-      gpioPin = BSP_MOTOR_CONTROL_BOARD_PWM_Z_PIN;
-      gpioPort = BSP_MOTOR_CONTROL_BOARD_PWM_Z_PORT; 
-      break;
-    case  1:
-      gpioPin = BSP_MOTOR_CONTROL_BOARD_PWM_Y_PIN;
-      gpioPort = BSP_MOTOR_CONTROL_BOARD_PWM_Y_PORT;        
-      break;
-    case 2:
-      gpioPin = BSP_MOTOR_CONTROL_BOARD_PWM_X_PIN;
-      gpioPort = BSP_MOTOR_CONTROL_BOARD_PWM_X_PORT;         
-      break;
-    case 3:
-      gpioPin = BSP_MOTOR_CONTROL_BOARD_PWM_E1_PIN;
-      gpioPort = BSP_MOTOR_CONTROL_BOARD_PWM_E1_PORT;            
-      break;
-#ifdef BSP_HEAT_E2_PIN
-    case 4:
-      gpioPin = BSP_MOTOR_CONTROL_BOARD_PWM_E2_PIN;
-      gpioPort = BSP_MOTOR_CONTROL_BOARD_PWM_E2_PORT;             
-      break;
-    case 5:
-      gpioPin = BSP_MOTOR_CONTROL_BOARD_PWM_E3_PIN;
-      gpioPort = BSP_MOTOR_CONTROL_BOARD_PWM_E3_PORT;            
-      break;
-#endif//BSP_HEAT_E2_PIN
-  }  
-  
-  HAL_GPIO_WritePin(gpioPort, gpioPin, GPIO_PIN_SET); 
-  HAL_GPIO_WritePin(gpioPort, gpioPin, GPIO_PIN_RESET); 
-}
+//void BSP_MiscGenerateStepClockPulse(uint8_t deviceId)
+//{
+//  uint32_t gpioPin;
+//  GPIO_TypeDef* gpioPort;
+//
+//  switch (deviceId)
+//  {
+//    case 0:
+//    default:
+//      gpioPin = BSP_MOTOR_CONTROL_BOARD_PWM_Z_PIN;
+//      gpioPort = BSP_MOTOR_CONTROL_BOARD_PWM_Z_PORT;
+//      break;
+//    case  1:
+//      gpioPin = BSP_MOTOR_CONTROL_BOARD_PWM_Y_PIN;
+//      gpioPort = BSP_MOTOR_CONTROL_BOARD_PWM_Y_PORT;
+//      break;
+//    case 2:
+//      gpioPin = BSP_MOTOR_CONTROL_BOARD_PWM_X_PIN;
+//      gpioPort = BSP_MOTOR_CONTROL_BOARD_PWM_X_PORT;
+//      break;
+//    case 3:
+//      gpioPin = BSP_MOTOR_CONTROL_BOARD_PWM_E1_PIN;
+//      gpioPort = BSP_MOTOR_CONTROL_BOARD_PWM_E1_PORT;
+//      break;
+//#ifdef BSP_HEAT_E2_PIN
+//    case 4:
+//      gpioPin = BSP_MOTOR_CONTROL_BOARD_PWM_E2_PIN;
+//      gpioPort = BSP_MOTOR_CONTROL_BOARD_PWM_E2_PORT;
+//      break;
+//    case 5:
+//      gpioPin = BSP_MOTOR_CONTROL_BOARD_PWM_E3_PIN;
+//      gpioPort = BSP_MOTOR_CONTROL_BOARD_PWM_E3_PORT;
+//      break;
+//#endif//BSP_HEAT_E2_PIN
+//  }
+//
+//  HAL_GPIO_WritePin(gpioPort, gpioPin, GPIO_PIN_SET);
+//  HAL_GPIO_WritePin(gpioPort, gpioPin, GPIO_PIN_RESET);
+//}
                                     
  /******************************************************//**
  * @brief Generate a step clock pulse
@@ -1089,21 +1090,21 @@ void BSP_MiscGenerateStepClockPulse(uint8_t deviceId)
  * @param[in] current value in mA
  * @retval None
 **********************************************************/
-void BSP_MiscSetOcdThreshold(uint8_t deviceId, uint32_t current)
-{
-  int32_t currentThreshold = 375;
-  uint32_t ocdThresholdParam = 0;
-  //TODO:check functionality that this actually still does hwat it's supposed to
-#ifdef MOTOR_L6474
-  while ((current >= currentThreshold) && (ocdThresholdParam < L6474_OCD_TH_6000mA))
-  {
-    currentThreshold += 375;
-    ocdThresholdParam++;
-  }
-  
-  BSP_MotorControl_CmdSetParam(deviceId, L6474_OCD_TH, ocdThresholdParam);   
-#endif
-}
+//void BSP_MiscSetOcdThreshold(uint8_t deviceId, uint32_t current)
+//{
+//  int32_t currentThreshold = 375;
+//  uint32_t ocdThresholdParam = 0;
+//  //TODO:check functionality that this actually still does hwat it's supposed to
+//#ifdef MOTOR_L6474
+//  while ((current >= currentThreshold) && (ocdThresholdParam < L6474_OCD_TH_6000mA))
+//  {
+//    currentThreshold += 375;
+//    ocdThresholdParam++;
+//  }
+//
+//  BSP_MotorControl_CmdSetParam(deviceId, L6474_OCD_TH, ocdThresholdParam);
+//#endif
+//}
 
 /******************************************************//**
  * @brief  Initialises the Gpios uses by the specified Heats
@@ -1165,74 +1166,74 @@ void BSP_MiscHeatManualInit(uint8_t heatId)
  * @retval None
  * @note 0 for bead heat, 1 for E1 heat, 2 for E2 heat...
  **********************************************************/
-void BSP_MiscHeatPwmInit(uint8_t heatId)
-{
-  TIM_OC_InitTypeDef sConfigOC;
-  TIM_MasterConfigTypeDef sMasterConfig;
-  TIM_HandleTypeDef *pHTim;
-  uint32_t  channel;
-  uint32_t sysFreq = HAL_RCC_GetSysClockFreq();
-  uint32_t period;
-  
-  switch (heatId)
-  {
-    case 0:
-    default:
-      pHTim = &hTimPwmHeatBed;
-      pHTim->Instance = BSP_MISC_TIMER_PWM_HEAT_BED;
-      channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_BED;
-      break;
-    case  1:
-      pHTim = &hTimPwmHeatE1;
-      pHTim->Instance = BSP_MISC_TIMER_PWM_HEAT_E1;
-      channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_E1;
-      break;
-#ifdef BSP_HEAT_E2_PIN
-    case 2:
-      pHTim = &hTimPwmHeatE2;
-      pHTim->Instance = BSP_MISC_TIMER_PWM_HEAT_E2;
-      channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_E2;
-      break;
-    case 3:
-      pHTim = &hTimPwmHeatE3;
-      pHTim->Instance = BSP_MISC_TIMER_PWM_HEAT_E3;
-      channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_E3;
-      break;
-#endif//BSP_HEAT_E2_PIN
-#ifdef BSP_HEAT_BED2_PIN
-    case 5:
-      pHTim = &hTimPwmHeatBed2;
-      pHTim->Instance = BSP_MISC_TIMER_PWM_HEAT_BED2;
-      channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_BED2;
-      break;
-    case 6:
-      pHTim = &hTimPwmHeatBed3;
-      pHTim->Instance = BSP_MISC_TIMER_PWM_HEAT_BED3;
-      channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_BED3;
-      break;
-#endif//BSP_HEAT_BED2_PIN
-  }
-  period = (sysFreq/ (HEAT_TIMER_PRESCALER * HEAT_TIMER_FREQUENCY)) - 1;
-  
-  pHTim->Init.Prescaler = HEAT_TIMER_PRESCALER -1;
-  pHTim->Init.CounterMode = TIM_COUNTERMODE_UP;
-  pHTim->Init.Period = period;
-  pHTim->Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  HAL_TIM_PWM_Init(pHTim);
-  
-  sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 0;
-  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-  HAL_TIM_PWM_ConfigChannel(pHTim, &sConfigOC, channel);
-  
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  HAL_TIMEx_MasterConfigSynchronization(pHTim, &sMasterConfig);
-  
-  HAL_TIM_PWM_Start(pHTim, channel);    
-  
-}
+//void BSP_MiscHeatPwmInit(uint8_t heatId)
+//{
+//  TIM_OC_InitTypeDef sConfigOC;
+//  TIM_MasterConfigTypeDef sMasterConfig;
+//  TIM_HandleTypeDef *pHTim;
+//  uint32_t  channel;
+//  uint32_t sysFreq = HAL_RCC_GetSysClockFreq();
+//  uint32_t period;
+//
+//  switch (heatId)
+//  {
+//    case 0:
+//    default:
+//      pHTim = &hTimPwmHeatBed;
+//      pHTim->Instance = BSP_MISC_TIMER_PWM_HEAT_BED;
+//      channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_BED;
+//      break;
+//    case  1:
+//      pHTim = &hTimPwmHeatE1;
+//      pHTim->Instance = BSP_MISC_TIMER_PWM_HEAT_E1;
+//      channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_E1;
+//      break;
+//#ifdef BSP_HEAT_E2_PIN
+//    case 2:
+//      pHTim = &hTimPwmHeatE2;
+//      pHTim->Instance = BSP_MISC_TIMER_PWM_HEAT_E2;
+//      channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_E2;
+//      break;
+//    case 3:
+//      pHTim = &hTimPwmHeatE3;
+//      pHTim->Instance = BSP_MISC_TIMER_PWM_HEAT_E3;
+//      channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_E3;
+//      break;
+//#endif//BSP_HEAT_E2_PIN
+//#ifdef BSP_HEAT_BED2_PIN
+//    case 5:
+//      pHTim = &hTimPwmHeatBed2;
+//      pHTim->Instance = BSP_MISC_TIMER_PWM_HEAT_BED2;
+//      channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_BED2;
+//      break;
+//    case 6:
+//      pHTim = &hTimPwmHeatBed3;
+//      pHTim->Instance = BSP_MISC_TIMER_PWM_HEAT_BED3;
+//      channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_BED3;
+//      break;
+//#endif//BSP_HEAT_BED2_PIN
+//  }
+//  period = (sysFreq/ (HEAT_TIMER_PRESCALER * HEAT_TIMER_FREQUENCY)) - 1;
+//
+//  pHTim->Init.Prescaler = HEAT_TIMER_PRESCALER -1;
+//  pHTim->Init.CounterMode = TIM_COUNTERMODE_UP;
+//  pHTim->Init.Period = period;
+//  pHTim->Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+//  HAL_TIM_PWM_Init(pHTim);
+//
+//  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+//  sConfigOC.Pulse = 0;
+//  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+//  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+//  HAL_TIM_PWM_ConfigChannel(pHTim, &sConfigOC, channel);
+//
+//  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+//  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+//  HAL_TIMEx_MasterConfigSynchronization(pHTim, &sMasterConfig);
+//
+//  HAL_TIM_PWM_Start(pHTim, channel);
+//
+//}
                                     
 /******************************************************//**
  * @brief  Initialises the PWM uses by the specified Heats
@@ -1241,55 +1242,55 @@ void BSP_MiscHeatPwmInit(uint8_t heatId)
  * @retval None
  * @note 0 for bead heat, 1 for E1 heat, 2 for E2 heat...
  **********************************************************/
-void BSP_MiscHeatPwmSetDutyCycle(uint8_t heatId, uint8_t newDuty)
-{
-  TIM_HandleTypeDef *pHTim;
-  uint32_t  channel;
-  uint32_t pulse;
-  
-  switch (heatId)
-  {
-  case 0:
-  default:
-      pHTim = &hTimPwmHeatBed;
-      channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_BED;
-      break;
-    case  1:
-      pHTim = &hTimPwmHeatE1;
-      channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_E1;
-      break;
-#ifdef BSP_HEAT_E2_PIN
-    case 2:
-      pHTim = &hTimPwmHeatE2;
-      channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_E2;
-      break;
-    case 3:
-      pHTim = &hTimPwmHeatE3;
-      channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_E3;
-      break;
-#endif//BSP_HEAT_E2_PIN
-#ifdef BSP_HEAT_BED2_PIN
-    case 5:
-      pHTim = &hTimPwmHeatBed2;
-      channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_BED2;
-      break;
-    case 6:
-      pHTim = &hTimPwmHeatBed3;
-      channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_BED3;
-      break;
-#endif
-  }
-  
-  if (newDuty == 0) 
-  {
-    pulse = 0 ;
-  }
-  else 
-  {
-    pulse = pHTim->Init.Period * newDuty /255 + 1;
-  }      
-  __HAL_TIM_SetCompare(pHTim, channel, pulse);
-}
+//void BSP_MiscHeatPwmSetDutyCycle(uint8_t heatId, uint8_t newDuty)
+//{
+//  TIM_HandleTypeDef *pHTim;
+//  uint32_t  channel;
+//  uint32_t pulse;
+//
+//  switch (heatId)
+//  {
+//  case 0:
+//  default:
+//      pHTim = &hTimPwmHeatBed;
+//      channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_BED;
+//      break;
+//    case  1:
+//      pHTim = &hTimPwmHeatE1;
+//      channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_E1;
+//      break;
+//#ifdef BSP_HEAT_E2_PIN
+//    case 2:
+//      pHTim = &hTimPwmHeatE2;
+//      channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_E2;
+//      break;
+//    case 3:
+//      pHTim = &hTimPwmHeatE3;
+//      channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_E3;
+//      break;
+//#endif//BSP_HEAT_E2_PIN
+//#ifdef BSP_HEAT_BED2_PIN
+//    case 5:
+//      pHTim = &hTimPwmHeatBed2;
+//      channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_BED2;
+//      break;
+//    case 6:
+//      pHTim = &hTimPwmHeatBed3;
+//      channel = BSP_MISC_CHAN_TIMER_PWM_HEAT_BED3;
+//      break;
+//#endif
+//  }
+//
+//  if (newDuty == 0)
+//  {
+//    pulse = 0 ;
+//  }
+//  else
+//  {
+//    pulse = pHTim->Init.Period * newDuty /255 + 1;
+//  }
+//  __HAL_TIM_SetCompare(pHTim, channel, pulse);
+//}
 
 
 /******************************************************//**

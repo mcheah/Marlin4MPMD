@@ -943,10 +943,11 @@ uint16_t BSP_MotorControl_ReadStatusRegister(uint8_t deviceId)
  **********************************************************/
 void BSP_MotorControl_ReleaseReset(void)
 { 
-  if ((motorDrvHandle != 0)&&(motorDrvHandle->ReleaseReset != 0))
-  {
-    motorDrvHandle->ReleaseReset();
-  }
+//  if ((motorDrvHandle != 0)&&(motorDrvHandle->ReleaseReset != 0))
+//  {
+	  A4985_ReleaseReset();
+//    motorDrvHandle->ReleaseReset();
+//  }
   else
   {
     MOTOR_CONTROL_ERROR_UNDEFINED_FUNCTION(38);
@@ -960,10 +961,11 @@ void BSP_MotorControl_ReleaseReset(void)
  **********************************************************/
 void BSP_MotorControl_Reset(void)
 {
-  if ((motorDrvHandle != 0)&&(motorDrvHandle->Reset != 0))
-  {
-    motorDrvHandle->Reset();
-  }
+//  if ((motorDrvHandle != 0)&&(motorDrvHandle->Reset != 0))
+//  {
+	A4985_Reset();
+//    motorDrvHandle->Reset();
+//  }
   else
   {
     MOTOR_CONTROL_ERROR_UNDEFINED_FUNCTION(39);
