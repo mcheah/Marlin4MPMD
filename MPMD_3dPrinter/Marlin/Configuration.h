@@ -840,7 +840,7 @@
 #ifndef DELTA
 #define HOMING_FEEDRATE_XY (50*60)
 #endif
-  #define HOMING_FEEDRATE_Z  (100*60)
+  #define HOMING_FEEDRATE_Z  (50*60)
 
 //
 // MOVEMENT SETTINGS

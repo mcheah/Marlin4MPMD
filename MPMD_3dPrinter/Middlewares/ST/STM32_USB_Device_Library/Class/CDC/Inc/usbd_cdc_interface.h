@@ -103,9 +103,14 @@
 extern USBD_CDC_ItfTypeDef  USBD_CDC_fops;
 
 /* Exported macro ------------------------------------------------------------*/
+#define CDC_ERROR_TAG        (0x5000)
+#define CDC_ERROR(error)     BSP_MiscErrorHandler(error|CDC_ERROR_TAG)
 /* Exported functions ------------------------------------------------------- */
-uint8_t CDC_Itf_SetTxBuffer(uint8_t *Buf, uint32_t *Len);
-uint8_t CDC_Itf_Transmit(uint32_t *Len);
+uint8_t CDC_Itf_QueueTxBytes(uint8_t *Buf, uint32_t Len);
+uint32_t CDC_Itf_GetNbTxQueuedBytes(void);
+uint32_t CDC_Itf_GetNbTxAvailableBytes(void);
+uint8_t CDC_Itf_IsTransmitting(void);
+uint8_t CDC_Itf_IsTxQueueEmpty(void);
 
 #endif /* __USBD_CDC_IF_H */
 

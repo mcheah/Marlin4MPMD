@@ -289,8 +289,12 @@ void USB_IRQHandler(void)
   * @param  None
   * @retval None
   */
-void TIMx_IRQHandler(void)
+void TIMx_IRQHandler(void) {
+	HAL_TIM_IRQHandler(&TimHandle);
+}
+
+void HardFault_Handler(void)
 {
-  HAL_TIM_IRQHandler(&TimHandle);
+	BSP_MiscErrorHandler(0);
 }
 

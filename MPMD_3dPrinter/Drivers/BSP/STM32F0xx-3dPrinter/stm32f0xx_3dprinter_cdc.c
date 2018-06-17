@@ -48,10 +48,9 @@
 #include "usbd_desc.h"
 #include "usbd_cdc.h"
 #include "usbd_cdc_interface.h"
+#include "stm32f0xx_mpmd.h"
 /* Private defines -----------------------------------------------------------*/
 /* Private constant ----------------------------------------------------------*/
-#define CDC_ERROR_TAG        (0x5000)
-#define CDC_ERROR(error)     BSP_MiscErrorHandler(error|CDC_ERROR_TAG)
 
 #ifdef USE_XONXOFF
 #define BSP_CDC_GET_NB_BYTES_IN_RX_BUFFER()  ((gBspUartData.pRxReadBuffer <= gBspUartData.pRxWriteBuffer)? \
@@ -71,22 +70,18 @@
 #endif
 
 /* Private functions ---------------------------------------------------------*/
-uint8_t BSP_CdcParseRxAvalaibleBytes(const char* pBuffer, uint8_t nbRxBytes);
+
 
 /* Global variables ----------------------------------------------------------*/
-USBD_HandleTypeDef USBD_Device;
+volatile USBD_HandleTypeDef USBD_Device;
 //BspUartDataType gBspUartData;
-uint8_t gBspCdcTxBuffer[2 * CDC_TX_BUFFER_SIZE]; // real size is double to easily handle memcpy and tx uart
-uint8_t gBspCdcRxBuffer[2 * CDC_RX_BUFFER_SIZE];
+volatile uint8_t gBspCdcTxBuffer[2 * CDC_TX_BUFFER_SIZE]; // real size is double to easily handle memcpy and tx uart
+volatile uint8_t gBspCdcRxBuffer[2 * CDC_RX_BUFFER_SIZE];
 
 volatile uint8_t rxWriteChar;
-uint8_t *pRxBuffer = gBspCdcRxBuffer;
+volatile uint8_t *pRxBuffer = gBspCdcRxBuffer;
 volatile uint8_t *pRxWriteBuffer;
 volatile uint8_t *pRxReadBuffer;
-uint8_t *pTxBuffer = gBspCdcTxBuffer;
-volatile uint8_t *pTxWriteBuffer;
-volatile uint8_t *pTxReadBuffer;
-volatile uint8_t *pTxWrap;
 uint32_t debugNbRxFrames = 0;
 uint32_t debugNbTxFrames = 0;
 #ifdef USE_XONXOFF
@@ -111,28 +106,6 @@ void BSP_CdcHwInit(uint32_t newBaudRate)
 
   /* Add CDC Interface Class */
   USBD_CDC_RegisterInterface(&USBD_Device, &USBD_CDC_fops);
-//
-//  //TODO: replace this with the updated function
-//  BspUartDataType *pUart = &gBspUartData;
-//
-//  pUart->handle.Instance = BSP_CDC_DEBUG;
-//  pUart->handle.Init.BaudRate = newBaudRate;
-//  pUart->handle.Init.WordLength = UART_WORDLENGTH_8B;
-//  pUart->handle.Init.StopBits = UART_STOPBITS_1;
-//  pUart->handle.Init.Parity = UART_PARITY_NONE;
-//  pUart->handle.Init.Mode = UART_MODE_TX_RX;
-//  pUart->handle.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-//  pUart->handle.Init.OverSampling = UART_OVERSAMPLING_16;
-//
-//  if(HAL_UART_DeInit(&pUart->handle) != HAL_OK)
-//  {
-//    CDC_ERROR(1);
-//  }
-//
-//  if( HAL_UART_Init(&pUart->handle) != HAL_OK)
-//  {
-//    CDC_ERROR(2);
-//  }
 }
 
 /******************************************************//**
@@ -145,36 +118,11 @@ void BSP_CdcIfStart(void)
 {
   /* Start Device Process */
   USBD_Start(&USBD_Device);
-  //Replace this with the correct function
-//  BspUartDataType *pUart = &gBspUartData;
-//  pUart->pRxBuffer = (uint8_t *)gBspCdcRxBuffer;
   pRxWriteBuffer =  pRxBuffer;
   pRxReadBuffer =  pRxBuffer;
-//
-//  pUart->pTxBuffer = (uint8_t *)gBspCdcTxBuffer;
-//  pTxWriteBuffer =  pUart->pTxBuffer;
-  pTxReadBuffer =  pTxBuffer;
-  pTxWrap  =  pTxBuffer + CDC_TX_BUFFER_SIZE;
-//
-//  pUart->rxBusy = RESET;
-//  pUart->txBusy = RESET;
   debugNbTxFrames = 0;
   debugNbRxFrames = 0;
-//
-//  pUart->newTxRequestInThePipe = 0;
-//  pUart->nbBridgedBytes = 0;
-//  pUart->gCodeDataMode = 0;
-//
-//  /* wait for 1 bytes on the RX uart */
-//  if (HAL_UART_Receive_IT(&pUart->handle, (uint8_t *)(&pUart->rxWriteChar), 1) != HAL_OK)
-//  {
-//    CDC_ERROR(3);
-//  }
-//
-//  pUart->rxBusy = SET;
-//  for(uint32_t i=0;i<48000000*5;i++) {
-//	  volatile uint32_t x = i;
-//  }
+//Delay to allow connection before trying to send data
   HAL_Delay(5000);
 }
 
@@ -186,57 +134,9 @@ void BSP_CdcIfStart(void)
  **********************************************************/
 void BSP_CdcIfQueueTxData(uint8_t *pBuf, uint8_t nbData)
 {
-//  if (nbData != 0)
-//  {
-//    BspUartDataType *pUart= &gBspUartData;
-//    int32_t nbFreeBytes = pUart->pTxReadBuffer - pUart->pTxWriteBuffer;
-//
-//    if (nbFreeBytes <= 0)
-//    {
-//      nbFreeBytes += UART_TX_BUFFER_SIZE;
-//    }
-//    if (nbData > nbFreeBytes)
-//    {
-//        /* Uart Tx buffer is full */
-//    	char txt[80];
-//    	sprintf(txt,"Fuckyou nbData=%d nbFree=%d,size=%d\r\n",nbData,nbFreeBytes,sizeof(gBspCdcTxBuffer));
-//    	BSP_CdcLockingTx(txt,80);
-//        CDC_ERROR(4);
-//    }
-//
-//    //use of memcpy is safe as real buffer size is 2 * UART_TX_BUFFER_SIZE
-//    memcpy((uint8_t *)pUart->pTxWriteBuffer, pBuf, nbData);
-//    pUart->pTxWriteBuffer += nbData;
-//#if defined(MARLIN)
-//    if (pBuf[nbData-1] == '\n')
-//    {
-//      *pUart->pTxWriteBuffer = '\n';
-//      pUart->pTxWriteBuffer--;
-//      *pUart->pTxWriteBuffer = '\r';
-//      pUart->pTxWriteBuffer += 2;
-//      if (pUart->pTxWriteBuffer >= pUart->pTxBuffer + UART_TX_BUFFER_SIZE)
-//      {
-//        pUart->pTxWrap = pUart->pTxWriteBuffer;
-//        pUart->pTxWriteBuffer = pUart->pTxBuffer;
-//      }
-//      //BSP_CdcIfSendQueuedData();  // BDI
-//    }
-//#else
-//    if (pUart->pTxWriteBuffer >= pUart->pTxBuffer + UART_TX_BUFFER_SIZE)
-//    {
-//      pUart->pTxWrap = pUart->pTxWriteBuffer;
-//      pUart->pTxWriteBuffer = pUart->pTxBuffer;
-//    }
-//#endif
-//    BSP_CdcIfSendQueuedData();
-////#endif
-//  }
     if(nbData) {
     	uint32_t Len = nbData;
-    	//Wait until txstate is done transmitting before queing
-    	CDC_Itf_SetTxBuffer(pBuf, &Len);
-//    	HAL_Delay(0);
-    	BSP_CdcIfSendQueuedData(&Len);
+    	CDC_Itf_QueueTxBytes(pBuf, Len);
     }
 }
    
@@ -245,73 +145,10 @@ void BSP_CdcIfQueueTxData(uint8_t *pBuf, uint8_t nbData)
  * @param None
  * @retval None
  **********************************************************/
-void BSP_CdcIfSendQueuedData(uint32_t Len)
+void BSP_CdcIfSendQueuedData()
 {
-//    BspUartDataType *pUart = &gBspUartData;
-//
-//#ifdef USE_XONXOFF
-//    if ((pUart->newTxRequestInThePipe == 0)&&
-//        (pUart->txBusy == RESET))
-//    {
-//      if ((BspUartXonXoff == 2)||
-//      ((BSP_CDC_GET_NB_BYTES_IN_TX_BUFFER()  > BSP_CDC_TX_THRESHOLD_XOFF) && (BspUartXonXoff == 0)))
-//      {
-//        pUart->txBusy = SET;
-//        pUart->nbTxBytesOnGoing = 0;
-//        BspUartXoffBuffer[0] = 0x13;
-//        if (HAL_UART_Transmit_IT(&pUart->handle, (uint8_t *)&BspUartXoffBuffer, sizeof(BspUartXoffBuffer))!= HAL_OK)
-//        {
-//          CDC_ERROR(10);
-//        }
-//        BspUartXonXoff = 3;
-//        return;
-//      }
-//      else if ((BspUartXonXoff == 1)||
-//        ((BSP_CDC_GET_NB_BYTES_IN_RX_BUFFER()  < BSP_CDC_RX_THRESHOLD_XON) && (BspUartXonXoff == 3)&& (BSP_CDC_GET_NB_BYTES_IN_TX_BUFFER() < BSP_CDC_TX_THRESHOLD_XON)))
-//      {
-//        pUart->txBusy = SET;
-//        pUart->nbTxBytesOnGoing = 0;
-//        BspUartXonBuffer[0] = 0x11;
-//        if (HAL_UART_Transmit_IT(&pUart->handle, (uint8_t *)&BspUartXonBuffer, sizeof(BspUartXonBuffer))!= HAL_OK)
-//        {
-//          CDC_ERROR(11);
-//        }
-//        BspUartXonXoff = 0;
-//        return;
-//      }
-//    }
-//#endif
-//    if ((pUart->newTxRequestInThePipe == 0)&&
-//        (pUart->txBusy == RESET)&&
-//        (pUart->pTxReadBuffer != pUart->pTxWriteBuffer))
-//    {
-//      int32_t nbTxBytes = pUart->pTxWriteBuffer - pUart->pTxReadBuffer;
-//      pUart->newTxRequestInThePipe++;
-//      if (nbTxBytes < 0)
-//      {
-//        nbTxBytes = pUart->pTxWrap - pUart->pTxReadBuffer;
-//      }
-//
-//#if defined(MARLIN)
-//      if (pUart->pTxReadBuffer[nbTxBytes-1]!='\n')
-//      {
-//        pUart->newTxRequestInThePipe--;
-//        return;
-//      }
-//#endif
-//      pUart->txBusy = SET;
-//      pUart->nbTxBytesOnGoing = nbTxBytes;
-//
-//      //use of HAL_UART_Transmit_IT is safe as real buffer size is 2 * UART_TX_BUFFER_SIZE
-//      if(HAL_UART_Transmit_IT(&pUart->handle, (uint8_t *) pUart->pTxReadBuffer, nbTxBytes)!= HAL_OK)
-//      {
-//        CDC_ERROR(5);
-//      }
-//
-//      pUart->debugNbTxFrames++;
-//      pUart->newTxRequestInThePipe--;
-//    }
-	CDC_Itf_Transmit(&Len);
+	while(BSP_CdcIsTxOnGoing()) { BSP_LED_On(LED_GREEN); }
+	BSP_LED_Off(LED_RED);
 }
 
 /******************************************************//**
@@ -319,60 +156,7 @@ void BSP_CdcIfSendQueuedData(uint32_t Len)
  * @param[in] UartHandle UART handle. 
  * @retval None
  **********************************************************/
-//void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle)
-//{
-//  BspUartDataType *pUart = &gBspUartData;
-//
-//  if (UartHandle == &(pUart->handle))
-//  {
-//    /* Set transmission flag: transfer complete*/
-//    pUart->txBusy = RESET;
-//
-//#ifdef USE_XONXOFF
-//    if ((BspUartXonXoff == 2)||
-//        ((BSP_CDC_GET_NB_BYTES_IN_TX_BUFFER()  > BSP_CDC_TX_THRESHOLD_XOFF) && (BspUartXonXoff == 0)))
-//    {
-//      pUart->txBusy = SET;
-//      BspUartXoffBuffer[0] = 0x13;
-//      if (HAL_UART_Transmit_IT(&pUart->handle, (uint8_t *)&BspUartXoffBuffer, sizeof(BspUartXoffBuffer))!= HAL_OK)
-//      {
-//        CDC_ERROR(10);
-//      }
-//      BspUartXonXoff = 3;
-//      return;
-//    }
-//    else if ((BspUartXonXoff == 1)||
-//        ((BSP_CDC_GET_NB_BYTES_IN_RX_BUFFER()  < BSP_CDC_RX_THRESHOLD_XON) && (BspUartXonXoff == 3)&& (BSP_CDC_GET_NB_BYTES_IN_TX_BUFFER() < BSP_CDC_TX_THRESHOLD_XON)))
-//    {
-//      pUart->txBusy = SET;
-//      BspUartXonBuffer[0] = 0x11;
-//      if (HAL_UART_Transmit_IT(&pUart->handle, (uint8_t *)&BspUartXonBuffer, sizeof(BspUartXonBuffer))!= HAL_OK)
-//      {
-//        CDC_ERROR(11);
-//      }
-//      BspUartXonXoff = 0;
-//      return;
-//    }
-//#endif
-//    pUart->pTxReadBuffer += pUart->nbTxBytesOnGoing;
-//
-//    if (pUart->pTxReadBuffer >= pUart->pTxBuffer + UART_TX_BUFFER_SIZE)
-//    {
-//      pUart->pTxReadBuffer  = pUart->pTxBuffer;
-//    }
-//
-//    if (pUart->uartTxDoneCallback != 0)
-//    {
-//      pUart->uartTxDoneCallback();
-//    }
-//  }
-//#if !defined(NO_WIFI)
-//  else
-//  {
-//    BSP_WifiUartTxCpltCallback(UartHandle);
-//  }
-//#endif //#if !defined(NO_WIFI)
-//}
+
 
 /******************************************************//**
  * @brief  Rx Transfer completed callback
@@ -381,67 +165,21 @@ void BSP_CdcIfSendQueuedData(uint32_t Len)
  **********************************************************/
 void BSP_CDC_RxCpltCallback(uint8_t* Buf, uint32_t *Len)
 {
-//  BspUartDataType *pUart = &gBspUartData;
-//#if !defined(NO_WIFI)
-//  unsigned char *pChar = NULL;
-//#endif //#if !defined(NO_WIFI)
-
-//  if (UartHandle == &(pUart->handle))
-//  {
-for(uint32_t i=0;i<*Len;i++)
-{
-    *pRxWriteBuffer = Buf[i];
-//    if (HAL_UART_Receive_IT(&pUart->handle, (uint8_t *)(&pUart->rxWriteChar), 1) != HAL_OK)
-//    {
-//      CDC_ERROR(6);
-//    }
-
-    pRxWriteBuffer++;
-
-    if (pRxWriteBuffer >= (pRxBuffer + CDC_RX_BUFFER_SIZE))
-    {
-      pRxWriteBuffer = pRxBuffer;
-    }
-
-//#ifdef USE_XONXOFF
-//    if ((BSP_CDC_GET_NB_BYTES_IN_RX_BUFFER()  > BSP_CDC_RX_THRESHOLD_XOFF) && (BspUartXonXoff == 0))
-//    {
-//      BspUartXonXoff = 2;
-//    }
-//    else if ((BSP_CDC_GET_NB_BYTES_IN_RX_BUFFER()  < BSP_CDC_RX_THRESHOLD_XON) && (BspUartXonXoff == 3)&& (BSP_CDC_GET_NB_BYTES_IN_TX_BUFFER() <BSP_CDC_TX_THRESHOLD_XON))
-//    {
-//      BspUartXonXoff = 1;
-//    }
-//#endif
-    if (pRxWriteBuffer == pRxReadBuffer)
-    {
-      // Rx buffer is full
-      CDC_ERROR(7);
-    }
-//    HAL_UART_Transmit(UartHandle,&(pUart->rxWriteChar),1,500);
-//    if (uartRxDataCallback != 0)
-//    {
-//      uartRxDataCallback((uint8_t *)pRxReadBuffer,pRxWriteBuffer - pRxReadBuffer);
-//    }
-    debugNbRxFrames++;
-//  }
-//#if !defined(NO_WIFI)
-//  else
-//  {
-//    uint32_t tmp = BSP_WifiUartRxCpltCallback(UartHandle, &pChar);
-//    if (tmp != 0)
-//    {
-//      memcpy((uint8_t*)(pUart->pRxWriteBuffer), pChar, tmp);
-//      pUart->pRxWriteBuffer += tmp;
-//      *pUart->pRxWriteBuffer = '\0';
-//      if (pUart->pRxWriteBuffer >= (pUart->pRxBuffer + UART_RX_BUFFER_SIZE))
-//      {
-//        pUart->pRxWriteBuffer = pUart->pRxBuffer;
-//      }
-//    }
-//  }
-//#endif //#if !defined(NO_WIFI)
-}
+	//Copy character by character to avoid wraparound issues
+	for(uint32_t i=0;i<*Len;i++)
+	{
+	    *pRxWriteBuffer = Buf[i];
+	    pRxWriteBuffer++;
+		//Wrap back to 0
+	    if (pRxWriteBuffer >= (pRxBuffer + CDC_RX_BUFFER_SIZE)) {
+	      pRxWriteBuffer = pRxBuffer;
+	    }
+	    if (pRxWriteBuffer == pRxReadBuffer) {
+	      // Rx buffer is full
+	      CDC_ERROR(7);
+	    }
+	    debugNbRxFrames++;
+	}
 }
 
 /******************************************************//**
@@ -449,39 +187,6 @@ for(uint32_t i=0;i<*Len;i++)
  * @param[in] UartHandle UART handle. 
  * @retval None
  **********************************************************/
-//void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
-//{
-//	char txt[80];
-////	sprintf(txt,"Fuckyou nbData=%d nbFree=%d,size=%d\r\n",nbData,nbFreeBytes,sizeof(gBspCdcTxBuffer));
-//	sprintf(txt,"Fuckyou Code=%0X ISR=%0X\r\n",huart->ErrorCode,huart->Instance->ISR);
-//	BSP_CdcLockingTx(txt,80);
-//    CDC_ERROR(8);
-//}
-
-/******************************************************//**
- * @brief  Attaches a callback which will be called when
- * a complete rx uart buffer is ready
- * @param[in] callback Name of the callback to attach 
- * @retval None
- **********************************************************/
-//void BSP_CdcAttachRxDataHandler(void (*callback)(uint8_t *, uint8_t))
-//{
-//  BspUartDataType *pUart = &gBspUartData;
-//  pUart->uartRxDataCallback = (void (*)(uint8_t *, uint8_t))callback;
-//}
-
-/******************************************************//**
- * @brief  Attaches a callback which will be called when
- * a complete tx uart buffer is ready
- * @param[in] callback Name of the callback to attach 
- * @retval None
- **********************************************************/
-//void BSP_CdcAttachTxDoneCallback(void (*callback)(void))
-//{
-//  BspUartDataType *pUart = &gBspUartData;
-//  pUart->uartTxDoneCallback = (void (*)(void))callback;
-//}
-
 
 /******************************************************//**
  * @brief  This function trigs the transmission of a string over the UART 
@@ -492,18 +197,9 @@ for(uint32_t i=0;i<*Len;i++)
  **********************************************************/
 uint32_t BSP_CdcPrintf(const char* format,...)
 {
-//  BspUartDataType *pUart = &gBspUartData;
   va_list args;
   uint32_t size;
   uint32_t retSize = 0;
-//  int32_t nbFreeBytes = pUart->pTxReadBuffer - pUart->pTxWriteBuffer;
-  
-//  if (nbFreeBytes <= 0)
-//  {
-//    nbFreeBytes += UART_TX_BUFFER_SIZE;
-//  }
-  
-//  char *writeBufferp =(char *) pUart->pTxWriteBuffer;
   char *writeBufferp = gBspCdcTxBuffer;
   /* the string to transmit is copied in the temporary buffer in order to    */
   /* check its size.                                                         */
@@ -518,20 +214,11 @@ uint32_t BSP_CdcPrintf(const char* format,...)
     *(writeBufferp + size) = '\n';
     size++;
   }
-  if (size != 0)
-  {
-    if ( size > CDC_TX_BUFFER_SIZE )
-    {
+  if (size != 0) {
+    if ( size > CDC_TX_BUFFER_SIZE ) {
       CDC_ERROR(9);
     }
-//    pUart->pTxWriteBuffer += size;
-//    if (pUart->pTxWriteBuffer >= pUart->pTxBuffer + UART_TX_BUFFER_SIZE)
-//    {
-//      pUart->pTxWrap = pUart->pTxWriteBuffer;
-//      pUart->pTxWriteBuffer  = pUart->pTxBuffer;
-//    }
-    BSP_CdcIfQueueTxData(writeBufferp,&size);
-//    BSP_CdcIfSendQueuedData(&size);
+    CDC_Itf_QueueTxBytes(writeBufferp,size);
   }
   return(retSize);  
 }
@@ -543,7 +230,6 @@ uint32_t BSP_CdcPrintf(const char* format,...)
  **********************************************************/
 uint32_t BSP_CdcGetNbRxAvalaibleBytes(void)
 {
-//  BspUartDataType *pUart = &gBspUartData;
   uint8_t *writePtr = (uint8_t *)(pRxWriteBuffer - 1);
   
   if (writePtr < pRxBuffer)
@@ -556,39 +242,11 @@ uint32_t BSP_CdcGetNbRxAvalaibleBytes(void)
     return (0);
   
   int32_t nxRxBytes = pRxWriteBuffer - pRxReadBuffer;
-  if (nxRxBytes < 0)
-  {
+  if (nxRxBytes < 0)  {
     nxRxBytes += CDC_RX_BUFFER_SIZE;
   }
-//#if !defined(MARLIN)
-//  if (nxRxBytes != 0)
-//  {
-//    uint8_t result = BSP_CdcParseRxAvalaibleBytes((char const*)pUart->pRxReadBuffer, nxRxBytes);
-//    if (result < BSP_WIFI_THRES_TO_GCODE_PARSER)
-//    {
-//      //The available bytes will not to go into the Gcode parser
-//      pUart->pRxReadBuffer += nxRxBytes;
-//      nxRxBytes = 0;
-//      if (pUart->pRxReadBuffer >= (pUart->pRxBuffer + UART_RX_BUFFER_SIZE))
-//      {
-//        pUart->pRxReadBuffer = pUart->pRxBuffer;
-//      }
-//    }
-//  }
-//#endif
-  
   return ((uint32_t) nxRxBytes );
 }
-
-/******************************************************//**
- * @brief  This function returns the number of bytes received via the UART
- * @param[in] fnone
-  * @retval nxRxBytes nb received bytes
- **********************************************************/
-//uint8_t BSP_CdcParseRxAvalaibleBytes(const char* pBuffer, uint8_t nbRxBytes)
-//{
-//  return (BSP_WifiParseTxBytes(pBuffer, nbRxBytes, BSP_WIFI_SOURCE_IS_DEBUG_UART));
-//}
 
 /******************************************************//**
  * @brief  This function returns the first byte available on the UART
@@ -597,28 +255,23 @@ uint32_t BSP_CdcGetNbRxAvalaibleBytes(void)
  **********************************************************/
 int8_t BSP_CdcGetNextRxBytes(void)
 {
-//  BspUartDataType *pUart = &gBspUartData;
   int8_t byteValue;
 
   uint8_t *writePtr = (uint8_t *)(pRxWriteBuffer);
   
-  if (writePtr < pRxBuffer)
-  {
+  if (writePtr < pRxBuffer)  {
     writePtr += CDC_RX_BUFFER_SIZE;
   }  
   
-  if (pRxReadBuffer != writePtr)
-  {
+  if (pRxReadBuffer != writePtr)  {
     byteValue = (int8_t)(*(pRxReadBuffer));
     pRxReadBuffer++;
 
-    if (pRxReadBuffer >= (pRxBuffer + CDC_RX_BUFFER_SIZE))
-    {
+    if (pRxReadBuffer >= (pRxBuffer + CDC_RX_BUFFER_SIZE))    {
       pRxReadBuffer = pRxBuffer;
     } 
   }
-  else
-  {
+  else  {
     byteValue = -1;
   }
   
@@ -632,28 +285,8 @@ int8_t BSP_CdcGetNextRxBytes(void)
  **********************************************************/
 uint8_t BSP_CdcIsTxOnGoing(void)
 {
-//  BspUartDataType *pUart = &gBspUartData;
-//  return (pUart->newTxRequestInThePipe||pUart->txBusy);
-	return 0;
+	return !CDC_Itf_IsTxQueueEmpty();
 }
-
-//#if defined(MARLIN)
-///******************************************************//**
-// * @brief  This function calls the WIFI TX parser and returns 0 when the command
-//   in the buffer is not destinated to the gcode parser
-// * @param[in] pBuf pointer to the buffer holding the command
-// * @retval number of bytes destinated to the gcode parser
-// **********************************************************/
-//uint32_t BSP_CdcCommandsFilter(char *pBufCmd, uint8_t nxRxBytes)
-//{
-//  if (BSP_CdcParseRxAvalaibleBytes((char const*)pBufCmd, nxRxBytes)\
-//        < BSP_WIFI_THRES_TO_GCODE_PARSER)
-//  {
-//    nxRxBytes = 0;
-//  }
-//  return nxRxBytes;
-//}
-//#endif
 
 /******************************************************//**
  * @brief  This function sends data via the Uart in locking
@@ -666,15 +299,8 @@ uint8_t BSP_CdcIsTxOnGoing(void)
 
 void BSP_CdcLockingTx(uint8_t *pBuf, uint8_t nbData)
 {
-//   BspUartDataType *pUart = &gBspUartData;
-  
-//    HAL_UART_Transmit(&pUart->handle, pBuf, nbData, 1000);
-	if(nbData)
-	{
-		uint32_t Len = nbData;
-		CDC_Itf_SetTxBuffer(pBuf,&Len);
-		CDC_Itf_Transmit(&Len);
-	}
+	CDC_Itf_QueueTxBytes(pBuf,nbData);
+	BSP_CdcIfSendQueuedData();
 }
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 

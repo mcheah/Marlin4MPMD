@@ -58,8 +58,13 @@
 void BSP_CDC_RxCpltCallback(uint8_t* Buf, uint32_t *Len);
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
+//#ifdef STM32_USE_USB_CDC
 #define APP_RX_DATA_SIZE  64
 #define APP_TX_DATA_SIZE  64
+//#else
+//#define APP_RX_DATA_SIZE  1
+//#define APP_TX_DATA_SIZE  1
+//#endif //STM32_USE_USB_CDC
 
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
@@ -71,12 +76,11 @@ USBD_CDC_LineCodingTypeDef LineCoding =
     0x08    /* nb. of bits 8*/
   };
 
-uint8_t UserRxBuffer[APP_RX_DATA_SIZE];/* Received Data over USB are stored in this buffer */
-uint8_t UserTxBuffer[APP_TX_DATA_SIZE];/* Received Data over UART (CDC interface) are stored in this buffer */
-uint32_t BuffLength;
-uint32_t UserTxBufPtrIn = 0;/* Increment this pointer or roll it back to
+volatile uint8_t UserRxBuffer[APP_RX_DATA_SIZE];/* Received Data over USB are stored in this buffer */
+volatile uint8_t UserTxBuffer[APP_TX_DATA_SIZE];/* Received Data over UART (CDC interface) are stored in this buffer */
+volatile uint32_t UserTxBufPtrIn = 0;/* Increment this pointer or roll it back to
                                start address when data are received over USART */
-uint32_t UserTxBufPtrOut = 0; /* Increment this pointer or roll it back to
+volatile uint32_t UserTxBufPtrOut = 0; /* Increment this pointer or roll it back to
                                  start address when data are sent over USB */
 
 /* UART handler declaration */
@@ -136,13 +140,13 @@ static int8_t CDC_Itf_Init(void)
   
   /*##-3- Configure the TIM Base generation  #################################*/
   TIM_Config();
-  
+
   /*##-4- Start the TIM Base generation in interrupt mode ####################*/
   /* Start Channel1 */
   if(HAL_TIM_Base_Start_IT(&TimHandle) != HAL_OK)
   {
     /* Starting Error */
-    Error_Handler();
+	  CDC_ERROR(1);
   }
   
   /*##-5- Set Application Buffers ############################################*/
@@ -164,7 +168,7 @@ static int8_t CDC_Itf_DeInit(void)
 //  if(HAL_UART_DeInit(UartHandle) != HAL_OK)
 //  {
     /* Initialization Error */
-//    Error_Handler();
+//	CDC_ERROR(2);
 //  }
   return (USBD_OK);
 }
@@ -229,6 +233,47 @@ static int8_t CDC_Itf_Control (uint8_t cmd, uint8_t* pbuf, uint16_t length)
   }
   
   return (USBD_OK);
+}
+uint8_t CDC_Itf_QueueTxBytes(uint8_t *Buf, uint32_t Len) {
+	for (uint32_t i=0;i<Len;i++) {
+		//Wait until the queue has cleared
+		uint8_t nBytes = CDC_Itf_GetNbTxAvailableBytes();
+		uint32_t InBytes = UserTxBufPtrIn;
+		uint32_t OutBytes = UserTxBufPtrOut;
+		while(nBytes<1) {
+			BSP_LED_On(LED_GREEN);
+			nBytes = CDC_Itf_GetNbTxAvailableBytes();
+		}
+		BSP_LED_Off(LED_GREEN);
+		UserTxBuffer[UserTxBufPtrIn] = Buf[i];
+		UserTxBufPtrIn++;
+		if(UserTxBufPtrIn >= APP_TX_DATA_SIZE)
+			UserTxBufPtrIn = 0;
+	}
+}
+
+uint32_t CDC_Itf_GetNbTxQueuedBytes(void)
+{
+	uint32_t nB;
+	if(UserTxBufPtrIn >= UserTxBufPtrOut)
+		nB = UserTxBufPtrIn - UserTxBufPtrOut;
+	else
+		nB = APP_TX_DATA_SIZE + (UserTxBufPtrIn-UserTxBufPtrOut);
+	return nB;
+}
+
+uint32_t CDC_Itf_GetNbTxAvailableBytes(void)
+{
+	return APP_TX_DATA_SIZE - CDC_Itf_GetNbTxQueuedBytes()-1;
+}
+
+uint8_t CDC_Itf_IsTransmitting(void) {
+	USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*) USBD_Device.pClassData;
+	return (hcdc->TxState == 1);
+}
+
+uint8_t CDC_Itf_IsTxQueueEmpty(void) {
+	return (!CDC_Itf_IsTransmitting() && CDC_Itf_GetNbTxQueuedBytes()==0);
 }
 
 /**
@@ -297,28 +342,7 @@ static int8_t CDC_Itf_Receive(uint8_t* Buf, uint32_t *Len)
     return (USBD_OK);
 }
 
-uint8_t CDC_Itf_SetTxBuffer(uint8_t *Buf, uint32_t *Len)
-{
-    USBD_CDC_SetTxBuffer(&USBD_Device, Buf, *Len);
-}
 
-uint8_t CDC_Itf_Transmit(uint32_t *Len)
-{
-	uint8_t ret;
-	ret = USBD_CDC_TransmitPacket(&USBD_Device);
-    if(ret == USBD_OK)
-    {
-      UserTxBufPtrOut += *Len;
-      if (UserTxBufPtrOut == APP_RX_DATA_SIZE)
-      {
-        UserTxBufPtrOut = 0;
-      }
-    }
-    else {
-    	Error_Handler();
-    }
-    return ret;
-}
 
 /**
   * @brief  Tx Transfer completed callback
@@ -363,34 +387,16 @@ static void TIM_Config(void)
   if(HAL_TIM_Base_Init(&TimHandle) != HAL_OK)
   {
     /* Initialization Error */
-    Error_Handler();
+	  CDC_ERROR(4);
   }
 }
 
-/**
-  * @brief  UART error callbacks
-  * @param  UartHandle: UART handle
-  * @retval None
-  */
-//void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle)
-//{
-//  /* Transfer error occured in reception and/or transmission process */
-//  Error_Handler();
-//}
 
 /**
   * @brief  This function is executed in case of error occurrence.
   * @param  None
   * @retval None
   */
-static void Error_Handler(void)
-{
-	while(1) {
-		BSP_LED_Toggle(LED_RED);
-		HAL_Delay(500);
-	}
-  /* Add your own code here */
-}
 
 /**
   * @}
