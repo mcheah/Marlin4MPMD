@@ -111,6 +111,8 @@ uint32_t CDC_Itf_GetNbTxQueuedBytes(void);
 uint32_t CDC_Itf_GetNbTxAvailableBytes(void);
 uint8_t CDC_Itf_IsTransmitting(void);
 uint8_t CDC_Itf_IsTxQueueEmpty(void);
+uint8_t CDC_Itf_IsConnected(void);
+
 
 #endif /* __USBD_CDC_IF_H */
 

@@ -166,6 +166,7 @@ void HAL_PCD_ResetCallback(PCD_HandleTypeDef *hpcd)
   */
 void HAL_PCD_SuspendCallback(PCD_HandleTypeDef *hpcd)
 {
+	USBD_LL_Suspend((USBD_HandleTypeDef*)hpcd->pData);
 }
 
 /**
@@ -175,6 +176,7 @@ void HAL_PCD_SuspendCallback(PCD_HandleTypeDef *hpcd)
   */
 void HAL_PCD_ResumeCallback(PCD_HandleTypeDef *hpcd)
 {
+	USBD_LL_Resume((USBD_CDC_HandleTypeDef*)hpcd->pData);
 }
 
 /**

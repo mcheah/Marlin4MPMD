@@ -60,7 +60,7 @@ void BSP_CDC_RxCpltCallback(uint8_t* Buf, uint32_t *Len);
 /* Private define ------------------------------------------------------------*/
 //#ifdef STM32_USE_USB_CDC
 #define APP_RX_DATA_SIZE  64
-#define APP_TX_DATA_SIZE  64
+#define APP_TX_DATA_SIZE  512
 //#else
 //#define APP_RX_DATA_SIZE  1
 //#define APP_TX_DATA_SIZE  1
@@ -83,8 +83,6 @@ volatile uint32_t UserTxBufPtrIn = 0;/* Increment this pointer or roll it back t
 volatile uint32_t UserTxBufPtrOut = 0; /* Increment this pointer or roll it back to
                                  start address when data are sent over USB */
 
-/* UART handler declaration */
-//UART_HandleTypeDef *UartHandle = &(gBspUartData.handle);
 /* TIM handler declaration */
 TIM_HandleTypeDef    TimHandle;
 /* USB handler declaration */
@@ -127,10 +125,6 @@ static int8_t CDC_Itf_Init(void)
       - Parity      = No parity
       - BaudRate    = 115200 baud
       - Hardware flow control disabled (RTS and CTS signals) */
-//  for(uint32_t i=0; i<0.010*48e6;i++)
-//  {
-//	  volatile bool = 1;
-//  }
     /* Initialization Error */
 
   
@@ -164,12 +158,6 @@ static int8_t CDC_Itf_Init(void)
   */
 static int8_t CDC_Itf_DeInit(void)
 {
-  /* DeInitialize the UART peripheral */
-//  if(HAL_UART_DeInit(UartHandle) != HAL_OK)
-//  {
-    /* Initialization Error */
-//	CDC_ERROR(2);
-//  }
   return (USBD_OK);
 }
 
@@ -240,10 +228,13 @@ uint8_t CDC_Itf_QueueTxBytes(uint8_t *Buf, uint32_t Len) {
 		uint8_t nBytes = CDC_Itf_GetNbTxAvailableBytes();
 		uint32_t InBytes = UserTxBufPtrIn;
 		uint32_t OutBytes = UserTxBufPtrOut;
-		while(nBytes<1) {
+		//Fill up the queue while disconnected, but do not block the thread
+		while(nBytes<1 && CDC_Itf_IsConnected()) {
 			BSP_LED_On(LED_GREEN);
 			nBytes = CDC_Itf_GetNbTxAvailableBytes();
 		}
+		if(!CDC_Itf_IsConnected() && nBytes<1)
+			break;
 		BSP_LED_Off(LED_GREEN);
 		UserTxBuffer[UserTxBufPtrIn] = Buf[i];
 		UserTxBufPtrIn++;
@@ -296,7 +287,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     {
       buffsize = UserTxBufPtrIn - UserTxBufPtrOut;
     }
-
+    //We can't queue up more than 64 bytes at a time without changing the endpoint
+    buffsize = MIN(buffsize,USB_FS_MAX_PACKET_SIZE);
     buffptr = UserTxBufPtrOut;
 
     USBD_CDC_SetTxBuffer(&USBD_Device, (uint8_t*)&UserTxBuffer[buffptr], buffsize);
@@ -312,26 +304,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 }
 
 /**
-  * @brief  Rx Transfer completed callback
-  * @param  huart: UART handle
-  * @retval None
-  */
-//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-//{
-//  /* Increment Index for buffer writing */
-//  UserTxBufPtrIn++;
-//
-//  /* To avoid buffer overflow */
-//  if(UserTxBufPtrIn == APP_RX_DATA_SIZE)
-//  {
-//    UserTxBufPtrIn = 0;
-//  }
-//
-//  /* Start another reception: provide the buffer pointer with offset and the buffer size */
-//  HAL_UART_Receive_IT(huart, (uint8_t *)(UserTxBuffer + UserTxBufPtrIn), 1);
-//}
-
-/**
   * @brief  CDC_Itf_DataRx
   *         Data received over USB OUT endpoint are sent over CDC interface 
   *         through this function.
@@ -341,35 +313,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   */
 static int8_t CDC_Itf_Receive(uint8_t* Buf, uint32_t *Len)
 {
-//	HAL_UART_Transmit(UartHandle,Buf,*Len,500);
-//  HAL_UART_Transmit_DMA(UartHandle, Buf, *Len);
-//	CDC_Itf_SetTxBuffer(Buf,*Len);
-//    CDC_Itf_Transmit();
     BSP_CDC_RxCpltCallback(Buf,Len);
     USBD_CDC_ReceivePacket(&USBD_Device);
     return (USBD_OK);
 }
-
-
-
-/**
-  * @brief  Tx Transfer completed callback
-  * @param  huart: UART handle
-  * @retval None
-  */
-//void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
-//{
-//  /* Initiate next USB packet transfer once UART completes transfer (transmitting data over Tx line) */
-//  USBD_CDC_ReceivePacket(&USBD_Device);
-//}
-
-/**
-  * @brief  ComPort_Config
-  *         Configure the COM Port with the parameters received from host.
-  * @param  None.
-  * @retval None.
-  * @note   When a configuration is not supported, a default value is used.
-  */
 
 /**
   * @brief  TIM_Config: Configure TIMx timer
@@ -399,12 +346,10 @@ static void TIM_Config(void)
   }
 }
 
-
-/**
-  * @brief  This function is executed in case of error occurrence.
-  * @param  None
-  * @retval None
-  */
+uint8_t CDC_Itf_IsConnected(void)
+{
+	return USBD_Device.dev_state==USBD_STATE_CONFIGURED;
+}
 
 /**
   * @}

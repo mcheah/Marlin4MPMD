@@ -123,7 +123,7 @@ void BSP_CdcIfStart(void)
   debugNbTxFrames = 0;
   debugNbRxFrames = 0;
 //Delay to allow connection before trying to send data
-  HAL_Delay(5000);
+  HAL_Delay(10);
 }
 
 /******************************************************//**
