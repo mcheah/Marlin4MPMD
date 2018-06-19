@@ -1449,7 +1449,7 @@ void Temperature::TemperatureHandler(void)
     	  //Extruder is disabled, turn on bed at pwm_count==0
 		  soft_pwm_BED = soft_pwm_bed;
 		  //Only enable bed FET if the extruder FET is off
-		  if( soft_pwm_BED > 0 )
+		  if(soft_pwm_BED >0 && soft_pwm_BED >= 127-0 )
 			WRITE_HEATER_BED(1);
 		  else
 			WRITE_HEATER_BED(0);
@@ -1490,7 +1490,7 @@ void Temperature::TemperatureHandler(void)
     	  //Extruder is disabled, turn on bed at pwmcount==soft_pwm_0
 		  soft_pwm_BED = soft_pwm_bed;
 		  //Only enable bed FET if the extruder FET is off
-		  if( soft_pwm_BED > 0 )
+		  if( soft_pwm_BED>0 && soft_pwm_BED >= 127-pwm_count )
 			WRITE_HEATER_BED(1);
 		  else
 			WRITE_HEATER_BED(0);
@@ -1506,9 +1506,6 @@ void Temperature::TemperatureHandler(void)
       #endif
     #endif
 
-    #if HAS_HEATER_BED
-      if (soft_pwm_BED < pwm_count) WRITE_HEATER_BED(0);
-    #endif
 
     #if ENABLED(FAN_SOFT_PWM)
       #if HAS_FAN0
