@@ -89,7 +89,7 @@
 #include "stdlib.h"
 #include "string.h"
 #include "stdio.h"
-
+#include "ff_gen_drv.h"
 /** @addtogroup BSP
 * @{
 */
@@ -357,6 +357,7 @@ uint8_t BSP_SD_ReadBlocks(uint32_t* pData, uint32_t ReadAddr, uint16_t BlockSize
 {
   uint32_t offset = 0;
   uint8_t retr = BSP_SD_ERROR;
+  uint8_t blockbuff[BLOCK_SIZE];
   uint8_t *ptr = NULL;
   SD_CmdAnswer_typedef response;
 
@@ -370,7 +371,7 @@ uint8_t BSP_SD_ReadBlocks(uint32_t* pData, uint32_t ReadAddr, uint16_t BlockSize
      goto error;
   }
 
-  ptr = malloc(sizeof(uint8_t)*BlockSize);
+  ptr = blockbuff;
   if( ptr == NULL )
   {
      goto error;
@@ -416,7 +417,6 @@ error :
   /* Send dummy byte: 8 Clock pulses of delay */
   SD_IO_CSState(1);
   SD_IO_WriteByte(SD_DUMMY_BYTE);
-  if(ptr != NULL) free(ptr);
 
   /* Return the reponse */
   return retr;
@@ -434,6 +434,7 @@ uint8_t BSP_SD_WriteBlocks(uint32_t* pData, uint32_t WriteAddr, uint16_t BlockSi
 {
   uint32_t offset = 0;
   uint8_t retr = BSP_SD_ERROR;
+  uint8_t blockbuff[BLOCK_SIZE];
   uint8_t *ptr = NULL;
   SD_CmdAnswer_typedef response;
 
@@ -446,8 +447,7 @@ uint8_t BSP_SD_WriteBlocks(uint32_t* pData, uint32_t WriteAddr, uint16_t BlockSi
   {
     goto error;
   }
-
-  ptr = malloc(sizeof(uint8_t)*BlockSize);
+  ptr = blockbuff;
   if (ptr == NULL)
   {
     goto error;
@@ -494,7 +494,6 @@ uint8_t BSP_SD_WriteBlocks(uint32_t* pData, uint32_t WriteAddr, uint16_t BlockSi
   retr = BSP_SD_OK;
 
 error :
-  if(ptr != NULL) free(ptr);
   /* Send dummy byte: 8 Clock pulses of delay */
   SD_IO_CSState(1);
   SD_IO_WriteByte(SD_DUMMY_BYTE);

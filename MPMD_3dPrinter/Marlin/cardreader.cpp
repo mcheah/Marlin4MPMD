@@ -48,7 +48,6 @@ CardReader::CardReader()
   autostart_atmillis=millis()+5000;
 
   // Activate the SD card detection
-  BSP_SD_DetectInit();
 }
 
 void CardReader::initsd()
@@ -182,10 +181,6 @@ void CardReader::lsDive(const char *prepend, DIR *parent, const char * const mat
         char pathAndFilename[LONG_FILENAME_LENGTH] = "\n";
         strcat(pathAndFilename, prepend);
         strcat(pathAndFilename, entry.fname);
-        if(BSP_WifiIsFileCreation())
-        {
-          strcat(fileList, pathAndFilename);
-        }
         strcat(pathAndFilename, "\n");
         SERIAL_PROTOCOL_N((uint8_t *)pathAndFilename, strlen(pathAndFilename));
       }
@@ -276,11 +271,6 @@ void CardReader::ls()
 	fileList[0]='\0';
 	f_readdir(&root,0);
 	lsDive("",&root);
-	if(BSP_WifiIsFileCreation())
-	{
-		strcat(fileList,"\n");
-		BSP_WifiParseTxBytes(fileList, strlen(fileList), BSP_WIFI_SOURCE_IS_PLATFORM);
-	}
 }
 
 
@@ -754,7 +744,7 @@ void CardReader::printingHasFinished()
       }
       // autotempShutdown();  -- BDI : no more present in new version
 #if defined (SD_SETTINGS)      
-      if (strcasecmp(p_card->longFilename, CONFIG_FILE_NAME)==0)
+      if (strcasecmp(longFilename, CONFIG_FILE_NAME)==0)
       {
 	  Config_PrintSettings(false);
       }
