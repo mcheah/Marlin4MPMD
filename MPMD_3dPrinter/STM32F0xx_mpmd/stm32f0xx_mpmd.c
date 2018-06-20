@@ -408,7 +408,7 @@ static void SPIx_Init(void)
 	      - For STM32F412ZG devices: 12,5 MHz maximum (PCLK2/SPI_BAUDRATEPRESCALER_8 = 100 MHz/8 = 12,5 MHz)
 		  - For STM32F446ZE/STM32F429ZI devices: 11,25 MHz maximum (PCLK2/SPI_BAUDRATEPRESCALER_8 = 90 MHz/8 = 11,25 MHz)
    */
-    hnucleo_Spi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_128;
+    hnucleo_Spi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
    hnucleo_Spi.Init.Direction = SPI_DIRECTION_2LINES;
    hnucleo_Spi.Init.CLKPhase = SPI_PHASE_2EDGE;
    hnucleo_Spi.Init.CLKPolarity = SPI_POLARITY_HIGH;
