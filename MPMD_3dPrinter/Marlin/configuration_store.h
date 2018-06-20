@@ -27,7 +27,6 @@
 
 #if ENABLED(SD_SETTINGS)
   #include "cardreader.h"
-  //extern CardReader *p_card;
 #endif
 
 void Config_ResetDefault();

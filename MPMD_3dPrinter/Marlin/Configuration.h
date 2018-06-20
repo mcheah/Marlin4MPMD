@@ -888,7 +888,7 @@
 
 #if ENABLED(EEPROM_SETTINGS)
   // To disable EEPROM Serial responses and decrease program space by ~1700 byte: comment this out:
-  #define EEPROM_CHITCHAT // Please keep turned on if you can.
+//  #define EEPROM_CHITCHAT // Please keep turned on if you can.
 #endif
 
 //
@@ -1090,8 +1090,8 @@
 //
 #define SDSUPPORT
 #if ENABLED(SDSUPPORT)
-//  #define SD_SETTINGS
-//  #define CONFIG_FILE_NAME "sys/m_cfg.g"
+  #define SD_SETTINGS
+  #define CONFIG_FILE_NAME "m_cfg.g"
 #endif
 //
 // SD CARD: SPI SPEED
