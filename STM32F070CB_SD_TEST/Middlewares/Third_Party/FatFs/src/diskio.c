@@ -53,7 +53,7 @@ extern Disk_drvTypeDef  disk;
   * @retval DSTATUS: Operation status
   */
 DSTATUS disk_status (
-	BYTE pdrv		/* Physical drive nmuber to identify the drive */
+	BYTE pdrv		/* Physical drive number to identify the drive */
 )
 {
   DSTATUS stat;
@@ -68,7 +68,7 @@ DSTATUS disk_status (
   * @retval DSTATUS: Operation status
   */
 DSTATUS disk_initialize (
-	BYTE pdrv				/* Physical drive nmuber to identify the drive */
+	BYTE pdrv				/* Physical drive number to identify the drive */
 )
 {
   DSTATUS stat = RES_OK;

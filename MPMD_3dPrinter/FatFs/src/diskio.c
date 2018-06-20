@@ -9,67 +9,67 @@
 
 
 /* Includes ------------------------------------------------------------------*/
-#include <string.h>
+//#include <string.h>
 #include "diskio.h"		/* FatFs lower layer API */
-#include "sd_mmc_diskio.h"
+//#include "sd_mmc_diskio.h"
+#include "ff_gen_drv.h"
 
 /* Private typedef -----------------------------------------------------------*/
-
 /* Private define ------------------------------------------------------------*/
 /* Block Size */
-#define BLOCK_SIZE                512
+//#define BLOCK_SIZE                512
 
-#define TRUE  1
-#define FALSE 0
+//#define TRUE  1
+//#define FALSE 0
 
 /* Private variables ---------------------------------------------------------*/
-static volatile BYTE mmc_initialized = FALSE;
+extern Disk_drvTypeDef  disk;
 
 /* Private function prototypes -----------------------------------------------*/
-
-
 /* Private functions ---------------------------------------------------------*/
 
-/*-----------------------------------------------------------------------*/
-/* Inidialize a Drive                                                    */
-/*-----------------------------------------------------------------------*/
-DSTATUS disk_initialize (
-	BYTE pdrv				/* Physical drive number to identify the drive */
-)
-{
-	DSTATUS stat = STA_OK;
-
-	if(BSP_SD_Init() != MSD_OK)
-	{
-		stat |= STA_NOINIT;
-	}
-	mmc_initialized = TRUE;
-
-	return stat;
-}
-
-/*-----------------------------------------------------------------------*/
-/* Get Drive Status                                                      */
-/*-----------------------------------------------------------------------*/
+/**
+  * @brief  Gets Disk Status 
+  * @param  pdrv: Physical drive number (0..)
+  * @retval DSTATUS: Operation status
+  */
 DSTATUS disk_status (
 	BYTE pdrv		/* Physical drive number to identify the drive */
 )
 {
-	DSTATUS stat = STA_OK;
+  DSTATUS stat;
 
-	if(BSP_SD_GetStatus() != MSD_OK)
-	{
-		stat |= STA_NOINIT;
-	}
-
+  stat = disk.drv[pdrv]->disk_status(disk.lun[pdrv]);
 	return stat;
 }
 
+/**
+  * @brief  Initializes a Drive
+  * @param  pdrv: Physical drive number (0..)
+  * @retval DSTATUS: Operation status
+  */
+DSTATUS disk_initialize (
+	BYTE pdrv				/* Physical drive number to identify the drive */
+)
+{
+  DSTATUS stat = RES_OK;
 
-/*-----------------------------------------------------------------------*/
-/* Read Sector(s)                                                        */
-/*-----------------------------------------------------------------------*/
+  if(disk.is_initialized[pdrv] == 0)
+	{
+    disk.is_initialized[pdrv] = 1;
+    stat = disk.drv[pdrv]->disk_initialize(disk.lun[pdrv]);
+	}
+	return stat;
+}
 
+/**
+  * @brief  Reads Sector(s) 
+  * @param  pdrv: Physical drive number (0..)
+  * @param  *buff: Data buffer to store read data
+  * @param  sector: Sector address (LBA)
+  * @param  count: Number of sectors to read (1..128)
+  * @retval DRESULT: Operation result
+  */
 DRESULT disk_read (
 	BYTE pdrv,		/* Physical drive nmuber to identify the drive */
 	BYTE *buff,		/* Data buffer to store read data */
@@ -77,24 +77,21 @@ DRESULT disk_read (
 	UINT count		/* Number of sectors to read */
 )
 {
-	if(BSP_SD_ReadBlocks_DMA(
-			(uint32_t*)buff,
-	        (uint64_t) (sector * BLOCK_SIZE),
-	        BLOCK_SIZE,
-	        count) != MSD_OK)
-	{
-		return RES_ERROR;
-	}
+  DRESULT res;
 
-	return RES_OK;
+  res = disk.drv[pdrv]->disk_read(disk.lun[pdrv], buff, sector, count);
+  return res;
 }
 
-
-
-/*-----------------------------------------------------------------------*/
-/* Write Sector(s)                                                       */
-/*-----------------------------------------------------------------------*/
-
+/**
+  * @brief  Writes Sector(s)  
+  * @param  pdrv: Physical drive number (0..)
+  * @param  *buff: Data to be written
+  * @param  sector: Sector address (LBA)
+  * @param  count: Number of sectors to write (1..128)
+  * @retval DRESULT: Operation result
+  */
+#if _USE_WRITE == 1
 DRESULT disk_write (
 	BYTE pdrv,			/* Physical drive nmuber to identify the drive */
 	const BYTE *buff,	/* Data to be written */
@@ -102,78 +99,34 @@ DRESULT disk_write (
 	UINT count			/* Number of sectors to write */
 )
 {
-#if _USE_WRITE == 1
-	if(BSP_SD_WriteBlocks_DMA(
-			(uint32_t*)buff,
-	        (uint64_t)(sector * BLOCK_SIZE),
-	        BLOCK_SIZE, count) != MSD_OK)
-	{
-		return RES_ERROR;
-	}
+  DRESULT res;
 
-	return RES_OK;
-#else
-	return RES_PARERR;
-#endif
+  res = disk.drv[pdrv]->disk_write(disk.lun[pdrv], buff, sector, count);
+  return res;
 }
+#endif /* _USE_WRITE == 1 */
 
-
-
-/*-----------------------------------------------------------------------*/
-/* Miscellaneous Functions                                               */
-/*-----------------------------------------------------------------------*/
-
+/**
+  * @brief  I/O control operation  
+  * @param  pdrv: Physical drive number (0..)
+  * @param  cmd: Control code
+  * @param  *buff: Buffer to send/receive control data
+  * @retval DRESULT: Operation result
+  */
+#if _USE_IOCTL == 1
 DRESULT disk_ioctl (
 	BYTE pdrv,		/* Physical drive nmuber (0..) */
 	BYTE cmd,		/* Control code */
 	void *buff		/* Buffer to send/receive control data */
 )
 {
-#if _USE_IOCTL == 1
+  DRESULT res;
 
-	DRESULT res = RES_ERROR;
-	//TODO: removing SD card stuff for now.
-//	SD_CardInfo CardInfo;
-
-	if (!mmc_initialized)
-		return RES_NOTRDY;
-
-	switch (cmd)
-	{
-		/* Make sure that no pending write process */
-		case CTRL_SYNC :
-			res = RES_OK;
-			break;
-
-		/* Get number of sectors on the disk (DWORD) */
-		case GET_SECTOR_COUNT :
-			//TODO:removing SD stuff for now
-//			BSP_SD_GetCardInfo(&CardInfo);
-//			*(DWORD*)buff = CardInfo.CardCapacity / BLOCK_SIZE;
-			res = RES_OK;
-			break;
-
-		/* Get R/W sector size (WORD) */
-		case GET_SECTOR_SIZE :
-			*(WORD*)buff = BLOCK_SIZE;
-			res = RES_OK;
-			break;
-
-		/* Get erase block size in unit of sector (DWORD) */
-		case GET_BLOCK_SIZE :
-			*(DWORD*)buff = BLOCK_SIZE;
-			break;
-
-		default:
-			res = RES_PARERR;
-	}
-
+  res = disk.drv[pdrv]->disk_ioctl(disk.lun[pdrv], cmd, buff);
 	return res;
-
-#else
-	return RES_PARERR;
-#endif
 }
+#endif /* _USE_IOCTL == 1 */
 
 
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 

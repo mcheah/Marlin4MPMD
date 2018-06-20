@@ -69,6 +69,8 @@
 /** @defgroup STM32F0XX_MPMD_LOW_LEVEL_Exported_Types STM32F0XX NUCLEO 144 LOW LEVEL Exported Types
   * @{
   */
+
+//#define SOFTWARE_SPI
 typedef enum 
 {
   LED1 = 0,
@@ -138,9 +140,9 @@ typedef enum
 #define LED3_GPIO_CLK_DISABLE()                 __HAL_RCC_GPIOB_CLK_DISABLE()  
 
 #define LEDx_GPIO_CLK_ENABLE(__INDEX__)   do { if((__INDEX__) == 0) {__HAL_RCC_GPIOB_CLK_ENABLE();} else\
-                                                                    {__HAL_RCC_GPIOB_CLK_ENABLE();   }} while(0)	
+                                                                    {__HAL_RCC_GPIOB_CLK_ENABLE();   }} while(0)
 #define LEDx_GPIO_CLK_DISABLE(__INDEX__)  do { if((__INDEX__) == 0) {__HAL_RCC_GPIOB_CLK_DISABLE();} else\
-                                                                    {__HAL_RCC_GPIOB_CLK_DISABLE();   }} while(0)	
+                                                                    {__HAL_RCC_GPIOB_CLK_DISABLE();   }} while(0)
 /**
   * @}
   */ 
@@ -198,18 +200,18 @@ typedef enum
 #define NUCLEO_SPIx                                     SPI1
 #define NUCLEO_SPIx_CLK_ENABLE()                        __HAL_RCC_SPI1_CLK_ENABLE()
 
-#define NUCLEO_SPIx_SCK_AF                              GPIO_AF5_SPI1
-#define NUCLEO_SPIx_SCK_GPIO_PORT                       GPIOA
-#define NUCLEO_SPIx_SCK_PIN                             GPIO_PIN_5
-#define NUCLEO_SPIx_SCK_GPIO_CLK_ENABLE()               __HAL_RCC_GPIOA_CLK_ENABLE()
-#define NUCLEO_SPIx_SCK_GPIO_CLK_DISABLE()              __HAL_RCC_GPIOA_CLK_DISABLE()
+#define NUCLEO_SPIx_SCK_AF                              GPIO_AF0_SPI1
+#define NUCLEO_SPIx_SCK_GPIO_PORT                       GPIOB
+#define NUCLEO_SPIx_SCK_PIN                             GPIO_PIN_3
+#define NUCLEO_SPIx_SCK_GPIO_CLK_ENABLE()               __HAL_RCC_GPIOB_CLK_ENABLE()
+#define NUCLEO_SPIx_SCK_GPIO_CLK_DISABLE()              __HAL_RCC_GPIOB_CLK_DISABLE()
 
-#define NUCLEO_SPIx_MISO_MOSI_AF                        GPIO_AF5_SPI1
-#define NUCLEO_SPIx_MISO_MOSI_GPIO_PORT                 GPIOA
-#define NUCLEO_SPIx_MISO_MOSI_GPIO_CLK_ENABLE()         __HAL_RCC_GPIOA_CLK_ENABLE()
-#define NUCLEO_SPIx_MISO_MOSI_GPIO_CLK_DISABLE()        __HAL_RCC_GPIOA_CLK_DISABLE()
-#define NUCLEO_SPIx_MISO_PIN                            GPIO_PIN_6
-#define NUCLEO_SPIx_MOSI_PIN                            GPIO_PIN_7
+#define NUCLEO_SPIx_MISO_MOSI_AF                        GPIO_AF0_SPI1
+#define NUCLEO_SPIx_MISO_MOSI_GPIO_PORT                 GPIOB
+#define NUCLEO_SPIx_MISO_MOSI_GPIO_CLK_ENABLE()         __HAL_RCC_GPIOB_CLK_ENABLE()
+#define NUCLEO_SPIx_MISO_MOSI_GPIO_CLK_DISABLE()        __HAL_RCC_GPIOB_CLK_DISABLE()
+#define NUCLEO_SPIx_MISO_PIN                            GPIO_PIN_4
+#define NUCLEO_SPIx_MOSI_PIN                            GPIO_PIN_5
 /* Maximum Timeout values for flags waiting loops. These timeout are not based
    on accurate values, they just guarantee that the application will not remain
    stuck if the SPI communication is corrupted.
@@ -217,19 +219,30 @@ typedef enum
    conditions (interrupts routines ...). */   
 #define NUCLEO_SPIx_TIMEOUT_MAX                   1000
 
-#define NUCLEO_SPIx_CS_GPIO_PORT                        GPIOD
-#define NUCLEO_SPIx_CS_PIN                              GPIO_PIN_14
-#define NUCLEO_SPIx_CS_GPIO_CLK_ENABLE()                __HAL_RCC_GPIOD_CLK_ENABLE()
-#define NUCLEO_SPIx_CS_GPIO_CLK_DISABLE()               __HAL_RCC_GPIOD_CLK_DISABLE()
 
-#define SPIx__CS_LOW()       HAL_GPIO_WritePin(NUCLEO_SPIx_CS_GPIO_PORT, NUCLEO_SPIx_CS_PIN, GPIO_PIN_RESET)
-#define SPIx__CS_HIGH()      HAL_GPIO_WritePin(NUCLEO_SPIx_CS_GPIO_PORT, NUCLEO_SPIx_CS_PIN, GPIO_PIN_SET)
 
 /**
   * @brief  SD Control Lines management
   */
 #define SD_CS_LOW()       HAL_GPIO_WritePin(SD_CS_GPIO_PORT, SD_CS_PIN, GPIO_PIN_RESET)
 #define SD_CS_HIGH()      HAL_GPIO_WritePin(SD_CS_GPIO_PORT, SD_CS_PIN, GPIO_PIN_SET)
+
+/**
+  * @brief  SD Control Interface pins (shield D4)
+  */
+#define SD_CS_PIN                                 GPIO_PIN_6
+#define SD_CS_GPIO_PORT                           GPIOB
+#define SD_CS_GPIO_CLK_ENABLE()                 __HAL_RCC_GPIOB_CLK_ENABLE()
+#define SD_CS_GPIO_CLK_DISABLE()                __HAL_RCC_GPIOB_CLK_DISABLE()
+//TODO: revisit whether we can use some pin for card detect
+///**
+//  * @brief  SD Detect Interface pins
+//  */
+//#define SD_DETECT_PIN                   GPIO_PIN_15             /* PB.15 */
+//#define SD_DETECT_GPIO_PORT             GPIOB                   /* GPIOB */
+//#define SD_DETECT_GPIO_CLK_ENABLE()     __HAL_RCC_GPIOB_CLK_ENABLE()
+//#define SD_DETECT_GPIO_CLK_DISABLE()    __HAL_RCC_GPIOB_CLK_DISABLE()
+//#define SD_DETECT_EXTI_IRQn             EXTI4_15_IRQn
 
 /**
   * @brief  LCD Control Lines management
@@ -239,14 +252,6 @@ typedef enum
 #define LCD_DC_LOW()      HAL_GPIO_WritePin(LCD_DC_GPIO_PORT, LCD_DC_PIN, GPIO_PIN_RESET)
 #define LCD_DC_HIGH()     HAL_GPIO_WritePin(LCD_DC_GPIO_PORT, LCD_DC_PIN, GPIO_PIN_SET)
      
-/**
-  * @brief  SD Control Interface pins (shield D4)
-  */
-#define SD_CS_PIN                                 GPIO_PIN_14
-#define SD_CS_GPIO_PORT                           GPIOF
-#define SD_CS_GPIO_CLK_ENABLE()                 __HAL_RCC_GPIOF_CLK_ENABLE()
-#define SD_CS_GPIO_CLK_DISABLE()                __HAL_RCC_GPIOF_CLK_DISABLE()
-
 /**
   * @brief  LCD Control Interface pins (shield D10)
   */
@@ -327,7 +332,14 @@ uint32_t         BSP_PB_GetState(Button_TypeDef Button);
 //JOYState_TypeDef BSP_JOY_GetState(void);
 //void             BSP_JOY_DeInit(void);
 //#endif /* HAL_ADC_MODULE_ENABLED */
+static inline void delay_basic(float Sec)
+{
+	  uint32_t steps_per_sec = 48e6/450;
+	  for(uint32_t i=0; i<Sec*steps_per_sec;i++)
+	  {
 
+	  }
+}
   
 /**
   * @}

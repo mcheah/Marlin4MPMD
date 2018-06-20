@@ -75,11 +75,11 @@
 typedef enum 
 {
   LED1 = 0,
-  LED_GREEN = LED1,
+  LED_RED = LED1,
   LED2 = 1,
-  LED_BLUE = LED2,
+  LED_GREEN = LED2,
   LED3 = 2,
-  LED_RED = LED3
+  LED_BLUE = LED3
 }Led_TypeDef;
 
 typedef enum 
@@ -225,13 +225,7 @@ typedef enum
    conditions (interrupts routines ...). */   
 #define NUCLEO_SPIx_TIMEOUT_MAX                   1000
 
-//#define NUCLEO_SPIx_CS_GPIO_PORT                        GPIOB
-//#define NUCLEO_SPIx_CS_PIN                              GPIO_PIN_6
-//#define NUCLEO_SPIx_CS_GPIO_CLK_ENABLE()                __HAL_RCC_GPIOB_CLK_ENABLE()
-//#define NUCLEO_SPIx_CS_GPIO_CLK_DISABLE()               __HAL_RCC_GPIOB_CLK_DISABLE()
 
-//#define SPIx__CS_LOW()       HAL_GPIO_WritePin(NUCLEO_SPIx_CS_GPIO_PORT, NUCLEO_SPIx_CS_PIN, GPIO_PIN_RESET)
-//#define SPIx__CS_HIGH()      HAL_GPIO_WritePin(NUCLEO_SPIx_CS_GPIO_PORT, NUCLEO_SPIx_CS_PIN, GPIO_PIN_SET)
 
 /**
   * @brief  SD Control Lines management
