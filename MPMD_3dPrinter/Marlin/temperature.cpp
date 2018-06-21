@@ -1439,8 +1439,26 @@ void Temperature::TemperatureHandler(void)
       soft_pwm_0 = soft_pwm[0];
       if (soft_pwm_0 > 0) {
         WRITE_HEATER_0(1);
-      }
-      else WRITE_HEATER_0P(0); // If HEATERS_PARALLEL should apply, change to WRITE_HEATER_0
+#ifdef HEATER_BED_5A_LIMIT
+	#if HAS_HEATER_BED
+        WRITE_HEATER_BED(0); //Extruder is enabled, turn off the bed
+	#endif //HAS_HEATER_BED
+#endif //HEATER_BED_5A_LIMIT
+      } //(soft_pwm_0 > 0)
+      else {
+    	  WRITE_HEATER_0P(0); // If HEATERS_PARALLEL should apply, change to WRITE_HEATER_0
+#ifdef HEATER_BED_5A_LIMIT
+	#if HAS_HEATER_BED
+    	  //Extruder is disabled, turn on bed at pwm_count==0 if bed==127
+		  soft_pwm_BED = soft_pwm_bed;
+		  //Only enable bed FET if the extruder FET is off
+		  if(soft_pwm_BED >0 && soft_pwm_BED >= 127-0 )
+			WRITE_HEATER_BED(1);
+		  else
+			WRITE_HEATER_BED(0);
+	#endif //HAS_HEATER_BED
+#endif //HEATER_BED_5A_LIMIT
+      } //(soft_pwm_0 > 0)
 
       #if HOTENDS > 1
         soft_pwm_1 = soft_pwm[1];
@@ -1454,7 +1472,7 @@ void Temperature::TemperatureHandler(void)
           #endif
         #endif
       #endif
-
+#ifndef HEATER_BED_5A_LIMIT
       #if HAS_HEATER_BED
         soft_pwm_BED = soft_pwm_bed;
         if( soft_pwm_BED > 0)
@@ -1462,7 +1480,7 @@ void Temperature::TemperatureHandler(void)
         else
         	WRITE_HEATER_BED(0);
       #endif
-
+#endif
       #if ENABLED(FAN_SOFT_PWM)
         #if HAS_FAN0
           soft_pwm_fan[0] = fanSpeedSoftPwm[0] / 2;
@@ -1477,9 +1495,22 @@ void Temperature::TemperatureHandler(void)
           WRITE_FAN2(soft_pwm_fan[2] > 0 ? 1 : 0);
         #endif
       #endif
-    }
+    } //PWM_COUNT==0
 
-    if (soft_pwm_0 < pwm_count) WRITE_HEATER_0(0);
+    if (soft_pwm_0 < pwm_count) {
+    	WRITE_HEATER_0(0);
+#ifdef HEATER_BED_5A_LIMIT
+	#if HAS_HEATER_BED
+    	  //Extruder is disabled, turn on bed at pwmcount==soft_pwm_0
+		  soft_pwm_BED = soft_pwm_bed;
+		  //Only enable bed FET if the extruder FET is off
+		  if( soft_pwm_BED>0 && soft_pwm_BED >= 127-pwm_count )
+			WRITE_HEATER_BED(1);
+		  else
+			WRITE_HEATER_BED(0);
+	#endif //HAS_HEATER_BED
+#endif //HEATER_BED_5A_LIMIT
+    } //(soft_pwm_0 < pwm_count)
     #if HOTENDS > 1
       if (soft_pwm_1 < pwm_count) WRITE_HEATER_1(0);
       #if HOTENDS > 2
@@ -1490,9 +1521,13 @@ void Temperature::TemperatureHandler(void)
       #endif
     #endif
 
+//TODO: even in the non-5A case we should probably start the bed heater
+//PWM in reverse to minimize overlap of the heaters
+#ifndef HEATER_BED_5A_LIMIT
     #if HAS_HEATER_BED
       if (soft_pwm_BED < pwm_count) WRITE_HEATER_BED(0);
     #endif
+#endif //HEATER_BED_5A_LIMIT
 
     #if ENABLED(FAN_SOFT_PWM)
       #if HAS_FAN0
@@ -1508,7 +1543,7 @@ void Temperature::TemperatureHandler(void)
 
     pwm_count += _BV(SOFT_PWM_SCALE);
     pwm_count &= 0x7f;
-
+//TODO: 5A limit doesn't work with slow_pwm_heaters
   #else // SLOW_PWM_HEATERS
 
     /**
