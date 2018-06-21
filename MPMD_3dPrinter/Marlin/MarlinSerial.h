@@ -146,7 +146,7 @@ class MarlinSerial { //: public Stream
 #ifndef STM32_USE_USB_CDC
     FORCE_INLINE int available(void) {return (BSP_UartGetNbRxAvalaibleBytes());}
 #else
-    FORCE_INLINE int available(void) {return (BSP_CdcGetNbRxAvalaibleBytes());}
+    FORCE_INLINE int available(void) {return (BSP_CdcGetNbRxAvailableBytes());}
 #endif //STM32_USE_USB_CDC
 
     FORCE_INLINE void checkRx(void) {}

@@ -50,8 +50,13 @@
 /* Exported macros ------------------------------------------------------------*/
 //TODO: we should probably adjust these to a smaller size
 //TODO: find a way to allocate these buffers without wasting RAM when using CDC interface
+#if 0
+#define UART_TX_BUFFER_SIZE (512)
+#define UART_RX_BUFFER_SIZE (256)
+#else
 #define UART_TX_BUFFER_SIZE (1)
 #define UART_RX_BUFFER_SIZE (1)
+#endif
    
 /* Definition for Usart resources *********************************************/
 
