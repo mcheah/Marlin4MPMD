@@ -36,17 +36,26 @@ static inline void remapVectorTable(void)
 }
 #endif
 
+/* Private typedef -----------------------------------------------------------*/
+/* Private define ------------------------------------------------------------*/
+/* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
+
+/* Private function prototypes -----------------------------------------------*/
+/* Private functions ---------------------------------------------------------*/
 
 int main(void)
 {
 #ifdef STM32_USE_BOOTLOADER
 	remapVectorTable();
 #endif
-    BSP_LED_Init(LED_GREEN);
+
+	BSP_LED_Init(LED_GREEN);
     BSP_LED_Init(LED_RED);
     BSP_LED_Init(LED_BLUE);
+    BSP_LED_On(LED_RED);
 	setup();
+
 	for(;;)
 	{
 		loop();

@@ -394,7 +394,7 @@ void BSP_MiscErrorHandler(uint16_t error)
   BSP_MiscHeatManualInit(3);
 #endif  
   BSP_LED_On(LED_BLUE);
-
+  
 //TODO: find a strategy to communicate error messages correctly
 // #ifndef STM32_USE_USB_CDC
 //  BSP_UartLockingTx((uint8_t *)&errorTxt, sizeof(errorTxt));

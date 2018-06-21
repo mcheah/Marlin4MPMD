@@ -4,18 +4,29 @@
 
 #define _FFCONF 68020	/* Revision ID */
 
-#if 1
 /*-----------------------------------------------------------------------------/
 / Additional user header to be used  
 /-----------------------------------------------------------------------------*/
+/* Replace 'stm32xxx' with the STM32 Serie used, ex: stm32f4xx_hal.h */
 #include "stm32f0xx_hal.h"
+#include "stm32f0xx_mpmd_sd.h"
+#ifndef _FS_SD_CARD
+#  ifdef USE_SD_CARD
+#    define _FS_SD_CARD			1
+#  else
+#    define _FS_SD_CARD			0
+#  endif
+#endif
+#if _FS_SD_CARD
+#  ifdef SD_CARD_HEADER
+#    include SD_CARD_HEADER
+#  else
+#    include "stm32f0xx_mpmd_sd.h"
+#  endif
+#endif
 
-#ifdef USE_STM324x9I_EVAL
-  #include "stm324x9i_eval_sd.h"
-#else
-  #include "stm32f0xx_3dprinter_sd.h"
-#endif
-#endif
+
+
 /*---------------------------------------------------------------------------/
 / Function Configurations
 /---------------------------------------------------------------------------*/
@@ -27,7 +38,7 @@
 /  and optional writing functions as well. */
 
 
-#define _FS_MINIMIZE	0
+#define _FS_MINIMIZE            0	/* 0 to 3 */
 /* This option defines minimization level to remove some basic API functions.
 /
 /   0: All basic functions are enabled.
@@ -37,7 +48,7 @@
 /   3: f_lseek() function is removed in addition to 2. */
 
 
-#define	_USE_STRFUNC	2
+#define	_USE_STRFUNC	2	/* 0:Disable or 1-2:Enable */
 /* This option switches string functions, f_gets(), f_putc(), f_puts() and
 /  f_printf().
 /

@@ -580,22 +580,22 @@ void Config_RetrieveSettings() {
 void Config_StoreSettings()
 {
   char cmdStr[MAX_CMD_SIZE+MAX_COMMENT_SIZE];
-  char numStr[16];
+  char numStr[96];
 
   p_card->openFile((char *)CONFIG_FILE_NAME,false);
 
   /* Steps per unit */
   strcpy(cmdStr,"M92 X");
-  sprintf(numStr, "%.2f", planner.axis_steps_per_mm[X_AXIS]);
+  sprintf(numStr, "%.8f", planner.axis_steps_per_mm[X_AXIS]);
   strcat(cmdStr, numStr);
   strcat(cmdStr, " Y");
-  sprintf(numStr, "%.2f", planner.axis_steps_per_mm[Y_AXIS]);
+  sprintf(numStr, "%.8f", planner.axis_steps_per_mm[Y_AXIS]);
   strcat(cmdStr, numStr);
   strcat(cmdStr, " Z");
-  sprintf(numStr, "%.2f", planner.axis_steps_per_mm[Z_AXIS]);
+  sprintf(numStr, "%.8f", planner.axis_steps_per_mm[Z_AXIS]);
   strcat(cmdStr, numStr);
   strcat(cmdStr, " E");
-  sprintf(numStr, "%.2f", planner.axis_steps_per_mm[E_AXIS]);
+  sprintf(numStr, "%.8f", planner.axis_steps_per_mm[E_AXIS]);
   strcat(cmdStr, numStr);
   strcat(cmdStr, " ; Steps per unit");
   p_card->write_command(cmdStr);
@@ -684,7 +684,10 @@ void Config_StoreSettings()
   strcat(cmdStr, " E");
   sprintf(numStr, "%.2f", planner.max_e_jerk);
   strcat(cmdStr, numStr);
-  strcat(cmdStr, " ; S=Min feedrate (mm/s), T=Min travel feedrate (mm/s), B=minimum segment time (ms), X=maximum XY jerk (mm/s),  Z=maximum Z jerk (mm/s),  E=maximum E jerk (mm/s)");
+  p_card->write_command(cmdStr);
+  strcpy(cmdStr, " ; S=Min feedrate (mm/s), T=Min travel feedrate (mm/s), B=minimum segment time (ms), ");
+  p_card->write_command(cmdStr);
+  strcpy(cmdStr, " ;X=maximum XY jerk (mm/s),  Z=maximum Z jerk (mm/s),  E=maximum E jerk (mm/s)");
   p_card->write_command(cmdStr);
 
   /* Home offset (mm) */
@@ -790,8 +793,10 @@ void Config_StoreSettings()
   strcat(cmdStr, " C");
   sprintf(numStr, "%.2f", delta_diagonal_rod_trim_tower_3);
   strcat(cmdStr, numStr);
-
-  strcat(cmdStr, " ; L=delta_diagonal_rod, R=delta_radius, S=delta_segments_per_second, A/B/C=delta_diagonal_rod_trim_tower_1/2/3");
+  p_card->write_command(cmdStr);
+  strcpy(cmdStr, " ; L=delta_diagonal_rod, R=delta_radius, S=delta_segments_per_second, ");
+  p_card->write_command(cmdStr);
+  strcpy(cmdStr, " ; A/B/C=delta_diagonal_rod_trim_tower_1/2/3");
   p_card->write_command(cmdStr);
 
 #elif ENABLED(Z_DUAL_ENDSTOPS)

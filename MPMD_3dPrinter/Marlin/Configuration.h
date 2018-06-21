@@ -86,7 +86,7 @@
 // User-specified version info of this build to display in [Pronterface, etc] terminal window during
 // startup. Implementation of an idea by Prof Braino to inform user that any changes made to this
 // build by the user have been successfully uploaded into firmware.
-#define STRING_CONFIG_H_AUTHOR "(MCheah, MPMD)" // Who made the changes.
+#define STRING_CONFIG_H_AUTHOR "(MCheah)" // Who made the changes.
 #define SHOW_BOOTSCREEN
 #define STRING_SPLASH_LINE1 SHORT_BUILD_VERSION // will be shown during bootup in line 1
 #define STRING_SPLASH_LINE2 WEBSITE_URL         // will be shown during bootup in line 2
@@ -341,7 +341,7 @@
 // setting this to anything other than 255 enables a form of PWM to the bed just like HEATER_BED_DUTY_CYCLE_DIVIDER did,
 // so you shouldn't use it unless you are OK with PWM on your bed.  (see the comment on enabling PIDTEMPBED)
 #define MAX_BED_POWER 255 // limits duty cycle to bed; 255=full current
-#define HEATER_BED_5A_LIMIT
+//#define HEATER_BED_5A_LIMIT
 #if ENABLED(PIDTEMPBED)
 
   //#define PID_BED_DEBUG // Sends debug data to the serial port.
@@ -888,7 +888,7 @@
 
 #if ENABLED(EEPROM_SETTINGS)
   // To disable EEPROM Serial responses and decrease program space by ~1700 byte: comment this out:
-  #define EEPROM_CHITCHAT // Please keep turned on if you can.
+//  #define EEPROM_CHITCHAT // Please keep turned on if you can.
 #endif
 
 //
@@ -1088,10 +1088,10 @@
 // SD Card support is disabled by default. If your controller has an SD slot,
 // you must uncomment the following option or it won't work.
 //
-//#define SDSUPPORT
+#define SDSUPPORT
 #if ENABLED(SDSUPPORT)
   #define SD_SETTINGS
-  #define CONFIG_FILE_NAME "sys/m_cfg.g"
+  #define CONFIG_FILE_NAME "m_cfg.g"
 #endif
 //
 // SD CARD: SPI SPEED

@@ -61,6 +61,11 @@
 #include "nozzle.h"
 #include "duration_t.h"
 
+#ifdef SDSUPPORT
+#include "ff_gen_drv.h"
+#include "sd_diskio.h"
+#endif
+
 #if ENABLED(USE_WATCHDOG)
   #include "watchdog.h"
 #endif
@@ -279,7 +284,8 @@ static bool cmdForWifi = false;
 #endif
 
 #if ENABLED(SDSUPPORT)
-  CardReader *p_card;
+  CardReader card;
+  CardReader *p_card = &card;
 #endif
 
 #if ENABLED(EXPERIMENTAL_I2CBUS)
@@ -801,12 +807,13 @@ void setup_powerhold() {
 
 }
 
+char SDPath[4]; /* SD card logical drive path */
 void setup_sdcard()
 {
 #if defined(SDSUPPORT)
-  p_card = new(CardReader);
-  while (p_card->autostart_atmillis>millis());
-  p_card->checkautostart(true);
+  while (p_card->autostart_atmillis>millis()) { }
+  if(FATFS_LinkDriver(&SD_Driver, SDPath) == 0)
+	  p_card->checkautostart(true);
 #endif
 }
 
@@ -4062,7 +4069,9 @@ inline void gcode_M17() {
    * M21: Init SD Card
    */
   inline void gcode_M21() {
-    p_card->initsd();
+    //TODO: there's a bug related to re-initializing the SD card, currently it only works
+    //the first time on powerup, so we disable this command for now
+//    p_card->initsd();
   }
 
   /**

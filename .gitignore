@@ -461,3 +461,5 @@ RemoteSystemsTempFiles/
 blank/
 STM32070B_EVAL*/
 STM32072B_EVAL*/
+fatFS/
+STM32F070CB_SD_TEST/

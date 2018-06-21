@@ -112,11 +112,11 @@ const uint8_t BUTTON_IRQn[BUTTONn] = {USER_BUTTON_EXTI_IRQn};
  */
 //
 //#ifdef ADAFRUIT_TFT_JOY_SD_ID802
-//#ifdef HAL_SPI_MODULE_ENABLED
-//uint32_t SpixTimeout = NUCLEO_SPIx_TIMEOUT_MAX; /*<! Value of Timeout when SPI communication fails */
-//static SPI_HandleTypeDef hnucleo_Spi;
-//#endif /* HAL_SPI_MODULE_ENABLED */
-//
+#ifdef HAL_SPI_MODULE_ENABLED
+uint32_t SpixTimeout = NUCLEO_SPIx_TIMEOUT_MAX; /*<! Value of Timeout when SPI communication fails */
+static SPI_HandleTypeDef hnucleo_Spi;
+#endif /* HAL_SPI_MODULE_ENABLED */
+
 //#ifdef HAL_ADC_MODULE_ENABLED
 //static ADC_HandleTypeDef hnucleo_Adc;
 ///* ADC channel configuration structure declaration */
@@ -133,25 +133,27 @@ const uint8_t BUTTON_IRQn[BUTTONn] = {USER_BUTTON_EXTI_IRQn};
   */
 //#ifdef ADAFRUIT_TFT_JOY_SD_ID802
 //
-//#ifdef HAL_SPI_MODULE_ENABLED
-//static void SPIx_Init(void);
-//static void SPIx_Write(uint8_t Value);
-//static void SPIx_Error(void);
-//static void SPIx_MspInit(SPI_HandleTypeDef *hspi);
-//
-///* SD IO functions */
-//void SD_IO_Init(void);
-//void SD_IO_CSState(uint8_t state);
-//void SD_IO_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLength);
-//uint8_t SD_IO_WriteByte(uint8_t Data);
-//
+#ifdef HAL_SPI_MODULE_ENABLED
+static void SPIx_Init(void);
+static void SPIx_Write(uint8_t Value);
+static void SPIx_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLegnth);
+static void SPIx_FlushFifo(void);
+static void SPIx_Error(void);
+static void SPIx_MspInit(SPI_HandleTypeDef *hspi);
+
+/* SD IO functions */
+void SD_IO_Init(void);
+void SD_IO_CSState(uint8_t state);
+void SD_IO_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLength);
+uint8_t SD_IO_WriteByte(uint8_t Data);
+
 ///* LCD IO functions */
 //void LCD_IO_Init(void);
 //void LCD_IO_WriteData(uint8_t Data);
 //void LCD_IO_WriteMultipleData(uint8_t *pData, uint32_t Size);
 //void LCD_IO_WriteReg(uint8_t LCDReg);
 //void LCD_Delay(uint32_t delay);
-//#endif /* HAL_SPI_MODULE_ENABLED */
+#endif /* HAL_SPI_MODULE_ENABLED */
 //
 //#ifdef HAL_ADC_MODULE_ENABLED
 //static void ADCx_Init(void);
@@ -333,105 +335,176 @@ uint32_t BSP_PB_GetState(Button_TypeDef Button)
 *******************************************************************************/
 //#ifdef ADAFRUIT_TFT_JOY_SD_ID802
 //
-///******************************* SPI ********************************/
-//#ifdef HAL_SPI_MODULE_ENABLED
-//
-///**
-//  * @brief  Initializes SPI MSP.
-//  */
-//static void SPIx_MspInit(SPI_HandleTypeDef *hspi)
-//{
-//  GPIO_InitTypeDef  GPIO_InitStruct;
-//
-//  /*** Configure the GPIOs ***/
-//  /* Enable GPIO clock */
-//  NUCLEO_SPIx_SCK_GPIO_CLK_ENABLE();
-//  NUCLEO_SPIx_MISO_MOSI_GPIO_CLK_ENABLE();
-//
-//  /* Configure SPI SCK */
-//  GPIO_InitStruct.Pin = NUCLEO_SPIx_SCK_PIN;
-//  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-//  GPIO_InitStruct.Pull  = GPIO_PULLUP;
-//  GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
-//  GPIO_InitStruct.Alternate = NUCLEO_SPIx_SCK_AF;
-//  HAL_GPIO_Init(NUCLEO_SPIx_SCK_GPIO_PORT, &GPIO_InitStruct);
-//
-//  /* Configure SPI MISO and MOSI */
-//  GPIO_InitStruct.Pin = NUCLEO_SPIx_MOSI_PIN;
-//  GPIO_InitStruct.Alternate = NUCLEO_SPIx_MISO_MOSI_AF;
-//  GPIO_InitStruct.Pull  = GPIO_PULLDOWN;
-//  HAL_GPIO_Init(NUCLEO_SPIx_MISO_MOSI_GPIO_PORT, &GPIO_InitStruct);
-//
-//  GPIO_InitStruct.Pin = NUCLEO_SPIx_MISO_PIN;
-//  GPIO_InitStruct.Pull  = GPIO_PULLDOWN;
-//  HAL_GPIO_Init(NUCLEO_SPIx_MISO_MOSI_GPIO_PORT, &GPIO_InitStruct);
-//
-//  /*** Configure the SPI peripheral ***/
-//  /* Enable SPI clock */
-//  NUCLEO_SPIx_CLK_ENABLE();
-//}
-//
-///**
-//  * @brief  Initializes SPI HAL.
-//  */
-//static void SPIx_Init(void)
-//{
-//  if(HAL_SPI_GetState(&hnucleo_Spi) == HAL_SPI_STATE_RESET)
-//  {
-//    /* SPI Config */
-//    hnucleo_Spi.Instance = NUCLEO_SPIx;
-//    /* SPI configuration contraints
-//          - ST7735 LCD SPI interface max baudrate is 15MHz for write and 6.66MHz for read
-//            Since the provided driver doesn't use read capability from LCD, only constraint
-//            on write baudrate is considered.
-//          - SD card SPI interface max baudrate is 25MHz for write/read
-//       to feat these constraints SPI baudrate is set to:
-//	      - For STM32F412ZG devices: 12,5 MHz maximum (PCLK2/SPI_BAUDRATEPRESCALER_8 = 100 MHz/8 = 12,5 MHz)
-//		  - For STM32F446ZE/STM32F429ZI devices: 11,25 MHz maximum (PCLK2/SPI_BAUDRATEPRESCALER_8 = 90 MHz/8 = 11,25 MHz)
-//    */
-//    hnucleo_Spi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
-//    hnucleo_Spi.Init.Direction = SPI_DIRECTION_2LINES;
-//    hnucleo_Spi.Init.CLKPhase = SPI_PHASE_2EDGE;
-//    hnucleo_Spi.Init.CLKPolarity = SPI_POLARITY_HIGH;
-//    hnucleo_Spi.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLED;
-//    hnucleo_Spi.Init.CRCPolynomial = 7;
-//    hnucleo_Spi.Init.DataSize = SPI_DATASIZE_8BIT;
-//    hnucleo_Spi.Init.FirstBit = SPI_FIRSTBIT_MSB;
-//    hnucleo_Spi.Init.NSS = SPI_NSS_SOFT;
-//    hnucleo_Spi.Init.TIMode = SPI_TIMODE_DISABLED;
-//    hnucleo_Spi.Init.Mode = SPI_MODE_MASTER;
-//
-//    SPIx_MspInit(&hnucleo_Spi);
-//    HAL_SPI_Init(&hnucleo_Spi);
-//  }
-//}
-//
-///**
-//  * @brief  SPI Write a byte to device
-//  * @param  DataIn: value to be written
-//  * @param  DataOut: value to read
-//  * @param  DataLegnth: length of data
-//  */
-//static void SPIx_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLegnth)
-//{
-//  HAL_StatusTypeDef status = HAL_OK;
-//
-//  status = HAL_SPI_TransmitReceive(&hnucleo_Spi, (uint8_t*) DataIn, DataOut, DataLegnth, SpixTimeout);
-//
-//  /* Check the communication status */
-//  if(status != HAL_OK)
-//  {
-//    /* Execute user timeout callback */
-//    SPIx_Error();
-//  }
-//}
-//
-///**
-//  * @brief  SPI Write a byte to device.
-//  * @param  Value: value to be written
-//  */
-//static void SPIx_Write(uint8_t Value)
-//{
+/******************************* SPI ********************************/
+#ifdef HAL_SPI_MODULE_ENABLED
+
+/**
+  * @brief  Initializes SPI MSP.
+  */
+static void SPIx_MspInit(SPI_HandleTypeDef *hspi)
+{
+  GPIO_InitTypeDef  GPIO_InitStruct;
+
+  /*** Configure the SPI peripheral ***/
+  /* Enable SPI clock */
+  NUCLEO_SPIx_CLK_ENABLE();
+
+  /*** Configure the GPIOs ***/
+  /* Enable GPIO clock */
+  NUCLEO_SPIx_SCK_GPIO_CLK_ENABLE();
+  NUCLEO_SPIx_MISO_MOSI_GPIO_CLK_ENABLE();
+
+  /* Configure SPI SCK */
+  GPIO_InitStruct.Pin = NUCLEO_SPIx_SCK_PIN;
+#ifndef SOFTWARE_SPI
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+#else
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+#endif
+  GPIO_InitStruct.Pull  = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  GPIO_InitStruct.Alternate = NUCLEO_SPIx_SCK_AF;
+  HAL_GPIO_Init(NUCLEO_SPIx_SCK_GPIO_PORT, &GPIO_InitStruct);
+
+  /* Configure SPI MISO and MOSI */
+  GPIO_InitStruct.Pin = NUCLEO_SPIx_MOSI_PIN;
+#ifndef SOFTWARE_SPI
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+#else
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+#endif
+  GPIO_InitStruct.Alternate = NUCLEO_SPIx_MISO_MOSI_AF;
+  GPIO_InitStruct.Pull  = GPIO_NOPULL;
+  HAL_GPIO_Init(NUCLEO_SPIx_MISO_MOSI_GPIO_PORT, &GPIO_InitStruct);
+
+  GPIO_InitStruct.Pin = NUCLEO_SPIx_MISO_PIN;
+#ifndef SOFTWARE_SPI
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+#else
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+#endif
+//  GPIO_InitStruct.Pull  = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(NUCLEO_SPIx_MISO_MOSI_GPIO_PORT, &GPIO_InitStruct);
+
+
+}
+
+/**
+  * @brief  Initializes SPI HAL.
+  */
+static void SPIx_Init(void)
+{
+ if(HAL_SPI_GetState(&hnucleo_Spi) == HAL_SPI_STATE_RESET)
+ {
+   /* SPI Config */
+   hnucleo_Spi.Instance = NUCLEO_SPIx;
+   /* SPI configuration contraints
+         - ST7735 LCD SPI interface max baudrate is 15MHz for write and 6.66MHz for read
+           Since the provided driver doesn't use read capability from LCD, only constraint
+           on write baudrate is considered.
+         - SD card SPI interface max baudrate is 25MHz for write/read
+      to feat these constraints SPI baudrate is set to:
+	      - For STM32F412ZG devices: 12,5 MHz maximum (PCLK2/SPI_BAUDRATEPRESCALER_8 = 100 MHz/8 = 12,5 MHz)
+		  - For STM32F446ZE/STM32F429ZI devices: 11,25 MHz maximum (PCLK2/SPI_BAUDRATEPRESCALER_8 = 90 MHz/8 = 11,25 MHz)
+   */
+    hnucleo_Spi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
+   hnucleo_Spi.Init.Direction = SPI_DIRECTION_2LINES;
+   hnucleo_Spi.Init.CLKPhase = SPI_PHASE_2EDGE;
+   hnucleo_Spi.Init.CLKPolarity = SPI_POLARITY_HIGH;
+    hnucleo_Spi.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+   hnucleo_Spi.Init.CRCPolynomial = 7;
+   hnucleo_Spi.Init.DataSize = SPI_DATASIZE_8BIT;
+   hnucleo_Spi.Init.FirstBit = SPI_FIRSTBIT_MSB;
+   hnucleo_Spi.Init.NSS = SPI_NSS_SOFT;
+    hnucleo_Spi.Init.TIMode = SPI_TIMODE_DISABLE;
+   hnucleo_Spi.Init.Mode = SPI_MODE_MASTER;
+
+   SPIx_MspInit(&hnucleo_Spi);
+#ifndef SOFTWARE_SPI
+   HAL_SPI_Init(&hnucleo_Spi);
+#endif
+ }
+}
+
+static uint8_t SWSPISendReceive(uint8_t txdata) {
+  uint8_t rxdata = 0;
+  uint8_t txxdata = 0;
+  // no interrupts during byte send - about 8 us
+BSP_LED_Toggle(LED3);
+//  cli();
+  for (uint8_t i = 0; i < 8; i++) {
+	GPIO_PinState level = txdata & 0X80 ? GPIO_PIN_SET : GPIO_PIN_RESET;
+	if(level==GPIO_PIN_SET)
+		txxdata |= 1;
+	HAL_GPIO_WritePin(NUCLEO_SPIx_MISO_MOSI_GPIO_PORT,NUCLEO_SPIx_MOSI_PIN,level);
+	HAL_GPIO_WritePin(NUCLEO_SPIx_SCK_GPIO_PORT,NUCLEO_SPIx_SCK_PIN,GPIO_PIN_RESET);
+//    fastDigitalWrite(SPI_SCK_PIN, LOW);
+
+//    fastDigitalWrite(SPI_MOSI_PIN, txdata & 0X80);
+	delay_basic(50e-6);
+//	HAL_Delay(1);
+//    nop;
+//    nop;
+
+    txdata <<= 1;
+	rxdata <<= 1;
+	txxdata <<= 1;
+	if(HAL_GPIO_ReadPin(NUCLEO_SPIx_MISO_MOSI_GPIO_PORT,NUCLEO_SPIx_MISO_PIN)==GPIO_PIN_SET)
+//    if (fastDigitalRead(SPI_MISO_PIN))
+    	rxdata |= 1;
+	HAL_GPIO_WritePin(NUCLEO_SPIx_SCK_GPIO_PORT,NUCLEO_SPIx_SCK_PIN,GPIO_PIN_SET);
+//    fastDigitalWrite(SPI_SCK_PIN, HIGH);
+//	HAL_Delay(1);
+	delay_basic(50e-6);
+
+  }
+//  HAL_Delay(1);
+	delay_basic(50e-6);
+
+  // hold SCK high for a few ns
+//  nop;
+//  nop;
+//  nop;
+//  nop;
+
+  HAL_GPIO_WritePin(NUCLEO_SPIx_SCK_GPIO_PORT,NUCLEO_SPIx_SCK_PIN,GPIO_PIN_SET);
+  // enable interrupts
+//  sei();
+  return rxdata;
+}
+
+/**
+ * @brief  SPI Write a byte to device
+ * @param  DataIn: value to be written
+ * @param  DataOut: value to read
+ * @param  DataLegnth: length of data
+ */
+static void SPIx_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLegnth)
+{
+ HAL_StatusTypeDef status = HAL_OK;
+#ifdef SOFTWARE_SPI
+  for(uint16_t i=0;i<DataLegnth;i++)
+  {
+	  DataOut[i] = SWSPISendReceive(DataIn[i]);
+  }
+#else
+ status = HAL_SPI_TransmitReceive(&hnucleo_Spi, (uint8_t*) DataIn, DataOut, DataLegnth, SpixTimeout);
+#endif
+ /* Check the communication status */
+ if(status != HAL_OK)
+ {
+   /* Execute user timeout callback */
+   SPIx_Error();
+ }
+}
+
+/**
+ * @brief  SPI Write a byte to device.
+ * @param  Value: value to be written
+ */
+// static void SPIx_Write(uint8_t Value)
+// {
 //  HAL_StatusTypeDef status = HAL_OK;
 //  uint8_t data;
 //
@@ -443,111 +516,104 @@ uint32_t BSP_PB_GetState(Button_TypeDef Button)
 //    /* Execute user timeout callback */
 //    SPIx_Error();
 //  }
-//}
-//
-///**
-//  * @brief  SPI error treatment function
-//  */
-//static void SPIx_Error (void)
-//{
-//  /* De-initialize the SPI communication BUS */
-//  HAL_SPI_DeInit(&hnucleo_Spi);
-//
-//  /* Re-Initiaize the SPI communication BUS */
-//  SPIx_Init();
-//}
-//
-///******************************************************************************
-//                            LINK OPERATIONS
-//*******************************************************************************/
-//
-///********************************* LINK SD ************************************/
-///**
-//  * @brief  Initializes the SD Card and put it into StandBy State (Ready for
-//  *         data transfer).
-//  */
-//void SD_IO_Init(void)
-//{
-//  GPIO_InitTypeDef  GPIO_InitStruct;
-//  uint8_t counter;
-//
-//  /* SD_CS_GPIO Periph clock enable */
-//  SD_CS_GPIO_CLK_ENABLE();
-//
-//  /* Configure SD_CS_PIN pin: SD Card CS pin */
-//  GPIO_InitStruct.Pin = SD_CS_PIN;
-//  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-//  GPIO_InitStruct.Pull = GPIO_PULLUP;
-//  GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
-//  HAL_GPIO_Init(SD_CS_GPIO_PORT, &GPIO_InitStruct);
-//
-//
-//  /*  LCD chip select line perturbs SD also when the LCD is not used */
-//  /*  this is a workaround to avoid sporadic failures during r/w operations */
-//  LCD_CS_GPIO_CLK_ENABLE();
-//  GPIO_InitStruct.Pin = LCD_CS_PIN;
-//  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-//  GPIO_InitStruct.Pull = GPIO_NOPULL;
-//  GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
-//  HAL_GPIO_Init(LCD_CS_GPIO_PORT, &GPIO_InitStruct);
-//  LCD_CS_HIGH();
-//
-//  /*------------Put SD in SPI mode--------------*/
-//  /* SD SPI Config */
-//  SPIx_Init();
-//
-//  /* SD chip select high */
-//  SD_CS_HIGH();
-//
-//  /* Send dummy byte 0xFF, 10 times with CS high */
-//  /* Rise CS and MOSI for 80 clocks cycles */
-//  for (counter = 0; counter <= 9; counter++)
-//  {
-//    /* Send dummy byte 0xFF */
-//    SD_IO_WriteByte(SD_DUMMY_BYTE);
-//  }
-//}
-//
-///**
-//  * @brief  Set the SD_CS pin.
-//  * @param  val: pin value.
-//  */
-//void SD_IO_CSState(uint8_t val)
-//{
-//  if(val == 1)
-//  {
-//    SD_CS_HIGH();
-//  }
-//  else
-//  {
-//    SD_CS_LOW();
-//  }
-//}
-//
-///**
-//  * @brief  Write a byte on the SD.
-//  * @param  DataIn: byte to send.
-//  * @param  DataOut: byte to read
-//  * @param  DataLength: length of data
-//  */
-//void SD_IO_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLength)
-//{
-//  /* Send the byte */
-//  SPIx_WriteReadData(DataIn, DataOut, DataLength);
-//}
-//
-///**
-//  * @brief  Writes a byte on the SD.
-//  * @param  Data: byte to send.
-//  */
-//uint8_t SD_IO_WriteByte(uint8_t Data)
-//{
-//  uint8_t tmp;
-//  /* Send the byte */
-//  SPIx_WriteReadData(&Data,&tmp,1);
-//  return tmp;
-//}
-//
+// }
+
+/**
+ * @brief  SPI error treatment function
+ */
+static void SPIx_Error (void)
+{
+ /* De-initialize the SPI communication BUS */
+ HAL_SPI_DeInit(&hnucleo_Spi);
+
+ /* Re-Initiaize the SPI communication BUS */
+ SPIx_Init();
+}
+
+/******************************************************************************
+                           LINK OPERATIONS
+*******************************************************************************/
+
+/********************************* LINK SD ************************************/
+/**
+ * @brief  Initializes the SD Card and put it into StandBy State (Ready for
+ *         data transfer).
+ */
+void SD_IO_Init(void)
+{
+ GPIO_InitTypeDef  GPIO_InitStruct;
+ uint8_t counter;
+
+ /* SD_CS_GPIO Periph clock enable */
+ SD_CS_GPIO_CLK_ENABLE();
+
+ /* Configure SD_CS_PIN pin: SD Card CS pin */
+ GPIO_InitStruct.Pin = SD_CS_PIN;
+ GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+ GPIO_InitStruct.Pull = GPIO_PULLUP;
+
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+ HAL_GPIO_Init(SD_CS_GPIO_PORT, &GPIO_InitStruct);
+
+
+
+ /*------------Put SD in SPI mode--------------*/
+ /* SD SPI Config */
+ SPIx_Init();
+
+ /* SD chip select high */
+ SD_CS_HIGH();
+
+ /* Send dummy byte 0xFF, 10 times with CS high */
+ /* Rise CS and MOSI for 80 clocks cycles */
+ for (counter = 0; counter <= 9; counter++)
+ {
+   /* Send dummy byte 0xFF */
+   SD_IO_WriteByte(SD_DUMMY_BYTE);
+ }
+}
+
+/**
+ * @brief  Set the SD_CS pin.
+ * @param  val: pin value.
+ */
+void SD_IO_CSState(uint8_t val)
+{
+ if(val == 1)
+ {
+   SD_CS_HIGH();
+ }
+ else
+ {
+   SD_CS_LOW();
+ }
+//  delay_basic(50e-6);
+}
+
+/**
+ * @brief  Write a byte on the SD.
+ * @param  DataIn: byte to send.
+ * @param  DataOut: byte to read
+ * @param  DataLength: length of data
+ */
+void SD_IO_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLength)
+{
+ /* Send the byte */
+ SPIx_WriteReadData(DataIn, DataOut, DataLength);
+}
+
+/**
+ * @brief  Writes a byte on the SD.
+ * @param  Data: byte to send.
+ */
+uint8_t SD_IO_WriteByte(uint8_t Data)
+{
+ uint8_t tmp;
+ /* Send the byte */
+ SPIx_WriteReadData(&Data,&tmp,1);
+ return tmp;
+}
+
 ///********************************* LINK LCD ***********************************/
 ///**
 //  * @brief  Initializes the LCD
@@ -681,8 +747,8 @@ uint32_t BSP_PB_GetState(Button_TypeDef Button)
 //{
 //  HAL_Delay(Delay);
 //}
-//#endif /* HAL_SPI_MODULE_ENABLED */
-//
+#endif /* HAL_SPI_MODULE_ENABLED */
+
 ///******************************* ADC driver ********************************/
 //#ifdef HAL_ADC_MODULE_ENABLED
 //
