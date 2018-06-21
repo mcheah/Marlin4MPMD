@@ -559,7 +559,7 @@ const unsigned int dropsegments = 5; //everything with less than this number of 
 // @section serial
 
 // The ASCII buffer for serial input
-#define MAX_CMD_SIZE 64
+#define MAX_CMD_SIZE 96
 #define BUFSIZE 2
 
 // Transfer Buffer Size

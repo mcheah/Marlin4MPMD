@@ -60,26 +60,8 @@
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
-/* User can use this section to tailor UARTx/UARTx instance used and associated
-   resources */
-/* Definition for UARTx clock resources */
 
-//#define UARTx                           USART2
-//#define UARTx_CLK_ENABLE()              __HAL_RCC_USART2_CLK_ENABLE();
-//#define UARTx_RX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOA_CLK_ENABLE()
-//#define UARTx_TX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOA_CLK_ENABLE()
-//
-//#define UARTx_FORCE_RESET()             __HAL_RCC_USART2_FORCE_RESET()
-//#define UARTx_RELEASE_RESET()           __HAL_RCC_USART2_RELEASE_RESET()
-//
-///* Definition for UARTx Pins */
-//#define UARTx_TX_PIN                    GPIO_PIN_2
-//#define UARTx_TX_GPIO_PORT              GPIOA
-//#define UARTx_TX_AF                     GPIO_AF1_USART2
-//#define UARTx_RX_PIN                    GPIO_PIN_3
-//#define UARTx_RX_GPIO_PORT              GPIOA
-//#define UARTx_RX_AF                     GPIO_AF1_USART2
-//#define STM32_USE_BOOTLOADER
+#define STM32_USE_BOOTLOADER
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
 /* Exported Variables --------------------------------------------------------*/

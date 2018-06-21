@@ -142,7 +142,7 @@ int MarlinSerial::read(void) {
 #ifndef STM32_USE_USB_CDC
 	return BSP_UartGetNextRxBytes();
 #else
-	return BSP_CdcGetNextRxBytes();
+	return BSP_CdcGetNextRxByte();
 #endif //STM32_USE_USB_CDC
 }
 

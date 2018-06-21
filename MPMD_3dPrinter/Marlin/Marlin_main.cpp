@@ -1028,6 +1028,13 @@ void setup() {
       for (uint8_t i = 0; i < MIXING_STEPPERS; i++)
         mixing_virtual_tool_mix[t][i] = mixing_factor[i];
   #endif
+    //Give ADC's enough time to sample thermistors
+    delay(100);
+    thermalManager.manage_heater();
+    //If the extruder heater temp is too high, pull head away from print in case of unexpected reset
+    if(thermalManager.current_temperature[0]>140)    {
+    	enqueue_and_echo_commands_P(PSTR("G28\nM106 S255"));
+    }
 }
 
 /**
@@ -4062,7 +4069,7 @@ inline void gcode_M17() {
    * M21: Init SD Card
    */
   inline void gcode_M21() {
-    p_card->initsd();
+//    p_card->initsd();
   }
 
   /**

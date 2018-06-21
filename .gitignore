@@ -459,3 +459,6 @@ RemoteSystemsTempFiles/
 # Debug files
 *.dSYM/
 blank/
+STM32070B_EVAL*/
+STM32072B_EVAL*/
+fatFS/

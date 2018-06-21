@@ -822,6 +822,34 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
 #endif
 }
 
+void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim)
+{
+  if(htim->Instance == TIMx)
+  {
+    /* Peripheral clock enable */
+	TIMx_CLK_ENABLE();
+
+    /* Peripheral interrupt init*/
+    /* Sets the priority grouping field */
+    //HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_3);   BDI : not needed. Done once at startup
+    HAL_NVIC_SetPriority(TIMx_IRQn, 3, 0);
+    HAL_NVIC_EnableIRQ(TIMx_IRQn);
+  }
+}
+
+void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim)
+{
+
+  if(htim->Instance == TIMx)
+  {
+    /* Peripheral clock disable */
+	  TIMx_CLK_ENABLE();
+
+    /* Peripheral interrupt Deinit*/
+    HAL_NVIC_DisableIRQ(TIMx_IRQn);
+  }
+}
+
 void HAL_TIM_OC_MspInit(TIM_HandleTypeDef* htim_oc)
 {
   if(htim_oc->Instance == BSP_MISC_TIMER_TICK)

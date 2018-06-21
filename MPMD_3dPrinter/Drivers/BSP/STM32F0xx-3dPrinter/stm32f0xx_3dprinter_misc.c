@@ -374,6 +374,7 @@ void BSP_MiscFlagInterruptHandler(void)
  **********************************************************/
 void BSP_MiscErrorHandler(uint16_t error)
 {
+  __disable_irq();
   static char errorTxt[15] = "Error = 0x";
   char* errorTxtPtr;
   errorTxtPtr = errorTxt + strlen(errorTxt);
@@ -392,18 +393,21 @@ void BSP_MiscErrorHandler(uint16_t error)
   BSP_MiscHeatManualInit(2);
   BSP_MiscHeatManualInit(3);
 #endif  
+  BSP_LED_On(LED_BLUE);
   
+//TODO: find a strategy to communicate error messages correctly
 // #ifndef STM32_USE_USB_CDC
-  BSP_UartLockingTx((uint8_t *)&errorTxt, sizeof(errorTxt));
+//  BSP_UartLockingTx((uint8_t *)&errorTxt, sizeof(errorTxt));
 // #else
-  BSP_CdcLockingTx((uint8_t *)&errorTxt, sizeof(errorTxt));
+//  BSP_CdcLockingTx((uint8_t *)&errorTxt, sizeof(errorTxt));
 // #endif //STM32_USE_USB_CDC
   
   /* Infinite loop */
   while(1)
   {
 	  BSP_LED_Toggle(LED_BLUE);
-	  HAL_Delay(100);
+	  //Systick disabled, use loop for delay
+	  for(int i=0;i<10e3;i++) { }
   }
 }
 /******************************************************//**

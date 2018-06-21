@@ -52,38 +52,6 @@
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
-/* User can use this section to tailor USARTx/UARTx instance used and associated 
-   resources */
-/* Definition for USARTx clock resources */
-//#define USARTx                           USART2
-//#define USARTx_CLK_ENABLE()              __USART2_CLK_ENABLE();
-//#define DMAx_CLK_ENABLE()                __HAL_RCC_DMA1_CLK_ENABLE()
-//#define USARTx_RX_GPIO_CLK_ENABLE()      __GPIOA_CLK_ENABLE()
-//#define USARTx_TX_GPIO_CLK_ENABLE()      __GPIOA_CLK_ENABLE()
-
-//#define USARTx_FORCE_RESET()             __USART2_FORCE_RESET()
-//#define USARTx_RELEASE_RESET()           __USART2_RELEASE_RESET()
-
-/* Definition for USARTx Pins */
-//#define USARTx_TX_PIN                    GPIO_PIN_2
-//#define USARTx_TX_GPIO_PORT              GPIOA
-//#define USARTx_TX_AF                     GPIO_AF1_USART2
-//#define USARTx_RX_PIN                    GPIO_PIN_3
-//#define USARTx_RX_GPIO_PORT              GPIOA
-//#define USARTx_RX_AF                     GPIO_AF1_USART2
-
-     
-/* Definition for USARTx's NVIC: used for receiving data over Rx pin */
-//#define USARTx_IRQn                      USART2_IRQn
-//#define USARTx_IRQHandler                USART2_IRQHandler
-
-/* Definition for USARTx's DMA */
-//#define USARTx_TX_DMA_STREAM              DMA1_Channel4
-//#define USARTx_RX_DMA_STREAM              DMA1_Channel5
-
-/* Definition for USARTx's NVIC */
-//#define USARTx_DMA_TX_RX_IRQn             DMA1_Channel4_5_IRQn
-//#define USARTx_DMA_TX_RX_IRQHandler       DMA1_CH4_5_IRQHandler
 
 /* Definition for TIMx clock resources */
 #define TIMx                             TIM6
@@ -103,9 +71,16 @@
 extern USBD_CDC_ItfTypeDef  USBD_CDC_fops;
 
 /* Exported macro ------------------------------------------------------------*/
+#define CDC_ERROR_TAG        (0x5000)
+#define CDC_ERROR(error)     BSP_MiscErrorHandler(error|CDC_ERROR_TAG)
 /* Exported functions ------------------------------------------------------- */
-uint8_t CDC_Itf_SetTxBuffer(uint8_t *Buf, uint32_t *Len);
-uint8_t CDC_Itf_Transmit(uint32_t *Len);
+void CDC_Itf_QueueTxBytes(uint8_t *Buf, uint32_t Len);
+uint32_t CDC_Itf_GetNbTxQueuedBytes(void);
+uint32_t CDC_Itf_GetNbTxAvailableBytes(void);
+uint8_t CDC_Itf_IsTransmitting(void);
+uint8_t CDC_Itf_IsTxQueueEmpty(void);
+uint8_t CDC_Itf_IsConnected(void);
+
 
 #endif /* __USBD_CDC_IF_H */
 
