@@ -812,12 +812,16 @@ uint8_t  USBD_CDC_SetTxBuffer  (USBD_HandleTypeDef   *pdev,
                                 uint16_t length)
 {
   USBD_CDC_HandleTypeDef   *hcdc = (USBD_CDC_HandleTypeDef*) pdev->pClassData;
+  const uint32_t TIMEOUT = 1024;//This is arbitrary
   uint32_t count=0;
-  while(hcdc->TxState!=0) { count++; }
-  hcdc->TxBuffer = pbuff;
-  hcdc->TxLength = length;  
-  
-  return USBD_OK;  
+  while(hcdc->TxState!=0 && count <TIMEOUT) { count++; }
+  if (count >=TIMEOUT)
+	  return USBD_BUSY;
+  else {
+	  hcdc->TxBuffer = pbuff;
+	  hcdc->TxLength = length;
+	  return USBD_OK;
+  }
 }
 
 

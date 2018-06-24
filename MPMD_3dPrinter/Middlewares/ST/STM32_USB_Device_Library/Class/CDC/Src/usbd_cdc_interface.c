@@ -61,7 +61,7 @@ void BSP_CDC_RxCpltCallback(uint8_t* Buf, uint32_t *Len);
 //TODO: Find a strategy to selectively disable UART/CDC
 //#ifdef STM32_USE_USB_CDC
 #define APP_RX_DATA_SIZE  64
-#define APP_TX_DATA_SIZE  512
+#define APP_TX_DATA_SIZE  256
 //#else
 //#define APP_RX_DATA_SIZE  1
 //#define APP_TX_DATA_SIZE  1
@@ -318,7 +318,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     buffsize = MIN(buffsize,USB_FS_MAX_PACKET_SIZE);
     buffptr = UserTxBufPtrOut;
     //Set up a EPIN interrupt using UserTxBuffer
-    USBD_CDC_SetTxBuffer(&USBD_Device, (uint8_t*)&UserTxBuffer[buffptr], buffsize);
+    if(USBD_CDC_SetTxBuffer(&USBD_Device, (uint8_t*)&UserTxBuffer[buffptr], buffsize) != USBD_OK)
+    	return;
     if(USBD_CDC_TransmitPacket(&USBD_Device) == USBD_OK)
     {
       UserTxBufPtrOut += buffsize;

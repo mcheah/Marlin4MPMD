@@ -127,6 +127,13 @@ DRESULT disk_ioctl (
 }
 #endif /* _USE_IOCTL == 1 */
 
+DSTATUS disk_deinitialize(
+		BYTE pdrv				/* Physical drive number to identify the drive */
+)
+{
+	disk.is_initialized[pdrv] = 0;
+	return RES_OK;
+}
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 

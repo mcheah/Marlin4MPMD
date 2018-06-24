@@ -56,7 +56,7 @@ void CardReader::initsd()
 
   // Set SD path
   strcpy( SDPath, "/");
-
+  FRESULT code = FR_OK;
   if (rootIsOpened == false)
   {
     //BSP_SD_DetectInit();
@@ -71,10 +71,13 @@ void CardReader::initsd()
       SERIAL_ERROR_START;
       SERIAL_ERRORLNPGM(MSG_SD_VOL_INIT_FAIL);
     }
-    else if (f_opendir(&root,SDPath) != FR_OK)
+    else if ((code = f_opendir(&root,SDPath)) != FR_OK)
     {
+      uint8_t buff[80]="";
       SERIAL_ERROR_START;
       SERIAL_ERRORLNPGM(MSG_SD_OPENROOT_FAIL);
+      sprintf((char *)buff,"code=%d\n",code);
+      BSP_CdcIfQueueTxData(buff,sizeof(buff));
     }
     else
     {
@@ -291,7 +294,7 @@ void CardReader::release()
   cardOK = false;
   cardReaderInitialized = false;
   rootIsOpened = false;
-
+  disk_deinitialize(fileSystem.drv);
   SERIAL_ECHO_START;
   SERIAL_ECHOLNPGM(MSG_SD_INIT_FAIL);
 }

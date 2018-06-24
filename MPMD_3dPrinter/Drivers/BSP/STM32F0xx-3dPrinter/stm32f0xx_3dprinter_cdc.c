@@ -166,15 +166,21 @@ void BSP_CDC_RxCpltCallback(uint8_t* Buf, uint32_t *Len)
 	//Copy character by character to avoid wraparound issues
 	for(uint32_t i=0;i<*Len;i++)
 	{
-	    *pRxWriteBuffer = Buf[i];
-	    pRxWriteBuffer++;
-		//Wrap back to 0
-	    if (pRxWriteBuffer >= (pRxBuffer + CDC_RX_BUFFER_SIZE)) {
-	      pRxWriteBuffer = pRxBuffer;
+		//Check next byte location first
+		uint32_t *j = pRxWriteBuffer + 1;
+	    if (j >= (pRxBuffer + CDC_RX_BUFFER_SIZE)) {
+	      j = pRxBuffer;
+	    }		//Wrap back to 0
+	    if(j!=pRxReadBuffer) //Buffer is not full
+	    {
+			*pRxWriteBuffer = Buf[i];
+			pRxWriteBuffer = j;
+	    	BSP_LED_Off(LED_GREEN);
 	    }
-	    if (pRxWriteBuffer == pRxReadBuffer) {
-	      // Rx buffer is full
-	      CDC_ERROR(7);
+	    else
+	    {
+	    	BSP_LED_On(LED_GREEN);
+	    	//CDC_ERROR(7); //Buffer overrun is not fatal, parser will handle garbage data
 	    }
 	    debugNbRxFrames++;
 	}

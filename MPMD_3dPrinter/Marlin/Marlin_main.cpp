@@ -869,6 +869,10 @@ void servo_init() {
   void enableStepperDrivers() { pinMode(STEPPER_RESET_PIN, INPUT); }  // set to input, which allows it to be pulled high by pullups
 #endif
 
+  void loop3() {
+	  p_card->initsd();
+  }
+
 /**
  * Marlin entry-point: Set up before the program loop
  *  - Set up the kill pin, filament runout, power hold
@@ -4071,7 +4075,7 @@ inline void gcode_M17() {
   inline void gcode_M21() {
     //TODO: there's a bug related to re-initializing the SD card, currently it only works
     //the first time on powerup, so we disable this command for now
-//    p_card->initsd();
+    p_card->initsd();
   }
 
   /**
@@ -7784,8 +7788,13 @@ void ok_to_send() {
   if (!send_ok[cmd_queue_index_r] ||
 		  MYSERIAL.available() >= (2*(UART_RX_BUFFER_SIZE-MAX_CMD_SIZE)) ) return;
 #else
-  if (!send_ok[cmd_queue_index_r] ||
-		  MYSERIAL.available() >= (2*(CDC_RX_BUFFER_SIZE-MAX_CMD_SIZE)) ) return;
+  if (!send_ok[cmd_queue_index_r] /*||
+		  MYSERIAL.available() >= (2*(CDC_RX_BUFFER_SIZE-MAX_CMD_SIZE))*/ )
+  {
+  	  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_8,GPIO_PIN_RESET);
+  	  volatile int numbytes = MYSERIAL.available();
+	  return;
+  }
 #endif //STM32_USE_USB_CDC
     
   SERIAL_PROTOCOLPGM(MSG_OK);

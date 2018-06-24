@@ -24,6 +24,7 @@
 #include "temperature.h"
 #include "language.h"
 #include "configuration_store.h"
+#include "diskio.h"
 
 #include "ff.h"  //for FATFS
 
