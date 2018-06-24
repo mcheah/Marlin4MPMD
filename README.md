@@ -58,7 +58,7 @@ Debugging directly on the printer hardware requires access to the 4-pin SWD jump
 The MCU on this board has been locked down with the security read-out protection set to level 1, meaning that any attempt to re-flash any memory location or change the security bits results in a full erase of the flash memory.  Therefore care should be taken when going down the route of debugging directly on the actual printer.  I've included the original bootloader that I was able to extract so that you can restore the stock software without risking bricking your printer.  To enable debugging on the board with an ST-link debugger, you will need to start the STM32 ST-LINK utility and change the Read Out Protection level to 0.  This will trigger a full erase, but will allow you to debug the firmware directly.
 
 ###  Recent changes
-##Marlin4MPMD - v1.0.0 6/14/2018
+## Marlin4MPMD - v1.0.0 6/14/2018
 ------------------
 Second release to address some of the limitations of the first release.  Most notably:
 - Limited current consumption during heating to prevent overdriving the power supply and triggering a reset
@@ -66,6 +66,6 @@ Second release to address some of the limitations of the first release.  Most no
 - Added suppport for SD cards!
 - Various reliability fixes and improvments to USB
 - Added support for M500/M501 by saving calibration settings to M_CFG.G on the SD card
-##Marlin4MPMD - v1.0.0 6/14/2018
+## Marlin4MPMD - v1.0.0 6/14/2018
 ------------------
 This is the first release as a proof of concept that third party software can be ported to this device without altering the mainboard  Performance has been comparable to the stock firmware when connected to a PC/Raspberry Pi over USB with significant improvements in the heating control and also in the interface latency.
