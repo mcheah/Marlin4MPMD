@@ -61,11 +61,11 @@ The MCU on this board has been locked down with the security read-out protection
 ##Marlin4MPMD - v1.0.0 6/14/2018
 ------------------
 Second release to address some of the limitations of the first release.  Most notably:
--Limited current consumption during heating to prevent overdriving the power supply and triggering a reset
--Immediately on reset, detect a hot extruder and pull away nozzle in case of power supply glitch or outage
--Added suppport for SD cards!
--Various reliability fixes and improvments to USB
--Added support for M500/M501 by saving calibration settings to M_CFG.G on the SD card
+- Limited current consumption during heating to prevent overdriving the power supply and triggering a reset
+- Immediately on reset, detect a hot extruder and pull away nozzle in case of power supply glitch or outage
+- Added suppport for SD cards!
+- Various reliability fixes and improvments to USB
+- Added support for M500/M501 by saving calibration settings to M_CFG.G on the SD card
 ##Marlin4MPMD - v1.0.0 6/14/2018
 ------------------
 This is the first release as a proof of concept that third party software can be ported to this device without altering the mainboard  Performance has been comparable to the stock firmware when connected to a PC/Raspberry Pi over USB with significant improvements in the heating control and also in the interface latency.
