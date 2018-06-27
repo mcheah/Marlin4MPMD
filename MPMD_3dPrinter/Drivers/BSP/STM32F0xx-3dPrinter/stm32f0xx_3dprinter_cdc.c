@@ -148,7 +148,8 @@ void BSP_CdcIfQueueTxData(uint8_t *pBuf, uint8_t nbData)
  **********************************************************/
 void BSP_CdcIfSendQueuedData()
 {
-	while(BSP_CdcIsTxOnGoing()) { BSP_LED_On(LED_GREEN); }
+	while(BSP_CdcIsTxOnGoing()) {
+	BSP_LED_On(LED_GREEN); }
 	BSP_LED_Off(LED_RED);
 }
 
@@ -175,11 +176,11 @@ void BSP_CDC_RxCpltCallback(uint8_t* Buf, uint32_t *Len)
 	    {
 			*pRxWriteBuffer = Buf[i];
 			pRxWriteBuffer = j;
-	    	BSP_LED_Off(LED_GREEN);
+	    	BSP_LED_Off(LED_BLUE);
 	    }
 	    else
 	    {
-	    	BSP_LED_On(LED_GREEN);
+	    	BSP_LED_On(LED_BLUE);
 	    	//CDC_ERROR(7); //Buffer overrun is not fatal, parser will handle garbage data
 	    }
 	    debugNbRxFrames++;

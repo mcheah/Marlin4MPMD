@@ -315,7 +315,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
       buffsize = UserTxBufPtrIn - UserTxBufPtrOut;
     }
     //We can't queue up more than 64 bytes at a time without changing the endpoint
-    buffsize = MIN(buffsize,USB_FS_MAX_PACKET_SIZE);
+    buffsize = MIN(buffsize,USB_FS_MAX_PACKET_SIZE-1);
     buffptr = UserTxBufPtrOut;
     //Set up a EPIN interrupt using UserTxBuffer
     if(USBD_CDC_SetTxBuffer(&USBD_Device, (uint8_t*)&UserTxBuffer[buffptr], buffsize) != USBD_OK)
