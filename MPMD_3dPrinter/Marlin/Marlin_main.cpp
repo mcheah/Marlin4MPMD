@@ -2965,7 +2965,6 @@ inline void gcode_G28() {
   #if ENABLED(AUTO_BED_LEVELING_FEATURE)
     planner.bed_level_matrix.set_to_identity();
     #if ENABLED(DELTA)
-      reset_bed_level();
     #endif
   #endif
 
@@ -4263,7 +4262,36 @@ inline void gcode_M42() {
 }
 
 #if ENABLED(Z_MIN_PROBE_REPEATABILITY_TEST)
+//TODO: put these in the appropriate header file, got lazy and hacked these in for the bed repeatability test
+static void randomSeed( uint32_t dwSeed )
+{
+  if ( dwSeed != 0 )
+  {
+    srand( dwSeed ) ;
+  }
+}
 
+static inline long random( long howbig )
+{
+  if ( howbig == 0 )
+  {
+    return 0 ;
+  }
+
+  return rand() % howbig;
+}
+
+static inline long random( long howsmall, long howbig )
+{
+  if (howsmall >= howbig)
+  {
+    return howsmall;
+  }
+
+  long diff = howbig - howsmall;
+
+  return random(diff) + howsmall;
+}
   /**
    * M48: Z probe repeatability measurement function.
    *
@@ -6161,43 +6189,69 @@ void quickstop_stepper() {
   #endif
 }
 
-#if ENABLED(MESH_BED_LEVELING)
+#if ENABLED(AUTO_BED_LEVELING_FEATURE)
 
   /**
    * M420: Enable/Disable Mesh Bed Leveling
    */
+#if ENABLED(MESH_BED_LEVELING)
   inline void gcode_M420() { if (code_seen('S') && code_has_value()) mbl.set_has_mesh(code_value_bool()); }
-
+#endif //MESH_BED_LEVELING
   /**
    * M421: Set a single Mesh Bed Leveling Z coordinate
    * Use either 'M421 X<linear> Y<linear> Z<linear>' or 'M421 I<xindex> J<yindex> Z<linear>'
    */
   inline void gcode_M421() {
     int8_t px = 0, py = 0;
-    float z = 0;
-    bool hasX, hasY, hasZ, hasI, hasJ;
-    if ((hasX = code_seen('X'))) px = mbl.probe_index_x(code_value_axis_units(X_AXIS));
-    if ((hasY = code_seen('Y'))) py = mbl.probe_index_y(code_value_axis_units(Y_AXIS));
+    float z = 0, q = 0;
+    bool hasX, hasY, hasZ, hasI, hasJ, hasQ, hasC, hasE;
     if ((hasI = code_seen('I'))) px = code_value_axis_units(X_AXIS);
     if ((hasJ = code_seen('J'))) py = code_value_axis_units(Y_AXIS);
     if ((hasZ = code_seen('Z'))) z = code_value_axis_units(Z_AXIS);
-
-    if (hasX && hasY && hasZ) {
-
-      if (px >= 0 && py >= 0)
-        mbl.set_z(px, py, z);
+    if ((hasQ = code_seen('Q'))) q = code_value_axis_units(Z_AXIS);
+    hasC = code_seen('C');
+    hasE = code_seen('E');
+    if (!hasI && !hasJ) {
+    	if(hasC)
+    		reset_bed_level();
+    	else if(hasE)//Re-calculate the 0'ed points, must be done manually
+    		extrapolate_unprobed_bed_level(); 	
+		//TODO: make it so that the extrapolated points are automatically cleared			
+    	print_bed_level();//Print entire map
+    }
+    else if (hasI && hasJ && !hasZ && !hasQ) {
+        if (px >= 0 && px < AUTO_BED_LEVELING_GRID_POINTS && py >= 0 && py < AUTO_BED_LEVELING_GRID_POINTS)//Print single point
+        {
+			SERIAL_PROTOCOLPGM("Bed I: ");
+			SERIAL_PROTOCOL_F(px, 3);
+			SERIAL_PROTOCOLPGM(" J: ");
+			SERIAL_PROTOCOL_F(py, 3);
+			SERIAL_PROTOCOLPGM(" Z: ");
+			SERIAL_PROTOCOL_F(bed_level[px][py], 3);
+			SERIAL_EOL;
+        }
+        else {
+            SERIAL_ERROR_START;
+            SERIAL_ERRORLNPGM(MSG_ERR_MESH_XY);
+        }
+    }
+	//Z sets the actual value directly
+    else if (hasI && hasJ && hasZ) {
+      if (px >= 0 && px < AUTO_BED_LEVELING_GRID_POINTS && py >= 0 && py < AUTO_BED_LEVELING_GRID_POINTS)
+    	bed_level[px][py] = z;
       else {
         SERIAL_ERROR_START;
         SERIAL_ERRORLNPGM(MSG_ERR_MESH_XY);
       }
     }
-    else if (hasI && hasJ && hasZ) {
-      if (px >= 0 && px < MESH_NUM_X_POINTS && py >= 0 && py < MESH_NUM_Y_POINTS)
-        mbl.set_z(px, py, z);
-      else {
-        SERIAL_ERROR_START;
-        SERIAL_ERRORLNPGM(MSG_ERR_MESH_XY);
-      }
+	//Q adjusts level by offset
+    else if(hasI && hasJ && hasQ) {
+        if (px >= 0 && px < AUTO_BED_LEVELING_GRID_POINTS && py >= 0 && py < AUTO_BED_LEVELING_GRID_POINTS)
+      	bed_level[px][py] += q;
+        else {
+          SERIAL_ERROR_START;
+          SERIAL_ERRORLNPGM(MSG_ERR_MESH_XY);
+        }
     }
     else {
       SERIAL_ERROR_START;
@@ -7663,6 +7717,8 @@ void process_next_command() {
         case 420: // M420 Enable/Disable Mesh Bed Leveling
           gcode_M420();
           break;
+      #endif
+#if ENABLED(AUTO_BED_LEVELING_FEATURE)
         case 421: // M421 Set a Mesh Bed Leveling Z coordinate
           gcode_M421();
           break;

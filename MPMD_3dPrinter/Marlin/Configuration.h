@@ -619,7 +619,7 @@
 //#define DISABLE_Z_MIN_PROBE_ENDSTOP
 
 // Enable Z Probe Repeatability test to see how accurate your probe is
-//#define Z_MIN_PROBE_REPEATABILITY_TEST
+#define Z_MIN_PROBE_REPEATABILITY_TEST
 
 //
 // Probe Raise options provide clearance for the probe to deploy, stow, and travel.
@@ -766,7 +766,7 @@
 
   #if ENABLED(AUTO_BED_LEVELING_GRID)
 
-	#define DELTA_PROBEABLE_RADIUS (DELTA_PRINTABLE_RADIUS - 10)
+	#define DELTA_PROBEABLE_RADIUS (DELTA_PRINTABLE_RADIUS - 15)
 	#define LEFT_PROBE_BED_POSITION -(DELTA_PROBEABLE_RADIUS)
 	#define RIGHT_PROBE_BED_POSITION DELTA_PROBEABLE_RADIUS
 	#define FRONT_PROBE_BED_POSITION -(DELTA_PROBEABLE_RADIUS)
@@ -778,7 +778,7 @@
   // Compensate by interpolating between the nearest four Z probe values for each point.
   // Useful for deltas where the print surface may appear like a bowl or dome shape.
   // Works best with AUTO_BED_LEVELING_GRID_POINTS 5 or higher.
-  #define AUTO_BED_LEVELING_GRID_POINTS 3
+  #define AUTO_BED_LEVELING_GRID_POINTS 7
 
   #else  // !AUTO_BED_LEVELING_GRID
 

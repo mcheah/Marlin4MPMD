@@ -50,7 +50,7 @@
 /* Exported macros ------------------------------------------------------------*/
 //TODO: we should probably adjust these to a smaller size
 #define CDC_TX_BUFFER_SIZE (64)
-#define CDC_RX_BUFFER_SIZE (96*4)
+#define CDC_RX_BUFFER_SIZE (96*2)
 
 /* Exported types --- --------------------------------------------------------*/
 

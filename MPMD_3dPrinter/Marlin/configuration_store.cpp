@@ -952,7 +952,21 @@ void Config_StoreSettings()
     strcpy(cmdStr,"; Filament settings: Disabled");
   }
   p_card->write_command(cmdStr);
-
+  /* ABL settings */
+  for (int y = 0; y < AUTO_BED_LEVELING_GRID_POINTS; y++) {
+    for (int x = 0; x < AUTO_BED_LEVELING_GRID_POINTS; x++) {
+      strcpy(cmdStr, "M421 I");
+      sprintf(numStr, "%d", x);
+      strcat(cmdStr, numStr);
+      strcat(cmdStr, " J");
+      sprintf(numStr, "%d", y);
+      strcat(cmdStr, numStr);
+      strcat(cmdStr, " Z");
+      sprintf(numStr, "%0.2f", bed_level[x][y]);
+      strcat(cmdStr, numStr);
+      p_card->write_command(cmdStr);
+    }
+  }
   p_card->closefile();
   SERIAL_PROTOCOLLNPGM(MSG_FILE_SAVED);
 }
