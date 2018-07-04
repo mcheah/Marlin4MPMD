@@ -1082,13 +1082,18 @@
 //#define ULTRA_LCD   // Character based
 //#define DOGLCD      // Full graphics display
 
+// LCD for Malyan M200 printers.
+// This requires SDSUPPORT to be enabled
+//
+//#define MALYAN_LCD
+
 //
 // SD CARD
 //
 // SD Card support is disabled by default. If your controller has an SD slot,
 // you must uncomment the following option or it won't work.
 //
-#define SDSUPPORT
+//#define SDSUPPORT
 #if ENABLED(SDSUPPORT)
   #define SD_SETTINGS
   #define CONFIG_FILE_NAME "m_cfg.g"

@@ -268,7 +268,7 @@ private:
 };
 
 
-
+	extern CardReader card;
 	extern CardReader *p_card;
 	#define IS_SD_PRINTING (card.sdprinting)
 

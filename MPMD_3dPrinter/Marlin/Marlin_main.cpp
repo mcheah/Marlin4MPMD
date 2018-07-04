@@ -869,9 +869,11 @@ void servo_init() {
   void enableStepperDrivers() { pinMode(STEPPER_RESET_PIN, INPUT); }  // set to input, which allows it to be pulled high by pullups
 #endif
 
+#if ENABLED(SDSUPPORT)
   void loop3() {
 	  p_card->initsd();
   }
+#endif
 
 /**
  * Marlin entry-point: Set up before the program loop
