@@ -31,10 +31,9 @@
   void lcd_update();
   void lcd_setalertstatuspgm(const char* message);
 #else
+  FORCE_INLINE bool lcd_detected(void) { return true; }
   FORCE_INLINE void lcd_update() {}
   FORCE_INLINE void lcd_init() {}
-  FORCE_INLINE bool lcd_hasstatus() { return false; }
-  FORCE_INLINE void lcd_setstatus(const char* message, const bool persist=false) {UNUSED(message); UNUSED(persist);};
 #endif
 
 #if ENABLED(ULTRA_LCD)
@@ -160,11 +159,11 @@
   #endif
 
 #else // MALYAN_LCD or no LCD
+  FORCE_INLINE void lcd_setstatus(const char* message, const bool persist=false) {UNUSED(message); UNUSED(persist);};
+  FORCE_INLINE bool lcd_hasstatus() { return false; }
   FORCE_INLINE void lcd_setstatuspgm(const char* message, const uint8_t level=0) {UNUSED(message); UNUSED(level);}
   FORCE_INLINE void lcd_buttons_update() {}
   FORCE_INLINE void lcd_reset_alert_level() {}
-  FORCE_INLINE bool lcd_detected(void) { return true; }
-
   #define LCD_MESSAGEPGM(x) NOOP
   #define LCD_ALERTMESSAGEPGM(x) NOOP
 

@@ -191,6 +191,18 @@ void BSP_UART_DEBUG_IRQHandler(void)
 {
   HAL_UART_IRQHandler(&gBspUartData.handle);
 }
+
+/**
+  * @brief  This function handles UART interrupt request for debug.
+  * @param  None
+  * @retval None
+  * @Note   This function is redefined in "main.h" and related to DMA
+  *         used for USART data transmission
+  */
+void BSP_UART_LCD_IRQHandler(void)
+{
+  HAL_UART_IRQHandler(&gBspUartData.handle);
+}
 /**
   * @brief  This function handles UART interrupt request for wifi module.
   * @param  None

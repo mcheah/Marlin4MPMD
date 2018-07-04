@@ -27,7 +27,8 @@
 
 #ifndef CONDITIONALS_POST_H
 #define CONDITIONALS_POST_H
-
+#define min(a,b) (((a)<(b))?(a):(b))
+#define max(a,b) (((a)>(b))?(a):(b))
   #if ENABLED(EMERGENCY_PARSER)
     #define EMERGENCY_PARSER_CAPABILITIES " EMERGENCY_CODES:M108,M112,M410"
   #else

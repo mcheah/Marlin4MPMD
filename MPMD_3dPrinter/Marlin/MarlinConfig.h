@@ -43,11 +43,8 @@
 #include "stm32f0xx_hal.h"
 #include "stm32f0xx_3dprinter_misc.h"
 
-#ifndef STM32_USE_USB_CDC
 #include "stm32f0xx_3dprinter_uart.h"
-#else
 #include "stm32f0xx_3dprinter_cdc.h"
-#endif //STM32_USE_USB_CDC
 
 #include "stm32f0xx_3dprinter_adc.h"
 //#include "stm32f0xx_3dprinter_wifi.h"

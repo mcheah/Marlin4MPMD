@@ -81,6 +81,28 @@
 
 #define BSP_UART_DEBUG_TX_AF                     (GPIO_AF1_USART2)
 #define BSP_UART_DEBUG_RX_AF                     (GPIO_AF1_USART2)
+
+#define BSP_UART_LCD                           (USART1)
+#define __BSP_UART_LCD_CLK_ENABLE()              __USART1_CLK_ENABLE()
+#define __BSP_UART_LCD_CLK_DISABLE()             __USART1_CLK_DISABLE()
+#define __BSP_UART_LCD_RX_GPIO_CLK_ENABLE()      __GPIOA_CLK_ENABLE()
+#define __BSP_UART_LCD_TX_GPIO_CLK_ENABLE()      __GPIOA_CLK_ENABLE()
+
+#define __BSP_UART_LCD_FORCE_RESET()             __USART1_FORCE_RESET()
+#define __BSP_UART_LCD_RELEASE_RESET()           __USART1_RELEASE_RESET()
+
+/* Definition for BSP_UART_LCD Pins */
+#define BSP_UART_LCD_TX_PIN               (GPIO_PIN_9)
+#define BSP_UART_LCD_TX_PORT              (GPIOA)
+#define BSP_UART_LCD_RX_PIN               (GPIO_PIN_10)
+#define BSP_UART_LCD_RX_PORT              (GPIOA)
+
+/* Definition for BSP_UART_LCD's NVIC */
+#define BSP_UART_LCD_IRQn                      (USART1_IRQn)
+#define BSP_UART_LCD_IRQHandler                USART1_IRQHandler
+
+#define BSP_UART_LCD_TX_AF                     (GPIO_AF1_USART1)
+#define BSP_UART_LCD_RX_AF                     (GPIO_AF1_USART1)
    
 /* Exported types --- --------------------------------------------------------*/
 typedef struct BspUartDataTag
@@ -118,7 +140,7 @@ void BSP_UartIfSendQueuedData(void);
 void BSP_UartAttachRxDataHandler(void (*callback)(uint8_t *, uint8_t));
 void BSP_UartAttachTxDoneCallback(void (*callback)(void));
 uint32_t BSP_UartPrintf(const char* format,...);
-uint32_t BSP_UartGetNbRxAvalaibleBytes(void);
+uint32_t BSP_UartGetNbRxAvailableBytes(void);
 int8_t BSP_UartGetNextRxBytes(void);
 uint8_t BSP_UartIsTxOnGoing(void);
 #if defined(MARLIN)

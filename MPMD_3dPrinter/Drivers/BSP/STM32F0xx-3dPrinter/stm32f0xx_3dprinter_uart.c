@@ -89,7 +89,7 @@ static uint8_t BspUartXonBuffer[11] = " SEND XON\n";
 void BSP_UartHwInit(uint32_t newBaudRate)
 {
   BspUartDataType *pUart = &gBspUartData;
-  
+#if 0 //TODO: re-enable this for non MalyanLCD
   pUart->handle.Instance = BSP_UART_DEBUG;
   pUart->handle.Init.BaudRate = newBaudRate;
   pUart->handle.Init.WordLength = UART_WORDLENGTH_8B;
@@ -98,7 +98,16 @@ void BSP_UartHwInit(uint32_t newBaudRate)
   pUart->handle.Init.Mode = UART_MODE_TX_RX;
   pUart->handle.Init.HwFlowCtl = UART_HWCONTROL_NONE;
   pUart->handle.Init.OverSampling = UART_OVERSAMPLING_16;
-
+#else
+  pUart->handle.Instance = BSP_UART_LCD;
+  pUart->handle.Init.BaudRate = newBaudRate;
+  pUart->handle.Init.WordLength = UART_WORDLENGTH_8B;
+  pUart->handle.Init.StopBits = UART_STOPBITS_1;
+  pUart->handle.Init.Parity = UART_PARITY_NONE;
+  pUart->handle.Init.Mode = UART_MODE_TX_RX;
+  pUart->handle.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  pUart->handle.Init.OverSampling = UART_OVERSAMPLING_16;
+#endif
   if(HAL_UART_DeInit(&pUart->handle) != HAL_OK)
   {
     UART_ERROR(1);
@@ -490,7 +499,7 @@ uint32_t BSP_UartPrintf(const char* format,...)
  * @param[in] fnone
   * @retval nxRxBytes nb received bytes
  **********************************************************/
-uint32_t BSP_UartGetNbRxAvalaibleBytes(void)
+uint32_t BSP_UartGetNbRxAvailableBytes(void)
 {
   BspUartDataType *pUart = &gBspUartData;  
   uint8_t *writePtr = (uint8_t *)(pUart->pRxWriteBuffer - 1);

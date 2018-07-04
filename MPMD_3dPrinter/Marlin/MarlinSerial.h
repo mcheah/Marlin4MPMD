@@ -108,6 +108,11 @@ struct ring_buffer_r {
   volatile uint8_t tail;
 };
 
+typedef enum {
+	USB_CDC,
+	UART
+}MarlinSerialType;
+
 #if TX_BUFFER_SIZE > 0
   struct ring_buffer_t {
     unsigned char buffer[TX_BUFFER_SIZE];
@@ -137,24 +142,28 @@ extern int cmdReplyIndex;
 class MarlinSerial { //: public Stream
 
   public:
-    MarlinSerial();
+    MarlinSerial(MarlinSerialType serialtype);
     void begin(long);
     void end();
     int peek(void);
     int read(void);
     void flush(void);
-#ifndef STM32_USE_USB_CDC
-    FORCE_INLINE int available(void) {return (BSP_UartGetNbRxAvalaibleBytes());}
-#else
-    FORCE_INLINE int available(void) {return (BSP_CdcGetNbRxAvailableBytes());}
-#endif //STM32_USE_USB_CDC
+    FORCE_INLINE int available(void) {
+    	if(type==UART)
+    		return (BSP_UartGetNbRxAvailableBytes());
+    	else if(type==USB_CDC)
+    		return (BSP_CdcGetNbRxAvailableBytes());
+    	else
+    		return 0;
+    }
 
     FORCE_INLINE void checkRx(void) {}
-#ifndef STM32_USE_USB_CDC
-    FORCE_INLINE void write(uint8_t c) { /*BSP_UartLockingTx*/BSP_UartIfQueueTxData(&c, 1); }
-#else
-    FORCE_INLINE void write(uint8_t c) { /*BSP_UartLockingTx*/BSP_CdcIfQueueTxData(&c, 1); }
-#endif //STM32_USE_USB_CDC
+    FORCE_INLINE void write(uint8_t c) {
+    if(type==UART)
+    	BSP_UartIfQueueTxData(&c, 1);
+		else if(type==USB_CDC)
+			BSP_CdcIfQueueTxData(&c, 1);
+    }
 
 #if !defined(NO_WIFI)
     FORCE_INLINE void buildCmdReply(char c)
@@ -170,6 +179,7 @@ class MarlinSerial { //: public Stream
     #endif
 
   private:
+    MarlinSerialType type;
     void printNumber(unsigned long, uint8_t);
     void printFloat(double, uint8_t);
 
@@ -177,11 +187,12 @@ class MarlinSerial { //: public Stream
     FORCE_INLINE void write(const char* str) { while (*str) write(*str++); }
     FORCE_INLINE void write(const uint8_t* buffer, size_t size) { while (size--) write(*buffer++); }
     FORCE_INLINE void print(const char* str) { write(str); }
-#ifndef STM32_USE_USB_CDC
-    FORCE_INLINE void printn(uint8_t *str, uint8_t nbData) { /*BSP_UartLockingTx*/BSP_UartIfQueueTxData(str, nbData); }
-#else
-    FORCE_INLINE void printn(uint8_t *str, uint8_t nbData) { /*BSP_UartLockingTx*/BSP_CdcIfQueueTxData(str, nbData); }
-#endif //STM32_USE_USB_CDC
+    FORCE_INLINE void printn(uint8_t *str, uint8_t nbData) {
+    	if(type==UART)
+    		BSP_UartIfQueueTxData(str, nbData);
+    	else if(type==USB_CDC)
+    		BSP_CdcIfQueueTxData(str, nbData);
+    }
 
 
     void print(char, int = BYT);
@@ -204,6 +215,9 @@ class MarlinSerial { //: public Stream
 };
 
 extern MarlinSerial customizedSerial;
+#if ENABLED(MALYAN_LCD)
+extern MarlinSerial customizedSerial2;
+#endif
 
 #endif // !USBCON
 
