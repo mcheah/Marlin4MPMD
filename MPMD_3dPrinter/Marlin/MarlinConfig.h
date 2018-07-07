@@ -25,6 +25,8 @@
 
 
 //#include "fastio.h"
+#include "Configuration_STM.h"
+
 #include "macros.h"
 #include "boards.h"
 #include "Version.h"

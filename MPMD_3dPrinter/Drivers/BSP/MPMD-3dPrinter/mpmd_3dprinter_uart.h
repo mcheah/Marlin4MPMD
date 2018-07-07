@@ -50,9 +50,9 @@
 /* Exported macros ------------------------------------------------------------*/
 //TODO: we should probably adjust these to a smaller size
 //TODO: find a way to allocate these buffers without wasting RAM when using CDC interface
-#if 0
-#define UART_TX_BUFFER_SIZE (512)
-#define UART_RX_BUFFER_SIZE (256)
+#if !defined(STM32_USE_USB_CDC) || defined(MALYAN_LCD)
+#define UART_TX_BUFFER_SIZE (64)
+#define UART_RX_BUFFER_SIZE (96)
 #else
 #define UART_TX_BUFFER_SIZE (1)
 #define UART_RX_BUFFER_SIZE (1)
@@ -135,7 +135,7 @@ extern BspUartDataType gBspUartData;
 uint8_t* BSP_UartIfGetFreeTxBuffer(void);
 void BSP_UartHwInit(uint32_t newBaudRate);
 void BSP_UartIfStart(void);
-void BSP_UartIfQueueTxData(uint8_t *pBuf, uint8_t nbData);
+void BSP_UartIfQueueTxData(uint8_t *pBuf, uint32_t nbData);
 void BSP_UartIfSendQueuedData(void);
 void BSP_UartAttachRxDataHandler(void (*callback)(uint8_t *, uint8_t));
 void BSP_UartAttachTxDoneCallback(void (*callback)(void));
