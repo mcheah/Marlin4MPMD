@@ -44,7 +44,7 @@
 #define MAXPATHNAMELENGTH (13*MAX_DIR_DEPTH+MAX_DIR_DEPTH+1)
 
 // Maximum number of files displayed
-#define MAX_FILES (48) //MAX_FILES*LONG_FILENAME_LENGTH < 4096
+#define MAX_FILES (16) //MAX_FILES*LONG_FILENAME_LENGTH < 4096
 
 // Number of UTF-16 characters per entry
 #define FILENAME_LENGTH (13)

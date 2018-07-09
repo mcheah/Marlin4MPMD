@@ -429,6 +429,21 @@
   #define DELTA_SEGMENTS_PER_SECOND 200
 
   // NOTE NB all values for DELTA_* values MUST be floating point, so always have a decimal point in them
+  // uncomment to add G33 Delta Auto-Calibration (Enable EEPROM_SETTINGS to store results)
+  #define DELTA_AUTO_CALIBRATION
+
+  // NOTE NB all values for DELTA_* values MUST be floating point, so always have a decimal point in them
+
+  #if ENABLED(DELTA_AUTO_CALIBRATION)
+    // set the default number of probe points : n*n (1 -> 7)
+    #define DELTA_CALIBRATION_DEFAULT_POINTS 3
+
+    // Enable and set these values based on results of 'G33 A'
+    #define H_FACTOR 1.09
+    #define R_FACTOR 2.26
+    #define A_FACTOR 1.14
+
+  #endif
 
   // Center-to-center distance of the holes in the diagonal push rods.
   #define DELTA_DIAGONAL_ROD 120.8 // mm
@@ -564,7 +579,7 @@
 //  (0,0)
 #define X_PROBE_OFFSET_FROM_EXTRUDER 0 // X offset: -left  +right  [of the nozzle]
 #define Y_PROBE_OFFSET_FROM_EXTRUDER 0 // Y offset: -front +behind [the nozzle]
-#define Z_PROBE_OFFSET_FROM_EXTRUDER -0.0 //  Z offset: -below +above  [the nozzle]
+#define Z_PROBE_OFFSET_FROM_EXTRUDER -0.5 //  Z offset: -below +above  [the nozzle]
 
 // X and Y axis travel speed (mm/m) between probes
 #define XY_PROBE_SPEED (30*60)

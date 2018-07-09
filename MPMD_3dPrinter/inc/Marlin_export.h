@@ -46,6 +46,7 @@
 
 void setup(void);
 void loop(void);
+void loop3(void);
 void IsrStepperHandler(void);
 void IsrTemperatureHandler(void);
 void TimerStService(void);

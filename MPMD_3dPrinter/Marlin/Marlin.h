@@ -97,7 +97,13 @@ FORCE_INLINE void serial_echopair_P(const char* s_P, uint8_t v) { serial_echopai
 FORCE_INLINE void serial_echopair_P(const char* s_P, uint16_t v) { serial_echopair_P(s_P, (int)v); }
 FORCE_INLINE void serial_echopair_P(const char* s_P, bool v) { serial_echopair_P(s_P, (int)v); }
 FORCE_INLINE void serial_echopair_P(const char* s_P, void *v) { serial_echopair_P(s_P, (unsigned long)v); }
+//void serial_spaces(uint8_t count);
+#define PROPORTIONAL_FONT_RATIO 1
+FORCE_INLINE void serial_spaces(uint8_t count) { count *= (PROPORTIONAL_FONT_RATIO); while (count--) MYSERIAL.write(' '); }
 
+#define SERIAL_ECHO_SP(C)     serial_spaces(C)
+#define SERIAL_ERROR_SP(C)    serial_spaces(C)
+#define SERIAL_PROTOCOL_SP(C) serial_spaces(C)
 // Things to write to serial from Program memory. Saves 400 to 2k of RAM.
 FORCE_INLINE void serialprintPGM(const char* str)   { MYSERIAL.write(str); }
 
@@ -309,6 +315,8 @@ float code_value_temp_diff();
     extern float delta_grid_spacing[2];
     void adjust_delta(float cartesian[3]);
   #endif
+  //TODO: find a way to not hard-code this since NPP is not a #define
+  extern float z_adj_at_pt[7];
 #elif ENABLED(SCARA)
   extern float delta[3];
   extern float axis_scaling[3];  // Build size scaling

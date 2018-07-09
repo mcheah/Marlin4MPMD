@@ -755,6 +755,12 @@ void Config_StoreSettings()
   strcat(cmdStr, numStr);
   strcat(cmdStr, " ; zprobe_zoffset (float)");
   p_card->write_command(cmdStr);
+  for(int k=0;k<7;k++)
+  {
+	  strcpy(cmdStr,"M851 I");
+	  sprintf(numStr, "%.2d %0.2f", k,z_adj_at_pt[k]);
+	  strcat(cmdStr, numStr);
+  }
 #endif
 
 #if ENABLED(DELTA)
@@ -808,6 +814,7 @@ void Config_StoreSettings()
   strcat(cmdStr, " Z");
   sprintf(numStr, "%.2f", delta_tower_angle_trim[C_AXIS]);
   strcat(cmdStr, numStr);
+
   p_card->write_command(cmdStr);
 
   strcpy(cmdStr, "; H=delta_height, L=delta_diagonal_rod, R=delta_radius, S=delta_segments_per_second, ");
@@ -1423,6 +1430,12 @@ void Config_PrintSettings(bool forReplay) {
     }
     CONFIG_ECHO_START;
     SERIAL_ECHOPAIR("  M851 Z", zprobe_zoffset);
+	SERIAL_ECHO("ZCAL off:");
+	//TODO: don't hardcode this
+    for(int k=0;k<7;k+1)
+    {
+    	SERIAL_ECHOPAIR(" ",z_adj_at_pt[k]);
+    }
     SERIAL_EOL;
   #endif
 }
