@@ -334,7 +334,7 @@
 // setting this to anything other than 255 enables a form of PWM to the bed just like HEATER_BED_DUTY_CYCLE_DIVIDER did,
 // so you shouldn't use it unless you are OK with PWM on your bed.  (see the comment on enabling PIDTEMPBED)
 #define MAX_BED_POWER 255 // limits duty cycle to bed; 255=full current
-//#define HEATER_BED_5A_LIMIT
+#define HEATER_BED_5A_LIMIT
 #if ENABLED(PIDTEMPBED)
 
   //#define PID_BED_DEBUG // Sends debug data to the serial port.
@@ -438,11 +438,16 @@
 //  #define DELTA_RADIUS (DELTA_SMOOTH_ROD_OFFSET-(DELTA_EFFECTOR_OFFSET)-(DELTA_CARRIAGE_OFFSET))
 //  #define DELTA_RADIUS 63.25
 //	#define DELTA_RADIUS 63.90
-	#define DELTA_RADIUS 63.50
+	#define DELTA_RADIUS 63.00
 
 	#define DELTA_ENDSTOP_ADJ_X 0.0
-	#define DELTA_ENDSTOP_ADJ_Y -0.50
-	#define DELTA_ENDSTOP_ADJ_Z -0.90
+	#define DELTA_ENDSTOP_ADJ_Y 0.0
+	#define DELTA_ENDSTOP_ADJ_Z 0.0
+
+  // Trim adjustments for individual towers
+  // tower angle corrections for X and Y tower / rotate XYZ so Z tower angle = 0
+  // measured in degrees anticlockwise looking from above the printer
+  #define DELTA_TOWER_ANGLE_TRIM { 0.0, 0.0, 0.0 } // get these values from auto calibrate
 
   // Print surface diameter/2 minus unreachable space (avoid collisions with vertical towers).
   #define DELTA_PRINTABLE_RADIUS 60.0
@@ -551,7 +556,7 @@
 //  (0,0)
 #define X_PROBE_OFFSET_FROM_EXTRUDER 0 // X offset: -left  +right  [of the nozzle]
 #define Y_PROBE_OFFSET_FROM_EXTRUDER 0 // Y offset: -front +behind [the nozzle]
-#define Z_PROBE_OFFSET_FROM_EXTRUDER 0 //  Z offset: -below +above  [the nozzle]
+#define Z_PROBE_OFFSET_FROM_EXTRUDER -0.0 //  Z offset: -below +above  [the nozzle]
 
 // X and Y axis travel speed (mm/m) between probes
 #define XY_PROBE_SPEED (30*60)
@@ -611,7 +616,7 @@
 //#define DISABLE_Z_MIN_PROBE_ENDSTOP
 
 // Enable Z Probe Repeatability test to see how accurate your probe is
-//#define Z_MIN_PROBE_REPEATABILITY_TEST
+#define Z_MIN_PROBE_REPEATABILITY_TEST
 
 //
 // Probe Raise options provide clearance for the probe to deploy, stow, and travel.
@@ -687,7 +692,7 @@
 #define Z_MIN_POS 0
 #define X_MAX_POS 60
 #define Y_MAX_POS 60 //200
-#define Z_MAX_POS 130 //200
+#define Z_MAX_POS 125 //200
 
 //#define MAX_RAD (sqrt(sq(X_MAX_POS)+sq(Y_MAX_POS))))
 #define MAX_RAD 60
@@ -759,7 +764,7 @@
 
   #if ENABLED(AUTO_BED_LEVELING_GRID)
 
-	#define DELTA_PROBEABLE_RADIUS (DELTA_PRINTABLE_RADIUS - 10)
+	#define DELTA_PROBEABLE_RADIUS (DELTA_PRINTABLE_RADIUS - 15)
 	#define LEFT_PROBE_BED_POSITION -(DELTA_PROBEABLE_RADIUS)
 	#define RIGHT_PROBE_BED_POSITION DELTA_PROBEABLE_RADIUS
 	#define FRONT_PROBE_BED_POSITION -(DELTA_PROBEABLE_RADIUS)
@@ -771,7 +776,7 @@
   // Compensate by interpolating between the nearest four Z probe values for each point.
   // Useful for deltas where the print surface may appear like a bowl or dome shape.
   // Works best with AUTO_BED_LEVELING_GRID_POINTS 5 or higher.
-  #define AUTO_BED_LEVELING_GRID_POINTS 3
+  #define AUTO_BED_LEVELING_GRID_POINTS 7
 
   #else  // !AUTO_BED_LEVELING_GRID
 
@@ -811,7 +816,7 @@
 // For DELTA this is the top-center of the Cartesian print volume.
 //#define MANUAL_X_HOME_POS 0
 //#define MANUAL_Y_HOME_POS 0
-#define MANUAL_Z_HOME_POS 130 // Distance between the nozzle to printbed after homing
+#define MANUAL_Z_HOME_POS 125 // Distance between the nozzle to printbed after homing
 
 // Use "Z Safe Homing" to avoid homing with a Z probe outside the bed area.
 //
