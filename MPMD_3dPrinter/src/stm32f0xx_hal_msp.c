@@ -244,6 +244,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     HAL_GPIO_Init(BSP_UART_DEBUG_RX_PORT, &GPIO_InitStruct);
     
     /* Configure the NVIC for UART */
+	//No hardware FIFO for UART, so must be highest priority to prevent missing characters
     HAL_NVIC_SetPriority(BSP_UART_DEBUG_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(BSP_UART_DEBUG_IRQn);    
   }
@@ -251,7 +252,6 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
   {
     /* Peripheral clock enable */
     __BSP_UART_LCD_CLK_ENABLE();
-
     /* Enable GPIO TX/RX clock */
     __BSP_UART_LCD_TX_GPIO_CLK_ENABLE();
     __BSP_UART_LCD_RX_GPIO_CLK_ENABLE();
@@ -273,6 +273,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     HAL_GPIO_Init(BSP_UART_LCD_RX_PORT, &GPIO_InitStruct);
 
     /* Configure the NVIC for UART */
+	//No hardware FIFO for UART, so must be highest priority to prevent missing characters
     HAL_NVIC_SetPriority(BSP_UART_LCD_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(BSP_UART_LCD_IRQn);
   }
@@ -852,25 +853,6 @@ void HAL_TIM_OC_MspDeInit(TIM_HandleTypeDef* htim_oc)
 #endif//BSP_SERVO0_PIN
 #endif//MARLIN
 }
-
-/**
-  * @brief External Line Callback 
-  * @param[in] GPIO_Pin pin number
-  * @retval None
-  */
-//void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-//{
-//  if (GPIO_Pin == BSP_MOTOR_CONTROL_BOARD_FLAG_PIN)
-//  {
-//    BSP_MotorControl_FlagInterruptHandler();
-//  }
-//  //TODO: removing SD card stuff for now
-////  if (GPIO_Pin == BSP_SD_DETECT_PIN)
-////  {
-////    BSP_SD_DetectIT();
-////  }
-// }
-
 
 void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
 {

@@ -161,8 +161,8 @@ class MarlinSerial { //: public Stream
     FORCE_INLINE void write(uint8_t c) {
     if(type==UART)
     	BSP_UartIfQueueTxData(&c, 1);
-		else if(type==USB_CDC)
-			BSP_CdcIfQueueTxData(&c, 1);
+	else if(type==USB_CDC)
+		BSP_CdcIfQueueTxData(&c, 1);
     }
 
 #if !defined(NO_WIFI)

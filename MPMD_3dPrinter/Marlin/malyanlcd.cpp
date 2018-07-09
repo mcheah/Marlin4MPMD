@@ -28,6 +28,11 @@
  * wrapped in curly braces which the LCD implementation translates into
  * actual G-code commands.
  *
+ * Jul 07, 18 - MCheah
+ * Added for use with Delta/Malyan M300 
+ * Added {P:P} {P:R} commands
+ * Still some unknown command related to the wifi implementation
+ * 
  * Added to Marlin for Mini/Malyan M200
  * Unknown commands as of Jan 2018: {H:}
  * Not currently implemented:
@@ -92,7 +97,6 @@ uint8_t last_percent_done = 100;
 void write_to_lcd_P(const char * const message) {
   char encoded_message[MAX_CURLY_COMMAND];
   uint8_t message_length = min(strlen(message), sizeof(encoded_message));
-  BSP_CdcPrintf(" %s\n",message);
 
   for (uint8_t i = 0; i < message_length; i++)
     encoded_message[i] = /*pgm_read_byte*/(message[i]) | 0x80;
@@ -103,7 +107,6 @@ void write_to_lcd_P(const char * const message) {
 void write_to_lcd(const char * const message) {
   char encoded_message[MAX_CURLY_COMMAND];
   const uint8_t message_length = min(strlen(message), sizeof(encoded_message));
-  BSP_CdcPrintf(" %s\n",message);
 
   for (uint8_t i = 0; i < message_length; i++)
     encoded_message[i] = message[i] | 0x80;
@@ -487,7 +490,6 @@ void lcd_update() {
     inbound_buffer[inbound_count++] = b;
     if (b == '}' || inbound_count == sizeof(inbound_buffer) - 1) {
       inbound_buffer[inbound_count - 1] = '\0';
-      BSP_CdcPrintf("%s}\n",inbound_buffer);
       process_lcd_command(inbound_buffer);
       inbound_count = 0;
       inbound_buffer[0] = 0;

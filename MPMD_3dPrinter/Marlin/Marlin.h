@@ -272,6 +272,10 @@ extern float home_offset[3];
 extern float sw_endstop_min[3];
 extern float sw_endstop_max[3];
 
+#if ENABLED(AUTO_BED_LEVELING_FEATURE)
+extern float bed_level[AUTO_BED_LEVELING_GRID_POINTS][AUTO_BED_LEVELING_GRID_POINTS];
+#endif
+
 #define LOGICAL_POSITION(POS, AXIS) (POS + home_offset[AXIS] + position_shift[AXIS])
 #define RAW_POSITION(POS, AXIS)     (POS - home_offset[AXIS] - position_shift[AXIS])
 #define LOGICAL_X_POSITION(POS)     LOGICAL_POSITION(POS, X_AXIS)
@@ -291,16 +295,18 @@ float code_value_temp_diff();
 #if ENABLED(DELTA)
   extern float delta[3];
   extern float endstop_adj[3]; // axis[n].endstop_adj
+  extern float delta_height;
   extern float delta_radius;
   extern float delta_diagonal_rod;
   extern float delta_segments_per_second;
   extern float delta_diagonal_rod_trim_tower_1;
   extern float delta_diagonal_rod_trim_tower_2;
   extern float delta_diagonal_rod_trim_tower_3;
+  extern float delta_tower_angle_trim[3];
   void inverse_kinematics(const float cartesian[3]);
   void recalc_delta_settings(float radius, float diagonal_rod);
   #if ENABLED(AUTO_BED_LEVELING_FEATURE)
-    extern int delta_grid_spacing[2];
+    extern float delta_grid_spacing[2];
     void adjust_delta(float cartesian[3]);
   #endif
 #elif ENABLED(SCARA)

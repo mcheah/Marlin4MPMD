@@ -62,8 +62,6 @@
 /* Exported variables  --------------------------------------------------------*/
 
 /* Exported functions --------------------------------------------------------*/
-//TODO: come up with a less janky way to do conditional compiling
-//#ifdef STM32_USE_USB_CDC
 void BSP_CdcHwInit(uint32_t newBaudRate);
 void BSP_CdcIfStart(void);
 void BSP_CdcIfQueueTxData(uint8_t *pBuf, uint8_t nbData);

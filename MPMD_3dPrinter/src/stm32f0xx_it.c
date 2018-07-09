@@ -187,22 +187,25 @@ void TIM14_IRQHandler(void)
   * @Note   This function is redefined in "main.h" and related to DMA
   *         used for USART data transmission
   */
+//TODO: should use a different handle between debug UART and LCD UART
 void BSP_UART_DEBUG_IRQHandler(void)
 {
   HAL_UART_IRQHandler(&gBspUartData.handle);
 }
 
 /**
-  * @brief  This function handles UART interrupt request for debug.
+  * @brief  This function handles LCD interrupt request for debug.
   * @param  None
   * @retval None
   * @Note   This function is redefined in "main.h" and related to DMA
   *         used for USART data transmission
   */
+#ifdef MALYAN_LCD
 void BSP_UART_LCD_IRQHandler(void)
 {
   HAL_UART_IRQHandler(&gBspUartData.handle);
 }
+#endif
 /**
   * @brief  This function handles UART interrupt request for wifi module.
   * @param  None

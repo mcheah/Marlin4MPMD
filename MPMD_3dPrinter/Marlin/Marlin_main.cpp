@@ -472,6 +472,7 @@ static uint8_t target_extruder;
   #define COS_60 0.5
   float endstop_adj[3] = { DELTA_ENDSTOP_ADJ_X, DELTA_ENDSTOP_ADJ_Y, DELTA_ENDSTOP_ADJ_Z };
   // these are the default values, can be overriden with M665
+  float delta_height = Z_HOME_POS;
   float delta_radius = DELTA_RADIUS;
   float delta_tower1_x = -SIN_60 * (delta_radius + DELTA_RADIUS_TRIM_TOWER_1); // front left tower
   float delta_tower1_y = -COS_60 * (delta_radius + DELTA_RADIUS_TRIM_TOWER_1);
@@ -486,10 +487,12 @@ static uint8_t target_extruder;
   float delta_diagonal_rod_2_tower_1 = sq(delta_diagonal_rod + delta_diagonal_rod_trim_tower_1);
   float delta_diagonal_rod_2_tower_2 = sq(delta_diagonal_rod + delta_diagonal_rod_trim_tower_2);
   float delta_diagonal_rod_2_tower_3 = sq(delta_diagonal_rod + delta_diagonal_rod_trim_tower_3);
+  float delta_tower_angle_trim[3] = DELTA_TOWER_ANGLE_TRIM;
   float delta_segments_per_second = DELTA_SEGMENTS_PER_SECOND;
   float delta_clip_start_height = Z_MAX_POS;
   #if ENABLED(AUTO_BED_LEVELING_FEATURE)
-    int delta_grid_spacing[2] = { 0, 0 };
+    float delta_grid_spacing[2] = { ((RIGHT_PROBE_BED_POSITION - LEFT_PROBE_BED_POSITION) / (AUTO_BED_LEVELING_GRID_POINTS - 1)),
+    								((BACK_PROBE_BED_POSITION - FRONT_PROBE_BED_POSITION) / (AUTO_BED_LEVELING_GRID_POINTS - 1)) };
     float bed_level[AUTO_BED_LEVELING_GRID_POINTS][AUTO_BED_LEVELING_GRID_POINTS];
   #endif
   float delta_safe_distance_from_top();
@@ -867,12 +870,6 @@ void servo_init() {
     digitalWrite(STEPPER_RESET_PIN, LOW);  // drive it down to hold in reset motor driver chips
   }
   void enableStepperDrivers() { pinMode(STEPPER_RESET_PIN, INPUT); }  // set to input, which allows it to be pulled high by pullups
-#endif
-
-#if ENABLED(SDSUPPORT)
-  void loop3() {
-	  p_card->initsd();
-  }
 #endif
 
 /**
@@ -1626,8 +1623,17 @@ static void set_axis_is_at_home(AxisEnum axis) {
     else
   #endif
   {
+#if ENABLED(DELTA)
+  if (axis == Z_AXIS) {
+	  current_position[axis] = delta_height;
+  }
+#else
+  if(1) { }
+#endif
+  else {
     current_position[axis] = LOGICAL_POSITION(base_home_pos(axis), axis);
-    update_software_endstops(axis);
+  }
+  update_software_endstops(axis);
 
     #if HAS_BED_PROBE && Z_HOME_DIR < 0 && DISABLED(Z_MIN_PROBE_ENDSTOP)
       if (axis == Z_AXIS) {
@@ -2246,7 +2252,7 @@ static void clean_up_after_endstop_or_probe_move() {
     if (DEPLOY_PROBE()) return NAN;
 
     float measured_z = run_z_probe();
-
+    	measured_z -= zprobe_zoffset;
     if (stow) {
       #if ENABLED(DEBUG_LEVELING_FEATURE)
         if (DEBUGGING(LEVELING)) SERIAL_ECHOPGM("> ");
@@ -2956,7 +2962,6 @@ inline void gcode_G28() {
   #if ENABLED(AUTO_BED_LEVELING_FEATURE)
     planner.bed_level_matrix.set_to_identity();
     #if ENABLED(DELTA)
-      reset_bed_level();
     #endif
   #endif
 
@@ -3649,7 +3654,7 @@ inline void gcode_G28() {
       #if ENABLED(DELTA)
         delta_grid_spacing[0] = xGridSpacing;
         delta_grid_spacing[1] = yGridSpacing;
-        float zoffset = zprobe_zoffset;
+        float zoffset = 0;
         if (code_seen('Z')) zoffset += code_value_axis_units(Z_AXIS);
       #else // !DELTA
         /**
@@ -4254,7 +4259,36 @@ inline void gcode_M42() {
 }
 
 #if ENABLED(Z_MIN_PROBE_REPEATABILITY_TEST)
+//TODO: put these in the appropriate header file, got lazy and hacked these in for the bed repeatability test
+static void randomSeed( uint32_t dwSeed )
+{
+  if ( dwSeed != 0 )
+  {
+    srand( dwSeed ) ;
+  }
+}
 
+static inline long random( long howbig )
+{
+  if ( howbig == 0 )
+  {
+    return 0 ;
+  }
+
+  return rand() % howbig;
+}
+
+static inline long random( long howsmall, long howbig )
+{
+  if (howsmall >= howbig)
+  {
+    return howsmall;
+  }
+
+  long diff = howbig - howsmall;
+
+  return random(diff) + howsmall;
+}
   /**
    * M48: Z probe repeatability measurement function.
    *
@@ -5502,12 +5536,16 @@ inline void gcode_M206() {
    *    C = Gamma (Tower 3) diagonal rod trim
    */
   inline void gcode_M665() {
+	if (code_seen('H')) delta_height = code_value_linear_units();
     if (code_seen('L')) delta_diagonal_rod = code_value_linear_units();
     if (code_seen('R')) delta_radius = code_value_linear_units();
     if (code_seen('S')) delta_segments_per_second = code_value_float();
     if (code_seen('A')) delta_diagonal_rod_trim_tower_1 = code_value_linear_units();
     if (code_seen('B')) delta_diagonal_rod_trim_tower_2 = code_value_linear_units();
     if (code_seen('C')) delta_diagonal_rod_trim_tower_3 = code_value_linear_units();
+    if (code_seen('X')) delta_tower_angle_trim[A_AXIS] = code_value_float();
+    if (code_seen('Y')) delta_tower_angle_trim[B_AXIS] = code_value_float();
+    if (code_seen('Z')) delta_tower_angle_trim[C_AXIS] = code_value_float();
     recalc_delta_settings(delta_radius, delta_diagonal_rod);
   }
   /**
@@ -6152,43 +6190,69 @@ void quickstop_stepper() {
   #endif
 }
 
-#if ENABLED(MESH_BED_LEVELING)
+#if ENABLED(AUTO_BED_LEVELING_FEATURE)
 
   /**
    * M420: Enable/Disable Mesh Bed Leveling
    */
+#if ENABLED(MESH_BED_LEVELING)
   inline void gcode_M420() { if (code_seen('S') && code_has_value()) mbl.set_has_mesh(code_value_bool()); }
-
+#endif //MESH_BED_LEVELING
   /**
    * M421: Set a single Mesh Bed Leveling Z coordinate
    * Use either 'M421 X<linear> Y<linear> Z<linear>' or 'M421 I<xindex> J<yindex> Z<linear>'
    */
   inline void gcode_M421() {
     int8_t px = 0, py = 0;
-    float z = 0;
-    bool hasX, hasY, hasZ, hasI, hasJ;
-    if ((hasX = code_seen('X'))) px = mbl.probe_index_x(code_value_axis_units(X_AXIS));
-    if ((hasY = code_seen('Y'))) py = mbl.probe_index_y(code_value_axis_units(Y_AXIS));
-    if ((hasI = code_seen('I'))) px = code_value_axis_units(X_AXIS);
-    if ((hasJ = code_seen('J'))) py = code_value_axis_units(Y_AXIS);
+    float z = 0, q = 0;
+    bool hasX, hasY, hasZ, hasI, hasJ, hasQ, hasC, hasE;
+	if ((hasI = code_seen('I'))) px = code_value_int();
+	if ((hasJ = code_seen('J'))) py = code_value_int();
     if ((hasZ = code_seen('Z'))) z = code_value_axis_units(Z_AXIS);
-
-    if (hasX && hasY && hasZ) {
-
-      if (px >= 0 && py >= 0)
-        mbl.set_z(px, py, z);
+    if ((hasQ = code_seen('Q'))) q = code_value_axis_units(Z_AXIS);
+    hasC = code_seen('C');
+    hasE = code_seen('E');
+    if (!hasI && !hasJ) {
+    	if(hasC)
+    		reset_bed_level();
+    	else if(hasE)//Re-calculate the 0'ed points, must be done manually
+    		extrapolate_unprobed_bed_level(); 	
+		//TODO: make it so that the extrapolated points are automatically cleared			
+    	print_bed_level();//Print entire map
+    }
+    else if (hasI && hasJ && !hasZ && !hasQ) {
+        if (px >= 0 && px < AUTO_BED_LEVELING_GRID_POINTS && py >= 0 && py < AUTO_BED_LEVELING_GRID_POINTS)//Print single point
+        {
+			SERIAL_PROTOCOLPGM("Bed I: ");
+			SERIAL_PROTOCOL_F(px, 3);
+			SERIAL_PROTOCOLPGM(" J: ");
+			SERIAL_PROTOCOL_F(py, 3);
+			SERIAL_PROTOCOLPGM(" Z: ");
+			SERIAL_PROTOCOL_F(bed_level[px][py], 3);
+			SERIAL_EOL;
+        }
+        else {
+            SERIAL_ERROR_START;
+            SERIAL_ERRORLNPGM(MSG_ERR_MESH_XY);
+        }
+    }
+	//Z sets the actual value directly
+    else if (hasI && hasJ && hasZ) {
+      if (px >= 0 && px < AUTO_BED_LEVELING_GRID_POINTS && py >= 0 && py < AUTO_BED_LEVELING_GRID_POINTS)
+    	bed_level[px][py] = z;
       else {
         SERIAL_ERROR_START;
         SERIAL_ERRORLNPGM(MSG_ERR_MESH_XY);
       }
     }
-    else if (hasI && hasJ && hasZ) {
-      if (px >= 0 && px < MESH_NUM_X_POINTS && py >= 0 && py < MESH_NUM_Y_POINTS)
-        mbl.set_z(px, py, z);
-      else {
-        SERIAL_ERROR_START;
-        SERIAL_ERRORLNPGM(MSG_ERR_MESH_XY);
-      }
+	//Q adjusts level by offset
+    else if(hasI && hasJ && hasQ) {
+        if (px >= 0 && px < AUTO_BED_LEVELING_GRID_POINTS && py >= 0 && py < AUTO_BED_LEVELING_GRID_POINTS)
+      	bed_level[px][py] += q;
+        else {
+          SERIAL_ERROR_START;
+          SERIAL_ERRORLNPGM(MSG_ERR_MESH_XY);
+        }
     }
     else {
       SERIAL_ERROR_START;
@@ -7654,6 +7718,8 @@ void process_next_command() {
         case 420: // M420 Enable/Disable Mesh Bed Leveling
           gcode_M420();
           break;
+      #endif
+#if ENABLED(AUTO_BED_LEVELING_FEATURE)
         case 421: // M421 Set a Mesh Bed Leveling Z coordinate
           gcode_M421();
           break;
@@ -7819,15 +7885,16 @@ void clamp_to_software_endstops(float target[3]) {
 #if ENABLED(DELTA)
 
   void recalc_delta_settings(float radius, float diagonal_rod) {
-    delta_tower1_x = -SIN_60 * (radius + DELTA_RADIUS_TRIM_TOWER_1);  // front left tower
-    delta_tower1_y = -COS_60 * (radius + DELTA_RADIUS_TRIM_TOWER_1);
-    delta_tower2_x =  SIN_60 * (radius + DELTA_RADIUS_TRIM_TOWER_2);  // front right tower
-    delta_tower2_y = -COS_60 * (radius + DELTA_RADIUS_TRIM_TOWER_2);
-    delta_tower3_x = 0.0;                                             // back middle tower
-    delta_tower3_y = (radius + DELTA_RADIUS_TRIM_TOWER_3);
+	delta_tower1_x = cos(RADIANS(210 + delta_tower_angle_trim[A_AXIS])) * (radius + DELTA_RADIUS_TRIM_TOWER_1); // front left tower
+	delta_tower1_y = sin(RADIANS(210 + delta_tower_angle_trim[A_AXIS])) * (radius + DELTA_RADIUS_TRIM_TOWER_1);
+	delta_tower2_x = cos(RADIANS(330 + delta_tower_angle_trim[B_AXIS])) * (radius + DELTA_RADIUS_TRIM_TOWER_2); // front right tower
+	delta_tower2_y = sin(RADIANS(330 + delta_tower_angle_trim[B_AXIS])) * (radius + DELTA_RADIUS_TRIM_TOWER_2);
+	delta_tower3_x = cos(RADIANS( 90 + delta_tower_angle_trim[C_AXIS])) * (radius + DELTA_RADIUS_TRIM_TOWER_3); // back middle tower
+	delta_tower3_y = sin(RADIANS( 90 + delta_tower_angle_trim[C_AXIS])) * (radius + DELTA_RADIUS_TRIM_TOWER_3);
     delta_diagonal_rod_2_tower_1 = sq(diagonal_rod + delta_diagonal_rod_trim_tower_1);
     delta_diagonal_rod_2_tower_2 = sq(diagonal_rod + delta_diagonal_rod_trim_tower_2);
     delta_diagonal_rod_2_tower_3 = sq(diagonal_rod + delta_diagonal_rod_trim_tower_3);
+    update_software_endstops(Z_AXIS);
   }
 
   void inverse_kinematics(const float in_cartesian[3]) {

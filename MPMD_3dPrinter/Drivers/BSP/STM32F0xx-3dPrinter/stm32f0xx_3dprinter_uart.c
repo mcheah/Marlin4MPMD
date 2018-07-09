@@ -74,8 +74,8 @@ static uint8_t  UART_Itf_IsTransmitting(void);
 static uint8_t  UART_Itf_IsTxQueueEmpty(void);
 /* Global variables ----------------------------------------------------------*/
 BspUartDataType gBspUartData;
-uint8_t gBspUartTxBuffer[1 * UART_TX_BUFFER_SIZE]; // real size is double to easily handle memcpy and tx uart
-uint8_t gBspUartRxBuffer[1 * UART_RX_BUFFER_SIZE];
+uint8_t gBspUartTxBuffer[UART_TX_BUFFER_SIZE];
+uint8_t gBspUartRxBuffer[UART_RX_BUFFER_SIZE];
 #ifdef USE_XONXOFF
 static uint8_t  BspUartXonXoff = 0;
 static uint8_t BspUartXoffBuffer[12] = " SEND XOFF\n";
@@ -104,6 +104,7 @@ void BSP_UartHwInit(uint32_t newBaudRate)
   pUart->handle.Init.Mode = UART_MODE_TX_RX;
   pUart->handle.Init.HwFlowCtl = UART_HWCONTROL_NONE;
   pUart->handle.Init.OverSampling = UART_OVERSAMPLING_16;
+
   if(HAL_UART_DeInit(&pUart->handle) != HAL_OK)
   {
     UART_ERROR(1);
@@ -163,14 +164,14 @@ void BSP_UartIfQueueTxData(uint8_t *pBuf, uint32_t nbData)
 	  BspUartDataType *pUart= &gBspUartData;
 	  for(uint32_t i=0;i<nbData;i++) {
 			uint8_t nBytes = UART_Itf_GetNbTxAvailableBytes();
-			while(nBytes <1)
+			while(nBytes <1)  //Queue is full, start UART_Tx_IT
 			{
 				if(!UART_Itf_IsTransmitting())
 					BSP_UartIfSendQueuedData();
 				BSP_LED_On(LED_GREEN);
 				nBytes = UART_Itf_GetNbTxAvailableBytes();
 			}
-			BSP_LED_Off(LED_GREEN);
+			BSP_LED_Off(LED_GREEN); //Queue has room, fill user buffer
 			*(pUart->pTxWriteBuffer) = pBuf[i];
 			pUart->pTxWriteBuffer++;
 			//Wraparound
@@ -178,8 +179,8 @@ void BSP_UartIfQueueTxData(uint8_t *pBuf, uint32_t nbData)
 				pUart->pTxWriteBuffer = pUart->pTxBuffer;
 	  }
   }
-	if(!UART_Itf_IsTransmitting())
-		BSP_UartIfSendQueuedData();
+  if(!UART_Itf_IsTransmitting())
+	BSP_UartIfSendQueuedData();
 }
 
 /**
@@ -194,7 +195,7 @@ static uint32_t UART_Itf_GetNbTxQueuedBytes(void)
 	if(pUart->pTxWriteBuffer >= pUart->pTxReadBuffer)
 		nB = pUart->pTxWriteBuffer - pUart->pTxReadBuffer;
 	else//wraparound
-		nB = UART_TX_BUFFER_SIZE + (pUart->pTxWriteBuffer-pUart->pTxReadBuffer);
+		nB = UART_TX_BUFFER_SIZE + (pUart->pTxWriteBuffer - pUart->pTxReadBuffer);
 	return nB;
 }
 
@@ -267,6 +268,7 @@ void BSP_UartIfSendQueuedData(void)
       }
     }
 #endif
+	//TODO: we don't really use newTxRequestInThePipe, probably should remove at some point
     if ((pUart->newTxRequestInThePipe == 0)&&
         (pUart->txBusy == RESET)&&
         (pUart->pTxReadBuffer != pUart->pTxWriteBuffer))
