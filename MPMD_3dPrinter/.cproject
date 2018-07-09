@@ -215,7 +215,7 @@
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/MotorControl"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/NUCLEO-F070RB-3dPrinter"/>
 						<entry excluding="stm32f0xx_3dprinter_sd.h" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/STM32F0xx-3dPrinter"/>
-						<entry excluding="doc|src/option/ccsbcs.c|src/option/cc950.c|src/option/cc949.c|src/option/cc936.c|src/option/cc932.c|src/drivers/usbh_diskio.c|src/drivers/sram_diskio.c|src/drivers/sdram_diskio.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FatFs"/>
+						<entry excluding="doc|src/drivers/usbh_diskio.c|src/drivers/sram_diskio.c|src/drivers/sdram_diskio.c|src/option/ccsbcs.c|src/option/cc950.c|src/option/cc949.c|src/option/cc936.c|src/option/cc932.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FatFs"/>
 						<entry excluding="Src/stm32f0xx_hal_crc.c|Src/stm32f0xx_ll_crc.c|Src/stm32f0xx_hal_timebase_tim_template.c|Src/stm32f0xx_hal_timebase_rtc_wakeup_template.c|Src/stm32f0xx_hal_timebase_rtc_alarm_template.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="HAL_Driver"/>
 						<entry excluding="exclude|SdFatUtil.cpp|SdFile.cpp|SdBaseFile.cpp|Sd2Card.cpp|ultralcd.cpp|planner_bezier.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Marlin"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>

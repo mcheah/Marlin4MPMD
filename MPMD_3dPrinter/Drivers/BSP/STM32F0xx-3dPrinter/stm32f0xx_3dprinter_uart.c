@@ -401,7 +401,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
  **********************************************************/
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 {
-    UART_ERROR(8);
+//    UART_ERROR(8);
 }
 
 /******************************************************//**

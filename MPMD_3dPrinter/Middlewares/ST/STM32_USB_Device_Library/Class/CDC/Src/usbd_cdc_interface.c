@@ -61,7 +61,7 @@ void BSP_CDC_RxCpltCallback(uint8_t* Buf, uint32_t *Len);
 //TODO: Find a strategy to selectively disable UART/CDC
 //#ifdef STM32_USE_USB_CDC
 #define APP_RX_DATA_SIZE  64
-#define APP_TX_DATA_SIZE  256
+#define APP_TX_DATA_SIZE  64
 //#else
 //#define APP_RX_DATA_SIZE  1
 //#define APP_TX_DATA_SIZE  1

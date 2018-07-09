@@ -550,17 +550,26 @@ const unsigned int dropsegments = 5; //everything with less than this number of 
 
 // The number of linear motions that can be in the plan at any give time.
 // THE BLOCK_BUFFER_SIZE NEEDS TO BE A POWER OF 2, i.g. 8,16,32 because shifts and ors are used to do the ring-buffering.
-#if ENABLED(SDSUPPORT)
-  #define BLOCK_BUFFER_SIZE 16   // SD,LCD,Buttons take more memory, block buffer needs to be smaller
+#if ENABLED(MINIMAL_BUILD)
+#define BLOCK_BUFFER_SIZE 4 // maximize block buffer
 #else
-  #define BLOCK_BUFFER_SIZE 64 // maximize block buffer
+	#if ENABLED(SDSUPPORT)
+	  #define BLOCK_BUFFER_SIZE 16   // SD,LCD,Buttons take more memory, block buffer needs to be smaller
+	#else
+	  #define BLOCK_BUFFER_SIZE 64 // maximize block buffer
+	#endif
 #endif
 
 // @section serial
 
 // The ASCII buffer for serial input
+#if DISABLED(MINIMUM_BUILD)
 #define MAX_CMD_SIZE 96
 #define BUFSIZE 4
+#else
+#define MAX_CMD_SIZE 64
+#define BUFSIZE 1
+#endif
 
 // Transfer Buffer Size
 // To save 386 bytes of PROGMEM (and TX_BUFFER_SIZE+3 bytes of RAM) set to 0.

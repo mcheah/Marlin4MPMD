@@ -274,7 +274,9 @@
 
 // Comment the following line to disable PID and enable bang-bang.
 //TODO: re-enable PID temp control
+//#if DISABLED(MINIMAL_BUILD)
 #define PIDTEMP
+//#endif
 #define BANG_MAX 255 // limits current to nozzle while in bang-bang mode; 255=full current
 #define PID_MAX BANG_MAX // limits current to nozzle while PID is active (see PID_FUNCTIONAL_RANGE below); 255=full current
 #if ENABLED(PIDTEMP)
@@ -325,7 +327,9 @@
 // If your configuration is significantly different than this and you don't understand the issues involved, you probably
 // shouldn't use bed PID until someone else verifies your hardware works.
 // If this is enabled, find your own PID constants below.
+//#if DISABLED(MINIMAL_BUILD)
 #define PIDTEMPBED
+//#endif
 
 //#define BED_LIMIT_SWITCHING
 

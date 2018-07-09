@@ -187,11 +187,12 @@ void TIM14_IRQHandler(void)
   * @Note   This function is redefined in "main.h" and related to DMA
   *         used for USART data transmission
   */
+#if !defined(MINIMAL_BUILD) && !defined(STM32_USE_USB_CDC)
 void BSP_UART_DEBUG_IRQHandler(void)
 {
   HAL_UART_IRQHandler(&gBspUartData.handle);
 }
-
+#endif
 /**
   * @brief  This function handles UART interrupt request for debug.
   * @param  None
