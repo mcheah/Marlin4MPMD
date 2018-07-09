@@ -919,10 +919,6 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     HAL_GPIO_Init(BSP_THERM_E3_PORT, &GPIO_InitStruct);
 #endif//BSP_THERM_E2_PIN
     
-    GPIO_InitStruct.Pin = BSP_IR_OUT_PIN;
-    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(BSP_IR_OUT_PORT, &GPIO_InitStruct);    
 
     /* Peripheral DMA init*/
     pDmaHandle->Instance = BSP_DMA;
@@ -974,7 +970,6 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
     HAL_GPIO_DeInit(BSP_THERM_E2_PORT, BSP_THERM_E2_PIN);
     HAL_GPIO_DeInit(BSP_THERM_E3_PORT, BSP_THERM_E3_PIN);
 #endif//BSP_THERM_E2_PIN
-    HAL_GPIO_DeInit(BSP_IR_OUT_PORT, BSP_IR_OUT_PIN);
     
     /* Peripheral DMA DeInit*/
     if(hadc->DMA_Handle != NULL)
