@@ -4,7 +4,24 @@ That said, this is development firmware that has been tested only handful of tim
 USE AT YOUR OWN RISK! 3d printers have been known to fail and cause fires while unattended.  I cannot be responsible for any failures as a result of using this software, although unlikely, Monoprice may use this as an excuse to void your warranty if you brick your printer (this is extremely unlikely).
 
 The stock power supply cannot power both heaters on at the same time, so a special firmware has been created to prevent this situation to allow use of the stock power supply.  If you have upgraded to a 10A power supply, use the "firmware_10ALimit.bin" file to allow faster heating and potentially a higher max bed temperature.  Otherwise, use the "firmware_5ALimit.bin" file, which should still heat the bed faster, but will still respect the 5A limit of the power supply
+###  Changes from stock monoprice firmware
+- Mesh bed leveling ignores the P0-5 / C parameters that the stock firmware uses.  Instead, calling G29 will run a mesh leveling grid over a 7x7 area between -45 to 45mm on the X and Y axes in 15mm increments.  Points outside the probeable radius on the print bed will be extrapolated based on probed values.  This mesh grid is persistent, and saved/loaded by M500/M501.  This means that you should probably not run G29 on startup for every print.  Instead, your startup g-code only needs a G28 command at the top and the restored mesh grid should take care of the rest.  If you find the initial height is off, then you should adjust the M665 H parameter manually to compensate.  The Z parameter for G29 is still valid, but the better way is to use the M851 Z\<probe offset\> command to compensate for the switch travel of the bed.  On my printer I use a value around -0.5mm.  YMMV
+- Mesh bed leveling points can be retrieved and edited directly using the M421 command.  This is extended by the standard Marlin g-code in the following ways:
+  
+  M421 \<no parameters\> : displays the current mesh 
+  
 
+  M421 C : clears the current mesh
+  
+  M421 E : re-extrapolates the non-probeable points on the mesh using the actual probe points.  It is required that you set all of these points to 0.0 manually
+  
+  M421 I\<X Index\> J\<Y Index\> Z\<Value\> sets the mesh value at I,J to the Z value
+  
+  M421 I\<X Index\> J\<Y Index\> Q\<Offset> adjusts the mesh value at I,J up or down by Q offset
+  
+  Editing of the mesh bed level is required to account for some of the peculiarities of this printer and non-linearities of the bed leveling switches.  I strongly recommend doing a paper test at each of the probe points to verify the switch values.  In some instances (especially opposite the delta towers) the variation can be as much as 0.2-0.3mm which can throw off the first layer on large prints.
+- added support for M48 for bed probe repeatability
+- M665 delta parameters now includes parameters for adjusting delta height (the distance from the Zmax home position to the bed, the Zmin position in mm), individual rod length (X,Y,Z: adjustments are added to the nominal length in mm), individual tower angles (A,B,C: adjustments to the tower angles in degrees, sum of all three should be 0)
 ###  How to load the Firmware on a stock printer?
 The binary of the Marlin4MPMD firmware is found under firmware binaries\firmware.bin.  Also in this folder is the two stock firmwares as provided by [mpminidelta.com](https://www.mpminidelta.com/firmware/motion_controller), these can be re-loaded at any time by the following instructions.
 To load the binary onto your printer:
@@ -21,23 +38,31 @@ On windows you will need to install the STMicro Virtual COM Port driver found in
 On Linux and Mac the Virtual COM port driver should be installed by default, you should see the serial interface under /dev.
 Fire up your favorite g-code loading software (Pronterface and Octoprint are confirmed working, Cura seems to work, although I have had some issues with the printer freezing so it is not recommended).  Click the Connect button, the terminal window should print:
 start
+
 Printer is now online.
+
 echo:Marlin4MPMD
-echo: Last Updated: 2018-06-21 00:00 | Author: (MCheah, MPMD)
+
+echo: Last Updated: 2018-07-09 00:00 | Author: (MCheah, MPMD)
+
 Compiled: Jun 24 2018
+
 Issue G28 from the terminal window to make sure that communication is working correctly.  
+
 Calibration settings from stock firmware should be directly applicable from the stock firmware, so it is advised to write down the M503 results before re-flashing the firmware.  You may need to adjust M92, M666 and M665 for your specific printer.  The M301/M304 PID settings are not directly comparable to the stock firmware, but the default values should work fairly nicely.
-There is no non-volatile storage implemented right now, so whatever calibration settings you set will need to be written in your start g-code on every print or at least on power-up.
   
 ###  Current known Limitations:
 There are a number of stock features that have not been implemented.  They all should be possible, I just haven't bothered implementing them as this was more of a proof of concept than anything.
-- There is currently no support for the UI and wifi board on the printer.  This shouldn't be too hard to implement since the command interface between the two boards is plaintext UART, and the interface seems mildly well documented, but it hasn't been a priority since I use Octoprint most the time
 - EEPROM support is implemented by saving to M_CFG.G on the SD card, this implies that the SD card is present when executing M500 or M501.  Since M501 effectively just executes a G-code script, this means that it cannot be executed inside of another g-code file.  Therefore you will need to trigger M501 on connection through octoprint or manually run it every time you power on.
-- Only one G29 calibration pattern of a 3x3 mesh is supported at the moment.  This version of marlin supports greater meshes (Change AUTO_BED_LEVELING_GRID_POINTS to greater than 3 to get this support), however it can only be hardcoded to one setting at the moment
+- Only one G29 calibration pattern of a 7x7 mesh is supported at the moment.  This version allows direct editing and saving of the mesh grid, but it's currently hard-coded to a 7x7 grid as it's likely that you will not actually want to run this before every print.  As a result, it is not able to adjust for changes in delta height without re-running a full mesh calibration, so if you need to finetune the delta height, use the M665 H parameter.
+- LCD GUI browsing of SD card folders isn't supported, all g-code must be stored in the root directory
+- SOME wifi functionality may be available given that you have already set up the IP address previously, but loading g-code or running arbitrary functions over WIFI are not supported.  If you're reading this, I'm going to guess that you're already using something like octoprint already
 
 ###  Troubleshooting
 Installation of the firmware uses the stock bootloader to replace the application on the printer.  This is perfectly safe and reversible, but if you have issues, you should first check that your SD card formatted correctly.  The stock firmware will read both FAT16 and FAT32 partitions, but the bootloader only recognizes FAT32 partitions.  Make sure that you have properly formatted the SD card as FAT32 with a 512 byte allocation size.  See https://www.mpminidelta.com/firmware/motion_controller for more info.
+
 After verifying the partition, copy over one of the stock firmwares to the SD card.  If these files do not flash correctly, then you will not be able to install Marlin4MPMD, verify that you can re-flash the stock firmware first.
+
 If the stock firmware can be flashed correctly, then rename one of the appropriate Marlin4MPMD firmware files (depending on which power supply you have) and try installing by SD.  The white LED should flash for several seconds and then turn to solid red indicating the new firmware is loaded.  If you see flashing red and purple at any time, then a hard error has occurred and the printer should be reset.  If you experience problems, please open a github issue and I will try to help.
 
 
@@ -58,6 +83,13 @@ Debugging directly on the printer hardware requires access to the 4-pin SWD jump
 The MCU on this board has been locked down with the security read-out protection set to level 1, meaning that any attempt to re-flash any memory location or change the security bits results in a full erase of the flash memory.  Therefore care should be taken when going down the route of debugging directly on the actual printer.  I've included the original bootloader that I was able to extract so that you can restore the stock software without risking bricking your printer.  To enable debugging on the board with an ST-link debugger, you will need to start the STM32 ST-LINK utility and change the Read Out Protection level to 0.  This will trigger a full erase, but will allow you to debug the firmware directly.
 
 ###  Recent changes
+## Marlin4MPMD - v1.2.0 7/09/2018
+Third release brings things pretty close to parity to the stock firmware changes include:
+- Added MalyanLCD support from [xC0000005's](https://github.com/xC0000005/Marlin) port of Marlin 2.0 for use with the Malyan M200.  There is a potential to use that effort for a Marlin2.0 port for MPMD, but it will likely require some more effort.  All stock GUI functions should be implemented now.
+- Changed the way mesh bed leveling is done.  Uses a fixed 7x7 mesh now and is persistent through G28 homing.  You can now save/load meshes using the M500/M501 command.  You can also set individual points by the M421 command.  See above for more details
+- Bugfixes for the SD card
+- Added delta angle trim, use M665 XYZ
+
 ## Marlin4MPMD - v1.1.0 6/24/2018
 ------------------
 Second release to address some of the limitations of the first release.  Most notably:
