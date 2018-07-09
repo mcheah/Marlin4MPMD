@@ -33,11 +33,12 @@
  * - Extra features
  *
  * Advanced settings can be found in Configuration_adv.h
+ * Platform specific settings can be found in Confiuration_STM.h
  *
  */
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
-
+#include "Configuration_STM.h"
 /**
  *
  *  ***********************************
@@ -105,14 +106,6 @@
 //#define SHOW_CUSTOM_BOOTSCREEN
 // @section machine
 
-// RASPBERRY PI connected
-// This indicate if a Raspberry Pi is connected to the board and so if the firmware shall wait
-// for it.
-//#define RPI_CONNECTED
-
-// USE USB CDC Serial Interface.  Comment this line out to use USART2 directly instead.
-// Useful if Raspberry Pi GPIO's are hooked directly to UART interface for faster data transfer
-#define STM32_USE_USB_CDC
 // SERIAL_PORT selects which serial port should be used for communication with the host.
 // This allows the connection of wireless adapters (for instance) to non-default port pins.
 // Serial port 0 is still used by the Arduino bootloader regardless of this setting.
@@ -374,10 +367,11 @@
 
 //this prevents dangerous Extruder moves, i.e. if the temperature is under the limit
 //can be software-disabled for whatever purposes by
+#if DISABLED(MINIMAL_BUILD)
 #define PREVENT_DANGEROUS_EXTRUDE
 //if PREVENT_DANGEROUS_EXTRUDE is on, you can still disable (uncomment) very long bits of extrusion separately.
 #define PREVENT_LENGTHY_EXTRUDE
-
+#endif
 #define EXTRUDE_MINTEMP 170
 #define EXTRUDE_MAXLENGTH (X_MAX_LENGTH+Y_MAX_LENGTH) //prevent extrusion of very large distances.
 
@@ -396,10 +390,10 @@
  * If you get "Thermal Runaway" or "Heating failed" errors the
  * details can be tuned in Configuration_adv.h
  */
-
+#if DISABLED(MINIMAL_BUILD)
 #define THERMAL_PROTECTION_HOTENDS // Enable thermal protection for all extruders
 #define THERMAL_PROTECTION_BED     // Enable thermal protection for the heated bed
-
+#endif
 //===========================================================================
 //============================= Mechanical Settings =========================
 //===========================================================================
@@ -418,9 +412,7 @@
 //============================== Delta Settings =============================
 //===========================================================================
 // Enable DELTA kinematics and most of the default configuration for Deltas
-//TODO: Re-enable Delta mode once low level drivers are verified
 #define DELTA
-//TODO: check vs MPMD settings
 #if ENABLED(DELTA)
 
   // Make delta curves from many straight lines (linear interpolation).
@@ -740,8 +732,9 @@
 
 // @section bedlevel
 //TODO: re-enable later
+#if DISABLED(MINIMAL_BUILD)
 #define AUTO_BED_LEVELING_FEATURE // Delete the comment to enable (remove // at the start of the line)
-
+#endif
 // Enable this feature to get detailed logging of G28, G29, M48, etc.
 // Logging is off by default. Enable this logging feature with 'M111 S32'.
 // NOTE: Requires a huge amount of PROGMEM.
@@ -1082,13 +1075,19 @@
 //#define ULTRA_LCD   // Character based
 //#define DOGLCD      // Full graphics display
 
+// LCD for Malyan M200/M300 printers.
+//
+//#define MALYAN_LCD
+
 //
 // SD CARD
 //
 // SD Card support is disabled by default. If your controller has an SD slot,
 // you must uncomment the following option or it won't work.
 //
+#if DISABLED(MINIMAL_BUILD)
 #define SDSUPPORT
+#endif
 #if ENABLED(SDSUPPORT)
   #define SD_SETTINGS
   #define CONFIG_FILE_NAME "m_cfg.g"

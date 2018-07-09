@@ -46,11 +46,16 @@
 
    /* Includes ------------------------------------------------------------------*/
 #include "stm32f0xx_hal.h"
-   
+#include "Configuration_STM.h"
 /* Exported macros ------------------------------------------------------------*/
 //TODO: we should probably adjust these to a smaller size
+#ifdef STM32_USE_USB_CDC
 #define CDC_TX_BUFFER_SIZE (64)
 #define CDC_RX_BUFFER_SIZE (96*4)
+#else
+#define CDC_TX_BUFFER_SIZE (1)
+#define CDC_RX_BUFFER_SIZE (1)
+#endif
 
 /* Exported types --- --------------------------------------------------------*/
 

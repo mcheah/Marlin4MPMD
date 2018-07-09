@@ -109,18 +109,21 @@ FORCE_INLINE void store_char(unsigned char c) {
 
 // Constructors ////////////////////////////////////////////////////////////////
 
-MarlinSerial::MarlinSerial() { }
+MarlinSerial::MarlinSerial(MarlinSerialType serialtype) {
+	type = serialtype;
+}
 
 // Public Methods //////////////////////////////////////////////////////////////
 
 void MarlinSerial::begin(long baud) {
-#ifndef STM32_USE_USB_CDC
-	BSP_UartHwInit(baud);
-	BSP_UartIfStart();
-#else
-	BSP_CdcHwInit(baud);
-	BSP_CdcIfStart();
-#endif //STM32_USE_USB_CDC
+	if(type==UART) {
+		BSP_UartHwInit(baud);
+		BSP_UartIfStart();
+	}
+	else if(type==USB_CDC) {
+		BSP_CdcHwInit(baud);
+		BSP_CdcIfStart();
+	}
 }
 
 void MarlinSerial::end() {}
@@ -139,11 +142,12 @@ int MarlinSerial::peek(void) {
 }
 
 int MarlinSerial::read(void) {
-#ifndef STM32_USE_USB_CDC
-	return BSP_UartGetNextRxBytes();
-#else
-	return BSP_CdcGetNextRxByte();
-#endif //STM32_USE_USB_CDC
+	if(type==UART)
+		return BSP_UartGetNextRxBytes();
+	else if(type==USB_CDC)
+		return BSP_CdcGetNextRxByte();
+	else
+		return -1;
 }
 
 #if 0  // BDI
@@ -391,8 +395,14 @@ void MarlinSerial::printFloat(double number, uint8_t digits) {
 }
 // Preinstantiate Objects //////////////////////////////////////////////////////
 
-
-MarlinSerial customizedSerial;
+#ifdef STM32_USE_USB_CDC
+MarlinSerial customizedSerial(USB_CDC);
+#else
+MarlinSerial customizedSerial(UART);
+#endif
+#if ENABLED(MALYAN_LCD)
+MarlinSerial customizedSerial2(UART);
+#endif
 
 #endif // whole file
 #endif // !USBCON

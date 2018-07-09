@@ -187,10 +187,25 @@ void TIM14_IRQHandler(void)
   * @Note   This function is redefined in "main.h" and related to DMA
   *         used for USART data transmission
   */
+//TODO: should use a different handle between debug UART and LCD UART
 void BSP_UART_DEBUG_IRQHandler(void)
 {
   HAL_UART_IRQHandler(&gBspUartData.handle);
 }
+
+/**
+  * @brief  This function handles LCD interrupt request for debug.
+  * @param  None
+  * @retval None
+  * @Note   This function is redefined in "main.h" and related to DMA
+  *         used for USART data transmission
+  */
+#ifdef MALYAN_LCD
+void BSP_UART_LCD_IRQHandler(void)
+{
+  HAL_UART_IRQHandler(&gBspUartData.handle);
+}
+#endif
 /**
   * @brief  This function handles UART interrupt request for wifi module.
   * @param  None
@@ -273,7 +288,7 @@ void BSP_ADC_IRQHandler(void)
 //{
 //  BSP_SD_IRQHandler();
 //}
-
+#ifdef STM32_USE_USB_CDC
 /**
   * @brief  This function handles USB Handler.
   * @param  None
@@ -292,7 +307,7 @@ void USB_IRQHandler(void)
 void TIMx_IRQHandler(void) {
 	HAL_TIM_IRQHandler(&TimHandle);
 }
-
+#endif
 void HardFault_Handler(void)
 {
 	BSP_MiscErrorHandler(0);

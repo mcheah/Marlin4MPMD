@@ -193,6 +193,9 @@ void CardReader::lsDive(const char *prepend, DIR *parent, const char * const mat
       } 
       else if(lsAction==LS_GetFilename)
       {
+    	strcpy(filename,entry.fname);
+    	strcpy(longFilename, prepend);
+    	strcat(longFilename, entry.fname);
         if (match != NULL) {
           if (strcasecmp(match, entry.fname) == 0) return;
         }
@@ -271,7 +274,6 @@ void CardReader::ls()
   if(lsAction==LS_Count)
   nrFiles=0;
 */
-	fileList[0]='\0';
 	f_readdir(&root,0);
 	lsDive("",&root);
 }
@@ -303,6 +305,12 @@ void CardReader::startFileprint()
 {
   if(cardOK)
   {
+//	if(sdpos!=0)
+//	{
+//	    enqueue_and_echo_command_now("G91");
+//	    enqueue_and_echo_commands_P(PSTR("G1 Z-50 S1"));
+//	    enqueue_and_echo_commands_P(PSTR("G90"));
+//	}
     sdprinting = true;
   }
 }
@@ -312,6 +320,9 @@ void CardReader::pauseSDPrint()
   if(sdprinting)
   {
     sdprinting = false;
+    //TODO: add behavior to correctly raise the print head but currently causes deadlock
+//    enqueue_and_echo_command_now("M91");
+//    enqueue_and_echo_commands_P(PSTR("G1 Z50 S1"));
   }
 }
 
@@ -520,6 +531,15 @@ void CardReader::openFile(char* name,bool read, bool replace_current/*=true*/)
 
 }
 
+void CardReader::openAndPrintFile(const char *name) {
+//  sdpos = 0;
+  char cmd[4 + strlen(name) + 1]; // Room for "M23 ", filename, and null
+  sprintf_P(cmd, PSTR("M23 %s"), name);
+  for (char *c = &cmd[4]; *c; c++) *c = tolower(*c);
+  enqueue_and_echo_command_now(cmd);
+  enqueue_and_echo_commands_P(PSTR("M24"));
+}
+
 void CardReader::removeFile(char* name)
 {
 	char *fname=name;
@@ -721,6 +741,10 @@ void CardReader::updir()
   }
 }
 
+uint16_t CardReader::get_num_Files() {
+  return getnrfilenames();
+}
+
 
 void CardReader::printingHasFinished()
 {
@@ -739,7 +763,7 @@ void CardReader::printingHasFinished()
       // quickStop();   -- BDI : no more present in new version
       fileOpened[file_subcall_ctr] = 0;
       f_close(&file);
-      //sdprinting = false;
+      sdprinting = false;
       if(SD_FINISHED_STEPPERRELEASE)
       {
           //finishAndDisableSteppers();

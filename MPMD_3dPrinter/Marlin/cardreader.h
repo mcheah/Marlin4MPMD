@@ -37,14 +37,14 @@
   * @{
   */
 
-// Maximum directory deph
-#define MAX_DIR_DEPTH (5)
+// Maximum directory depth
+#define MAX_DIR_DEPTH (1)
 
 // Maximum length of path
 #define MAXPATHNAMELENGTH (13*MAX_DIR_DEPTH+MAX_DIR_DEPTH+1)
 
 // Maximum number of files displayed
-#define MAX_FILES (48) //MAX_FILES*LONG_FILENAME_LENGTH < 4096
+#define MAX_FILES (24) //MAX_FILES*LONG_FILENAME_LENGTH < 4096
 
 // Number of UTF-16 characters per entry
 #define FILENAME_LENGTH (13)
@@ -155,6 +155,15 @@ public:
 	 *
 	 * \param name  Name of the logfile.
 	 */
+
+	/**
+	 * \fn void openAndPrintFile(char* name)
+	 * \brief Function used to open a file and start a print
+	 *
+	 * \param name  Name of the file to open.
+	 */
+	void openAndPrintFile(const char *name);
+
 	void openLogFile(char* name);
 
 	/**
@@ -197,7 +206,7 @@ public:
 	 */
 	void getStatus();
 
-
+	uint16_t get_num_Files();
 	void printingHasFinished();
 
 	void getfilename(uint16_t nr, const char* const match=NULL);
@@ -227,8 +236,21 @@ public:
 		return (int16_t) readByte;
 	};
 	FORCE_INLINE void setIndex(long index) {sdpos = index;f_lseek(&file, index);};
+	FORCE_INLINE uint8_t percentDone(){
+		if(!isFileOpen())
+			if(sdpos==filesize && filesize)
+				return 100;
+			else
+				return 0;
+		if(filesize)
+			if(sdpos==filesize)
+				return 100;
+			else
+				return sdpos/((filesize+99)/100);
+		else return 0;
+	};
+
 #if (!MB(STM_3DPRINT))
-	FORCE_INLINE uint8_t percentDone(){if(!isFileOpen()) return 0; if(filesize) return sdpos/((filesize+99)/100); else return 0;};
 	FORCE_INLINE char* getWorkDirName(){workDir.getFilename(filename);return filename;};
 #endif
   
@@ -256,7 +278,6 @@ private:
 	LsAction lsAction; //stored for recursion.
 	int16_t nrFiles; //counter for the files in the current directory and recycled as position counter for getting the nrFiles'th name in the directory.
 	char* diveDirName;
-  char fileList[LONG_FILENAME_LENGTH*MAX_FILES];
 
 	// Private methods
 	//-----------------
@@ -268,11 +289,11 @@ private:
 };
 
 
-
+	extern CardReader card;
 	extern CardReader *p_card;
 	#define IS_SD_PRINTING (card.sdprinting)
 
-	#if (SDCARDDETECT > -1)
+#if (SDCARDDETECT > -1)
 # ifdef SDCARDDETECTINVERTED 
 #  define IS_SD_INSERTED (READ(SDCARDDETECT)!=0)
 # else

@@ -869,10 +869,6 @@ void servo_init() {
   void enableStepperDrivers() { pinMode(STEPPER_RESET_PIN, INPUT); }  // set to input, which allows it to be pulled high by pullups
 #endif
 
-  void loop3() {
-	  p_card->initsd();
-  }
-
 /**
  * Marlin entry-point: Set up before the program loop
  *  - Set up the kill pin, filament runout, power hold
@@ -905,17 +901,6 @@ void setup() {
     disableStepperDrivers();
 #endif
 
-#if !defined(DEBUG_ONGOING)
-  #if defined(WITH_RPI_DETECTION)
-    BSP_RPiGpioInit();
-    BSP_RPiWaitUntilReady();
-  #elif defined(WAIT_FOR_RPI)
-    HAL_Delay(30000);  //debug elan for raspberry
-  #endif
-#endif
-
-//    BSP_UartHwInit(BAUDRATE);
-//    BSP_UartIfStart();
     MYSERIAL.begin(BAUDRATE);
     SERIAL_PROTOCOLLNPGM("start");
     SERIAL_ECHO_START;
@@ -1317,7 +1302,7 @@ void get_available_commands() {
   get_serial_commands();
 
   //Kick uart tx queue
-#ifndef STM32_USE_USB_CDC
+#if DISABLED(STM32_USE_USB_CDC) || ENABLED(MALYAN_LCD)
   BSP_UartIfSendQueuedData();
 #else //CDC automatically sends the queue right away
 //  BSP_CdcIfSendQueuedData();

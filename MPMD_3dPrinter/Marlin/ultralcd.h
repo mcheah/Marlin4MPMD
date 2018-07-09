@@ -25,19 +25,25 @@
 
 #include "Marlin.h"
 
-#if ENABLED(ULTRA_LCD)
+#if ENABLED(ULTRA_LCD) || ENABLED(MALYAN_LCD)
+  void lcd_init();
+  void lcd_update();
+  void lcd_setalertstatuspgm(const char* message);
+#else
+  FORCE_INLINE void lcd_update() {}
+  FORCE_INLINE void lcd_init() {}
+  FORCE_INLINE void lcd_setstatuspgm(const char* message, const uint8_t level=0) {UNUSED(message); UNUSED(level);}
+#endif
 
+#if ENABLED(ULTRA_LCD)
   #define BUTTON_EXISTS(BN) (defined(BTN_## BN) && BTN_## BN >= 0)
   #define BUTTON_PRESSED(BN) !READ(BTN_## BN)
 
   int lcd_strlen(const char* s);
   int lcd_strlen_P(const char* s);
-  void lcd_update();
-  void lcd_init();
   bool lcd_hasstatus();
   void lcd_setstatus(const char* message, const bool persist=false);
   void lcd_setstatuspgm(const char* message, const uint8_t level=0);
-  void lcd_setalertstatuspgm(const char* message);
   void lcd_reset_alert_level();
   bool lcd_detected(void);
   void lcd_kill_screen();
@@ -152,16 +158,13 @@
     #define LCD_CLICKED (buttons & EN_C)
   #endif
 
-#else //no LCD
-  FORCE_INLINE void lcd_update() {}
-  FORCE_INLINE void lcd_init() {}
+#else // MALYAN_LCD or no LCD
+
   FORCE_INLINE bool lcd_hasstatus() { return false; }
   FORCE_INLINE void lcd_setstatus(const char* message, const bool persist=false) {UNUSED(message); UNUSED(persist);}
-  FORCE_INLINE void lcd_setstatuspgm(const char* message, const uint8_t level=0) {UNUSED(message); UNUSED(level);}
   FORCE_INLINE void lcd_buttons_update() {}
   FORCE_INLINE void lcd_reset_alert_level() {}
   FORCE_INLINE bool lcd_detected(void) { return true; }
-
   #define LCD_MESSAGEPGM(x) NOOP
   #define LCD_ALERTMESSAGEPGM(x) NOOP
 

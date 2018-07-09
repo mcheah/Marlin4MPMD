@@ -68,6 +68,7 @@ void TIM6_IRQHandler(void);
 //void TIM1_UP_TIM10_IRQHandler(void);
 void TIM14_IRQHandler(void);
 void BSP_UART_DEBUG_IRQHandler(void);
+void BSP_UART_LCD_IRQHandler(void);
 //void BSP_WIFI_UART_IRQHandler(void);
 void BSP_DMA_IRQHandler(void);
 void BSP_ADC_IRQHandler(void);

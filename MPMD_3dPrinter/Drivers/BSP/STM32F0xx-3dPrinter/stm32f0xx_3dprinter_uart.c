@@ -40,7 +40,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f0xx_3dprinter_uart.h"
 #include "stm32f0xx_3dprinter_misc.h"
-#include "stm32f0xx_3dprinter_wifi.h"
+#include "main.h"
 #include <string.h> /* for memcpy */
 #include <stdarg.h> /* for va_start */
 #include <stdio.h> /* for vsprintf */
@@ -68,12 +68,14 @@
 #endif
 
 /* Private functions ---------------------------------------------------------*/
-uint8_t BSP_UartParseRxAvalaibleBytes(const char* pBuffer, uint8_t nbRxBytes);
-    
+static uint32_t UART_Itf_GetNbTxQueuedBytes(void);
+static uint32_t UART_Itf_GetNbTxAvailableBytes(void);
+static uint8_t  UART_Itf_IsTransmitting(void);
+static uint8_t  UART_Itf_IsTxQueueEmpty(void);
 /* Global variables ----------------------------------------------------------*/
 BspUartDataType gBspUartData;
-uint8_t gBspUartTxBuffer[2 * UART_TX_BUFFER_SIZE]; // real size is double to easily handle memcpy and tx uart
-uint8_t gBspUartRxBuffer[2 * UART_RX_BUFFER_SIZE];
+uint8_t gBspUartTxBuffer[UART_TX_BUFFER_SIZE];
+uint8_t gBspUartRxBuffer[UART_RX_BUFFER_SIZE];
 #ifdef USE_XONXOFF
 static uint8_t  BspUartXonXoff = 0;
 static uint8_t BspUartXoffBuffer[12] = " SEND XOFF\n";
@@ -89,8 +91,12 @@ static uint8_t BspUartXonBuffer[11] = " SEND XON\n";
 void BSP_UartHwInit(uint32_t newBaudRate)
 {
   BspUartDataType *pUart = &gBspUartData;
-  
+//TODO: add a method for enabling both malyan LCD and UART as primary interface
+#ifndef MALYAN_LCD
   pUart->handle.Instance = BSP_UART_DEBUG;
+#else
+  pUart->handle.Instance = BSP_UART_LCD;
+#endif
   pUart->handle.Init.BaudRate = newBaudRate;
   pUart->handle.Init.WordLength = UART_WORDLENGTH_8B;
   pUart->handle.Init.StopBits = UART_STOPBITS_1;
@@ -152,50 +158,73 @@ void BSP_UartIfStart(void)
  * @param[in]  nbData number of bytes to be sent
  * @retval None
  **********************************************************/
-void BSP_UartIfQueueTxData(uint8_t *pBuf, uint8_t nbData)
+void BSP_UartIfQueueTxData(uint8_t *pBuf, uint32_t nbData)
 {
-  if (nbData != 0)
-  {
-    BspUartDataType *pUart= &gBspUartData;  
-    int32_t nbFreeBytes = pUart->pTxReadBuffer - pUart->pTxWriteBuffer;
-       
-    if (nbFreeBytes <= 0)
-    {
-      nbFreeBytes += UART_TX_BUFFER_SIZE;
-    }
-    if (nbData > nbFreeBytes)
-    {
-        /* Uart Tx buffer is full */
-        UART_ERROR(4);
-    }
-    
-    //use of memcpy is safe as real buffer size is 2 * UART_TX_BUFFER_SIZE
-    memcpy((uint8_t *)pUart->pTxWriteBuffer, pBuf, nbData);
-    pUart->pTxWriteBuffer += nbData;
-#if defined(MARLIN)
-    if (pBuf[nbData-1] == '\n')
-    {
-      *pUart->pTxWriteBuffer = '\n';
-      pUart->pTxWriteBuffer--;
-      *pUart->pTxWriteBuffer = '\r';
-      pUart->pTxWriteBuffer += 2;
-      if (pUart->pTxWriteBuffer >= pUart->pTxBuffer + UART_TX_BUFFER_SIZE)
-      {
-        pUart->pTxWrap = pUart->pTxWriteBuffer; 
-        pUart->pTxWriteBuffer = pUart->pTxBuffer;
-      }
-      //BSP_UartIfSendQueuedData();  // BDI
-    }
-#else
-    if (pUart->pTxWriteBuffer >= pUart->pTxBuffer + UART_TX_BUFFER_SIZE)
-    {
-      pUart->pTxWrap = pUart->pTxWriteBuffer; 
-      pUart->pTxWriteBuffer = pUart->pTxBuffer;
-    }
-#endif
-    BSP_UartIfSendQueuedData();
-//#endif
+  if (nbData != 0) {
+	  BspUartDataType *pUart= &gBspUartData;
+	  for(uint32_t i=0;i<nbData;i++) {
+			uint8_t nBytes = UART_Itf_GetNbTxAvailableBytes();
+			while(nBytes <1)  //Queue is full, start UART_Tx_IT
+			{
+				if(!UART_Itf_IsTransmitting())
+					BSP_UartIfSendQueuedData();
+				BSP_LED_On(LED_GREEN);
+				nBytes = UART_Itf_GetNbTxAvailableBytes();
+			}
+			BSP_LED_Off(LED_GREEN); //Queue has room, fill user buffer
+			*(pUart->pTxWriteBuffer) = pBuf[i];
+			pUart->pTxWriteBuffer++;
+			//Wraparound
+			if(pUart->pTxWriteBuffer >= (pUart->pTxBuffer + UART_TX_BUFFER_SIZE) )
+				pUart->pTxWriteBuffer = pUart->pTxBuffer;
+	  }
   }
+  if(!UART_Itf_IsTransmitting())
+	BSP_UartIfSendQueuedData();
+}
+
+/**
+* @brief  CDC_Itf_GetNbTxQueuedBytes
+*         Returns the number of bytes currently queued for transmit by USB CDC
+* @retval Number of queued bytes
+*/
+static uint32_t UART_Itf_GetNbTxQueuedBytes(void)
+{
+    BspUartDataType *pUart= &gBspUartData;
+	uint32_t nB;
+	if(pUart->pTxWriteBuffer >= pUart->pTxReadBuffer)
+		nB = pUart->pTxWriteBuffer - pUart->pTxReadBuffer;
+	else//wraparound
+		nB = UART_TX_BUFFER_SIZE + (pUart->pTxWriteBuffer - pUart->pTxReadBuffer);
+	return nB;
+}
+
+/**
+  * @brief  CDC_Itf_GetNbTxAvailableBytes
+  *         Returns the number of bytes available to queue
+  * @retval Number of bytes available
+  */
+static uint32_t UART_Itf_GetNbTxAvailableBytes(void)
+{
+	return UART_TX_BUFFER_SIZE - UART_Itf_GetNbTxQueuedBytes()-1;
+}
+/**
+  * @brief  CDC_Itf_IsTransmitting
+  *         Returns 1 if the USB device is currently transmitting
+  * @retval 1 if connected, 0 otherwise
+  */
+static uint8_t UART_Itf_IsTransmitting(void) {
+    BspUartDataType *pUart= &gBspUartData;
+    return (pUart->txBusy == SET);
+}
+
+/**
+  * @brief  CDC_Itf_IsTxQueueEmpty
+  *         Returns 1 if we the TX queue is empty
+  * @retval 1 if empty, 0 otherwise
+  */
+static uint8_t UART_Itf_IsTxQueueEmpty(void) {
+	return (!UART_Itf_IsTransmitting() && UART_Itf_GetNbTxQueuedBytes()==0);
 }
    
 /******************************************************//**
@@ -206,7 +235,7 @@ void BSP_UartIfQueueTxData(uint8_t *pBuf, uint8_t nbData)
 void BSP_UartIfSendQueuedData(void)
 {
     BspUartDataType *pUart = &gBspUartData;  
-    
+    uint32_t nbTxBytes;
 #ifdef USE_XONXOFF    
     if ((pUart->newTxRequestInThePipe == 0)&&
         (pUart->txBusy == RESET))
@@ -239,24 +268,20 @@ void BSP_UartIfSendQueuedData(void)
       }
     }
 #endif
+	//TODO: we don't really use newTxRequestInThePipe, probably should remove at some point
     if ((pUart->newTxRequestInThePipe == 0)&&
         (pUart->txBusy == RESET)&&
         (pUart->pTxReadBuffer != pUart->pTxWriteBuffer))
     {
-      int32_t nbTxBytes = pUart->pTxWriteBuffer - pUart->pTxReadBuffer;
-      pUart->newTxRequestInThePipe++;
-      if (nbTxBytes < 0)
+      if(pUart->pTxReadBuffer > pUart->pTxWriteBuffer) /* rollback */
       {
-        nbTxBytes = pUart->pTxWrap - pUart->pTxReadBuffer;
+        nbTxBytes = UART_TX_BUFFER_SIZE - (pUart->pTxReadBuffer - pUart->pTxBuffer);
       }
-      
-#if defined(MARLIN)
-      if (pUart->pTxReadBuffer[nbTxBytes-1]!='\n')
+      else
       {
-        pUart->newTxRequestInThePipe--;
-        return;
+        nbTxBytes = pUart->pTxWriteBuffer - pUart->pTxReadBuffer;
       }
-#endif
+//      pUart->newTxRequestInThePipe++;
       pUart->txBusy = SET;
       pUart->nbTxBytesOnGoing = nbTxBytes;       
       
@@ -267,7 +292,7 @@ void BSP_UartIfSendQueuedData(void)
       }
       
       pUart->debugNbTxFrames++;
-      pUart->newTxRequestInThePipe--;
+//      pUart->newTxRequestInThePipe--;
     }
 }
 
@@ -282,8 +307,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle)
   
   if (UartHandle == &(pUart->handle))
   {
-    /* Set transmission flag: transfer complete*/
-    pUart->txBusy = RESET;
+
     
 #ifdef USE_XONXOFF
     if ((BspUartXonXoff == 2)||
@@ -312,23 +336,16 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle)
     }
 #endif
     pUart->pTxReadBuffer += pUart->nbTxBytesOnGoing;
-    
-    if (pUart->pTxReadBuffer >= pUart->pTxBuffer + UART_TX_BUFFER_SIZE)
-    {
-      pUart->pTxReadBuffer  = pUart->pTxBuffer;
-    }          
+    if(pUart->pTxReadBuffer == (pUart->pTxBuffer+UART_TX_BUFFER_SIZE) )
+    	pUart->pTxReadBuffer = pUart->pTxBuffer;
     
     if (pUart->uartTxDoneCallback != 0)
     {
       pUart->uartTxDoneCallback();
     }
+    /* Set transmission flag: transfer complete*/
+    pUart->txBusy = RESET;
   }
-#if !defined(NO_WIFI)
-  else
-  {
-    BSP_WifiUartTxCpltCallback(UartHandle);
-  }
-#endif //#if !defined(NO_WIFI)
 }
 
 /******************************************************//**
@@ -339,9 +356,6 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle)
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 {
   BspUartDataType *pUart = &gBspUartData;
-#if !defined(NO_WIFI)
-  unsigned char *pChar = NULL;
-#endif //#if !defined(NO_WIFI)
   
   if (UartHandle == &(pUart->handle))
   {
@@ -380,22 +394,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
     }
     pUart->debugNbRxFrames++;
   }
-#if !defined(NO_WIFI)
-  else
-  {
-    uint32_t tmp = BSP_WifiUartRxCpltCallback(UartHandle, &pChar);
-    if (tmp != 0)
-    {
-      memcpy((uint8_t*)(pUart->pRxWriteBuffer), pChar, tmp);
-      pUart->pRxWriteBuffer += tmp;
-      *pUart->pRxWriteBuffer = '\0';
-      if (pUart->pRxWriteBuffer >= (pUart->pRxBuffer + UART_RX_BUFFER_SIZE))
-      {
-        pUart->pRxWriteBuffer = pUart->pRxBuffer;
-      }
-    }
-  }
-#endif //#if !defined(NO_WIFI)
 }
 
 /******************************************************//**
@@ -490,7 +488,7 @@ uint32_t BSP_UartPrintf(const char* format,...)
  * @param[in] fnone
   * @retval nxRxBytes nb received bytes
  **********************************************************/
-uint32_t BSP_UartGetNbRxAvalaibleBytes(void)
+uint32_t BSP_UartGetNbRxAvailableBytes(void)
 {
   BspUartDataType *pUart = &gBspUartData;  
   uint8_t *writePtr = (uint8_t *)(pUart->pRxWriteBuffer - 1);
@@ -500,44 +498,14 @@ uint32_t BSP_UartGetNbRxAvalaibleBytes(void)
     writePtr += UART_RX_BUFFER_SIZE;
   }  
   
-  //waitline feed to have a complete line before processing bytes
-  if ((*writePtr) != '\r' && (*writePtr) != '\n')
-    return (0);
-  
   int32_t nxRxBytes = pUart->pRxWriteBuffer - pUart->pRxReadBuffer;
   if (nxRxBytes < 0)
   {
     nxRxBytes += UART_RX_BUFFER_SIZE;
   }
-#if !defined(MARLIN)
-  if (nxRxBytes != 0)
-  {
-    uint8_t result = BSP_UartParseRxAvalaibleBytes((char const*)pUart->pRxReadBuffer, nxRxBytes);
-    if (result < BSP_WIFI_THRES_TO_GCODE_PARSER)
-    {
-      //The available bytes will not to go into the Gcode parser
-      pUart->pRxReadBuffer += nxRxBytes;
-      nxRxBytes = 0; 
-      if (pUart->pRxReadBuffer >= (pUart->pRxBuffer + UART_RX_BUFFER_SIZE))
-      {
-        pUart->pRxReadBuffer = pUart->pRxBuffer;
-      }
-    }
-  }
-#endif
-  
   return ((uint32_t) nxRxBytes );
 }
 
-/******************************************************//**
- * @brief  This function returns the number of bytes received via the UART
- * @param[in] fnone
-  * @retval nxRxBytes nb received bytes
- **********************************************************/
-uint8_t BSP_UartParseRxAvalaibleBytes(const char* pBuffer, uint8_t nbRxBytes)
-{
-  return (BSP_WifiParseTxBytes(pBuffer, nbRxBytes, BSP_WIFI_SOURCE_IS_DEBUG_UART));
-}
 
 /******************************************************//**
  * @brief  This function returns the first byte available on the UART
@@ -585,23 +553,6 @@ uint8_t BSP_UartIsTxOnGoing(void)
   return (pUart->newTxRequestInThePipe||pUart->txBusy);
 }
 
-#if defined(MARLIN)
-/******************************************************//**
- * @brief  This function calls the WIFI TX parser and returns 0 when the command 
-   in the buffer is not destinated to the gcode parser
- * @param[in] pBuf pointer to the buffer holding the command
- * @retval number of bytes destinated to the gcode parser
- **********************************************************/
-uint32_t BSP_UartCommandsFilter(char *pBufCmd, uint8_t nxRxBytes)
-{
-  if (BSP_UartParseRxAvalaibleBytes((char const*)pBufCmd, nxRxBytes)\
-        < BSP_WIFI_THRES_TO_GCODE_PARSER)
-  {
-    nxRxBytes = 0; 
-  }
-  return nxRxBytes;  
-}
-#endif
 
 /******************************************************//**
  * @brief  This function sends data via the Uart in locking
