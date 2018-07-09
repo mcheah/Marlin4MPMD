@@ -652,6 +652,9 @@
     #if ENABLED(AUTO_BED_LEVELING_GRID)
       #define DELTA_BED_LEVELING_GRID
     #endif
+    #ifndef DELTA_TOWER_ANGLE_TRIM
+      #define DELTA_TOWER_ANGLE_TRIM {0, 0, 0}
+    #endif
   #endif
 
   /**
