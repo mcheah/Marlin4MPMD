@@ -75,8 +75,8 @@
 /* Global variables ----------------------------------------------------------*/
 volatile USBD_HandleTypeDef USBD_Device;
 //TODO: investigate whether these actually need to be 2x BUFFER_SIZE, this is just copied direct from STM
-volatile uint8_t gBspCdcTxBuffer[2 * CDC_TX_BUFFER_SIZE]; // real size is double to easily handle memcpy and tx uart
-volatile uint8_t gBspCdcRxBuffer[2 * CDC_RX_BUFFER_SIZE];
+volatile uint8_t gBspCdcTxBuffer[CDC_TX_BUFFER_SIZE]; // real size is double to easily handle memcpy and tx uart
+volatile uint8_t gBspCdcRxBuffer[CDC_RX_BUFFER_SIZE];
 
 volatile uint8_t *pRxBuffer = gBspCdcRxBuffer;
 volatile uint8_t *pRxWriteBuffer;

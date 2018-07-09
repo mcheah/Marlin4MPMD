@@ -32,7 +32,7 @@
  */
 #ifndef CONFIGURATION_ADV_H
 #define CONFIGURATION_ADV_H
-
+#include "Configuration_STM.h"
 /**
  *
  *  ***********************************

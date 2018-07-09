@@ -74,8 +74,8 @@ static uint8_t  UART_Itf_IsTransmitting(void);
 static uint8_t  UART_Itf_IsTxQueueEmpty(void);
 /* Global variables ----------------------------------------------------------*/
 BspUartDataType gBspUartData;
-uint8_t gBspUartTxBuffer[2 * UART_TX_BUFFER_SIZE]; // real size is double to easily handle memcpy and tx uart
-uint8_t gBspUartRxBuffer[2 * UART_RX_BUFFER_SIZE];
+uint8_t gBspUartTxBuffer[1 * UART_TX_BUFFER_SIZE]; // real size is double to easily handle memcpy and tx uart
+uint8_t gBspUartRxBuffer[1 * UART_RX_BUFFER_SIZE];
 #ifdef USE_XONXOFF
 static uint8_t  BspUartXonXoff = 0;
 static uint8_t BspUartXoffBuffer[12] = " SEND XOFF\n";
@@ -279,6 +279,7 @@ void BSP_UartIfSendQueuedData(void)
       {
         nbTxBytes = pUart->pTxWriteBuffer - pUart->pTxReadBuffer;
       }
+//      pUart->newTxRequestInThePipe++;
       pUart->txBusy = SET;
       pUart->nbTxBytesOnGoing = nbTxBytes;       
       
@@ -289,7 +290,7 @@ void BSP_UartIfSendQueuedData(void)
       }
       
       pUart->debugNbTxFrames++;
-      pUart->newTxRequestInThePipe--;
+//      pUart->newTxRequestInThePipe--;
     }
 }
 

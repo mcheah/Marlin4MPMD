@@ -49,10 +49,6 @@
 #include "stm32f0xx_3dprinter_cdc.h"
 
 #include "stm32f0xx_3dprinter_adc.h"
-//#include "stm32f0xx_3dprinter_wifi.h"
-//#ifdef RPI_CONNECTED
-//#include "stm32f0xx_3dprinter_rpi.h"
-//#endif
 #include "motorcontrol.h"
 #include "ff.h" /* for FATS and FIL*/
 #include "arm_math.h"

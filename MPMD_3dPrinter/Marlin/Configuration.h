@@ -38,7 +38,7 @@
  */
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
-
+#include "Configuration_STM.h"
 /**
  *
  *  ***********************************
@@ -412,9 +412,7 @@
 //============================== Delta Settings =============================
 //===========================================================================
 // Enable DELTA kinematics and most of the default configuration for Deltas
-//TODO: Re-enable Delta mode once low level drivers are verified
 #define DELTA
-//TODO: check vs MPMD settings
 #if ENABLED(DELTA)
 
   // Make delta curves from many straight lines (linear interpolation).
@@ -1088,7 +1086,7 @@
 // you must uncomment the following option or it won't work.
 //
 #if DISABLED(MINIMAL_BUILD)
-//#define SDSUPPORT
+#define SDSUPPORT
 #endif
 #if ENABLED(SDSUPPORT)
   #define SD_SETTINGS

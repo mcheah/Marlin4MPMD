@@ -50,14 +50,27 @@
 #include "duration_t.h"
 #include "printcounter.h"
 #include "configuration_store.h"
-
+#if ENABLED(STM32_USE_USB_CDC)
+	#ifdef __cplusplus
+	 extern "C" {
+	#endif
+	#include "usbd_cdc_interface.h"
+	#ifdef __cplusplus
+	}
+	#endif
+#endif
 #include "Marlin.h"
 #if ENABLED(SDSUPPORT)
   #include "cardreader.h"
-  #include "SdFatConfig.h"
 #else
   #define LONG_FILENAME_LENGTH 0
 #endif
+
+typedef enum {
+	MALYAN_IDLE,
+	MALYAN_PRINTING,
+	MALYAN_PAUSED
+} MALYAN_PRINT_STATUS;
 
 // On the Malyan M200, this will be Serial1. On a RAMPS board,
 // it might not be.
@@ -72,13 +85,14 @@
 int inbound_count;
 
 // For sending print completion messages
-bool last_printing_status = false;
+MALYAN_PRINT_STATUS last_printing_status = MALYAN_IDLE;
 uint8_t last_percent_done = 100;
 
 // Everything written needs the high bit set.
 void write_to_lcd_P(const char * const message) {
   char encoded_message[MAX_CURLY_COMMAND];
   uint8_t message_length = min(strlen(message), sizeof(encoded_message));
+  BSP_CdcPrintf(" %s\n",message);
 
   for (uint8_t i = 0; i < message_length; i++)
     encoded_message[i] = /*pgm_read_byte*/(message[i]) | 0x80;
@@ -89,6 +103,7 @@ void write_to_lcd_P(const char * const message) {
 void write_to_lcd(const char * const message) {
   char encoded_message[MAX_CURLY_COMMAND];
   const uint8_t message_length = min(strlen(message), sizeof(encoded_message));
+  BSP_CdcPrintf(" %s\n",message);
 
   for (uint8_t i = 0; i < message_length; i++)
     encoded_message[i] = message[i] | 0x80;
@@ -111,7 +126,7 @@ void write_to_lcd(const char * const message) {
  */
 void process_lcd_c_command(const char* command) {
   switch (command[0]) {
-    case 'C': {
+    case 'S': {
       int raw_feedrate = atoi(command + 1);
       feedrate_percentage = raw_feedrate * 10;
       feedrate_percentage = constrain(feedrate_percentage, 10, 999);
@@ -138,30 +153,40 @@ void process_lcd_c_command(const char* command) {
  * but the stock firmware always sends it, and it's always zero.
  */
 void process_lcd_eb_command(const char* command) {
-  char elapsed_buffer[10];
   duration_t elapsed;
   switch (command[0]) {
     case '0': {
-      elapsed = print_job_timer.duration();
-      sprintf_P(elapsed_buffer, PSTR("%02u%02u%02u"), uint16_t(elapsed.hour()), uint16_t(elapsed.minute()) % 60UL, elapsed.second());
-
-      char message_buffer[MAX_CURLY_COMMAND];
-      sprintf_P(message_buffer,
-              PSTR("{T0:%03.0f/%03i}{T1:000/000}{TP:%03.0f/%03i}{TQ:%03i}{TT:%s}"),
+	char message_buffer[MAX_CURLY_COMMAND];
+      sprintf(message_buffer,
+    		  PSTR("{T0:%03.0f/%03i}"),
               thermalManager.degHotend(0),
-              thermalManager.degTargetHotend(0),
-              #if HAS_HEATED_BED
-                thermalManager.degBed(),
-                thermalManager.degTargetBed(),
-              #else
-                0, 0,
-              #endif
-              #if ENABLED(SDSUPPORT)
-                card.percentDone(),
-              #else
-                0,
-              #endif
-              elapsed_buffer);
+			  (int)thermalManager.degTargetHotend(0));
+      write_to_lcd(message_buffer);
+
+      sprintf(message_buffer,
+    		  PSTR("{T1:000/000}{TP:%03.0f/%03i}"),
+#if HAS_TEMP_BED
+		  thermalManager.degBed(),
+			(int)thermalManager.degTargetBed());
+#else
+		  0, 0));
+#endif
+	  write_to_lcd(message_buffer);
+
+	  sprintf(message_buffer,
+			  PSTR("{TQ:%03i}"),
+#if ENABLED(SDSUPPORT)
+	  (int)card.percentDone());
+#else
+		0);
+#endif
+      write_to_lcd(message_buffer);
+      elapsed = print_job_timer.duration();
+      sprintf_P(message_buffer,
+    		  PSTR("{TT:%02u%02u%02u}"),
+			  uint16_t(elapsed.hour()),
+			  uint16_t(elapsed.minute()) % 60UL,
+			  elapsed.second() % 60UL);
       write_to_lcd(message_buffer);
     } break;
 
@@ -215,6 +240,16 @@ void process_lcd_j_command(const char* command) {
 
 /**
  * Process an LCD 'P' command, related to homing and printing.
+ * Pause:
+ * {P:P}
+ * Printer responds with:
+ * {SYS:PAUSE}
+ * {SYS:PAUSED}
+ * Resume:
+ * {P:R}
+ * Printer responds with:
+ * {SYS:RESUME}
+ * {SYS:RESUMED}
  * Cancel:
  * {P:X}
  *
@@ -242,12 +277,8 @@ void process_lcd_p_command(const char* command) {
       #if ENABLED(SDSUPPORT)
         // cancel print
         write_to_lcd_P(PSTR("{SYS:CANCELING}"));
-        last_printing_status = false;
-        card.stopSDPrint(
-          #if SD_RESORT
-            true
-          #endif
-        );
+        last_printing_status = MALYAN_IDLE;
+        card.pauseSDPrint();
         clear_command_queue();
         quickstop_stepper();
         print_job_timer.stop();
@@ -263,6 +294,24 @@ void process_lcd_p_command(const char* command) {
       // Home all axis
     	enqueue_and_echo_command_now("G28");
       break;
+    case 'P':
+#if ENABLED(SDSUPPORT)
+    	// pause print
+    	last_printing_status = MALYAN_PAUSED;
+    	write_to_lcd(PSTR("{SYS:PAUSE}"));
+    	card.pauseSDPrint();
+    	write_to_lcd(PSTR("{SYS:PAUSED}"));
+#endif
+    	break;
+    case 'R':
+#if ENABLED(SDSUPPORT)
+    	// resume print
+    	last_printing_status = MALYAN_PRINTING;
+    	write_to_lcd(PSTR("{SYS:RESUME}"));
+    	card.startFileprint();
+    	write_to_lcd(PSTR("{SYS:RESUMED}"));
+#endif
+    	break;
     default: {
       #if ENABLED(SDSUPPORT)
         // Print file 000 - a three digit number indicating which
@@ -278,7 +327,8 @@ void process_lcd_p_command(const char* command) {
         // prints. Investigate more. This matches the V1 motion controller actions
         // but the V2 LCD switches to "print" mode on {SYS:DIR} response.
         if (card.filenameIsDir) {
-          card.chdir(card.filename);
+		//TODO: traversing directories works, but selecting files within them.  Disabling folders for now
+//          card.chdir(card.filename);
           write_to_lcd_P(PSTR("{SYS:DIR}"));
         }
         else {
@@ -312,9 +362,9 @@ void process_lcd_s_command(const char* command) {
       // temperature information
       char message_buffer[MAX_CURLY_COMMAND];
       sprintf_P(message_buffer, PSTR("{T0:%03.0f/%03i}{T1:000/000}{TP:%03.0f/%03i}"),
-        thermalManager.degHotend(0), thermalManager.degTargetHotend(0),
-        #if HAS_HEATED_BED
-          thermalManager.degBed(), thermalManager.degTargetBed()
+        thermalManager.degHotend(0), (int)thermalManager.degTargetHotend(0),
+        #if HAS_TEMP_BED
+          thermalManager.degBed(), (int)thermalManager.degTargetBed()
         #else
           0, 0
         #endif
@@ -341,7 +391,7 @@ void process_lcd_s_command(const char* command) {
         uint16_t file_count = card.get_num_Files();
         for (uint16_t i = 0; i < file_count; i++) {
           card.getfilename(i);
-          sprintf_P(message_buffer, card.filenameIsDir ? PSTR("{DIR:%s}") : PSTR("{FILE:%s}"), card.longFilename[0] ? card.longFilename : card.filename);
+          sprintf_P(message_buffer, card.filenameIsDir ? PSTR("{DIR:%s}") : PSTR("{FILE:%s}"), card.filename);
           write_to_lcd(message_buffer);
         }
 
@@ -410,10 +460,11 @@ void update_usb_status(const bool forceUpdate) {
   // appears to use the usb discovery status.
   // This is more logical.
   if (forceUpdate) {
-//  if (last_usb_connected_status != Serial || forceUpdate) {
-	  //TODO: hardcoding to false for now
-//    last_usb_connected_status = Serial;
+#if ENABLED(STM32_USE_USB_CDC)
+	last_usb_connected_status = CDC_Itf_IsConnected();
+#else
 	last_usb_connected_status = false;
+#endif
     write_to_lcd_P(last_usb_connected_status ? PSTR("{R:UC}\r\n") : PSTR("{R:UD}\r\n"));
   }
 }
@@ -436,6 +487,7 @@ void lcd_update() {
     inbound_buffer[inbound_count++] = b;
     if (b == '}' || inbound_count == sizeof(inbound_buffer) - 1) {
       inbound_buffer[inbound_count - 1] = '\0';
+      BSP_CdcPrintf("%s}\n",inbound_buffer);
       process_lcd_command(inbound_buffer);
       inbound_count = 0;
       inbound_buffer[0] = 0;
@@ -450,18 +502,18 @@ void lcd_update() {
         if (card.percentDone() != last_percent_done) {
         char message_buffer[10];
         last_percent_done = card.percentDone();
-        sprintf_P(message_buffer, PSTR("{TQ:%03i}"), last_percent_done);
+        sprintf_P(message_buffer, PSTR("{TQ:%03i}"), (int)last_percent_done);
         write_to_lcd(message_buffer);
 
-        if (!last_printing_status) last_printing_status = true;
+        if (last_printing_status==MALYAN_IDLE) last_printing_status = MALYAN_PRINTING;
       }
     }
     else {
       // If there was a print in progress, we need to emit the final
       // print status as {TQ:100}. Reset last percent done so a new print will
       // issue a percent of 0.
-      if (last_printing_status) {
-        last_printing_status = false;
+      if (last_printing_status==MALYAN_PRINTING) {
+        last_printing_status = MALYAN_IDLE;
         last_percent_done = 100;
         write_to_lcd_P(PSTR("{TQ:100}"));
       }

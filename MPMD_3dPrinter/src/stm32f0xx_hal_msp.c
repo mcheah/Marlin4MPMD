@@ -858,18 +858,18 @@ void HAL_TIM_OC_MspDeInit(TIM_HandleTypeDef* htim_oc)
   * @param[in] GPIO_Pin pin number
   * @retval None
   */
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-  if (GPIO_Pin == BSP_MOTOR_CONTROL_BOARD_FLAG_PIN)
-  {
-    BSP_MotorControl_FlagInterruptHandler();
-  }
-  //TODO: removing SD card stuff for now
-//  if (GPIO_Pin == BSP_SD_DETECT_PIN)
+//void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+//{
+//  if (GPIO_Pin == BSP_MOTOR_CONTROL_BOARD_FLAG_PIN)
 //  {
-//    BSP_SD_DetectIT();
+//    BSP_MotorControl_FlagInterruptHandler();
 //  }
- }
+//  //TODO: removing SD card stuff for now
+////  if (GPIO_Pin == BSP_SD_DETECT_PIN)
+////  {
+////    BSP_SD_DetectIT();
+////  }
+// }
 
 
 void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)

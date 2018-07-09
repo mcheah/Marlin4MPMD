@@ -113,7 +113,7 @@
 							</tool>
 							<tool id="fr.ac6.managedbuild.tool.gnu.cross.c.linker.238508429" name="MCU GCC Linker" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.linker"/>
 							<tool id="fr.ac6.managedbuild.tool.gnu.cross.cpp.linker.1036461651" name="MCU G++ Linker" superClass="fr.ac6.managedbuild.tool.gnu.cross.cpp.linker">
-								<option id="gnu.cpp.link.option.flags.1807579367" name="Linker flags" superClass="gnu.cpp.link.option.flags" useByScannerDiscovery="false" value="-u _printf_float" valueType="string"/>
+								<option id="gnu.cpp.link.option.flags.1807579367" name="Linker flags" superClass="gnu.cpp.link.option.flags" useByScannerDiscovery="false" value="-specs=nano.specs -u _printf_float" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.123848777" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>

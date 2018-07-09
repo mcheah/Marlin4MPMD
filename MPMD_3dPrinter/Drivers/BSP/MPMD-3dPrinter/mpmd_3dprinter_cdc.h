@@ -46,7 +46,7 @@
 
    /* Includes ------------------------------------------------------------------*/
 #include "stm32f0xx_hal.h"
-   
+#include "Configuration_STM.h"
 /* Exported macros ------------------------------------------------------------*/
 //TODO: we should probably adjust these to a smaller size
 #ifdef STM32_USE_USB_CDC
@@ -63,7 +63,7 @@
 
 /* Exported functions --------------------------------------------------------*/
 //TODO: come up with a less janky way to do conditional compiling
-#ifdef STM32_USE_USB_CDC
+//#ifdef STM32_USE_USB_CDC
 void BSP_CdcHwInit(uint32_t newBaudRate);
 void BSP_CdcIfStart(void);
 void BSP_CdcIfQueueTxData(uint8_t *pBuf, uint8_t nbData);
@@ -73,17 +73,6 @@ uint32_t BSP_CdcGetNbRxAvailableBytes(void);
 int8_t BSP_CdcGetNextRxByte(void);
 uint8_t BSP_CdcIsTxOnGoing(void);
 void BSP_CdcLockingTx(uint8_t *pBuf, uint8_t nbData);
-#else
-__INLINE void BSP_CdcHwInit(uint32_t newBaudRate) { }
-__INLINE void BSP_CdcIfStart(void){ }
-__INLINE void BSP_CdcIfQueueTxData(uint8_t *pBuf, uint8_t nbData){ }
-__INLINE void BSP_CdcIfSendQueuedData(){ }
-__INLINE uint32_t BSP_CdcPrintf(const char* format,...){ return 0; }
-__INLINE uint32_t BSP_CdcGetNbRxAvailableBytes(void){ return 0; }
-__INLINE int8_t BSP_CdcGetNextRxByte(void){ return 0; }
-__INLINE uint8_t BSP_CdcIsTxOnGoing(void){ return 0; }
-__INLINE void BSP_CdcLockingTx(uint8_t *pBuf, uint8_t nbData){ }
-#endif
 #ifdef __cplusplus
 }
 #endif
