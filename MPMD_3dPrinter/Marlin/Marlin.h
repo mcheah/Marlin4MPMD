@@ -367,7 +367,7 @@ float code_value_temp_diff();
 #else
   extern Stopwatch print_job_timer;
 #endif
-
+extern int8_t progress;
 // Handling multiple extruders pins
 extern uint8_t active_extruder;
 

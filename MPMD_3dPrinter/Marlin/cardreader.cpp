@@ -311,6 +311,9 @@ void CardReader::startFileprint()
 //	    enqueue_and_echo_commands_P(PSTR("G1 Z-50 S1"));
 //	    enqueue_and_echo_commands_P(PSTR("G90"));
 //	}
+#if ENABLED(MALYAN_LCD)
+	lcd_setstatuspgm(PSTR(MSG_BUILD));
+#endif
     sdprinting = true;
   }
 }
@@ -503,7 +506,13 @@ void CardReader::openFile(char* name,bool read, bool replace_current/*=true*/)
       
       SERIAL_PROTOCOLLNPGM(MSG_SD_FILE_SELECTED);
       getfilename(0, fname);
+#if ENABLED(MALYAN_LCD)//TODO: it seems like Malyan ignores this, I thought it might put it on the status bar, but apparently not
+      lcd_setstatuspgm(PSTR(MSG_PRINTFILE));
       lcd_setstatus(longFilename[0] ? longFilename : fname);
+      lcd_setstatuspgm(PSTR("}"));
+#else
+      lcd_setstatus(longFilename[0] ? longFilename : fname);
+#endif
     }
     else
     {
@@ -525,7 +534,9 @@ void CardReader::openFile(char* name,bool read, bool replace_current/*=true*/)
       saving = true;
       SERIAL_PROTOCOLPGM(MSG_SD_WRITE_TO_FILE);
       SERIAL_PROTOCOLLN(name);
+#if DISABLED(MALYAN_LCD)
       lcd_setstatus(fname);
+#endif
     }
   }
 

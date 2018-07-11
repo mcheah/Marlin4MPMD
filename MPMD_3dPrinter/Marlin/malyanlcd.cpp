@@ -91,13 +91,12 @@ int inbound_count;
 
 // For sending print completion messages
 MALYAN_PRINT_STATUS last_printing_status = MALYAN_IDLE;
-uint8_t last_percent_done = 100;
 
 // Everything written needs the high bit set.
 void write_to_lcd_P(const char * const message) {
   char encoded_message[MAX_CURLY_COMMAND];
   uint8_t message_length = min(strlen(message), sizeof(encoded_message));
-
+  BSP_CdcPrintf("-%s\n",message);
   for (uint8_t i = 0; i < message_length; i++)
     encoded_message[i] = /*pgm_read_byte*/(message[i]) | 0x80;
 
@@ -107,7 +106,7 @@ void write_to_lcd_P(const char * const message) {
 void write_to_lcd(const char * const message) {
   char encoded_message[MAX_CURLY_COMMAND];
   const uint8_t message_length = min(strlen(message), sizeof(encoded_message));
-
+  BSP_CdcPrintf("-%s\n",message);
   for (uint8_t i = 0; i < message_length; i++)
     encoded_message[i] = message[i] | 0x80;
 
@@ -175,14 +174,13 @@ void process_lcd_eb_command(const char* command) {
 		  0, 0));
 #endif
 	  write_to_lcd(message_buffer);
-
-	  sprintf(message_buffer,
-			  PSTR("{TQ:%03i}"),
 #if ENABLED(SDSUPPORT)
-	  (int)card.percentDone());
-#else
-		0);
+	  if (last_printing_status==MALYAN_PRINTING)
+	    progress = (int)card.percentDone();
 #endif
+	  sprintf(message_buffer,
+			  PSTR("{TQ:%03i}"),progress);
+
       write_to_lcd(message_buffer);
       elapsed = print_job_timer.duration();
       sprintf_P(message_buffer,
@@ -218,9 +216,13 @@ void process_lcd_j_command(const char* command) {
     case 'E':
       // enable or disable steppers
       // switch to relative
-    	enqueue_and_echo_command_now("G91");
-    	enqueue_and_echo_command_now(steppers_enabled ? "M18" : "M17");
-      steppers_enabled = !steppers_enabled;
+//TODO: E command has a tendency to break USB prints in progress if the move menu is accidentally accessed
+//		Since there is no method for moving the XYZ axes manually by LCD (at least for M300), this
+//    	functionality seems dangerous to leave in, as the next commands issued will think it's relative
+//    	and dive into the bed
+//    	enqueue_and_echo_command_now("G91");
+//    	enqueue_and_echo_command_now(steppers_enabled ? "M18" : "M17");
+//      steppers_enabled = !steppers_enabled;
       break;
     case 'A':
       axis = 'E';
@@ -301,18 +303,18 @@ void process_lcd_p_command(const char* command) {
 #if ENABLED(SDSUPPORT)
     	// pause print
     	last_printing_status = MALYAN_PAUSED;
-    	write_to_lcd(PSTR("{SYS:PAUSE}"));
+    	write_to_lcd(PSTR(MSG_PAUSE));
     	card.pauseSDPrint();
-    	write_to_lcd(PSTR("{SYS:PAUSED}"));
+    	write_to_lcd(PSTR(MSG_PAUSED));
 #endif
     	break;
     case 'R':
 #if ENABLED(SDSUPPORT)
     	// resume print
     	last_printing_status = MALYAN_PRINTING;
-    	write_to_lcd(PSTR("{SYS:RESUME}"));
+    	write_to_lcd(PSTR(MSG_RESUME));
     	card.startFileprint();
-    	write_to_lcd(PSTR("{SYS:RESUMED}"));
+    	write_to_lcd(PSTR(MSG_RESUMED));
 #endif
     	break;
     default: {
@@ -335,10 +337,6 @@ void process_lcd_p_command(const char* command) {
           write_to_lcd_P(PSTR("{SYS:DIR}"));
         }
         else {
-          char message_buffer[MAX_CURLY_COMMAND];
-          sprintf_P(message_buffer, PSTR("{PRINTFILE:%s}"), card.longFilename[0] ? card.longFilename : card.filename);
-          write_to_lcd(message_buffer);
-          write_to_lcd_P(PSTR("{SYS:BUILD}"));
           card.openAndPrintFile(card.filename);
         }
       #endif
@@ -416,7 +414,7 @@ void process_lcd_s_command(const char* command) {
  */
 void process_lcd_command(const char* command) {
   const char *current = command;
-
+  BSP_CdcPrintf("%s}\n",current);
   current++; // skip the leading {. The trailing one is already gone.
   byte command_code = *current++;
   if (*current != ':') {
@@ -501,10 +499,10 @@ void lcd_update() {
     // The UI needs to see at least one TQ which is not 100%
     // and then when the print is complete, one which is.
     if (card.sdprinting) {
-        if (card.percentDone() != last_percent_done) {
+        if (card.percentDone() != progress) {
         char message_buffer[10];
-        last_percent_done = card.percentDone();
-        sprintf_P(message_buffer, PSTR("{TQ:%03i}"), (int)last_percent_done);
+        progress = card.percentDone();
+        sprintf_P(message_buffer, PSTR("{TQ:%03i}"), (int)progress);
         write_to_lcd(message_buffer);
 
         if (last_printing_status==MALYAN_IDLE) last_printing_status = MALYAN_PRINTING;
@@ -516,8 +514,8 @@ void lcd_update() {
       // issue a percent of 0.
       if (last_printing_status==MALYAN_PRINTING) {
         last_printing_status = MALYAN_IDLE;
-        last_percent_done = 100;
-        write_to_lcd_P(PSTR("{TQ:100}"));
+        progress = 0;
+        write_to_lcd_P(PSTR(MSG_COMPLETE));
       }
     }
   #endif
@@ -552,5 +550,16 @@ void lcd_setalertstatusPGM(const char* message) {
   sprintf_P(message_buffer, PSTR("{E:%s}"), message);
   write_to_lcd(message_buffer);
 }
+/**
+ * Send an arbitrary message
+ */
+void lcd_setstatus(const char* message, bool persist) {
+	write_to_lcd(message);
+}
+void lcd_setstatuspgm(const char* message, uint8_t level) {
+	write_to_lcd_P(message);
+}
+
+
 
 #endif // MALYAN_LCD

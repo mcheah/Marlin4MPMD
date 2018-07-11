@@ -233,6 +233,8 @@ unsigned char Temperature::soft_pwm[HOTENDS];
 
     SERIAL_ECHOLN(MSG_PID_AUTOTUNE_START);
 
+    NOLESS(fanSpeeds[0],EXTRUDER_AUTO_FAN_SPEED); //Make sure the fan is on
+    BSP_MiscFanSetSpeed(0, fanSpeeds[0]);
     disable_all_heaters(); // switch off all heaters.
 
     #if HAS_PID_FOR_BOTH
@@ -363,7 +365,7 @@ unsigned char Temperature::soft_pwm[HOTENDS];
           }
         }
       }
-      #define MAX_OVERSHOOT_PID_AUTOTUNE 20
+      #define MAX_OVERSHOOT_PID_AUTOTUNE 35
       if (input > temp + MAX_OVERSHOOT_PID_AUTOTUNE) {
         SERIAL_PROTOCOLLNPGM(MSG_PID_TEMP_TOO_HIGH);
         return;
