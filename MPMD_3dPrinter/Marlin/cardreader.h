@@ -238,12 +238,9 @@ public:
 	FORCE_INLINE void setIndex(long index) {sdpos = index;f_lseek(&file, index);};
 	FORCE_INLINE uint8_t percentDone(){
 		if(!isFileOpen())
-			if(sdpos==filesize && filesize)
-				return 100;
-			else
-				return 0;
+			return 0;
 		if(filesize)
-			if(sdpos==filesize)
+			if(sdpos>=filesize)
 				return 100;
 			else
 				return sdpos/((filesize+99)/100);

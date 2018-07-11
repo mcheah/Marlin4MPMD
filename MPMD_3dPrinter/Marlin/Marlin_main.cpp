@@ -386,7 +386,7 @@ static millis_t stepper_inactive_time = (DEFAULT_STEPPER_DEACTIVE_TIME) * 1000UL
 #else
   Stopwatch print_job_timer = Stopwatch();
 #endif
-
+int8_t progress=0;
 // Buzzer
 #if HAS_BUZZER
     Buzzer buzzer;
@@ -4092,15 +4092,30 @@ inline void gcode_M17() {
    * M24: Start SD Print
    */
   inline void gcode_M24() {
+
+#if ENABLED(MALYAN_LCD)
+	lcd_setstatuspgm(PSTR(MSG_RESUME));
     p_card->startFileprint();
     print_job_timer.start();
+    lcd_setstatuspgm(PSTR(MSG_RESUMED));
+#else
+    p_card->startFileprint();
+    print_job_timer.start();
+#endif
   }
 
   /**
    * M25: Pause SD Print
    */
   inline void gcode_M25() {
+
+#if ENABLED(MALYAN_LCD)
+	lcd_setstatuspgm(PSTR(MSG_PAUSE));
     p_card->pauseSDPrint();
+    lcd_setstatuspgm(PSTR(MSG_PAUSED));
+#else
+    p_card->pauseSDPrint();
+#endif
   }
 
   /**
@@ -4514,6 +4529,31 @@ static inline long random( long howsmall, long howbig )
 
 #endif // Z_MIN_PROBE_REPEATABILITY_TEST
 
+#if ENABLED(MALYAN_LCD)
+  /**
+   * M73: Open a file
+   */
+  inline void gcode_M73() {
+	  bool hasP = code_seen('P');
+	  if(hasP) {
+		  progress = code_value_byte();
+		  char message_buffer[10];
+	        sprintf_P(message_buffer, PSTR("{TQ:%03i}"), (int)progress);
+	        lcd_setstatus(message_buffer);
+		  if(progress==0)
+			lcd_setstatuspgm(PSTR(MSG_BUILD));
+		  else if(progress>=100)
+		  {
+			lcd_setstatuspgm(PSTR(MSG_COMPLETE));
+			progress = 0;
+		  }
+	  }
+  }
+#endif
+
+
+
+
 /**
  * M75: Start print timer
  */
@@ -4714,7 +4754,9 @@ inline void gcode_M109() {
   #if ENABLED(SINGLENOZZLE)
     if (target_extruder != active_extruder) return;
   #endif
-
+#if ENABLED(MALYAN_LCD)
+  lcd_setstatuspgm(PSTR(MSG_BUILD));
+#endif
   bool no_wait_for_cooling = code_seen('S');
   if (no_wait_for_cooling || code_seen('R')) {
     thermalManager.setTargetHotend(code_value_temp_abs(), target_extruder);
@@ -4844,7 +4886,9 @@ inline void gcode_M109() {
    */
   inline void gcode_M190() {
     if (DEBUGGING(DRYRUN)) return;
-
+#if ENABLED(MALYAN_LCD)
+  lcd_setstatuspgm(PSTR(MSG_BUILD));
+#endif
     LCD_MESSAGEPGM(MSG_BED_HEATING);
     bool no_wait_for_cooling = code_seen('S');
     if (no_wait_for_cooling || code_seen('R')) {
@@ -7347,6 +7391,12 @@ void process_next_command() {
           gcode_M48();
           break;
       #endif // Z_MIN_PROBE_REPEATABILITY_TEST
+
+#if ENABLED(MALYAN_LCD)
+      case 73: //Set percentage
+    	gcode_M73();
+    	break;
+#endif
 
       case 75: // Start print timer
         gcode_M75();

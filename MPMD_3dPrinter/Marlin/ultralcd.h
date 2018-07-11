@@ -24,15 +24,28 @@
 #define ULTRALCD_H
 
 #include "Marlin.h"
-
+#if ENABLED(MALYAN_LCD)
+  #define MSG_BUILD "{SYS:BUILD}"
+  #define MSG_PAUSE "{SYS:PAUSE}"
+  #define MSG_PAUSED "{SYS:PAUSED}"
+  #define MSG_RESUME "{SYS:RESUME}"
+  #define MSG_RESUMED "{SYS:RESUMED}"
+  #define MSG_COMPLETE "{TQ:100}"
+  #define MSG_PCT "{TQ:"
+  #define MSG_PRINTFILE "{PRINTFILE:"
+#endif
 #if ENABLED(ULTRA_LCD) || ENABLED(MALYAN_LCD)
   void lcd_init();
   void lcd_update();
+  void lcd_setstatus(const char* message, const bool persist=false);
+  void lcd_setstatuspgm(const char* message, const uint8_t level=0);
   void lcd_setalertstatuspgm(const char* message);
 #else
   FORCE_INLINE void lcd_update() {}
   FORCE_INLINE void lcd_init() {}
+  FORCE_INLINE void lcd_setstatus(const char* message, const bool persist=false) {UNUSED(message); UNUSED(persist);}
   FORCE_INLINE void lcd_setstatuspgm(const char* message, const uint8_t level=0) {UNUSED(message); UNUSED(level);}
+  void lcd_setalertstatuspgm(const char* message) {}
 #endif
 
 #if ENABLED(ULTRA_LCD)
@@ -161,7 +174,6 @@
 #else // MALYAN_LCD or no LCD
 
   FORCE_INLINE bool lcd_hasstatus() { return false; }
-  FORCE_INLINE void lcd_setstatus(const char* message, const bool persist=false) {UNUSED(message); UNUSED(persist);}
   FORCE_INLINE void lcd_buttons_update() {}
   FORCE_INLINE void lcd_reset_alert_level() {}
   FORCE_INLINE bool lcd_detected(void) { return true; }
