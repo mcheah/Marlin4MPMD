@@ -96,7 +96,8 @@ MALYAN_PRINT_STATUS last_printing_status = MALYAN_IDLE;
 void write_to_lcd_P(const char * const message) {
   char encoded_message[MAX_CURLY_COMMAND];
   uint8_t message_length = min(strlen(message), sizeof(encoded_message));
-  BSP_CdcPrintf("-%s\n",message);
+  if (DEBUGGING(COMMUNICATION))
+	  BSP_CdcPrintf("-%s\n",message);
   for (uint8_t i = 0; i < message_length; i++)
     encoded_message[i] = /*pgm_read_byte*/(message[i]) | 0x80;
 
@@ -106,7 +107,8 @@ void write_to_lcd_P(const char * const message) {
 void write_to_lcd(const char * const message) {
   char encoded_message[MAX_CURLY_COMMAND];
   const uint8_t message_length = min(strlen(message), sizeof(encoded_message));
-  BSP_CdcPrintf("-%s\n",message);
+  if (DEBUGGING(COMMUNICATION))
+	  BSP_CdcPrintf("-%s\n",message);
   for (uint8_t i = 0; i < message_length; i++)
     encoded_message[i] = message[i] | 0x80;
 
@@ -414,7 +416,8 @@ void process_lcd_s_command(const char* command) {
  */
 void process_lcd_command(const char* command) {
   const char *current = command;
-  BSP_CdcPrintf("%s}\n",current);
+  if (DEBUGGING(COMMUNICATION))
+	  BSP_CdcPrintf("%s}\n",current);
   current++; // skip the leading {. The trailing one is already gone.
   byte command_code = *current++;
   if (*current != ':') {

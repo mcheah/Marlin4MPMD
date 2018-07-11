@@ -83,6 +83,11 @@ Debugging directly on the printer hardware requires access to the 4-pin SWD jump
 The MCU on this board has been locked down with the security read-out protection set to level 1, meaning that any attempt to re-flash any memory location or change the security bits results in a full erase of the flash memory.  Therefore care should be taken when going down the route of debugging directly on the actual printer.  I've included the original bootloader that I was able to extract so that you can restore the stock software without risking bricking your printer.  To enable debugging on the board with an ST-link debugger, you will need to start the STM32 ST-LINK utility and change the Read Out Protection level to 0.  This will trigger a full erase, but will allow you to debug the firmware directly.
 
 ###  Recent changes
+## Marlin4MPMD - v1.2.1 7/11/2018
+- Added fix for the LCD that causes the build menu to pop up appropriately when printing from USB, previously the LCD could time out and cause the print to fail when it issued commands to change movement to relative mode
+- Added fixes to PID tuning to prevent overshoots and fail during autotune
+- Added support M73 command to set the progress bar percent.  Use M73 P0 in your start g-code and M73 P100 in your end g-code to ensure that the build menu is called and finished (M109,M190, and M24 also trigger it, but just to be safe).  You can also use plugins such as:
+[M73 Progress](https://plugins.octoprint.org/plugins/m73progress/) to sync octoprint progress with your print, or manually insert M73 commands in your g-code.  M73 is ignored when printing from SD.
 ## Marlin4MPMD - v1.2.0 7/09/2018
 Third release brings things pretty close to parity to the stock firmware changes include:
 - Added MalyanLCD support from [xC0000005's](https://github.com/xC0000005/Marlin) port of Marlin 2.0 for use with the Malyan M200.  There is a potential to use that effort for a Marlin2.0 port for MPMD, but it will likely require some more effort.  All stock GUI functions should be implemented now.
