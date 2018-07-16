@@ -834,7 +834,7 @@ float Temperature::analog2temp(int raw, uint8_t e) {
   if (heater_ttbl_map[e] != NULL) {
     float celsius = 0;
     uint8_t i;
-    short(*tt)[][2] = (short(*)[][2])(heater_ttbl_map[e]);
+    unsigned short(*tt)[][2] = (unsigned short(*)[][2])(heater_ttbl_map[e]);
 
     for (i = 1; i < heater_ttbllen_map[e]; i++) {
       if (PGM_RD_W((*tt)[i][0]) > raw) {

@@ -72,7 +72,7 @@ void BSP_AdcHwInit(void)
     */
   pAdc->adcHandle.Instance = BSP_ADC;
   pAdc->adcHandle.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
-  pAdc->adcHandle.Init.Resolution = ADC_RESOLUTION_10B;
+  pAdc->adcHandle.Init.Resolution = ADC_RESOLUTION_12B;
   pAdc->adcHandle.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   pAdc->adcHandle.Init.ScanConvMode = ENABLE;
   pAdc->adcHandle.Init.EOCSelection = 0X0000;
