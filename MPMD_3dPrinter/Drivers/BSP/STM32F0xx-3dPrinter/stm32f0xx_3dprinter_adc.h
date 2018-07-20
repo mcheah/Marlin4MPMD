@@ -45,7 +45,7 @@
 #endif
 
 #ifdef STM32_MPMD
-#include "mpmd_3dPrinter_adc.h"
+#include "mpmd_3dprinter_adc.h"
 #elif defined(NUCLEO_F070RB)
 #include "nucleo-f070rb_3dPrinter_adc.h"
 #endif
