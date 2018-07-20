@@ -45,7 +45,7 @@
 #endif
 
 #ifdef STM32_MPMD
-#include "mpmd_3dPrinter_cdc.h"
+#include "mpmd_3dprinter_cdc.h"
 #elif defined(NUCLEO_F070RB)
 #error "No USB port on Nucleo board, USB CDC is not valid"
 // #include "nucleo-f070rb_3dPrinter_cdc.h"
