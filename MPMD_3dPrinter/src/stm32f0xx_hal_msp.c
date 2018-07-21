@@ -745,6 +745,10 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
   if ((htim->Instance == BSP_MISC_TIMER_TICK2)&& (htim->Channel == BSP_MISC_HAL_ACT_CHAN_TIMER_TICK2))
   {
     IsrTemperatureHandler();
+    if(HAL_GPIO_ReadPin(BSP_STOP_W_PORT,BSP_STOP_W_PIN)==GPIO_PIN_SET)
+    	BSP_LED_Off(LED_RED);
+    else
+    	BSP_LED_On(LED_RED);
   }  
 #endif
 }
