@@ -34,7 +34,9 @@
 // LCD for Malyan M200/300 printers.
 //
 #define MALYAN_LCD
-
+// Use pin PA2 (Pin 2 of extra 5-pin debug connector) as the E1 ADC input
+// Only used by Dennis Brown
+#define E1_ADC_PA2
 //#define MINIMAL_BUILD
 /* Exported functions ------------------------------------------------------- */
 /* Exported Variables --------------------------------------------------------*/
