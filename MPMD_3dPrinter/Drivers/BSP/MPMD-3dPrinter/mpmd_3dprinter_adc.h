@@ -64,7 +64,7 @@
 #else
 #define BSP_ADC_CHANNEL_THERM_E1    (ADC_CHANNEL_0)
 #endif
-//TODO: remove unused thermister values, hardcode to 0 for now
+//TODO: remove unused thermistor values, hardcode to 0 for now
 //#define BSP_ADC_CHANNEL_THERM_E2    (ADC_CHANNEL_0)
 //#define BSP_ADC_CHANNEL_THERM_E3    (ADC_CHANNEL_0)
 //#define BSP_ADC_CHANNEL_THERM_BED2  (ADC_CHANNEL_0)

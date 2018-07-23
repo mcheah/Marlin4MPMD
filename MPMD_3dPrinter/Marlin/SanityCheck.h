@@ -651,6 +651,16 @@
   #error "EMERGENCY_PARSER does not work on boards with AT90USB processors (USBCON)."
 #endif
 
+/**
+ * Warnings for STM config
+ */
+#if DISABLED(STM32_USE_USB_CDC) && (ENABLED(E1_ADC_PA2) || ENABLED(E1_ADC_PA3))
+  #error "Cannot use UART for PA2/3 at the same time as ADC."
+#endif
+#if DISABLED(STM32_USE_USB_CDC) && (ENABLED(MALYAN_LCD))
+  #error "Cannot use UART and Malyan LCD at the same time"
+#endif
+
  /**
  * Warnings for old configurations
  */
