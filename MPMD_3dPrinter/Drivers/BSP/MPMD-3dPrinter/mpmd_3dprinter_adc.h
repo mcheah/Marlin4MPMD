@@ -46,6 +46,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f0xx_hal.h"
+#include "Configuration_STM.h"
    
 /* Exported macros ------------------------------------------------------------*/
 
@@ -58,8 +59,12 @@
 #define __BSP_ADC_RELEASE_RESET()    __ADC_RELEASE_RESET()   
    
 #define BSP_ADC_CHANNEL_THERM_BED1   (ADC_CHANNEL_4)
+#ifdef E1_ADC_PA2
+#define BSP_ADC_CHANNEL_THERM_E1    (ADC_CHANNEL_2)
+#else
 #define BSP_ADC_CHANNEL_THERM_E1    (ADC_CHANNEL_0)
-//TODO: remove unused thermister values, hardcode to 0 for now
+#endif
+//TODO: remove unused thermistor values, hardcode to 0 for now
 //#define BSP_ADC_CHANNEL_THERM_E2    (ADC_CHANNEL_0)
 //#define BSP_ADC_CHANNEL_THERM_E3    (ADC_CHANNEL_0)
 //#define BSP_ADC_CHANNEL_THERM_BED2  (ADC_CHANNEL_0)
@@ -78,7 +83,11 @@
 #define BSP_THERM_BED1_PORT             (GPIOA)
 //#define BSP_THERM_BED2_PIN             (GPIO_PIN_4)
 //#define BSP_THERM_BED2_PORT            (GPIOA)
+#ifdef E1_ADC_PA2
+#define BSP_THERM_E1_PIN               (GPIO_PIN_2)
+#else
 #define BSP_THERM_E1_PIN               (GPIO_PIN_0)
+#endif
 #define BSP_THERM_E1_PORT              (GPIOA)
 //#define BSP_THERM_E2_PIN               (GPIO_PIN_0)
 //#define BSP_THERM_E2_PORT              (GPIOA)
@@ -88,8 +97,6 @@
 //#define BSP_THERM_BED3_PORT            (GPIOA)
 
    /* Definition for IR Out Pin used for Z probing*/
-#define BSP_IR_OUT_PIN                 (GPIO_PIN_0)
-#define BSP_IR_OUT_PORT                (GPIOA)
 
 /* Definition of ADC NVIC resources */
 #define BSP_ADC_IRQn                   (ADC1_IRQn)
