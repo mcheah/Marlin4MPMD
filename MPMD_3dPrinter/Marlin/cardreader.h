@@ -89,6 +89,7 @@ public:
 	bool saving;
 	bool logging;
 	bool sdprinting ;
+	bool updateLCD;
 
 	bool cardReaderInitialized;
 	bool cardOK ;

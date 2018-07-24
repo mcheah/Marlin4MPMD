@@ -816,7 +816,11 @@ void setup_sdcard()
 #if defined(SDSUPPORT)
   while (p_card->autostart_atmillis>millis()) { }
   if(FATFS_LinkDriver(&SD_Driver, SDPath) == 0)
+  {
 	  p_card->checkautostart(true);
+  	  if(p_card->cardOK)
+		Config_RetrieveSettings();
+  }
 #endif
 }
 
@@ -944,11 +948,6 @@ void setup() {
   // Reset parameters to default values
   Config_ResetDefault();
 
-  // Init and autostart on SD card
-#if defined(SDSUPPORT)
-  setup_sdcard();
-#endif
-
   // Load data from EEPROM if available (or use defaults)
   // This also updates variables in the planner, elsewhere
 //  Config_RetrieveSettings();
@@ -1001,8 +1000,9 @@ void setup() {
     pinMode(STAT_LED_BLUE, OUTPUT);
     digitalWrite(STAT_LED_BLUE, LOW); // turn it off
   #endif
-
+  delay(1000); //Give USB time to connect and initialize before starting LCD interface
   lcd_init();
+
   #if ENABLED(SHOW_BOOTSCREEN)
     #if ENABLED(DOGLCD)
       safe_delay(BOOTSCREEN_TIMEOUT);
@@ -1027,6 +1027,10 @@ void setup() {
     if(thermalManager.current_temperature[0]>140)    {
     	enqueue_and_echo_commands_P(PSTR("G28\nM106 S255"));
     }
+    // Init and autostart on SD card
+  #if defined(SDSUPPORT)
+    setup_sdcard();
+  #endif
 }
 
 /**
@@ -4070,8 +4074,6 @@ inline void gcode_M17() {
    * M21: Init SD Card
    */
   inline void gcode_M21() {
-    //TODO: there's a bug related to re-initializing the SD card, currently it only works
-    //the first time on powerup, so we disable this command for now
     p_card->initsd();
   }
 

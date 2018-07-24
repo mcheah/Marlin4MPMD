@@ -45,7 +45,7 @@
   FORCE_INLINE void lcd_init() {}
   FORCE_INLINE void lcd_setstatus(const char* message, const bool persist=false) {UNUSED(message); UNUSED(persist);}
   FORCE_INLINE void lcd_setstatuspgm(const char* message, const uint8_t level=0) {UNUSED(message); UNUSED(level);}
-  void lcd_setalertstatuspgm(const char* message) {}
+  FORCE_INLINE void lcd_setalertstatuspgm(const char* message) {}
 #endif
 
 #if ENABLED(ULTRA_LCD)

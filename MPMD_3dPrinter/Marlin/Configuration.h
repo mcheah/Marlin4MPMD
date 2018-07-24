@@ -1096,6 +1096,7 @@
 #if ENABLED(SDSUPPORT)
   #define SD_SETTINGS
   #define CONFIG_FILE_NAME "m_cfg.g"
+  #define UPPER_CONFIG_FILE_NAME "M_CFG.G"
 #endif
 //
 // SD CARD: SPI SPEED

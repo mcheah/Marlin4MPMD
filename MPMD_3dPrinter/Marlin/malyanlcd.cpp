@@ -501,6 +501,7 @@ void lcd_update() {
     // The way last printing status works is simple:
     // The UI needs to see at least one TQ which is not 100%
     // and then when the print is complete, one which is.
+  if(card.updateLCD) {
     if (card.sdprinting) {
         if (card.percentDone() != progress) {
         char message_buffer[10];
@@ -521,6 +522,7 @@ void lcd_update() {
         write_to_lcd_P(PSTR(MSG_COMPLETE));
       }
     }
+  }
   #endif
 }
 

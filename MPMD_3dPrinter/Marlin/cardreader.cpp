@@ -12,6 +12,7 @@ CardReader::CardReader()
    filesize = 0;
    sdpos = 0;
    sdprinting = false;
+   updateLCD = false;
    cardOK = false;
    rootIsOpened = false;
    saving = false;
@@ -52,49 +53,74 @@ CardReader::CardReader()
 
 void CardReader::initsd()
 {
-  cardOK = false;
-
-  // Set SD path
-  strcpy( SDPath, "/");
-  FRESULT code = FR_OK;
-  if (rootIsOpened == false)
+  for(int i=0;i<2;i++) //Attempt two times in case card need released first
   {
-    //BSP_SD_DetectInit();
+	  cardOK = false;
 
-    if (BSP_SD_IsDetected() == 0)
-    {
-      SERIAL_ECHO_START;
-      SERIAL_ECHOLNPGM(MSG_SD_INIT_FAIL);
-    }
-    else if (f_mount(&fileSystem, (TCHAR const*)SDPath, 0) != FR_OK)
-    {
-      SERIAL_ERROR_START;
-      SERIAL_ERRORLNPGM(MSG_SD_VOL_INIT_FAIL);
-    }
-    else if ((code = f_opendir(&root,SDPath)) != FR_OK)
-    {
-      uint8_t buff[80]="";
-      SERIAL_ERROR_START;
-      SERIAL_ERRORLNPGM(MSG_SD_OPENROOT_FAIL);
-      sprintf((char *)buff,"code=%d\n",code);
-      BSP_CdcIfQueueTxData(buff,sizeof(buff));
-    }
-    else
-    {
-      cardOK = true;
-      rootIsOpened = true;
-      cardReaderInitialized = true;
-      SERIAL_ECHO_START;
-      SERIAL_ECHOLNPGM(MSG_SD_CARD_OK);
-    }
+	  // Set SD path
+	  strcpy( SDPath, "/");
+	  FRESULT code = FR_OK;
+	  uint8_t buff[80]="";
+	  if (rootIsOpened == false)
+	  {
+		//BSP_SD_DetectInit();
+
+		if (BSP_SD_IsDetected() == 0)
+		{
+		  SERIAL_ECHO_START;
+		  SERIAL_ECHOLNPGM(MSG_SD_INIT_FAIL);
+		}
+		else if ((code = f_mount(&fileSystem, (TCHAR const*)SDPath, 0)) != FR_OK)
+		{
+		  SERIAL_ERROR_START;
+		  SERIAL_ERRORLNPGM(MSG_SD_VOL_INIT_FAIL);
+		  sprintf((char *)buff,"code=%d\n",code);
+		  BSP_CdcIfQueueTxData(buff,sizeof(buff));
+		  release();
+		  return;//Previously uninitialized, don't try again
+		}
+		else if ((code = f_opendir(&root,SDPath)) != FR_OK)
+		{
+		  SERIAL_ERROR_START;
+		  SERIAL_ERRORLNPGM(MSG_SD_OPENROOT_FAIL);
+		  sprintf((char *)buff,"code=%d\n",code);
+		  BSP_CdcIfQueueTxData(buff,sizeof(buff));
+		  release();
+		  return;//Previously uninitialized, don't try again
+		}
+		else
+		{
+		  cardOK = true;
+		  rootIsOpened = true;
+		  cardReaderInitialized = true;
+		  SERIAL_ECHO_START;
+		  SERIAL_ECHOLNPGM(MSG_SD_CARD_OK);
+		}
+		workDir=root;
+		curDir=&root;
+	  }
+	  else
+	  {
+		DIR testroot;
+		FILINFO testnfo;
+		FRESULT res = f_opendir(&testroot,SDPath);
+//		res = f_readdir(&testroot,&testnfo);
+//		uint8_t code = BSP_SD_GetStatus();
+		if(res!=FR_OK/* || code!= BSP_SD_OK*/) {
+			  SERIAL_ERROR_START;
+			  SERIAL_ERRORLNPGM(MSG_SD_OPENROOT_FAIL);
+			  sprintf((char *)buff,"code=%d\n",res);
+			  BSP_CdcIfQueueTxData(buff,sizeof(buff));
+			  release(); //test failed, loop again after releasing
+		}
+		else {
+			f_closedir(&testroot);
+			cardOK = true;
+		}
+	  }
+	  if(cardOK)
+		return; //Success, don't loop again
   }
-  else
-  {
-    cardOK = true;
-  }
-  workDir=root;
-  curDir=&root;
-  
 }
 
 
@@ -121,7 +147,7 @@ void CardReader::lsDive(const char *prepend, DIR *parent, const char * const mat
   FILINFO entry;
   uint8_t cnt=0;
  
-  if( !cardOK)
+  if(!cardOK)
 	  return;
 
   //while (f_readdir(parent,&entry) == FR_OK) 
@@ -266,16 +292,19 @@ bool CardReader::testPath( char *name, char **fname)
 
 void CardReader::ls() 
 {
-	if( !cardOK)
+	initsd(); //test card
+	if(!cardOK)
 		return;
-
 	lsAction=LS_SerialPrint;
  /*   --  BDI : Quel int�ret?
   if(lsAction==LS_Count)
   nrFiles=0;
 */
-	f_readdir(&root,0);
-	lsDive("",&root);
+	FRESULT res = f_readdir(&root,0);
+	if(res==FR_OK)
+		lsDive("",&root);
+	else
+		release();
 }
 
 
@@ -293,6 +322,7 @@ void CardReader::setroot()
 void CardReader::release()
 {
   sdprinting = false;
+  updateLCD = false;
   cardOK = false;
   cardReaderInitialized = false;
   rootIsOpened = false;
@@ -303,8 +333,9 @@ void CardReader::release()
 
 void CardReader::startFileprint()
 {
-  if(cardOK)
-  {
+  initsd(); //test card
+  if(!cardOK)
+	  return;
 //	if(sdpos!=0)
 //	{
 //	    enqueue_and_echo_command_now("G91");
@@ -312,10 +343,14 @@ void CardReader::startFileprint()
 //	    enqueue_and_echo_commands_P(PSTR("G90"));
 //	}
 #if ENABLED(MALYAN_LCD)
+  const char upper_config_file_name[] = UPPER_CONFIG_FILE_NAME;
+  updateLCD = ( strncmp(longFilename,
+		  	  upper_config_file_name,
+			  sizeof(upper_config_file_name))!=0);
+  if(updateLCD)
 	lcd_setstatuspgm(PSTR(MSG_BUILD));
 #endif
     sdprinting = true;
-  }
 }
 
 void CardReader::pauseSDPrint()
@@ -332,6 +367,9 @@ void CardReader::pauseSDPrint()
 
 void CardReader::openLogFile(char* name)
 {
+  initsd(); //test card
+  if(!cardOK)
+	  return;
   logging = true;
   openFile(name, false);
 }
@@ -374,6 +412,7 @@ void CardReader::getAbsFilename(char *t)
 
 void CardReader::openFile(char* name,bool read, bool replace_current/*=true*/)
 {
+  initsd(); //test card
   if(!cardOK)
     return;
    
@@ -453,7 +492,7 @@ void CardReader::openFile(char* name,bool read, bool replace_current/*=true*/)
         strncpy(subdirname, dirname_start, dirname_end-dirname_start);
         subdirname[dirname_end-dirname_start]=0;
         SERIAL_ECHOLN(subdirname);
-       if (f_opendir(&myDir,subdirname) != FR_OK) 
+       if (f_opendir(&myDir,subdirname) != FR_OK)
         {
           SERIAL_PROTOCOLPGM(MSG_SD_OPEN_FILE_FAIL);
           SERIAL_PROTOCOL(subdirname);
@@ -465,7 +504,7 @@ void CardReader::openFile(char* name,bool read, bool replace_current/*=true*/)
           //SERIAL_ECHOLN("dive ok");
         }
           
-        curDir=&myDir; 
+        curDir=&myDir;
         dirname_start=dirname_end+1;
       }
       else // the reminder after all /fsa/fdsa/ is the filename
@@ -521,7 +560,7 @@ void CardReader::openFile(char* name,bool read, bool replace_current/*=true*/)
       SERIAL_PROTOCOLLNPGM(".");
     }
   }
-  else 
+  else
   { //write
     if (f_open(&file, fname, FA_CREATE_ALWAYS | FA_WRITE) != FR_OK)
     {
@@ -534,6 +573,7 @@ void CardReader::openFile(char* name,bool read, bool replace_current/*=true*/)
       saving = true;
       SERIAL_PROTOCOLPGM(MSG_SD_WRITE_TO_FILE);
       SERIAL_PROTOCOLLN(name);
+	  release();
 #if DISABLED(MALYAN_LCD)
       lcd_setstatus(fname);
 #endif
@@ -554,7 +594,7 @@ void CardReader::openAndPrintFile(const char *name) {
 void CardReader::removeFile(char* name)
 {
 	char *fname=name;
-
+	initsd();
 	if(!cardOK)
 		return;
 
@@ -634,12 +674,9 @@ void CardReader::checkautostart(bool force)
   }
   autostart_stilltocheck=false;
 
-  if(!cardOK)
-  {
-    initsd();
-    if(!cardOK) //fail
-      return;
-  }
+  initsd();
+  if(!cardOK) //fail
+	  return;
   
   char autoname[30];
   sprintf(autoname, PSTR("auto%i.g"), lastnr);
@@ -671,6 +708,8 @@ void CardReader::checkautostart(bool force)
       }
     }
   }
+  else
+	  release();
   if(!found)
     lastnr=-1;
   else
@@ -718,7 +757,7 @@ uint16_t CardReader::getnrfilenames()
 void CardReader::chdir(const char * relpath)
 {
 	DIR newDir;
-  
+	initsd(); //test card
 	if(!cardOK)
 		return;
   
