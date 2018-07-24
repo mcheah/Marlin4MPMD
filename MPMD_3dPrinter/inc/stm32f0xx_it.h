@@ -54,9 +54,7 @@
 //void PendSV_Handler(void);
 void SysTick_Handler(void);
 
-//void EXTI0_IRQHandler(void);
-//void EXTI1_IRQHandler(void);
-//void EXTI0_1_IRQHandler(void);
+void BSP_STOP_W_IRQHandler(void);
 
 //void TIM1_CC_IRQHandler(void);
 //void TIM2_IRQHandler(void);

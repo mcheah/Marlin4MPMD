@@ -784,24 +784,6 @@ void setup_powerhold() {
     BSP_MiscStopInit(2);
     BSP_MiscStopInit(5);
 
-#if defined(U_MIN_PIN) && U_MIN_PIN > -1
-    BSP_MiscStopInit(3);
-#endif
-#if defined(V_MIN_PIN) && V_MIN_PIN > -1
-    BSP_MiscStopInit(4);
-#endif
-#if defined(W_MIN_PIN) && W_MIN_PIN > -1
-    BSP_MiscStopInit(5);
-#endif
-
-#if !defined(NO_WIFI)
-    //--- Wifi init
-#if defined(PROD_TEST)
-    BSP_WifiHwInit(BAUDRATE,WIFI_SSID,WIFI_WEP_KEY,WIFI_FW_VERSION,WIFI_FS_VERSION);
-#else
-    BSP_WifiHwInit(BAUDRATE,WIFI_SSID,WIFI_WEP_KEY);
-#endif
-#endif //#if !defined(NO_WIFI)
 
     //Extruder 0 Fan init
     BSP_MiscFanInit(0);

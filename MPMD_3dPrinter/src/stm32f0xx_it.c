@@ -40,8 +40,6 @@ extern TIM_HandleTypeDef hTimServo;
 extern BspAdcDataType gBspAdcData;
 extern PCD_HandleTypeDef hpcd;
 extern TIM_HandleTypeDef TimHandle;
-//TODO: removing wifiData
-//extern BspWifiDataType gBspWifiData;
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
@@ -62,26 +60,17 @@ void SysTick_Handler(void)
 	osSystickHandler();
 #endif
 }
-/**
-  * @brief  This function handles interrupt for External line 1
-  * @param  None
-  * @retval None
-  */
-//void EXTI0_1_IRQHandler(void)
-//{
-////	HAL_GPIO_EXTI_IRQHandler(BSP_MOTOR_CONTROL_BOARD_FLAG_PIN);
-//}
 
 /**
   * @brief  This function handles interrupt for External lines 10 to 15
   * @param  None
   * @retval None
   */
-//void EXTI4_15_IRQHandler(void)
-//{
-//	/* PA15 : SD_CARD_DETECT */
-//	HAL_GPIO_EXTI_IRQHandler(BSP_SD_DETECT_PIN);
-//}
+void BSP_STOP_W_IRQHandler(void)
+{
+	//BSP ZMIN switch, triggers LED's
+	HAL_GPIO_EXTI_IRQHandler(BSP_STOP_W_PIN);
+}
 
 /**
   * @brief  This function handles TIM1 interrupt request.
@@ -206,18 +195,6 @@ void BSP_UART_LCD_IRQHandler(void)
   HAL_UART_IRQHandler(&gBspUartData.handle);
 }
 #endif
-/**
-  * @brief  This function handles UART interrupt request for wifi module.
-  * @param  None
-  * @retval None
-  * @Note   This function is redefined in "main.h" and related to DMA
-  *         used for USART data transmission
-  */
-//TODO: removing wifi functionality
-//void BSP_WIFI_UART_IRQHandler(void)
-//{
-//  HAL_UART_IRQHandler(&(gBspWifiData.uartHandle));
-//}
 
 /**
 * @brief This function handles DMA global interrupt.
@@ -237,57 +214,6 @@ void BSP_ADC_IRQHandler(void)
   HAL_ADC_IRQHandler(&(gBspAdcData.adcHandle));
 }
 
-/**
-  * @brief  This function handles DMA2 Stream 3 interrupt request.
-  * @param  None
-  * @retval None
-  */
-//TODO: check that these DMA handlers match up
-//void DMA1_CH1_IRQHandler(void)
-//{
-//  BSP_SD_DMA_Rx_IRQHandler();
-//}
-
-/**
-  * @brief  This function handles DMA2 Stream 6 interrupt request.
-  * @param  None
-  * @retval None
-  */
-//void DMA1_CH2_3_IRQHandler(void)
-//{
-//  BSP_SD_DMA_Tx_IRQHandler();
-//}
-
-///**
-//  * @brief  This function handles DMA RX interrupt request.
-//  * @param  None
-//  * @retval None
-//  */
-//void BSP_WIFI_UART_DMA_RX_IRQHandler(void)
-//{
-//  HAL_DMA_IRQHandler(gBspWifiData.uartHandle.hdmarx);
-//}
-//
-///**
-//  * @brief  This function handles DMA TX interrupt request.
-//  * @param  None
-//  * @retval None
-//  */
-//void BSP_WIFI_UART_DMA_TX_IRQHandler(void)
-//{
-//  HAL_DMA_IRQHandler(gBspWifiData.uartHandle.hdmatx);
-//}
-
-/**
-  * @brief  This function handles SDIO interrupt request.
-  * @param  None
-  * @retval None
-  */
-//TODO: removing SD handler
-//void SDIO_IRQHandler(void)
-//{
-//  BSP_SD_IRQHandler();
-//}
 #ifdef STM32_USE_USB_CDC
 /**
   * @brief  This function handles USB Handler.

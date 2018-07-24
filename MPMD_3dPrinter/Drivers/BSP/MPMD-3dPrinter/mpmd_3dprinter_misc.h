@@ -72,6 +72,8 @@
 #define BSP_STOP_W_PIN               (GPIO_PIN_7)
 #define BSP_STOP_W_PORT              (GPIOB)
 #define STOP_W__PULL_UP
+#define BSP_STOP_W_IRQN				 (EXTI4_15_IRQn)
+#define BSP_STOP_W_IRQHandler        (EXTI4_15_IRQHandler)
 
 /* Definition for Heats*/
  //TODO: removed unused heaters
