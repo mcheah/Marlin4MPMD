@@ -3009,7 +3009,7 @@ inline void gcode_G28() {
     /**
      * A delta can only safely home all axes at the same time
      */
-
+    bool safeHome = (current_position[Z_AXIS] <= delta_clip_start_height);
     // Pretend the current position is 0,0,0
     // This is like quick_home_xy() but for 3 towers.
     current_position[X_AXIS] = current_position[Y_AXIS] = current_position[Z_AXIS] = 0.0;
@@ -3267,7 +3267,8 @@ inline void gcode_G28() {
 
   #if ENABLED(DELTA)
     // move to a height where we can use the full xy-area
-    do_blocking_move_to_z(delta_clip_start_height);
+    if(safeHome)
+    	do_blocking_move_to_z(delta_clip_start_height);
   #endif
 
   clean_up_after_endstop_or_probe_move();
