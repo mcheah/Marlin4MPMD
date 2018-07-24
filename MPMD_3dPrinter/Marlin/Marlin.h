@@ -299,10 +299,14 @@ float code_value_temp_diff();
   extern float delta_radius;
   extern float delta_diagonal_rod;
   extern float delta_segments_per_second;
+  extern float delta_radius_trim_tower_1;
+  extern float delta_radius_trim_tower_2;
+  extern float delta_radius_trim_tower_3;
   extern float delta_diagonal_rod_trim_tower_1;
   extern float delta_diagonal_rod_trim_tower_2;
   extern float delta_diagonal_rod_trim_tower_3;
   extern float delta_tower_angle_trim[3];
+  extern float delta_clip_start_height;
   void inverse_kinematics(const float cartesian[3]);
   void recalc_delta_settings(float radius, float diagonal_rod);
   #if ENABLED(AUTO_BED_LEVELING_FEATURE)
