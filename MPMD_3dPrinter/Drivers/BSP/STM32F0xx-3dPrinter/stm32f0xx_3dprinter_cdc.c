@@ -148,8 +148,13 @@ void BSP_CdcIfQueueTxData(uint8_t *pBuf, uint8_t nbData)
  **********************************************************/
 void BSP_CdcIfSendQueuedData()
 {
+	static const uint32_t timeout = 1000;
+	uint32_t startTick = HAL_GetTick();
 	while(BSP_CdcIsTxOnGoing()) {
-	BSP_LED_On(LED_GREEN); }
+		BSP_LED_On(LED_GREEN);
+		if((HAL_GetTick()-startTick)>timeout)
+			return;
+	}
 	BSP_LED_Off(LED_RED);
 }
 
