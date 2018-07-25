@@ -818,6 +818,9 @@
 //#define MANUAL_Y_HOME_POS 0
 #define MANUAL_Z_HOME_POS 125 // Distance between the nozzle to printbed after homing
 
+#define MAX_Z_HEIGHT_ERROR 40
+#define MIN_Z_HEIGHT_ERROR -60
+
 // Use "Z Safe Homing" to avoid homing with a Z probe outside the bed area.
 //
 // With this feature enabled:
