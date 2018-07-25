@@ -474,16 +474,20 @@ static uint8_t target_extruder;
   // these are the default values, can be overriden with M665
   float delta_height = Z_HOME_POS;
   float delta_radius = DELTA_RADIUS;
-  float delta_tower1_x = -SIN_60 * (delta_radius + DELTA_RADIUS_TRIM_TOWER_1); // front left tower
-  float delta_tower1_y = -COS_60 * (delta_radius + DELTA_RADIUS_TRIM_TOWER_1);
-  float delta_tower2_x =  SIN_60 * (delta_radius + DELTA_RADIUS_TRIM_TOWER_2); // front right tower
-  float delta_tower2_y = -COS_60 * (delta_radius + DELTA_RADIUS_TRIM_TOWER_2);
-  float delta_tower3_x = 0;                                                    // back middle tower
-  float delta_tower3_y = (delta_radius + DELTA_RADIUS_TRIM_TOWER_3);
+  float delta_radius_trim_tower_1 = DELTA_RADIUS_TRIM_TOWER_1;
+  float delta_radius_trim_tower_2 = DELTA_RADIUS_TRIM_TOWER_2;
+  float delta_radius_trim_tower_3 = DELTA_RADIUS_TRIM_TOWER_3;
+  float delta_tower1_x = cos(RADIANS(210 + delta_tower_angle_trim[A_AXIS])) * (delta_radius + delta_radius_trim_tower_1); // front left tower
+  float delta_tower1_y = sin(RADIANS(210 + delta_tower_angle_trim[A_AXIS])) * (delta_radius + delta_radius_trim_tower_1);
+  float delta_tower2_x = cos(RADIANS(330 + delta_tower_angle_trim[B_AXIS])) * (delta_radius + delta_radius_trim_tower_2); // front right tower
+  float delta_tower2_y = sin(RADIANS(330 + delta_tower_angle_trim[B_AXIS])) * (delta_radius + delta_radius_trim_tower_2);
+  float delta_tower3_x = cos(RADIANS( 90 + delta_tower_angle_trim[C_AXIS])) * (delta_radius + delta_radius_trim_tower_3); // back middle tower
+  float delta_tower3_y = sin(RADIANS( 90 + delta_tower_angle_trim[C_AXIS])) * (delta_radius + delta_radius_trim_tower_3);
   float delta_diagonal_rod = DELTA_DIAGONAL_ROD;
   float delta_diagonal_rod_trim_tower_1 = DELTA_DIAGONAL_ROD_TRIM_TOWER_1;
   float delta_diagonal_rod_trim_tower_2 = DELTA_DIAGONAL_ROD_TRIM_TOWER_2;
   float delta_diagonal_rod_trim_tower_3 = DELTA_DIAGONAL_ROD_TRIM_TOWER_3;
+
   float delta_diagonal_rod_2_tower_1 = sq(delta_diagonal_rod + delta_diagonal_rod_trim_tower_1);
   float delta_diagonal_rod_2_tower_2 = sq(delta_diagonal_rod + delta_diagonal_rod_trim_tower_2);
   float delta_diagonal_rod_2_tower_3 = sq(delta_diagonal_rod + delta_diagonal_rod_trim_tower_3);
@@ -5569,6 +5573,9 @@ inline void gcode_M206() {
     if (code_seen('A')) delta_diagonal_rod_trim_tower_1 = code_value_linear_units();
     if (code_seen('B')) delta_diagonal_rod_trim_tower_2 = code_value_linear_units();
     if (code_seen('C')) delta_diagonal_rod_trim_tower_3 = code_value_linear_units();
+    if (code_seen('D')) delta_radius_trim_tower_1 = code_value_linear_units();
+    if (code_seen('E')) delta_radius_trim_tower_2 = code_value_linear_units();
+    if (code_seen('F')) delta_radius_trim_tower_3 = code_value_linear_units();
     if (code_seen('X')) delta_tower_angle_trim[A_AXIS] = code_value_float();
     if (code_seen('Y')) delta_tower_angle_trim[B_AXIS] = code_value_float();
     if (code_seen('Z')) delta_tower_angle_trim[C_AXIS] = code_value_float();
@@ -7917,12 +7924,12 @@ void clamp_to_software_endstops(float target[3]) {
 #if ENABLED(DELTA)
 
   void recalc_delta_settings(float radius, float diagonal_rod) {
-	delta_tower1_x = cos(RADIANS(210 + delta_tower_angle_trim[A_AXIS])) * (radius + DELTA_RADIUS_TRIM_TOWER_1); // front left tower
-	delta_tower1_y = sin(RADIANS(210 + delta_tower_angle_trim[A_AXIS])) * (radius + DELTA_RADIUS_TRIM_TOWER_1);
-	delta_tower2_x = cos(RADIANS(330 + delta_tower_angle_trim[B_AXIS])) * (radius + DELTA_RADIUS_TRIM_TOWER_2); // front right tower
-	delta_tower2_y = sin(RADIANS(330 + delta_tower_angle_trim[B_AXIS])) * (radius + DELTA_RADIUS_TRIM_TOWER_2);
-	delta_tower3_x = cos(RADIANS( 90 + delta_tower_angle_trim[C_AXIS])) * (radius + DELTA_RADIUS_TRIM_TOWER_3); // back middle tower
-	delta_tower3_y = sin(RADIANS( 90 + delta_tower_angle_trim[C_AXIS])) * (radius + DELTA_RADIUS_TRIM_TOWER_3);
+	delta_tower1_x = cos(RADIANS(210 + delta_tower_angle_trim[A_AXIS])) * (radius + delta_radius_trim_tower_1); // front left tower
+	delta_tower1_y = sin(RADIANS(210 + delta_tower_angle_trim[A_AXIS])) * (radius + delta_radius_trim_tower_1);
+	delta_tower2_x = cos(RADIANS(330 + delta_tower_angle_trim[B_AXIS])) * (radius + delta_radius_trim_tower_2); // front right tower
+	delta_tower2_y = sin(RADIANS(330 + delta_tower_angle_trim[B_AXIS])) * (radius + delta_radius_trim_tower_2);
+	delta_tower3_x = cos(RADIANS( 90 + delta_tower_angle_trim[C_AXIS])) * (radius + delta_radius_trim_tower_3); // back middle tower
+	delta_tower3_y = sin(RADIANS( 90 + delta_tower_angle_trim[C_AXIS])) * (radius + delta_radius_trim_tower_3);
     delta_diagonal_rod_2_tower_1 = sq(diagonal_rod + delta_diagonal_rod_trim_tower_1);
     delta_diagonal_rod_2_tower_2 = sq(diagonal_rod + delta_diagonal_rod_trim_tower_2);
     delta_diagonal_rod_2_tower_3 = sq(diagonal_rod + delta_diagonal_rod_trim_tower_3);

@@ -797,6 +797,18 @@ void Config_StoreSettings()
   sprintf(numStr, "%.2f", delta_diagonal_rod_trim_tower_3);
   strcat(cmdStr, numStr);
 
+  strcat(cmdStr, " D");
+  sprintf(numStr, "%.2f", delta_radius_trim_tower_1);
+  strcat(cmdStr, numStr);
+
+  strcat(cmdStr, " E");
+  sprintf(numStr, "%.2f", delta_radius_trim_tower_2);
+  strcat(cmdStr, numStr);
+
+  strcat(cmdStr, " F");
+  sprintf(numStr, "%.2f", delta_radius_trim_tower_3);
+  strcat(cmdStr, numStr);
+
   strcat(cmdStr, " X");
   sprintf(numStr, "%.2f", delta_tower_angle_trim[A_AXIS]);
   strcat(cmdStr, numStr);
@@ -812,7 +824,9 @@ void Config_StoreSettings()
 
   strcpy(cmdStr, "; H=delta_height, L=delta_diagonal_rod, R=delta_radius, S=delta_segments_per_second, ");
   p_card->write_command(cmdStr);
-  strcpy(cmdStr, "; A/B/C=delta_diagonal_rod_trim_tower_1/2/3, X/Y/Z=delta_angle_adjust");
+  strcpy(cmdStr, "; A/B/C=delta_diagonal_rod_trim_tower_1/2/3");
+  p_card->write_command(cmdStr);
+  strcpy(cmdStr, "; D/E/F=delta_radius_trim_tower_1/2/3, X/Y/Z=delta_angle_adjust");
   p_card->write_command(cmdStr);
 
 #elif ENABLED(Z_DUAL_ENDSTOPS)
@@ -1038,14 +1052,24 @@ void Config_ResetDefault() {
   #endif
 
   #if ENABLED(DELTA)
-    endstop_adj[X_AXIS] = endstop_adj[Y_AXIS] = endstop_adj[Z_AXIS] = 0;
+	endstop_adj[X_AXIS] = DELTA_ENDSTOP_ADJ_X;
+	endstop_adj[Y_AXIS] = DELTA_ENDSTOP_ADJ_Y;
+	endstop_adj[Z_AXIS] = DELTA_ENDSTOP_ADJ_Z;
     delta_height = Z_HOME_POS;
     delta_radius =  DELTA_RADIUS;
     delta_diagonal_rod =  DELTA_DIAGONAL_ROD;
     delta_segments_per_second =  DELTA_SEGMENTS_PER_SECOND;
+    delta_radius_trim_tower_1 = DELTA_RADIUS_TRIM_TOWER_1;
+    delta_radius_trim_tower_2 = DELTA_RADIUS_TRIM_TOWER_2;
+    delta_radius_trim_tower_3 = DELTA_RADIUS_TRIM_TOWER_3;
     delta_diagonal_rod_trim_tower_1 = DELTA_DIAGONAL_ROD_TRIM_TOWER_1;
     delta_diagonal_rod_trim_tower_2 = DELTA_DIAGONAL_ROD_TRIM_TOWER_2;
     delta_diagonal_rod_trim_tower_3 = DELTA_DIAGONAL_ROD_TRIM_TOWER_3;
+    //TODO: update delta_tower_angle_trim to correctly use the initializer
+    for(int i=0;i<3;i++)
+    	delta_tower_angle_trim[i] = 0;
+    delta_clip_start_height = Z_MAX_POS;
+    recalc_delta_settings(delta_radius,delta_diagonal_rod);
   #elif ENABLED(Z_DUAL_ENDSTOPS)
     z_endstop_adj = 0;
   #endif
@@ -1106,7 +1130,10 @@ void Config_ResetDefault() {
   volumetric_enabled = false;
   for (uint8_t q = 0; q < COUNT(filament_size); q++)
     filament_size[q] = DEFAULT_NOMINAL_FILAMENT_DIA;
+  // make sure the bed_level_rotation_matrix is identity or the planner will get it wrong
+  planner.bed_level_matrix.set_to_identity();
 
+  reset_bed_level();
   endstops.enable_globally(
     #if ENABLED(ENDSTOPS_ALWAYS_ON_DEFAULT)
       (true)
@@ -1253,6 +1280,9 @@ void Config_PrintSettings(bool forReplay) {
     SERIAL_ECHOPAIR(" A", delta_diagonal_rod_trim_tower_1);
     SERIAL_ECHOPAIR(" B", delta_diagonal_rod_trim_tower_2);
     SERIAL_ECHOPAIR(" C", delta_diagonal_rod_trim_tower_3);
+    SERIAL_ECHOPAIR(" D", delta_radius_trim_tower_1);
+    SERIAL_ECHOPAIR(" E", delta_radius_trim_tower_2);
+    SERIAL_ECHOPAIR(" F", delta_radius_trim_tower_3);
     SERIAL_ECHOPAIR(" X", delta_tower_angle_trim[A_AXIS]);
     SERIAL_ECHOPAIR(" Y", delta_tower_angle_trim[B_AXIS]);
     SERIAL_ECHOPAIR(" Z", delta_tower_angle_trim[C_AXIS]);
