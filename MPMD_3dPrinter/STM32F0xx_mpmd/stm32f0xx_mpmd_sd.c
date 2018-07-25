@@ -796,7 +796,20 @@ SD_CmdAnswer_typedef SD_SendCmd(uint8_t Cmd, uint32_t Arg, uint8_t Crc, uint8_t 
   SD_IO_CSState(0);
 //  HAL_Delay(10);
   SD_IO_WriteReadData(frame, frameout, SD_CMD_LENGTH); /* Send the Cmd bytes */
-
+  uint8_t failure=1;
+  for(int i=0;i<SD_CMD_LENGTH;i++) {
+	  if(frameout[i])
+	  {
+		  failure=0;
+		  break;
+	  }
+  }
+  if(failure)
+  {
+	  retr.r1 = SD_R1_COM_CRC_ERROR;
+	  retr.r2 = SD_R2_ERROR;
+	  return retr;
+  }
   switch(Answer)
   {
   case SD_ANSWER_R1_EXPECTED :

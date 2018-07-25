@@ -578,6 +578,7 @@ void get_available_commands();
 void process_next_command();
 void prepare_move_to_destination();
 void set_current_from_steppers_for_axis(AxisEnum axis);
+void gcode_G28();
 
 #if ENABLED(ARC_SUPPORT)
   void plan_arc(float target[NUM_AXIS], float* offset, uint8_t clockwise);
@@ -802,7 +803,11 @@ void setup_sdcard()
 #if defined(SDSUPPORT)
   while (p_card->autostart_atmillis>millis()) { }
   if(FATFS_LinkDriver(&SD_Driver, SDPath) == 0)
+  {
 	  p_card->checkautostart(true);
+  	  if(p_card->cardOK)
+		Config_RetrieveSettings();
+  }
 #endif
 }
 
@@ -930,11 +935,6 @@ void setup() {
   // Reset parameters to default values
   Config_ResetDefault();
 
-  // Init and autostart on SD card
-#if defined(SDSUPPORT)
-  setup_sdcard();
-#endif
-
   // Load data from EEPROM if available (or use defaults)
   // This also updates variables in the planner, elsewhere
 //  Config_RetrieveSettings();
@@ -987,8 +987,9 @@ void setup() {
     pinMode(STAT_LED_BLUE, OUTPUT);
     digitalWrite(STAT_LED_BLUE, LOW); // turn it off
   #endif
-
+  delay(1000); //Give USB time to connect and initialize before starting LCD interface
   lcd_init();
+
   #if ENABLED(SHOW_BOOTSCREEN)
     #if ENABLED(DOGLCD)
       safe_delay(BOOTSCREEN_TIMEOUT);
@@ -1013,6 +1014,10 @@ void setup() {
     if(thermalManager.current_temperature[0]>140)    {
     	enqueue_and_echo_commands_P(PSTR("G28\nM106 S255"));
     }
+    // Init and autostart on SD card
+  #if defined(SDSUPPORT)
+    setup_sdcard();
+  #endif
 }
 
 /**
@@ -2432,6 +2437,47 @@ static void clean_up_after_endstop_or_probe_move() {
       }
     }
 
+    static float probe_delta_height(float probe_offset, bool stow=true, int verbose=3) {
+    	float z_at_pt;
+		SERIAL_PROTOCOLPGM("Probing Delta Height");
+    	for(int i=0;i<2;i++) { //iterate up to 2 times in case the wrong steps per mm detected
+			delta_height = Z_HOME_POS; //set default home position
+			gcode_G28();
+			z_at_pt = probe_pt(0,0,stow,verbose) + probe_offset;
+			if(z_at_pt <= MIN_Z_HEIGHT_ERROR) //If we are this far off, then steps/mm is too small, try 2x
+			{
+				LOOP_XYZE(axis) {
+					planner.axis_steps_per_mm[axis]*=2;
+				}
+				planner.refresh_positioning();
+				SERIAL_PROTOCOLPGM("Delta height too large, trying 2x M92 value\n");
+				SERIAL_ECHOPAIR(" New M92 X", planner.axis_steps_per_mm[X_AXIS]);
+				SERIAL_ECHOPAIR(" Y", planner.axis_steps_per_mm[Y_AXIS]);
+				SERIAL_ECHOPAIR(" Z", planner.axis_steps_per_mm[Z_AXIS]);
+				SERIAL_ECHOPAIR(" E", planner.axis_steps_per_mm[E_AXIS]);
+			}
+			else if(z_at_pt >= MAX_Z_HEIGHT_ERROR) //If we are this far off, then steps/mm is too big, try 1/2
+			{
+				LOOP_XYZE(axis) {
+					planner.axis_steps_per_mm[axis]/=2;
+				}
+				planner.refresh_positioning();
+				SERIAL_PROTOCOLPGM("Delta height too small, trying 1/2 M92 value\n");
+				SERIAL_ECHOPAIR(" New M92 X", planner.axis_steps_per_mm[X_AXIS]);
+				SERIAL_ECHOPAIR(" Y", planner.axis_steps_per_mm[Y_AXIS]);
+				SERIAL_ECHOPAIR(" Z", planner.axis_steps_per_mm[Z_AXIS]);
+				SERIAL_ECHOPAIR(" E", planner.axis_steps_per_mm[E_AXIS]);
+			}
+			else //within range
+				break;
+    	}
+    	delta_height -= z_at_pt;
+    	current_position[Z_AXIS] -= z_at_pt;
+        SYNC_PLAN_POSITION_KINEMATIC();
+    	return z_at_pt;
+    }
+
+
   #endif // DELTA
 
 #endif // AUTO_BED_LEVELING_FEATURE
@@ -2995,7 +3041,7 @@ inline void gcode_G28() {
     /**
      * A delta can only safely home all axes at the same time
      */
-
+    bool safeHome = (current_position[Z_AXIS] <= delta_clip_start_height);
     // Pretend the current position is 0,0,0
     // This is like quick_home_xy() but for 3 towers.
     current_position[X_AXIS] = current_position[Y_AXIS] = current_position[Z_AXIS] = 0.0;
@@ -3253,7 +3299,8 @@ inline void gcode_G28() {
 
   #if ENABLED(DELTA)
     // move to a height where we can use the full xy-area
-    do_blocking_move_to_z(delta_clip_start_height);
+    if(safeHome)
+    	do_blocking_move_to_z(delta_clip_start_height);
   #endif
 
   clean_up_after_endstop_or_probe_move();
@@ -3519,7 +3566,13 @@ inline void gcode_G28() {
 
     // Don't allow auto-leveling without homing first
     if (axis_unhomed_error(true, true, true)) return;
-
+    int probe_level = code_seen('P') ? code_value_int() : 2;
+    if (probe_level < 0 || probe_level > 2) {
+      SERIAL_ECHOLNPGM("?(P)robe Level is implausible (0-2).");
+      return;
+    }
+    bool do_height_probe = !(probe_level & 0x01); //!LSB means do probe height
+    bool do_mesh_probe = probe_level!=0; //Do mesh probe if non-zero
     int verbose_level = code_seen('V') ? code_value_int() : 1;
     if (verbose_level < 0 || verbose_level > 4) {
       SERIAL_ECHOLNPGM("?(V)erbose Level is implausible (0-4).");
@@ -3528,13 +3581,22 @@ inline void gcode_G28() {
 
     bool dryrun = code_seen('D');
     bool stow_probe_after_each = code_seen('E');
+    float zoffset = 0;
+    if (code_seen('Z')) zoffset += code_value_axis_units(Z_AXIS);
 
     #if ENABLED(AUTO_BED_LEVELING_GRID)
+
+    if(do_height_probe)
+    {
+    	float delta_z_offset = probe_delta_height(zoffset);
+    	if(delta_z_offset<=MIN_Z_HEIGHT_ERROR || delta_z_offset>=MAX_Z_HEIGHT_ERROR )
+			SERIAL_PROTOCOLPGM("Delta Height is misconfigured, aborting Auto Bed Leveling");
+    }
 
       #if DISABLED(DELTA)
         bool do_topography_map = verbose_level > 2 || code_seen('T');
       #endif
-
+      if (do_mesh_probe) {
       if (verbose_level > 0) {
         SERIAL_PROTOCOLLNPGM("G29 Auto Bed Leveling");
         if (dryrun) SERIAL_PROTOCOLLNPGM("Running in DRY-RUN mode");
@@ -3640,8 +3702,6 @@ inline void gcode_G28() {
       #if ENABLED(DELTA)
         delta_grid_spacing[0] = xGridSpacing;
         delta_grid_spacing[1] = yGridSpacing;
-        float zoffset = 0;
-        if (code_seen('Z')) zoffset += code_value_axis_units(Z_AXIS);
       #else // !DELTA
         /**
          * solve the plane equation ax + by + d = z
@@ -3746,6 +3806,7 @@ inline void gcode_G28() {
       #if ENABLED(DELTA)
 
         if (!dryrun) extrapolate_unprobed_bed_level();
+      }
         print_bed_level();
 
       #else // !DELTA
@@ -4055,8 +4116,6 @@ inline void gcode_M17() {
    * M21: Init SD Card
    */
   inline void gcode_M21() {
-    //TODO: there's a bug related to re-initializing the SD card, currently it only works
-    //the first time on powerup, so we disable this command for now
     p_card->initsd();
   }
 

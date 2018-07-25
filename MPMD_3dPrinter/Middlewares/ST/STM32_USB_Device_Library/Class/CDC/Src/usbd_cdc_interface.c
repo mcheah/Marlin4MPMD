@@ -230,13 +230,17 @@ static int8_t CDC_Itf_Control (uint8_t cmd, uint8_t* pbuf, uint16_t length)
   * @param  Len: Number of data to be sent (in bytes)
   */
 void CDC_Itf_QueueTxBytes(uint8_t *Buf, uint32_t Len) {
+	static const uint32_t timeout = 5;//Use much shorter timeout per character
 	for (uint32_t i=0;i<Len;i++) {
 		//Wait until the queue has cleared
 		uint8_t nBytes = CDC_Itf_GetNbTxAvailableBytes();
 		//Fill up the queue while disconnected, but do not block the thread
+		uint32_t startTick = HAL_GetTick();
 		while(nBytes<1 && CDC_Itf_IsConnected()) {
 			BSP_LED_On(LED_GREEN);
 			nBytes = CDC_Itf_GetNbTxAvailableBytes();
+			if((HAL_GetTick()-startTick)>timeout)
+				return;
 		}
 		if(!CDC_Itf_IsConnected() && nBytes<1)
 			break;
