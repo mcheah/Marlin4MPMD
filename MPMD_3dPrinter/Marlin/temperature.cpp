@@ -809,6 +809,7 @@ void Temperature::manage_heater() {
 }
 
 #define PGM_RD_W(x)   (short)(x)
+#define PGM_RD_UW(x)  (int)(x)
 // #define PGM_RD_W(x)   (short)pgm_read_word(&x)   -- BDI : To suppress
 
 // Derived from RepRap FiveD extruder::getTemperature()
@@ -834,20 +835,20 @@ float Temperature::analog2temp(int raw, uint8_t e) {
   if (heater_ttbl_map[e] != NULL) {
     float celsius = 0;
     uint8_t i;
-    short(*tt)[][2] = (short(*)[][2])(heater_ttbl_map[e]);
+    int(*tt)[][2] = (int(*)[][2])(heater_ttbl_map[e]);
 
     for (i = 1; i < heater_ttbllen_map[e]; i++) {
-      if (PGM_RD_W((*tt)[i][0]) > raw) {
-        celsius = PGM_RD_W((*tt)[i - 1][1]) +
-                  (raw - PGM_RD_W((*tt)[i - 1][0])) *
-                  (float)(PGM_RD_W((*tt)[i][1]) - PGM_RD_W((*tt)[i - 1][1])) /
-                  (float)(PGM_RD_W((*tt)[i][0]) - PGM_RD_W((*tt)[i - 1][0]));
+      if (PGM_RD_UW((*tt)[i][0]) > raw) {
+        celsius = PGM_RD_UW((*tt)[i - 1][1]) +
+                  (raw - PGM_RD_UW((*tt)[i - 1][0])) *
+                  (float)(PGM_RD_UW((*tt)[i][1]) - PGM_RD_UW((*tt)[i - 1][1])) /
+                  (float)(PGM_RD_UW((*tt)[i][0]) - PGM_RD_UW((*tt)[i - 1][0]));
         break;
       }
     }
 
     // Overflow: Set to last value in the table
-    if (i == heater_ttbllen_map[e]) celsius = PGM_RD_W((*tt)[i - 1][1]);
+    if (i == heater_ttbllen_map[e]) celsius = PGM_RD_UW((*tt)[i - 1][1]);
 
     return celsius;
   }
@@ -862,18 +863,18 @@ float Temperature::analog2tempBed(int raw) {
     byte i;
 
     for (i = 1; i < BEDTEMPTABLE_LEN; i++) {
-      if (PGM_RD_W(BEDTEMPTABLE[i][0]) > raw) {
-        celsius  = PGM_RD_W(BEDTEMPTABLE[i - 1][1]) +
-                   (raw - PGM_RD_W(BEDTEMPTABLE[i - 1][0])) *
-                   (float)(PGM_RD_W(BEDTEMPTABLE[i][1]) - PGM_RD_W(BEDTEMPTABLE[i - 1][1])) /
-                   (float)(PGM_RD_W(BEDTEMPTABLE[i][0]) - PGM_RD_W(BEDTEMPTABLE[i - 1][0]));
+      if (PGM_RD_UW(BEDTEMPTABLE[i][0]) > raw) {
+        celsius  = PGM_RD_UW(BEDTEMPTABLE[i - 1][1]) +
+                   (raw - PGM_RD_UW(BEDTEMPTABLE[i - 1][0])) *
+                   (float)(PGM_RD_UW(BEDTEMPTABLE[i][1]) - PGM_RD_UW(BEDTEMPTABLE[i - 1][1])) /
+                   (float)(PGM_RD_UW(BEDTEMPTABLE[i][0]) - PGM_RD_UW(BEDTEMPTABLE[i - 1][0]));
         break;
       }
     }
 
     // Overflow: Set to last value in the table
     if (i == BEDTEMPTABLE_LEN)
-    	celsius = PGM_RD_W(BEDTEMPTABLE[i - 1][1]);
+    	celsius = PGM_RD_UW(BEDTEMPTABLE[i - 1][1]);
 
     return celsius;
 

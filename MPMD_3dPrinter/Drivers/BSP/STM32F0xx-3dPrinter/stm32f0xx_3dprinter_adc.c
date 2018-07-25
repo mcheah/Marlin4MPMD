@@ -46,8 +46,10 @@
 #define ADC_ERROR_TAG        (0x2000)
 #define ADC_ERROR(error)     BSP_MiscErrorHandler(error|ADC_ERROR_TAG)
 //TODO: update this to correspond to the correct number of
+#define BSP_ADC_NUM_CHANNELS (2)
+#define BSP_ADC_OS_RATIO	 (16)
 //#define BSP_ADC_CONVERTED_VALUES_BUFFER_SIZE (6)
-#define BSP_ADC_CONVERTED_VALUES_BUFFER_SIZE (2)
+#define BSP_ADC_CONVERTED_VALUES_BUFFER_SIZE (BSP_ADC_NUM_CHANNELS*BSP_ADC_OS_RATIO)
     
 /* Global variables ---------------------------------------------------------*/
 BspAdcDataType gBspAdcData;
@@ -72,7 +74,7 @@ void BSP_AdcHwInit(void)
     */
   pAdc->adcHandle.Instance = BSP_ADC;
   pAdc->adcHandle.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
-  pAdc->adcHandle.Init.Resolution = ADC_RESOLUTION_10B;
+  pAdc->adcHandle.Init.Resolution = ADC_RESOLUTION_12B;
   pAdc->adcHandle.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   pAdc->adcHandle.Init.ScanConvMode = ENABLE;
   pAdc->adcHandle.Init.EOCSelection = 0X0000;
@@ -93,7 +95,6 @@ void BSP_AdcHwInit(void)
 //  pAdc->adcHandle.Init.Overrun = ADC_OVR_DATA_PRESERVED;
 //  pAdc->adcHandle.Init.SamplingTimeCommon =
   
-    
   if (HAL_ADC_Init(&pAdc->adcHandle) != HAL_OK)
   {
     /* ADC initialization error */
@@ -161,6 +162,7 @@ void BSP_AdcHwInit(void)
     ADC_ERROR(7);
   }  
 #endif
+  HAL_ADCEx_Calibration_Start(&pAdc->adcHandle);
 
   /* Start conversion */
   if (HAL_ADC_Start_DMA(&pAdc->adcHandle,
@@ -220,7 +222,10 @@ uint16_t BSP_AdcGetValue(uint8_t rankId)
   {
       ADC_ERROR(10);
   }
-  return (aBspAdcConvertedValues[rankId]);
+  uint32_t adcSum = 0;
+  for(int i=0;i<BSP_ADC_CONVERTED_VALUES_BUFFER_SIZE;i+=BSP_ADC_NUM_CHANNELS)
+	  adcSum += aBspAdcConvertedValues[rankId+i];
+  return (adcSum/BSP_ADC_OS_RATIO);
 }
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 
