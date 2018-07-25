@@ -456,7 +456,8 @@ void BSP_MiscStopInit(uint8_t id)
   GPIO_InitTypeDef GPIO_InitStruct;
   uint32_t gpioPin;
   GPIO_TypeDef* gpioPort;
-
+  //Default to input, add EXTI to W pin
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   switch (id)
   {
     case 0:
@@ -520,6 +521,7 @@ void BSP_MiscStopInit(uint8_t id)
       /* Configure W_STOP pin */
       gpioPin = BSP_STOP_W_PIN;
       gpioPort = BSP_STOP_W_PORT;
+      GPIO_InitStruct.Mode |= GPIO_MODE_IT_RISING_FALLING;
 #if defined(STOP_W__PULL_UP)
       GPIO_InitStruct.Pull = GPIO_PULLUP;
 #elif defined(STOP_W__PULL_DOWN)
@@ -532,9 +534,15 @@ void BSP_MiscStopInit(uint8_t id)
       return;
   }
   GPIO_InitStruct.Pin = gpioPin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
   HAL_GPIO_Init(gpioPort, &GPIO_InitStruct);      
+  switch(id) {
+	  case 5:
+	  /* Configure W_STOP pin */
+		  NVIC_EnableIRQ(BSP_STOP_W_IRQN);
+		  NVIC_SetPriority(BSP_STOP_W_IRQN,3);//Set lowest priority
+	  break;
+  }
 }
 
 /******************************************************//**

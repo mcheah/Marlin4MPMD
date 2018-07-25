@@ -854,6 +854,23 @@ void HAL_TIM_OC_MspDeInit(TIM_HandleTypeDef* htim_oc)
 #endif//MARLIN
 }
 
+/**
+  * @brief External Line Callback
+  * @param[in] GPIO_Pin pin number
+  * @retval None
+  */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	if (GPIO_Pin == BSP_STOP_W_PIN)
+	{
+		if(HAL_GPIO_ReadPin(BSP_STOP_W_PORT,BSP_STOP_W_PIN)==GPIO_PIN_RESET)
+			BSP_LED_On(LED_RED);
+		else
+			BSP_LED_Off(LED_RED);
+	}
+ }
+
+
 void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
 {
 
