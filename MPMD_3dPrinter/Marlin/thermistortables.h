@@ -1290,6 +1290,26 @@ const unsigned short temptable_73[][2] PROGMEM = {
 #endif
 
 #if ANY_THERMISTOR_IS(74) // mpmd 100k EPCOS 4.7k, 3.3V, dennis brown table, -0.15% gain adjust
+#if (THERMISTORHEATER_0 == 74)
+  #define HEATER_0_RAW_HI_TEMP 0
+  #define HEATER_0_RAW_LO_TEMP 65535
+#endif
+#if (THERMISTORHEATER_1 == 74)
+  #define HEATER_1_RAW_HI_TEMP 0
+  #define HEATER_1_RAW_LO_TEMP 65535
+#endif
+#if (THERMISTORHEATER_2 == 74)
+  #define HEATER_2_RAW_HI_TEMP 0
+  #define HEATER_2_RAW_LO_TEMP 65535
+#endif
+#if (THERMISTORHEATER_3 == 74)
+  #define HEATER_3_RAW_HI_TEMP 0
+  #define HEATER_3_RAW_LO_TEMP 65535
+#endif
+#if (THERMISTORBED == 74)
+  #define HEATER_BED_RAW_HI_TEMP 0
+  #define HEATER_BED_RAW_LO_TEMP 65535
+#endif
 const int temptable_74[][2] PROGMEM = {
 {   51 * OVERSAMPLENR,   349 },
 {   52 * OVERSAMPLENR,   346 },

@@ -328,6 +328,15 @@ class Temperature {
       #if ENABLED(THERMAL_PROTECTION_HOTENDS) && WATCH_TEMP_PERIOD > 0
         start_watching_heater(HOTEND_INDEX);
       #endif
+	#if ENABLED(HEATER_BED_5A_LIMIT)
+      if(thermal_runaway_bed_state_machine!=TRInactive &&
+    		  target_temperature[HOTEND_INDEX] > current_temperature[HOTEND_INDEX]) {
+    	  //When slewing HOTEND temp, the bed heater will turn off, triggering thermal runaway
+    	  //to combat this, set and overly generous timeout, and change state to FirstHeating
+    	  thermal_runaway_bed_timer = millis() + 30 * 1000UL;
+    	  thermal_runaway_bed_state_machine = TRFirstHeating;
+      }
+	#endif
     }
 
     static void setTargetBed(const float& celsius) {
