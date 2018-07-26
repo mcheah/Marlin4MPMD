@@ -67,8 +67,8 @@
 #define STOP_Z__PULL_UP
 //#define BSP_STOP_U_PIN               (GPIO_PIN_13)
 //#define BSP_STOP_U_PORT              (GPIOC)
-//#define BSP_STOP_V_PIN               (GPIO_PIN_13)
-//#define BSP_STOP_V_PORT              (GPIOC)
+#define BSP_STOP_V_PIN               (GPIO_PIN_3)
+#define BSP_STOP_V_PORT              (GPIOA)
 #define BSP_STOP_W_PIN               (GPIO_PIN_7)
 #define BSP_STOP_W_PORT              (GPIOB)
 #define STOP_W__PULL_UP
@@ -104,8 +104,8 @@
 
 /* Definition for Servo 0*/
 //TODO: removed unused servo
-//#define BSP_SERVO0_PIN               (GPIO_PIN_8)
-//#define BSP_SERVO0_PORT              (GPIOA)
+#define BSP_SERVO0_PIN               (GPIO_PIN_2)
+#define BSP_SERVO0_PORT              (GPIOA)
    
 /* Definition for Tick timer */
 /// Timer used for Tick
@@ -115,7 +115,7 @@
 /// HAL Active Channel Timer used for Tick
 #define BSP_MISC_HAL_ACT_CHAN_TIMER_TICK      (HAL_TIM_ACTIVE_CHANNEL_1)
 /// Timer Clock Enable for Tick
-#define __BSP_MISC_TIMER_TICK_CLCK_ENABLE()   __TIM3_CLK_ENABLE()
+#define __BSP_MISC_TIMER_TICK_CLK_ENABLE()   __TIM3_CLK_ENABLE()
 /// Timer Clock Disable for Tick
 #define __BSP_MISC_TIMER_TICK_CLCK_DISABLE()  __TIM3_CLK_DISABLE()
 
@@ -130,7 +130,7 @@
 /// HAL Active Channel Timer used for Tick
 #define BSP_MISC_HAL_ACT_CHAN_TIMER_TICK2      (HAL_TIM_ACTIVE_CHANNEL_1)
 /// Timer Clock Enable for Tick
-#define __BSP_MISC_TIMER_TICK2_CLCK_ENABLE()   __TIM14_CLK_ENABLE()
+#define __BSP_MISC_TIMER_TICK2_CLK_ENABLE()   __TIM14_CLK_ENABLE()
 /// Timer Clock Disable for Tick
 #define __BSP_MISC_TIMER_TICK2_CLCK_DISABLE()  __TIM14_CLK_DISABLE()
 
@@ -178,17 +178,17 @@
 //#define BSP_MISC_AFx_TIMx_PWM_HEAT_BED3               (GPIO_AF2_TIM1)
    
 /// Timer used for PWM_HEAT_E1
-#define BSP_MISC_TIMER_PWM_HEAT_E1                  (TIM15)
+#define BSP_MISC_TIMER_PWM_HEAT_E1                  (TIM1)
 /// Channel Timer used for PWM_HEAT_E1
 #define BSP_MISC_CHAN_TIMER_PWM_HEAT_E1                  (TIM_CHANNEL_1)
 /// HAL Active Channel Timer used for PWM_HEAT_E1
 #define BSP_MISC_HAL_ACT_CHAN_TIMER_PWM_HEAT_E1     (HAL_TIM_ACTIVE_CHANNEL_1)
 /// Timer Clock Enable for PWM_HEAT_E1
-#define __BSP_MISC_TIMER_PWM_HEAT_E1_CLCK_ENABLE()  __TIM15_CLK_ENABLE()
+#define __BSP_MISC_TIMER_PWM_HEAT_E1_CLCK_ENABLE()  __TIM1_CLK_ENABLE()
 /// Timer Clock Disable for PWM_HEAT_E1
-#define __BSP_MISC_TIMER_PWM_HEAT_E1_CLCK_DISABLE() __TIM15_CLK_DISABLE()
+#define __BSP_MISC_TIMER_PWM_HEAT_E1_CLCK_DISABLE() __TIM1_CLK_DISABLE()
 /// PWM_HEAT_E1 GPIO alternate function 
-#define BSP_MISC_AFx_TIMx_PWM_HEAT_E1               (GPIO_AF3_TIM15)
+#define BSP_MISC_AFx_TIMx_PWM_HEAT_E1               (GPIO_AF2_TIM1)
    
 ///// Timer used for PWM_HEAT_E2
 //#define BSP_MISC_TIMER_PWM_HEAT_E2                  (TIM15)
@@ -217,20 +217,23 @@
 //#define BSP_MISC_AFx_TIMx_PWM_HEAT_E3               (GPIO_AF3_TIM15)
 
 //TODO: remove servo support
-/// Timer used for Servo (marlin only)
-//#define BSP_MISC_TIMER_SERVO                      (TIM1)
-///// Channel Timer used for PWM_HEAT_E4
-//#define BSP_MISC_CHAN_TIMER_SERVO                 (TIM_CHANNEL_1)
-///// HAL Active Channel Timer used for PWM_HEAT_E4
-//#define BSP_MISC_HAL_ACT_CHAN_TIMER_SERVO         (HAL_TIM_ACTIVE_CHANNEL_1)
-///// Timer Clock Enable for PWM_HEAT_E4
-//#define __BSP_MISC_TIMER_SERVO_CLCK_ENABLE()       __TIM1_CLK_ENABLE()
-///// Timer Clock Disable for PWM_HEAT_E4
-//#define __BSP_MISC_TIMER_SERVO_CLCK_DISABLE()     __TIM1_CLK_DISABLE()
-///// PWM_HEAT_E4 GPIO alternate function
-//#define BSP_MISC_AFx_TIMx_SERVO                    (GPIO_AF2_TIM1)
-//   /// SERVO global interrupt
-//#define BSP_MISC_SERVO_IRQn                    (TIM1_BRK_UP_TRG_COM_IRQn)
+// Timer used for Servo (marlin only)
+#define BSP_MISC_TIMER_SERVO                      (TIM15)
+/// Channel Timer used for PWM_HEAT_E4
+#define BSP_MISC_CHAN_TIMER_SERVO                 (TIM_CHANNEL_1)
+/// HAL Active Channel Timer used for PWM_HEAT_E4
+#define BSP_MISC_HAL_ACT_CHAN_TIMER_SERVO         (HAL_TIM_ACTIVE_CHANNEL_1)
+/// Timer Clock Enable for PWM_HEAT_E4
+#define __BSP_MISC_TIMER_SERVO_CLK_ENABLE()       __TIM15_CLK_ENABLE()
+/// Timer Clock Disable for PWM_HEAT_E4
+#define __BSP_MISC_TIMER_SERVO_CLK_DISABLE()     __TIM15_CLK_DISABLE()
+/// PWM_HEAT_E4 GPIO alternate function
+#define BSP_MISC_AFx_TIMx_SERVO                    (GPIO_AF0_TIM15)
+/// SERVO global interrupt
+#define BSP_MISC_SERVO_IRQn                    (TIM15_IRQn)
+
+#define BSP_MISC_SERVO_IRQnHandler        		(TIM15_IRQHandler)
+
   
 //TODO: remove user SPI
 /// User SPI (in example for LCD)

@@ -524,10 +524,10 @@
 // An inductive probe must be deactivated to go below
 // its trigger-point if hardware endstops are active.
 //TODO: check that this configuration is correct
-#define FIX_MOUNTED_PROBE
+//#define FIX_MOUNTED_PROBE
 
 // The BLTouch probe emulates a servo probe.
-//#define BLTOUCH
+#define BLTOUCH
 
 // Z Servo Probe, such as an endstop switch on a rotating arm.
 //#define Z_ENDSTOP_SERVO_NR 0
@@ -605,8 +605,9 @@
 
 // Enable Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN to use the Z_MIN_PIN for your Z_MIN_PROBE.
 // The Z_MIN_PIN will then be used for both Z-homing and probing.
+//#if DISABLED(BLTOUCH)
 #define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN
-
+//#endif
 // To use a probe you must enable one of the two options above!
 
 // This option disables the use of the Z_MIN_PROBE_PIN
@@ -1400,12 +1401,14 @@
 // leaving it undefined or defining as 0 will disable the servo subsystem
 // If unsure, leave commented / disabled
 //
-//#define NUM_SERVOS 1 // Servo index starts with 0 for M280 command
+#if ENABLED(BLTOUCH)
+#define NUM_SERVOS 1 // Servo index starts with 0 for M280 command
+#endif
 
 // Delay (in microseconds) before the next move will start, to give the servo time to reach its target angle.
 // 300ms is a good value but you can try less delay.
 // If the servo can't reach the requested position, increase it.
-#define SERVO_DELAY 300
+#define SERVO_DELAY 100
 
 // Servo deactivation
 //

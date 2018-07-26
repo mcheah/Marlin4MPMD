@@ -660,7 +660,12 @@
 #if DISABLED(STM32_USE_USB_CDC) && (ENABLED(MALYAN_LCD))
   #error "Cannot use UART and Malyan LCD at the same time"
 #endif
-
+#if DISABLED(STM32_USE_USB_CDC) && (ENABLED(BLTOUCH))
+  #error "Cannot use UART and BLtouch at the same time."
+#endif
+#if (ENABLED(BLTOUCH)) && (ENABLED(E1_ADC_PA2) || ENABLED(E1_ADC_PA3))
+  #error "Cannot use PA2/3 for ADCa at the same time as BLtouch."
+#endif
  /**
  * Warnings for old configurations
  */

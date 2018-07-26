@@ -117,7 +117,6 @@ void TIM3_IRQHandler(void)
 {
   HAL_NVIC_ClearPendingIRQ(TIM3_IRQn);
   HAL_TIM_IRQHandler(&hTimTick);
-
 }
 
 
@@ -137,16 +136,14 @@ void TIM1_BRK_UP_TRG_COM_IRQHandler(void)
   * @param  None
   * @retval None
   */
-#if defined(BSP_FAN_E2_PIN) || defined(BSP_SERVO0_PIN)
+#if defined(BSP_FAN_E2_PIN)
 void TIM1_UP_TIM10_IRQHandler(void)
 {
-#ifdef MARLIN
-  HAL_TIM_IRQHandler(&hTimServo);
-#else
+#ifndef MARLIN
   HAL_TIM_IRQHandler(&hTimPwmE3);
 #endif
 }
-#endif//(BSP_FAN_E2_PIN) || (BSP_SERVO0_PIN)
+#endif//(BSP_FAN_E2_PIN)
 /**
   * @brief  This function handles TIM1 interrupt request.
   * @param  None
@@ -157,6 +154,16 @@ void TIM14_IRQHandler(void)
 	HAL_NVIC_ClearPendingIRQ(TIM14_IRQn);
 	HAL_TIM_IRQHandler(&hTimTick2);
 }
+
+#if defined(BSP_SERVO0_PIN)
+void BSP_MISC_SERVO_IRQnHandler(void)
+{
+#ifdef MARLIN
+	  HAL_TIM_IRQHandler(&hTimServo);
+#endif//MARLIN
+}
+#endif//defined(BSP_SERVO0_PIN)
+
 //void TIM1_BRK_UP_TRG_COM_IRQHandler(void)
 //{
 //#ifdef MARLIN

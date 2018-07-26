@@ -47,10 +47,16 @@
 #define Z_STEP_PIN         10
 #define Z_DIR_PIN          11
 #define Z_ENABLE_PIN       -1
-#define Z_MIN_PIN          13
+#if ENABLED(BLTOUCH)
+#define Z_MIN_PIN          49
+#endif
 #define Z_MAX_PIN          14
 
+#if DISABLED(BLTOUCH)
+//#define Z_MIN_PROBE_PIN	   1
+//#else
 #define Z_MIN_PROBE_PIN	   13
+#endif
 
 //#define Y2_STEP_PIN        -1
 //#define Y2_DIR_PIN         -1

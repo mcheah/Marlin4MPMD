@@ -79,6 +79,9 @@ void USB_IRQHandler(void);
 void USARTx_IRQHandler(void);
 void USARTx_DMA_TX_RX_IRQHandler(void);
 void TIMx_IRQHandler(void);
+#if defined(BSP_SERVO0_PIN)
+void BSP_MISC_SERVO_IRQnHandler(void);
+#endif
 
 #ifdef __cplusplus
 }

@@ -102,7 +102,7 @@ GPIO_TypeDef* gArrayGpioPort[BSP_MISC_MAX_PIN_NUMBER] = {
   0,//BSP_THERM_E3_PORT,                     //TEMP_2_PIN
   BSP_HEAT_BED1_PORT,                     //HEATER_BED_PIN  
   BSP_THERM_BED1_PORT,                    //TEMP_BED_PIN    40
-  0,//BSP_SERVO0_PORT,                       //SERVO0_PIN
+  BSP_SERVO0_PORT,                       //SERVO0_PIN
   0,                                     //SERVO1_PIN  
   0,                                     //SERVO2_PIN  
   0,                                     //SERVO3_PIN 
@@ -110,8 +110,8 @@ GPIO_TypeDef* gArrayGpioPort[BSP_MISC_MAX_PIN_NUMBER] = {
   0,//BSP_MOTOR_CONTROL_BOARD_DIR_E3_PORT,   //E2_DIR_PIN
   0,//BSP_MOTOR_CONTROL_BOARD_RESET_E3_PORT,  //E2_ENABLE_PIN
   0,//BSP_STOP_U_PORT,                        //U_MIN_PIN
-  0,//BSP_STOP_V_PORT,                        //V_MIN_PIN
-  0,//BSP_STOP_W_PORT,                         //W_MIN_PIN   50
+  BSP_STOP_V_PORT,                        	  //V_MIN_PIN
+  0,//BSP_STOP_W_PORT,                        //W_MIN_PIN   50
   0,//BSP_HEAT_BED2_PORT,                     //HEATER_BED2_PIN
   0,//BSP_HEAT_BED3_PORT                      //HEATER_BED3_PIN
 };  
@@ -158,7 +158,7 @@ uint16_t gArrayGpioPin[BSP_MISC_MAX_PIN_NUMBER] = {
   0,//BSP_THERM_E3_PIN,                     //TEMP_2_PIN
   BSP_HEAT_BED1_PIN,                     //HEATER_BED_PIN   
   BSP_THERM_BED1_PIN,                    //TEMP_BED_PIN     40    
-  0,//BSP_SERVO0_PIN,                       //SERVO0_PIN
+  BSP_SERVO0_PIN,                       //SERVO0_PIN
   0,                                    //SERVO1_PIN  
   0,                                    //SERVO2_PIN  
   0,                                    //SERVO3_PIN  
@@ -166,7 +166,7 @@ uint16_t gArrayGpioPin[BSP_MISC_MAX_PIN_NUMBER] = {
   0,//BSP_MOTOR_CONTROL_BOARD_DIR_E3_PIN,   //E2_DIR_PIN
   0,//BSP_MOTOR_CONTROL_BOARD_RESET_E3_PIN, //E2_ENABLE_PIN
   0,//BSP_STOP_U_PIN,                       //U_MIN_PIN
-  0,//BSP_STOP_V_PIN,                       //V_MIN_PIN
+  BSP_STOP_V_PIN,                       	//V_MIN_PIN
   0,//BSP_STOP_W_PIN,                        //W_MIN_PIN     50
   0,//BSP_HEAT_BED2_PIN,                     //HEATER_BED2_PIN
   0,//BSP_HEAT_BED3_PIN                      //HEATER_BED3_PIN
