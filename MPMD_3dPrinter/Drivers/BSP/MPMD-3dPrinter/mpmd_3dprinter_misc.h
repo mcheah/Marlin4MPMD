@@ -67,8 +67,9 @@
 #define STOP_Z__PULL_UP
 //#define BSP_STOP_U_PIN               (GPIO_PIN_13)
 //#define BSP_STOP_U_PORT              (GPIOC)
-#define BSP_STOP_V_PIN               (GPIO_PIN_3)
+#define BSP_STOP_V_PIN               (GPIO_PIN_2)
 #define BSP_STOP_V_PORT              (GPIOA)
+#define STOP_V__PULL_UP
 #define BSP_STOP_W_PIN               (GPIO_PIN_7)
 #define BSP_STOP_W_PORT              (GPIOB)
 #define STOP_W__PULL_UP
@@ -104,7 +105,7 @@
 
 /* Definition for Servo 0*/
 //TODO: removed unused servo
-#define BSP_SERVO0_PIN               (GPIO_PIN_2)
+#define BSP_SERVO0_PIN               (GPIO_PIN_3)
 #define BSP_SERVO0_PORT              (GPIOA)
    
 /* Definition for Tick timer */

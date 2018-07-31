@@ -787,7 +787,7 @@ void setup_powerhold() {
     BSP_MiscStopInit(0);
     BSP_MiscStopInit(1);
     BSP_MiscStopInit(2);
-    BSP_MiscStopInit(5);
+    BSP_MiscStopInit(6);
 
 
     //Extruder 0 Fan init
@@ -7968,16 +7968,16 @@ void ok_to_send() {
 }
 
 void clamp_to_software_endstops(float target[3]) {
-  if (min_software_endstops) {
-    NOLESS(target[X_AXIS], sw_endstop_min[X_AXIS]);
-    NOLESS(target[Y_AXIS], sw_endstop_min[Y_AXIS]);
-    NOLESS(target[Z_AXIS], sw_endstop_min[Z_AXIS]);
-  }
-  if (max_software_endstops) {
-    NOMORE(target[X_AXIS], sw_endstop_max[X_AXIS]);
-    NOMORE(target[Y_AXIS], sw_endstop_max[Y_AXIS]);
-    NOMORE(target[Z_AXIS], sw_endstop_max[Z_AXIS]);
-  }
+//  if (min_software_endstops) {
+//    NOLESS(target[X_AXIS], sw_endstop_min[X_AXIS]);
+//    NOLESS(target[Y_AXIS], sw_endstop_min[Y_AXIS]);
+//    NOLESS(target[Z_AXIS], sw_endstop_min[Z_AXIS]);
+//  }
+//  if (max_software_endstops) {
+//    NOMORE(target[X_AXIS], sw_endstop_max[X_AXIS]);
+//    NOMORE(target[Y_AXIS], sw_endstop_max[Y_AXIS]);
+//    NOMORE(target[Z_AXIS], sw_endstop_max[Z_AXIS]);
+//  }
 }
 
 #if ENABLED(DELTA)

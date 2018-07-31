@@ -530,6 +530,19 @@ void BSP_MiscStopInit(uint8_t id)
       GPIO_InitStruct.Pull = GPIO_NOPULL;
 #endif
       break;        
+    case 6:
+      __GPIOA_CLK_ENABLE();
+      /* Configure V_STOP pin */
+      gpioPin = BSP_STOP_V_PIN;
+      gpioPort = BSP_STOP_V_PORT;
+#if defined(STOP_V__PULL_UP)
+      GPIO_InitStruct.Pull = GPIO_PULLUP;
+#elif defined(STOP_W__PULL_DOWN)
+      GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+#else
+      GPIO_InitStruct.Pull = GPIO_NOPULL;
+#endif
+      break;
     default:
       return;
   }

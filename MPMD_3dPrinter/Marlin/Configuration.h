@@ -252,20 +252,20 @@
 // The minimal temperature defines the temperature below which the heater will not be enabled It is used
 // to check that the wiring to the thermistor is not broken.
 // Otherwise this would lead to the heater being powered on all the time.
-#define HEATER_0_MINTEMP 5
+//#define HEATER_0_MINTEMP 5
 //#define HEATER_1_MINTEMP 5
 //#define HEATER_2_MINTEMP 5
 //#define HEATER_3_MINTEMP 5
-#define BED_MINTEMP 5
+//#define BED_MINTEMP 5
 
 // When temperature exceeds max temp, your heater will be switched off.
 // This feature exists to protect your hotend from overheating accidentally, but *NOT* from thermistor short/failure!
 // You should use MINTEMP for thermistor short/failure protection.
-#define HEATER_0_MAXTEMP 275
+//#define HEATER_0_MAXTEMP 275
 //#define HEATER_1_MAXTEMP 275
 //#define HEATER_2_MAXTEMP 275
 //#define HEATER_3_MAXTEMP 275
-#define BED_MAXTEMP 90
+//#define BED_MAXTEMP 90
 
 //===========================================================================
 //============================= PID Settings ================================
@@ -391,8 +391,8 @@
  * details can be tuned in Configuration_adv.h
  */
 #if DISABLED(MINIMAL_BUILD)
-#define THERMAL_PROTECTION_HOTENDS // Enable thermal protection for all extruders
-#define THERMAL_PROTECTION_BED     // Enable thermal protection for the heated bed
+//#define THERMAL_PROTECTION_HOTENDS // Enable thermal protection for all extruders
+//#define THERMAL_PROTECTION_BED     // Enable thermal protection for the heated bed
 #endif
 //===========================================================================
 //============================= Mechanical Settings =========================
@@ -554,8 +554,8 @@
 //    |           |
 //    O-- FRONT --+
 //  (0,0)
-#define X_PROBE_OFFSET_FROM_EXTRUDER 0 // X offset: -left  +right  [of the nozzle]
-#define Y_PROBE_OFFSET_FROM_EXTRUDER 0 // Y offset: -front +behind [the nozzle]
+#define X_PROBE_OFFSET_FROM_EXTRUDER (-35.5493) // X offset: -left  +right  [of the nozzle]
+#define Y_PROBE_OFFSET_FROM_EXTRUDER (-20.525) // Y offset: -front +behind [the nozzle]
 #define Z_PROBE_OFFSET_FROM_EXTRUDER -0.0 //  Z offset: -below +above  [the nozzle]
 
 // X and Y axis travel speed (mm/m) between probes
@@ -688,11 +688,11 @@
 // @section machine
 
 // Travel limits after homing (units are in mm)
-#define X_MIN_POS -60
-#define Y_MIN_POS -60
+#define X_MIN_POS -120
+#define Y_MIN_POS -120
 #define Z_MIN_POS 0
-#define X_MAX_POS 60
-#define Y_MAX_POS 60 //200
+#define X_MAX_POS 120
+#define Y_MAX_POS 120 //200
 #define Z_MAX_POS 125 //200
 
 //#define MAX_RAD (sqrt(sq(X_MAX_POS)+sq(Y_MAX_POS))))
