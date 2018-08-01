@@ -1535,9 +1535,9 @@ const short temptable_1047[][2] PROGMEM = {
 #ifndef HEATER_0_RAW_HI_TEMP
   #ifdef HEATER_0_USES_THERMISTOR // In case of a thermistor the highest temperature results in the lowest ADC value
     #define HEATER_0_RAW_HI_TEMP 0
-    #define HEATER_0_RAW_LO_TEMP 16383
+    #define HEATER_0_RAW_LO_TEMP 65535
   #else                           // In case of an thermocouple the highest temperature results in the highest ADC value
-    #define HEATER_0_RAW_HI_TEMP 16383
+    #define HEATER_0_RAW_HI_TEMP 65535
     #define HEATER_0_RAW_LO_TEMP 0
   #endif
 #endif
@@ -1624,9 +1624,9 @@ const short temptable_1047[][2] PROGMEM = {
 #ifndef HEATER_BED_RAW_HI_TEMP
   #ifdef BED_USES_THERMISTOR // In case of a thermistor the highest temperature results in the lowest ADC value
     #define HEATER_BED_RAW_HI_TEMP 0
-    #define HEATER_BED_RAW_LO_TEMP 16383
+    #define HEATER_BED_RAW_LO_TEMP 65535
   #else                      // In case of an thermocouple the highest temperature results in the highest ADC value
-    #define HEATER_BED_RAW_HI_TEMP 16383
+    #define HEATER_BED_RAW_HI_TEMP 65535
     #define HEATER_BED_RAW_LO_TEMP 0
   #endif
 #endif

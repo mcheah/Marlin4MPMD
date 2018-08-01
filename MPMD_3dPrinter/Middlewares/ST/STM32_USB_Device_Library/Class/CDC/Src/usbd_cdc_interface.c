@@ -307,7 +307,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   uint32_t buffptr;
   uint32_t buffsize;
-
+  static uint32_t lastSuccessfulTX = 0;
   if(UserTxBufPtrOut != UserTxBufPtrIn) //Do we have data?
   {
     if(UserTxBufPtrOut > UserTxBufPtrIn) /* rollback */
@@ -323,7 +323,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     buffptr = UserTxBufPtrOut;
     //Set up a EPIN interrupt using UserTxBuffer
     if(USBD_CDC_SetTxBuffer(&USBD_Device, (uint8_t*)&UserTxBuffer[buffptr], buffsize) != USBD_OK)
+    {
+    	if(HAL_GetTick()-lastSuccessfulTX>1000) //Haven't sent data successfully in 1000ms, clear the buffer
+    		UserTxBufPtrOut = UserTxBufPtrIn;
     	return;
+    }
+    lastSuccessfulTX = HAL_GetTick();
     if(USBD_CDC_TransmitPacket(&USBD_Device) == USBD_OK)
     {
       UserTxBufPtrOut += buffsize;

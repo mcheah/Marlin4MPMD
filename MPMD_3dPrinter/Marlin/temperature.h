@@ -328,7 +328,7 @@ class Temperature {
       #if ENABLED(THERMAL_PROTECTION_HOTENDS) && WATCH_TEMP_PERIOD > 0
         start_watching_heater(HOTEND_INDEX);
       #endif
-	#if ENABLED(HEATER_BED_5A_LIMIT)
+	#if ENABLED(HEATER_BED_5A_LIMIT) && ENABLED(THERMAL_PROTECTION_BED)
       if(thermal_runaway_bed_state_machine!=TRInactive &&
     		  target_temperature[HOTEND_INDEX] > current_temperature[HOTEND_INDEX]) {
     	  //When slewing HOTEND temp, the bed heater will turn off, triggering thermal runaway

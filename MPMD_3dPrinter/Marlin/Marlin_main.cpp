@@ -2389,6 +2389,23 @@ static void clean_up_after_endstop_or_probe_move() {
     }
 
     /**
+     * Zero's out points outside the probeable area of the print surface
+     * so that they can be effectively extrapolated
+     */
+    static void clear_extrapolated_bed_level() {
+    const int HALF_AUTO_BED_LEVELING_GRID_POINTS = (AUTO_BED_LEVELING_GRID_POINTS-1)/2;
+    for(int i=0;i<AUTO_BED_LEVELING_GRID_POINTS;i++) {
+			float xsq = sq(i-HALF_AUTO_BED_LEVELING_GRID_POINTS)/HALF_AUTO_BED_LEVELING_GRID_POINTS;
+    		for(int j=0;j<=AUTO_BED_LEVELING_GRID_POINTS;j++) {
+    			float ysq = (j-HALF_AUTO_BED_LEVELING_GRID_POINTS)/HALF_AUTO_BED_LEVELING_GRID_POINTS;
+    			float rad;
+    			arm_sqrt_f32(xsq+ysq,&rad);
+    			if(rad>1.0)
+    				bed_level[i][j] = 0;
+    		}
+    	}
+    }
+    /**
      * Fill in the unprobed points (corners of circular print surface)
      * using linear extrapolation, away from the center.
      */
@@ -6308,7 +6325,10 @@ void quickstop_stepper() {
     	if(hasC)
     		reset_bed_level();
     	else if(hasE)//Re-calculate the 0'ed points, must be done manually
+    	{
+    		clear_extrapolated_bed_level();
     		extrapolate_unprobed_bed_level(); 	
+    	}
 		//TODO: make it so that the extrapolated points are automatically cleared			
     	print_bed_level();//Print entire map
     }
