@@ -34,7 +34,7 @@
 // LCD for Malyan M200/300 printers.
 //
 #define MALYAN_LCD
-
+//#define E1_ADC_PA2
 //#define MINIMAL_BUILD
 /* Exported functions ------------------------------------------------------- */
 /* Exported Variables --------------------------------------------------------*/
