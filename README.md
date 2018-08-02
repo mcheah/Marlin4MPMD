@@ -8,9 +8,6 @@ USE AT YOUR OWN RISK! 3d printers have been known to fail and cause fires while 
 
 The stock power supply cannot power both heaters on at the same time, so a special firmware has been created to prevent this situation to allow use of the stock power supply.  If you have upgraded to a 10A power supply, use the "firmware_10ALimit.bin" file to allow faster heating and potentially a higher max bed temperature.  Otherwise, use the "firmware_5ALimit.bin" file, which should still heat the bed faster, but will still respect the 5A limit of the power supply
 ###  Changes from stock monoprice firmware
-
-
-
 - Mesh bed leveling ignores the P0-5 / C parameters that the stock firmware uses.  Instead, calling G29 will run a mesh leveling grid over a 7x7 area between -45 to 45mm on the X and Y axes in 15mm increments.  Points outside the probeable radius on the print bed will be extrapolated based on probed values.  This mesh grid is persistent, and saved/loaded by M500/M501.  
 
 **New 1.2.2**
