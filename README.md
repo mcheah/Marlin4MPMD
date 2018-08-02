@@ -1,3 +1,4 @@
+[![Join the chat at https://gitter.im/Marlin4MPMD/Lobby](https://badges.gitter.im/Marlin4MPMD/Lobby.svg)](https://gitter.im/Marlin4MPMD/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 This is a port of [Marlin4ST](https://github.com/St3dPrinter/Marlin4ST) to work with the [Monoprice Mini Delta 3D Printer](https://mpminidelta.monoprice.com/).  Marlin4ST itself is based off of [MarlinFW](https://github.com/MarlinFirmware/Marlin) version 1.1.0-RC7.  Much of this work was necessary to accommodate the less powerful STM32F070CBT microprocessor used in the Monoprice mini delta as well as supporting the specific hardware of thise machine.
 The motivation for this project was to correct some of the issues with the stock firmware of the printer, most notably the slow communication speed over USB, the inconsistent heater controls, disablement of the some of the safety features, and some of the delta calibrations.  The stock firmware is closed-source although it seems to be based off of Marlin, and as as result there's now way of confirming there are no hidden bugs or issues.
 That said, this is development firmware that has been tested only handful of times by me on two printers.  Relevant Marlin safety features have been turned on, but there is no guarantee it is bug free.  
@@ -8,7 +9,7 @@ USE AT YOUR OWN RISK! 3d printers have been known to fail and cause fires while 
 The stock power supply cannot power both heaters on at the same time, so a special firmware has been created to prevent this situation to allow use of the stock power supply.  If you have upgraded to a 10A power supply, use the "firmware_10ALimit.bin" file to allow faster heating and potentially a higher max bed temperature.  Otherwise, use the "firmware_5ALimit.bin" file, which should still heat the bed faster, but will still respect the 5A limit of the power supply
 ###  Changes from stock monoprice firmware
 
-[![Join the chat at https://gitter.im/Marlin4MPMD/Lobby](https://badges.gitter.im/Marlin4MPMD/Lobby.svg)](https://gitter.im/Marlin4MPMD/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 
 - Mesh bed leveling ignores the P0-5 / C parameters that the stock firmware uses.  Instead, calling G29 will run a mesh leveling grid over a 7x7 area between -45 to 45mm on the X and Y axes in 15mm increments.  Points outside the probeable radius on the print bed will be extrapolated based on probed values.  This mesh grid is persistent, and saved/loaded by M500/M501.  
 
