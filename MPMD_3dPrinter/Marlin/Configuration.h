@@ -265,7 +265,12 @@
 //#define HEATER_1_MAXTEMP 275
 //#define HEATER_2_MAXTEMP 275
 //#define HEATER_3_MAXTEMP 275
+#define HEATER_BED_5A_LIMIT
+#if ENABLED(HEATER_BED_5A_LIMIT)
 #define BED_MAXTEMP 90
+#else
+#define BED_MAXTEMP 110
+#endif
 
 //===========================================================================
 //============================= PID Settings ================================
@@ -334,7 +339,6 @@
 // setting this to anything other than 255 enables a form of PWM to the bed just like HEATER_BED_DUTY_CYCLE_DIVIDER did,
 // so you shouldn't use it unless you are OK with PWM on your bed.  (see the comment on enabling PIDTEMPBED)
 #define MAX_BED_POWER 255 // limits duty cycle to bed; 255=full current
-#define HEATER_BED_5A_LIMIT
 #if ENABLED(PIDTEMPBED)
 
   //#define PID_BED_DEBUG // Sends debug data to the serial port.
@@ -857,7 +861,7 @@
 #define MOTOR_DEFAULT_STEPS_PER_UNIT  (MOTOR_STEPS_PER_REVOLUTION * MOTOR_MICROSTEPS_COUNT / MOTOR_PULLEY_TEETH_COUNT / MOTOR_BELT_PITCH_MM)
 #define MOTOR_EXTRUDER_RADIUS		  5.5
 #define MOTOR_DEFAULT_EXTRUDER_STEPS_PER_UNIT	(MOTOR_STEPS_PER_REVOLUTION *MOTOR_MICROSTEPS_COUNT / (2*pi*MOTOR_EXTRUDER_RADIUS)
-#define DEFAULT_AXIS_STEPS_PER_UNIT   {MOTOR_DEFAULT_STEPS_PER_UNIT,MOTOR_DEFAULT_STEPS_PER_UNIT,MOTOR_DEFAULT_STEPS_PER_UNIT,48.50}  // default steps per unit for Ultimaker
+#define DEFAULT_AXIS_STEPS_PER_UNIT   {MOTOR_DEFAULT_STEPS_PER_UNIT,MOTOR_DEFAULT_STEPS_PER_UNIT,MOTOR_DEFAULT_STEPS_PER_UNIT,48.50*(MOTOR_MICROSTEPS_COUNT/8.0)}  // default steps per unit for Ultimaker
 #define DEFAULT_MAX_FEEDRATE          {150, 150, 150, 50}    // (mm/sec)
 #define DEFAULT_MAX_ACCELERATION      {800,800,800,10000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for Skeinforge 40+, for older versions raise them a lot.
 
