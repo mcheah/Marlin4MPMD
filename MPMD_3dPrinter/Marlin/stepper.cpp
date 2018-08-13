@@ -383,6 +383,7 @@ void Stepper::StepperHandler()
 
     // Take multiple steps per interrupt (For high speed moves)
     for (int8_t i = 0; i < step_loops; i++) {
+      if (step_events_completed >= current_block->step_event_count) break;
       #ifndef USBCON
         customizedSerial.checkRx(); // Check for serial chars.
       #endif

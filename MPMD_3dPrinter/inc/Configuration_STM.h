@@ -35,6 +35,7 @@
 //
 #define MALYAN_LCD
 //#define E1_ADC_PA2
+#define STEPPERS_16X
 //#define MINIMAL_BUILD
 /* Exported functions ------------------------------------------------------- */
 /* Exported Variables --------------------------------------------------------*/
