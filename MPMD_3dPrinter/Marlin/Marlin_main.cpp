@@ -294,7 +294,7 @@ static bool cmdForWifi = false;
 
 bool Running = true;
 
-uint8_t marlin_debug_flags = DEBUG_INFO | DEBUG_LEVELING;
+uint8_t marlin_debug_flags = DEBUG_INFO /*| DEBUG_LEVELING*/;
 
 float current_position[NUM_AXIS] = { 0.0 };
 static float destination[NUM_AXIS] = { 0.0 };
@@ -586,7 +586,7 @@ void process_next_command();
 void prepare_move_to_destination();
 void set_current_from_steppers_for_axis(AxisEnum axis);
 void gcode_G28();
-
+void set_cartesian_from_steppers();
 #if ENABLED(ARC_SUPPORT)
   void plan_arc(float target[NUM_AXIS], float* offset, uint8_t clockwise);
 #endif
@@ -605,7 +605,7 @@ void serial_echopair_P(const char* s_P, unsigned long v) { serialprintPGM(s_P); 
 void tool_change(const uint8_t tmp_extruder, const float fr_mm_m=0.0, bool no_move=false);
 static void report_current_position();
 //This does outputs lowercase xyz, so it is not parsed by pronterface
-static void report_current_position2();
+static void report_current_position2(float position[],long stepper_position[]);
 
 
 #if ENABLED(DEBUG_LEVELING_FEATURE)
@@ -1551,7 +1551,7 @@ static void update_software_endstops(AxisEnum axis) {
 
   #if ENABLED(DELTA)
     if (axis == Z_AXIS) {
-      delta_clip_start_height = sw_endstop_max[axis] - delta_safe_distance_from_top();
+      delta_clip_start_height = min(sw_endstop_max[axis],delta_height) - delta_safe_distance_from_top();
     }
   #endif
 
@@ -1722,6 +1722,9 @@ inline void set_destination_to_current() { memcpy(destination, current_position,
     #endif
     refresh_cmd_timeout();
     inverse_kinematics(destination);
+	#if ENABLED(DELTA) && ENABLED(AUTO_BED_LEVELING_FEATURE)
+	  if (!bed_leveling_in_progress) adjust_delta(destination);
+	#endif
     planner.buffer_line(delta[X_AXIS], delta[Y_AXIS], delta[Z_AXIS], destination[E_AXIS], MMM_TO_MMS_SCALED(feedrate_mm_m), active_extruder);
     set_current_to_destination();
   }
@@ -2179,18 +2182,32 @@ static void clean_up_after_endstop_or_probe_move() {
   static float run_z_probe(int verbose_level = 0) {
 	long start_pos[3];
 	long probe_pos[3];
+	float start_raw[3];
+	float start_z_logical;
     // Prevent stepper_inactive_time from running out and EXTRUDER_RUNOUT_PREVENT from extruding
     refresh_cmd_timeout();
 
     #if ENABLED(AUTO_BED_LEVELING_FEATURE)
       planner.bed_level_matrix.set_to_identity();
     #endif
+
       if (verbose_level > 3) {
       	SERIAL_PROTOCOLPGM("Start Position: ");
-      	report_current_position2();
-      	LOOP_XYZ(AXIS)
+	  //Get stepper counts for reporting only
+        LOOP_XYZ(AXIS)
       		start_pos[AXIS] = stepper.position((AxisEnum)AXIS);
+      	report_current_position2(current_position,start_pos);
       }
+	  //Get position based on stepper counts and save in start_raw
+      set_cartesian_from_steppers();
+      LOOP_XYZ(AXIS)
+      	  start_raw[AXIS] = LOGICAL_POSITION(cartesian_position[AXIS],AXIS);
+	  //Get logical position as reported by M114
+      start_z_logical = LOGICAL_POSITION(current_position[Z_AXIS],Z_AXIS);
+      if (verbose_level > 3) {
+	      SERIAL_PROTOCOLPGM("Actual Start Position: ");
+	      report_current_position2(start_raw,start_pos);
+	  }
       if(double_touch) {
       do_blocking_move_to_z(-(Z_MAX_LENGTH + 10), probing_feedrate);
       endstops.hit_on_purpose();
@@ -2198,7 +2215,10 @@ static void clean_up_after_endstop_or_probe_move() {
       SYNC_PLAN_POSITION_KINEMATIC();
       if (verbose_level > 3) {
   			SERIAL_PROTOCOLPGM("Probe Position 1: ");
-  			report_current_position2();
+			//Get first probe position, only on double touch for reporting
+  	        LOOP_XYZ(AXIS)
+  				probe_pos[AXIS] = stepper.position((AxisEnum)AXIS);
+  			report_current_position2(current_position,probe_pos);
       }
       // move up the retract distance
       do_blocking_move_to_z(current_position[Z_AXIS] + home_bump_mm(Z_AXIS), XY_PROBE_FEEDRATE_MM_M);
@@ -2209,29 +2229,31 @@ static void clean_up_after_endstop_or_probe_move() {
       }
 
     // move down slowly to find bed
-    do_blocking_move_to_z(current_position[Z_AXIS] -2.0*home_bump_mm(Z_AXIS), probing_feedrate/2);
+    do_blocking_move_to_z(-(Z_MAX_LENGTH + 10), probing_feedrate/2);
     endstops.hit_on_purpose();
     set_current_from_steppers_for_axis(Z_AXIS);
     SYNC_PLAN_POSITION_KINEMATIC();
     if (verbose_level > 3) {
 			SERIAL_PROTOCOLPGM("Probe Position: ");
-			report_current_position2();
+			//Get final stepper position counts for reporting
 			LOOP_XYZ(AXIS)
 				probe_pos[AXIS] = stepper.position((AxisEnum)AXIS);
+			report_current_position2(current_position,probe_pos);
 			SERIAL_PROTOCOLPGM("Probe difference");
 			SERIAL_PROTOCOLPGM(MSG_COUNT_X);
 			SERIAL_PROTOCOL(start_pos[X_AXIS]-probe_pos[X_AXIS]);
 			SERIAL_PROTOCOLPGM(" y :");
 			SERIAL_PROTOCOL(start_pos[Y_AXIS]-probe_pos[Y_AXIS]);
 			SERIAL_PROTOCOLPGM(" z :");
-			SERIAL_PROTOCOL(start_pos[Z_AXIS]-probe_pos[Y_AXIS]);
+			SERIAL_PROTOCOL(start_pos[Z_AXIS]-probe_pos[Z_AXIS]);
 			SERIAL_EOL;
     }
     #if ENABLED(DEBUG_LEVELING_FEATURE)
       if (DEBUGGING(LEVELING)) DEBUG_POS("run_z_probe", current_position);
     #endif
-
-    return current_position[Z_AXIS];
+	//Error is inverted so that a higher value indicates a higher position, sign matches bed_level matrix
+	//Error = expected distance traveled - actual distance traveled
+    return (start_z_logical - 0) - (start_raw[Z_AXIS] - current_position[Z_AXIS]);
   }
 
   //
@@ -2428,9 +2450,9 @@ static void clean_up_after_endstop_or_probe_move() {
     static void clear_extrapolated_bed_level() {
     const int HALF_AUTO_BED_LEVELING_GRID_POINTS = (AUTO_BED_LEVELING_GRID_POINTS-1)/2;
     for(int i=0;i<AUTO_BED_LEVELING_GRID_POINTS;i++) {
-			float xsq = sq(i-HALF_AUTO_BED_LEVELING_GRID_POINTS)/HALF_AUTO_BED_LEVELING_GRID_POINTS;
-    		for(int j=0;j<=AUTO_BED_LEVELING_GRID_POINTS;j++) {
-    			float ysq = (j-HALF_AUTO_BED_LEVELING_GRID_POINTS)/HALF_AUTO_BED_LEVELING_GRID_POINTS;
+			float xsq = sq(((float)i-HALF_AUTO_BED_LEVELING_GRID_POINTS)/HALF_AUTO_BED_LEVELING_GRID_POINTS);
+    		for(int j=0;j<AUTO_BED_LEVELING_GRID_POINTS;j++) {
+    			float ysq = sq(((float)j-HALF_AUTO_BED_LEVELING_GRID_POINTS)/HALF_AUTO_BED_LEVELING_GRID_POINTS);
     			float rad;
     			arm_sqrt_f32(xsq+ysq,&rad);
     			if(rad>1.0)
@@ -2493,6 +2515,7 @@ static void clean_up_after_endstop_or_probe_move() {
     	for(int i=0;i<2;i++) { //iterate up to 2 times in case the wrong steps per mm detected
 			delta_height = Z_HOME_POS; //set default home position
 			gcode_G28();
+			do_blocking_move_to_z(current_position[Z_AXIS]-1);
 			z_at_pt = probe_pt(0,0,stow,verbose) + probe_offset;
 			if(z_at_pt <= MIN_Z_HEIGHT_ERROR) //If we are this far off, then steps/mm is too small, try 2x
 			{
@@ -2522,8 +2545,9 @@ static void clean_up_after_endstop_or_probe_move() {
 				break;
     	}
     	delta_height -= z_at_pt;
-    	current_position[Z_AXIS] -= z_at_pt;
-        SYNC_PLAN_POSITION_KINEMATIC();
+//    	current_position[Z_AXIS] -= z_at_pt;
+//        SYNC_PLAN_POSITION_KINEMATIC();
+		do_blocking_move_to_z(current_position[Z_AXIS]-z_at_pt);
     	return z_at_pt;
     }
 
@@ -3044,6 +3068,7 @@ inline void gcode_G28() {
   #if ENABLED(AUTO_BED_LEVELING_FEATURE)
     planner.bed_level_matrix.set_to_identity();
     #if ENABLED(DELTA)
+    bed_leveling_in_progress = true;
     #endif
   #endif
 
@@ -3354,6 +3379,7 @@ inline void gcode_G28() {
   #endif
 
   clean_up_after_endstop_or_probe_move();
+  bed_leveling_in_progress = false;
 
   #if ENABLED(DEBUG_LEVELING_FEATURE)
     if (DEBUGGING(LEVELING)) SERIAL_ECHOLNPGM("<<< gcode_G28");
@@ -3630,6 +3656,7 @@ inline void gcode_G28() {
     }
 
     bool dryrun = code_seen('D');
+    float dry_bed_level[AUTO_BED_LEVELING_GRID_POINTS][AUTO_BED_LEVELING_GRID_POINTS];
     bool stow_probe_after_each = code_seen('E');
     float zoffset = 0;
     if (code_seen('Z')) zoffset += code_value_axis_units(Z_AXIS);
@@ -3638,9 +3665,16 @@ inline void gcode_G28() {
 
     if(do_height_probe)
     {
+    	if(do_mesh_probe && !dryrun)//clear bed level before probing delta height
+    		reset_bed_level();
     	float delta_z_offset = probe_delta_height(zoffset,/*stow*/true,verbose_level);
     	if(delta_z_offset<=MIN_Z_HEIGHT_ERROR || delta_z_offset>=MAX_Z_HEIGHT_ERROR )
 			SERIAL_PROTOCOLPGM("Delta Height is misconfigured, aborting Auto Bed Leveling");
+    	if(do_mesh_probe)
+    	{
+    	    gcode_G28();
+    	    do_blocking_move_to_z(current_position[Z_AXIS]-1);
+    	}
     }
 
       #if DISABLED(DELTA)
@@ -3699,7 +3733,6 @@ inline void gcode_G28() {
       }
 
     #endif // AUTO_BED_LEVELING_GRID
-
     if (!dryrun) {
 
       #if ENABLED(DEBUG_LEVELING_FEATURE) && DISABLED(DELTA)
@@ -3733,6 +3766,13 @@ inline void gcode_G28() {
 
       #endif // !DELTA
     }
+    else {
+        for (int y = 0; y < AUTO_BED_LEVELING_GRID_POINTS; y++) {
+          for (int x = 0; x < AUTO_BED_LEVELING_GRID_POINTS; x++) {
+        	  dry_bed_level[x][y] = bed_level[x][y];
+        }
+      }
+    }
 
     stepper.synchronize();
 
@@ -3740,8 +3780,8 @@ inline void gcode_G28() {
 
     // Deploy the probe. Probe will raise if needed.
     if (DEPLOY_PROBE()) return;
-
-    bed_leveling_in_progress = true;
+    if(!dryrun)
+    	bed_leveling_in_progress = true;
 
     #if ENABLED(AUTO_BED_LEVELING_GRID)
 
@@ -3854,11 +3894,18 @@ inline void gcode_G28() {
     // Calculate leveling, print reports, correct the position
     #if ENABLED(AUTO_BED_LEVELING_GRID)
       #if ENABLED(DELTA)
-
-        if (!dryrun) extrapolate_unprobed_bed_level();
+      	if(dryrun)
+      		clear_extrapolated_bed_level();
+        extrapolate_unprobed_bed_level();
       }
         print_bed_level();
-
+        if(dryrun && do_mesh_probe) {
+        for (int y = 0; y < AUTO_BED_LEVELING_GRID_POINTS; y++) {
+          for (int x = 0; x < AUTO_BED_LEVELING_GRID_POINTS; x++) {
+        	  bed_level[x][y] = dry_bed_level[x][y];
+        }
+      }
+    }
       #else // !DELTA
 
         // solve lsq problem
@@ -5434,16 +5481,41 @@ static void report_current_position() {
 /**
  * Output the current position to serial
  */
-static void report_current_position2() {
+static void report_current_position2(float position[],long stepper_pos[]) {
   SERIAL_PROTOCOLPGM("x :");
-  SERIAL_PROTOCOL_F(current_position[X_AXIS],5);
+  SERIAL_PROTOCOL_F(position[X_AXIS],5);
   SERIAL_PROTOCOLPGM(" y :");
-  SERIAL_PROTOCOL_F(current_position[Y_AXIS],5);
+  SERIAL_PROTOCOL_F(position[Y_AXIS],5);
   SERIAL_PROTOCOLPGM(" z :");
-  SERIAL_PROTOCOL_F(current_position[Z_AXIS],5);
+  SERIAL_PROTOCOL_F(position[Z_AXIS],5);
   SERIAL_PROTOCOLPGM(" e :");
-  SERIAL_PROTOCOL_F(current_position[E_AXIS],5);
-  stepper.report_positions();
+  SERIAL_PROTOCOL_F(position[E_AXIS],5);
+  long xpos = stepper_pos[X_AXIS],
+       ypos = stepper_pos[Y_AXIS],
+       zpos = stepper_pos[Z_AXIS];
+
+  #if ENABLED(COREXY) || ENABLED(COREXZ)
+    SERIAL_PROTOCOLPGM(MSG_COUNT_A);
+  #else
+    SERIAL_PROTOCOLPGM(MSG_COUNT_X);
+  #endif
+  SERIAL_PROTOCOL(xpos);
+
+  #if ENABLED(COREXY) || ENABLED(COREYZ)
+    SERIAL_PROTOCOLPGM(" B:");
+  #else
+    SERIAL_PROTOCOLPGM(" y :");
+  #endif
+  SERIAL_PROTOCOL(ypos);
+
+  #if ENABLED(COREXZ) || ENABLED(COREYZ)
+    SERIAL_PROTOCOLPGM(" C:");
+  #else
+    SERIAL_PROTOCOLPGM(" z :");
+  #endif
+  SERIAL_PROTOCOL(zpos);
+
+  SERIAL_EOL;
 }
 
 /**
@@ -6408,6 +6480,26 @@ void quickstop_stepper() {
     if ((hasQ = code_seen('Q'))) q = code_value_axis_units(Z_AXIS);
     hasC = code_seen('C');
     hasE = code_seen('E');
+    if(!hasI && !hasJ && (hasZ || hasQ)) //I,J not supplied, check if we are close enough to a grid point
+    {
+        int half = (AUTO_BED_LEVELING_GRID_POINTS - 1) / 2;
+        float h1 = 0.001 - half, h2 = half - 0.001,
+              grid_x = max(h1, min(h2, RAW_X_POSITION(current_position[X_AXIS]) / delta_grid_spacing[0])),
+              grid_y = max(h1, min(h2, RAW_Y_POSITION(current_position[Y_AXIS]) / delta_grid_spacing[1]));
+		//0.07 * 15 ~= 1mm
+        if(abs(round(grid_x)-grid_x)<0.07 &&
+        		abs(round(grid_y)-grid_y)<0.07)
+        {
+        	px = round(grid_x)+half;
+        	py = round(grid_y)+half;
+        	hasI = true;
+        	hasJ = true;
+        }
+        else {
+            SERIAL_ERROR_START;
+            SERIAL_ERRORLNPGM(MSG_ERR_MESH_XY);
+        }
+    }
     if (!hasI && !hasJ) {
     	if(hasC)
     		reset_bed_level();
@@ -6437,8 +6529,20 @@ void quickstop_stepper() {
     }
 	//Z sets the actual value directly
     else if (hasI && hasJ && hasZ) {
-      if (px >= 0 && px < AUTO_BED_LEVELING_GRID_POINTS && py >= 0 && py < AUTO_BED_LEVELING_GRID_POINTS)
+      if (px >= 0 && px < AUTO_BED_LEVELING_GRID_POINTS && py >= 0 && py < AUTO_BED_LEVELING_GRID_POINTS) {
+	    q = z - bed_level[px][py];
     	bed_level[px][py] = z;
+		int half = (AUTO_BED_LEVELING_GRID_POINTS - 1) / 2;
+		volatile float x,y;
+		x = delta_grid_spacing[0]*(px-half);
+		y = delta_grid_spacing[1]*(py-half);
+		//If we just finished a probe, move up right away to reflect changes
+		if(abs(current_position[X_AXIS]-x)<0.001 &&
+			abs(current_position[Y_AXIS]-y)<0.001 &&
+			abs(current_position[Z_AXIS]-(probing_z_raise-zprobe_zoffset))<0.001) {
+			do_blocking_move_to_z(current_position[Z_AXIS]-q);
+		  }
+      }
       else {
         SERIAL_ERROR_START;
         SERIAL_ERRORLNPGM(MSG_ERR_MESH_XY);
@@ -6446,8 +6550,21 @@ void quickstop_stepper() {
     }
 	//Q adjusts level by offset
     else if(hasI && hasJ && hasQ) {
-        if (px >= 0 && px < AUTO_BED_LEVELING_GRID_POINTS && py >= 0 && py < AUTO_BED_LEVELING_GRID_POINTS)
-      	bed_level[px][py] += q;
+        if (px >= 0 && px < AUTO_BED_LEVELING_GRID_POINTS && py >= 0 && py < AUTO_BED_LEVELING_GRID_POINTS) {
+			bed_level[px][py] += q;
+			int half = (AUTO_BED_LEVELING_GRID_POINTS - 1) / 2;
+			float x,y;
+			x = delta_grid_spacing[0]*(px-half);
+			y = delta_grid_spacing[1]*(py-half);
+			//If we just finished a probe, move up right away to reflect changes
+			if(abs(current_position[X_AXIS]-x)<0.001 &&
+					abs(current_position[Y_AXIS]-y)<0.001 &&
+					abs(current_position[Z_AXIS]-(probing_z_raise-zprobe_zoffset))<0.001) {
+				do_blocking_move_to_z(current_position[Z_AXIS]-q);
+//				current_position[Z_AXIS] -= q;
+//				SYNC_PLAN_POSITION_KINEMATIC();
+			}
+    	}
         else {
           SERIAL_ERROR_START;
           SERIAL_ERRORLNPGM(MSG_ERR_MESH_XY);
