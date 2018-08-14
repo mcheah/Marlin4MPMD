@@ -63,7 +63,9 @@ Stepper stepper; // Singleton
 // public:
 
 block_t* Stepper::current_block = NULL;  // A pointer to the block currently being traced
-
+#if ENABLED(BABYSTEPPING)
+  bool Stepper::inc_on_babystep = true;
+#endif
 #if ENABLED(ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED)
   bool Stepper::abort_on_endstop_hit = false;
 #endif
@@ -253,6 +255,14 @@ volatile long Stepper::endstops_trigsteps[3];
 #define ENABLE_STEPPER_DRIVER_INTERRUPT()  SBI(TIMSK1, OCIE1A)
 #define DISABLE_STEPPER_DRIVER_INTERRUPT() CBI(TIMSK1, OCIE1A)
 */
+
+static void delayMicroseconds(int uSec) {
+	volatile uint32_t X = 0;
+	for(uint32_t i=0;i<uSec*F_CPU()/(1e6/10);i++)
+	{
+		X++;
+	}
+}
 
 /**
  *         __________________________
@@ -1063,11 +1073,13 @@ void Stepper::report_positions() {
     #define BABYSTEP_AXIS(axis, AXIS, INVERT) { \
         _ENABLE(axis); \
         uint8_t old_pin = _READ_DIR(AXIS); \
-        _APPLY_DIR(AXIS, _INVERT_DIR(AXIS)^direction^INVERT); \
+        _APPLY_DIR(AXIS, _GPIO_PIN_STATE(_INVERT_DIR(AXIS)^direction^INVERT)); \
         _APPLY_STEP(AXIS)(!_INVERT_STEP_PIN(AXIS), true); \
         delayMicroseconds(2); \
         _APPLY_STEP(AXIS)(_INVERT_STEP_PIN(AXIS), true); \
         _APPLY_DIR(AXIS, old_pin); \
+        if(inc_on_babystep) \
+	    	count_position[_AXIS(AXIS)] += direction ? 1 : -1; \
       }
 
     switch (axis) {
@@ -1082,7 +1094,7 @@ void Stepper::report_positions() {
 
       case Z_AXIS: {
 
-        #if DISABLED(DELTA)
+        #if DISABLED(DELTA) || 1
 
           BABYSTEP_AXIS(z, Z, BABYSTEP_INVERT_Z);
 
@@ -1097,9 +1109,9 @@ void Stepper::report_positions() {
                   old_y_dir_pin = Y_DIR_READ,
                   old_z_dir_pin = Z_DIR_READ;
           //setup new step
-          X_DIR_WRITE(INVERT_X_DIR ^ z_direction);
-          Y_DIR_WRITE(INVERT_Y_DIR ^ z_direction);
-          Z_DIR_WRITE(INVERT_Z_DIR ^ z_direction);
+          X_DIR_WRITE(_GPIO_PIN_STATE(INVERT_X_DIR ^ z_direction));
+          Y_DIR_WRITE(_GPIO_PIN_STATE(INVERT_Y_DIR ^ z_direction));
+          Z_DIR_WRITE(_GPIO_PIN_STATE(INVERT_Z_DIR ^ z_direction));
           //perform step
           X_STEP_WRITE(!INVERT_X_STEP_PIN);
           Y_STEP_WRITE(!INVERT_Y_STEP_PIN);

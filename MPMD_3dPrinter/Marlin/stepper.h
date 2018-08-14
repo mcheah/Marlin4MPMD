@@ -61,7 +61,9 @@ class Stepper {
   public:
 
     static block_t* current_block;  // A pointer to the block currently being traced
-
+#if ENABLED(BABYSTEPPING)
+    static bool inc_on_babystep;
+#endif
     #if ENABLED(ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED)
       static bool abort_on_endstop_hit;
     #endif

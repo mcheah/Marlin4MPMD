@@ -100,6 +100,8 @@ typedef uint8_t  byte;
 
 #define clockCyclesPerMicrosecond() ( F_CPU() / 1000000L )
 
+#define _GPIO_PIN_STATE(x) ((x)!=0 ? GPIO_PIN_SET : GPIO_PIN_RESET)
+
 #ifdef __cplusplus
 }
 #endif

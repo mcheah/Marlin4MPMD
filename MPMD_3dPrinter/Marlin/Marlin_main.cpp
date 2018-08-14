@@ -5933,6 +5933,45 @@ inline void gcode_M226() {
 
 #endif // HAS_SERVOS
 
+#if ENABLED(BABYSTEPPING)
+
+  #if ENABLED(BABYSTEP_ZPROBE_OFFSET)
+    FORCE_INLINE void mod_zprobe_zoffset(const float &offs) {
+      zprobe_zoffset += offs;
+      SERIAL_ECHO_START();
+      SERIAL_ECHOLNPAIR(MSG_PROBE_Z_OFFSET ": ", zprobe_zoffset);
+    }
+  #endif
+
+  /**
+   * M290: Babystepping
+   */
+  inline void gcode_M290() {
+	if (code_seen('I')) { stepper.inc_on_babystep = code_value_bool(); }
+    #if ENABLED(BABYSTEP_XY)
+	  LOOP_XYZ(a) {
+        if (code_seen(axis_codes[a]) || (a == Z_AXIS && code_seen('S'))) {
+          const float offs = code_value_axis_units(a);
+//        		  constrain(parser.value_axis_units((AxisEnum)a), -2, 2);
+          thermalManager.babystep_axis((AxisEnum)a, offs * planner.axis_steps_per_mm[a]);
+          #if ENABLED(BABYSTEP_ZPROBE_OFFSET)
+            if (a == Z_AXIS && (!code_seen('P') || parser.value_bool())) mod_zprobe_zoffset(offs);
+          #endif
+        }
+	  }
+    #else
+      if (code_seen('Z') || code_seen('S')) {
+        const float offs = constrain(parser.value_axis_units(Z_AXIS), -2, 2);
+        thermalManager.babystep_axis(Z_AXIS, offs * planner.axis_steps_per_mm[Z_AXIS]);
+        #if ENABLED(BABYSTEP_ZPROBE_OFFSET)
+          if (!code_seen('P') || parser.value_bool()) mod_zprobe_zoffset(offs);
+        #endif
+      }
+    #endif
+  }
+
+#endif // BABYSTEPPING
+
 #if HAS_BUZZER
 
   /**
@@ -7798,6 +7837,12 @@ void process_next_command() {
           gcode_M280();
           break;
       #endif // HAS_SERVOS
+
+#if ENABLED(BABYSTEPPING)
+  case 290: // M290: Babystepping
+    gcode_M290();
+    break;
+#endif // BABYSTEPPING
 
       #if HAS_BUZZER
         case 300: // M300 - Play beep tone
