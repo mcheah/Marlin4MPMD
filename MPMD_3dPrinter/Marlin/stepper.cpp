@@ -1035,14 +1035,14 @@ void Stepper::report_positions() {
   #if ENABLED(COREXY) || ENABLED(COREYZ)
     SERIAL_PROTOCOLPGM(" B:");
   #else
-    SERIAL_PROTOCOLPGM(" Y:");
+    SERIAL_PROTOCOLPGM(" y :");
   #endif
   SERIAL_PROTOCOL(ypos);
 
   #if ENABLED(COREXZ) || ENABLED(COREYZ)
     SERIAL_PROTOCOLPGM(" C:");
   #else
-    SERIAL_PROTOCOLPGM(" Z:");
+    SERIAL_PROTOCOLPGM(" z :");
   #endif
   SERIAL_PROTOCOL(zpos);
 
