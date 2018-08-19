@@ -36,6 +36,8 @@
 #define MALYAN_LCD
 //#define E1_ADC_PA2
 #define STEPPERS_16X
+// Use polar mesh bed leveling instead of cartesian
+#define POLAR_MESH
 //#define MINIMAL_BUILD
 /* Exported functions ------------------------------------------------------- */
 /* Exported Variables --------------------------------------------------------*/

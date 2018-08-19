@@ -503,8 +503,13 @@ static uint8_t target_extruder;
   float delta_segments_per_second = DELTA_SEGMENTS_PER_SECOND;
   float delta_clip_start_height = Z_MAX_POS;
   #if ENABLED(AUTO_BED_LEVELING_FEATURE)
+#if ENABLED(POLAR_MESH)
   float delta_grid_spacing[2] = { ((2*PI) / (AUTO_BED_LEVELING_THETA_POINTS - 1)),
   								((DELTA_PROBEABLE_RADIUS) / (AUTO_BED_LEVELING_RAD_POINTS - 1)) };
+#else
+    float delta_grid_spacing[2] = { ((RIGHT_PROBE_BED_POSITION - LEFT_PROBE_BED_POSITION) / (AUTO_BED_LEVELING_GRID_POINTS - 1)),
+    								((BACK_PROBE_BED_POSITION - FRONT_PROBE_BED_POSITION) / (AUTO_BED_LEVELING_GRID_POINTS - 1)) };
+#endif
   float bed_level[AUTO_BED_LEVELING_THETA_POINTS][AUTO_BED_LEVELING_RAD_POINTS];
   #endif
   float delta_safe_distance_from_top();
@@ -2345,6 +2350,7 @@ static void clean_up_after_endstop_or_probe_move() {
     return measured_z;
   }
 
+#if ENABLED(POLAR_MESH)
 //Probes a point in polar notation and reports it as such
 static float probe_pt_pol(float th, float rad, bool stow = true, int verbose_level = 1) {
 	  float x,y;
@@ -2361,7 +2367,7 @@ static float probe_pt_pol(float th, float rad, bool stow = true, int verbose_lev
 	  }
 	  return z_at_pt;
   }
-
+#endif // POLAR_MESH
 #endif // HAS_BED_PROBE
 
 #if ENABLED(AUTO_BED_LEVELING_FEATURE)
@@ -2452,7 +2458,7 @@ static float probe_pt_pol(float th, float rad, bool stow = true, int verbose_lev
 //TODO: Verify that this doesn't break non 3 bed leveling grid points
 //Pretty sure this gets fixed in later versions of Marlin, but hard-coding this for now
 //TODO: this should be adjusted to take Polar meshes into account
-#if AUTO_BED_LEVELING_GRID_POINTS!=3 || 1
+#if ENABLED(POLAR_MESH) ||AUTO_BED_LEVELING_GRID_POINTS!=3
       float a = 2 * bed_level[x + xdir][y] - bed_level[x + xdir * 2][y]; // Left to right.
       float b = 2 * bed_level[x][y + ydir] - bed_level[x][y + ydir * 2]; // Front to back.
       float c = 2 * bed_level[x + xdir][y + ydir] - bed_level[x + xdir * 2][y + ydir * 2]; // Diagonal.
@@ -2480,12 +2486,22 @@ static float probe_pt_pol(float th, float rad, bool stow = true, int verbose_lev
      * so that they can be effectively extrapolated
      */
     static void clear_extrapolated_bed_level() {
+#if ENABLED(POLAR_MESH)
     const int HALF_AUTO_BED_LEVELING_THETA_GRID_POINTS = (AUTO_BED_LEVELING_THETA_POINTS-1)/2;
     const int HALF_AUTO_BED_LEVELING_RAD_GRID_POINTS = (AUTO_BED_LEVELING_RAD_POINTS-1)/2;
     for(int i=0;i<AUTO_BED_LEVELING_THETA_POINTS;i++) {
     		for(int j=0;j<AUTO_BED_LEVELING_RAD_POINTS;j++) {
     			float rad = j*delta_grid_spacing[RAD];
 
+#else
+    const int HALF_AUTO_BED_LEVELING_GRID_POINTS = (AUTO_BED_LEVELING_GRID_POINTS-1)/2;
+    for(int i=0;i<AUTO_BED_LEVELING_GRID_POINTS;i++) {
+			float xsq = sq(((float)i-HALF_AUTO_BED_LEVELING_GRID_POINTS)/HALF_AUTO_BED_LEVELING_GRID_POINTS);
+    		for(int j=0;j<AUTO_BED_LEVELING_GRID_POINTS;j++) {
+    			float ysq = sq(((float)j-HALF_AUTO_BED_LEVELING_GRID_POINTS)/HALF_AUTO_BED_LEVELING_GRID_POINTS);
+    			float rad;
+    			arm_sqrt_f32(xsq+ysq,&rad);
+#endif
     			if(rad>1.0)
     				bed_level[i][j] = 0;
     		}
@@ -2816,6 +2832,7 @@ void gcode_get_destination() {
     else
       destination[i] = current_position[i];
   }
+#if ENABLED(POLAR_MESH)
   float th = -1;
   float r = -1;
   if (code_seen('T'))
@@ -2824,6 +2841,7 @@ void gcode_get_destination() {
 	  r = code_value_axis_units(X_AXIS);
   if(th!=-1 && r!=-1)
 	  pol2Cart(th,r,&(destination[X_AXIS]),&(destination[Y_AXIS]));
+#endif
   if (code_seen('F') && code_value_linear_units() > 0.0)
     feedrate_mm_m = code_value_linear_units();
 
@@ -3825,12 +3843,19 @@ inline void gcode_G28() {
     #if ENABLED(AUTO_BED_LEVELING_GRID)
 
       // probe at the points of a lattice grid
-      const float thGridSpacing = ((2*PI) / (AUTO_BED_LEVELING_THETA_POINTS - 1));
-      const float rGridSpacing = ((DELTA_PROBEABLE_RADIUS) / (AUTO_BED_LEVELING_RAD_POINTS - 1));
-      #if ENABLED(DELTA)
-        delta_grid_spacing[THETA] = thGridSpacing;
-        delta_grid_spacing[RAD] = rGridSpacing;
-      #else // !DELTA
+#if ENABLED(DELTA)
+	#if ENABLED(POLAR_MESH)
+		  const float thGridSpacing = ((2*PI) / (AUTO_BED_LEVELING_THETA_POINTS - 1));
+		  const float rGridSpacing = ((DELTA_PROBEABLE_RADIUS) / (AUTO_BED_LEVELING_RAD_POINTS - 1));
+		  delta_grid_spacing[THETA] = thGridSpacing;
+		  delta_grid_spacing[RAD] = rGridSpacing;
+	#else //POLAR_MESH
+		  const int thGridSpacing = (right_probe_bed_position - left_probe_bed_position) / (auto_bed_leveling_theta_grid_points - 1),
+				  rGridSpacing = (back_probe_bed_position - front_probe_bed_position) / (auto_bed_leveling_rad_grid_points - 1);
+			delta_grid_spacing[X_AXIS] = thGridSpacing;
+			delta_grid_spacing[Y_AXIS] = rGridSpacing;
+	#endif //POLAR_MESH
+#else // !DELTA
         /**
          * solve the plane equation ax + by + d = z
          * A is the matrix with rows [x y 1] for all the probed points
@@ -3849,7 +3874,12 @@ inline void gcode_G28() {
       #endif // !DELTA
 
       int probePointCounter = 0;
+#if ENABLED(POLAR_MESH)
       bool zig = true;
+#else
+      bool zig = (auto_bed_leveling_theta_grid_points & 1) ? true : false; //always end at [RIGHT_PROBE_BED_POSITION, BACK_PROBE_BED_POSITION]
+
+#endif // POLAR_MESH
       for (int rCount = 0; rCount < auto_bed_leveling_rad_grid_points; rCount++) {
         int thStart, thStop, thInc;
 
@@ -3870,15 +3900,28 @@ inline void gcode_G28() {
           #if ENABLED(DELTA)
             // Avoid probing the corners (outside the round or hexagon print surface) on a delta printer.
         	float xProbe, yProbe;
-        	pol2Cart(thCount*thGridSpacing,rCount*rGridSpacing,&xProbe,&yProbe);
+#if ENABLED(POLAR_MESH)        	
+pol2Cart(thCount*thGridSpacing,rCount*rGridSpacing,&xProbe,&yProbe);
+#else
+        yProbe = front_probe_bed_position + rGridSpacing * rCount;
+        xProbe = left_probe_bed_position + thGridSpacing * thCount;
+#endif// POLAR_MESH
             float distance_from_center = HYPOT(xProbe, yProbe);
             if (distance_from_center > DELTA_PROBEABLE_RADIUS) continue;
+
+		  #else //!DELTA
+        yProbe = front_probe_bed_position + yGridSpacing * yCount;
+        xProbe = left_probe_bed_position + xGridSpacing * xCount;
           #endif //DELTA
+#if ENABLED(POLAR_MESH)
           float measured_z;
           if(rCount==0 && thCount!=0) //Only run center point once
         	  measured_z = bed_level[0][0] - zoffset;
           else
         	  measured_z = probe_pt_pol(thCount*thGridSpacing,rCount*rGridSpacing,stow_probe_after_each, verbose_level);
+#else
+          float measured_z = probe_pt(xProbe, yProbe, stow_probe_after_each, verbose_level);
+#endif
 
           #if DISABLED(DELTA)
             mean += measured_z;
@@ -3933,6 +3976,11 @@ inline void gcode_G28() {
     // Calculate leveling, print reports, correct the position
     #if ENABLED(AUTO_BED_LEVELING_GRID)
       #if ENABLED(DELTA)
+#if DISABLED(POLAR_MESH)
+      	if(dryrun)
+      		clear_extrapolated_bed_level();
+        extrapolate_unprobed_bed_level();
+#endif //POLAR_MESH
       }
         print_bed_level();
         if(dryrun && do_mesh_probe) {
@@ -6518,17 +6566,29 @@ void quickstop_stepper() {
     hasE = code_seen('E');
     if(!hasI && !hasJ && (hasZ || hasQ)) //I,J not supplied, check if we are close enough to a grid point
     {
+#if ENABLED(POLAR_MESH)
         float th,r;
         cart2Pol(RAW_X_POSITION(current_position[X_AXIS]),RAW_Y_POSITION(current_position[Y_AXIS]),&th,&r);
         float grid_th = th / delta_grid_spacing[THETA],
               grid_r = r / delta_grid_spacing[RAD];
 		//0.07 * 15 ~= 1mm
         //0.07 * 18deg ~= 1.26deg
-        //0.07 * 15 ~= 1mm
         if(abs(round(grid_th)-grid_th)<0.07 &&
         		abs(round(grid_r)-grid_r)<0.07) {
         	px = round(grid_th);
         	py = round(grid_r);
+#else //!POLEAR_MESH
+        int half = (AUTO_BED_LEVELING_GRID_POINTS - 1) / 2;
+        float h1 = 0.001 - half, h2 = half - 0.001,
+              grid_x = max(h1, min(h2, RAW_X_POSITION(current_position[X_AXIS]) / delta_grid_spacing[0])),
+              grid_y = max(h1, min(h2, RAW_Y_POSITION(current_position[Y_AXIS]) / delta_grid_spacing[1]));
+		//0.07 * 15 ~= 1mm
+        if(abs(round(grid_x)-grid_x)<0.07 &&
+        		abs(round(grid_y)-grid_y)<0.07)
+        {
+        	px = round(grid_x)+half;
+        	py = round(grid_y)+half;
+#endif //POLAR_MESH
         	hasI = true;
         	hasJ = true;
         }
@@ -6570,10 +6630,17 @@ void quickstop_stepper() {
 	    q = z - bed_level[px][py];
     	bed_level[px][py] = z;
 		volatile float x,y;
+#if ENABLED(POLAR_MESH)
 		volatile float th,r;
 		th = delta_grid_spacing[THETA]*(px);
 		r = delta_grid_spacing[RAD]*(py);
 		pol2Cart(th,r,(float*)&x,(float*)&y);
+#else //!POLAR_MESH
+		int half = (AUTO_BED_LEVELING_GRID_POINTS - 1) / 2;
+		x = delta_grid_spacing[X_AXIS]*(px-half);
+		y = delta_grid_spacing[Y_AXIS]*(py-half);
+#endif //POLAR_MESH
+
 		//If we just finished a probe, move up right away to reflect changes
 		if(abs(current_position[X_AXIS]-x)<0.001 &&
 			abs(current_position[Y_AXIS]-y)<0.001 &&
@@ -6591,10 +6658,16 @@ void quickstop_stepper() {
         if (px >= 0 && px < AUTO_BED_LEVELING_THETA_POINTS && py >= 0 && py < AUTO_BED_LEVELING_RAD_POINTS) {
 			bed_level[px][py] += q;
 			float x,y;
+#if ENABLED(POLAR_MESH)
 			volatile float th,r;
 			th = delta_grid_spacing[THETA]*(px);
 			r = delta_grid_spacing[RAD]*(py);
 			pol2Cart(th,r,&x,&y);
+#else
+			int half = (AUTO_BED_LEVELING_GRID_POINTS - 1) / 2;
+			x = delta_grid_spacing[X_AXIS]*(px-half);
+			y = delta_grid_spacing[Y_AXIS]*(py-half);
+#endif
 			//If we just finished a probe, move up right away to reflect changes
 			if(abs(current_position[X_AXIS]-x)<0.001 &&
 					abs(current_position[Y_AXIS]-y)<0.001 &&
@@ -8260,12 +8333,12 @@ void clamp_to_software_endstops(float target[3]) {
 #if ENABLED(DELTA)
 
   void recalc_delta_settings(float radius, float diagonal_rod) {
-	delta_tower1_x = arm_cos_f32(RADIANS(210 + delta_tower_angle_trim[A_AXIS])) * (radius + delta_radius_trim_tower_1); // front left tower
-	delta_tower1_y = arm_sin_f32(RADIANS(210 + delta_tower_angle_trim[A_AXIS])) * (radius + delta_radius_trim_tower_1);
-	delta_tower2_x = arm_cos_f32(RADIANS(330 + delta_tower_angle_trim[B_AXIS])) * (radius + delta_radius_trim_tower_2); // front right tower
-	delta_tower2_y = arm_sin_f32(RADIANS(330 + delta_tower_angle_trim[B_AXIS])) * (radius + delta_radius_trim_tower_2);
-	delta_tower3_x = arm_cos_f32(RADIANS( 90 + delta_tower_angle_trim[C_AXIS])) * (radius + delta_radius_trim_tower_3); // back middle tower
-	delta_tower3_y = arm_sin_f32(RADIANS( 90 + delta_tower_angle_trim[C_AXIS])) * (radius + delta_radius_trim_tower_3);
+	delta_tower1_x = arm_cos_f32(RADIANS( 210-120 + delta_tower_angle_trim[A_AXIS])) * (radius + delta_radius_trim_tower_1); // front left tower
+	delta_tower1_y = arm_sin_f32(RADIANS( 210-120 + delta_tower_angle_trim[A_AXIS])) * (radius + delta_radius_trim_tower_1);
+	delta_tower2_x = arm_cos_f32(RADIANS( 330-120 + delta_tower_angle_trim[B_AXIS])) * (radius + delta_radius_trim_tower_2); // front right tower
+	delta_tower2_y = arm_sin_f32(RADIANS( 330-120 + delta_tower_angle_trim[B_AXIS])) * (radius + delta_radius_trim_tower_2);
+	delta_tower3_x = arm_cos_f32(RADIANS( 90-120 + delta_tower_angle_trim[C_AXIS])) * (radius + delta_radius_trim_tower_3); // back middle tower
+	delta_tower3_y = arm_sin_f32(RADIANS( 90-120 + delta_tower_angle_trim[C_AXIS])) * (radius + delta_radius_trim_tower_3);
     delta_diagonal_rod_2_tower_1 = sq(diagonal_rod + delta_diagonal_rod_trim_tower_1);
     delta_diagonal_rod_2_tower_2 = sq(diagonal_rod + delta_diagonal_rod_trim_tower_2);
     delta_diagonal_rod_2_tower_3 = sq(diagonal_rod + delta_diagonal_rod_trim_tower_3);
@@ -8426,17 +8499,30 @@ static inline float bilinear_interpolate(float x1, float x2, float y1, float y2,
     void adjust_delta(float cartesian[3]) {
       if (delta_grid_spacing[0] == 0 || delta_grid_spacing[1] == 0) return; // G29 not done!
       volatile float th,r;
+#if ENABLED(POLAR_MESH)
       cart2Pol(RAW_X_POSITION(cartesian[X_AXIS]),RAW_Y_POSITION(cartesian[Y_AXIS]),(float*)&th,(float*)&r);
       volatile int i = floor(th/delta_grid_spacing[THETA]);
       volatile int j = floor(r/delta_grid_spacing[RAD]);
+#else //!POLAR_MESH
+
+      int half = (AUTO_BED_LEVELING_GRID_POINTS - 1) / 2;
+      float h1 = 0.001 - half, h2 = half - 0.001,
+            grid_x = max(h1, min(h2, RAW_X_POSITION(cartesian[X_AXIS]) / delta_grid_spacing[X_AXIS])),
+            grid_y = max(h1, min(h2, RAW_Y_POSITION(cartesian[Y_AXIS]) / delta_grid_spacing[Y_AXIS]));
+      int floor_x = floor(grid_x), floor_y = floor(grid_y);
+volatile int i = floor_x + half;
+volatile int j = floor_y + half;
+th=cartesian[X_AXIS];
+r=cartesian[Y_AXIS];
+#endif //POLAR_MESH
       volatile float q11 = bed_level[i][j];
       volatile float q12 = bed_level[i][j+1];
       volatile float q21 = bed_level[i+1][j];
       volatile float q22 = bed_level[i+1][j+1];
-      volatile float t1 = i*delta_grid_spacing[THETA];
-      volatile float t2 = (i+1)*delta_grid_spacing[THETA];
-      volatile float r1 = j*delta_grid_spacing[RAD];
-      volatile float r2 = (j+1)*delta_grid_spacing[RAD];
+      volatile float t1 = i*delta_grid_spacing[0];
+      volatile float t2 = (i+1)*delta_grid_spacing[0];
+      volatile float r1 = j*delta_grid_spacing[1];
+      volatile float r2 = (j+1)*delta_grid_spacing[1];
       volatile float offset = bilinear_interpolate(t1,t2,r1,r2,q11,q22,q21,q22,th,r);
       delta[X_AXIS] += offset;
       delta[Y_AXIS] += offset;
