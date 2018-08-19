@@ -768,7 +768,7 @@
 
   #if ENABLED(AUTO_BED_LEVELING_GRID)
 
-	#define DELTA_PROBEABLE_RADIUS (DELTA_PRINTABLE_RADIUS - 15)
+	#define DELTA_PROBEABLE_RADIUS (DELTA_PRINTABLE_RADIUS - 10)
 	#define LEFT_PROBE_BED_POSITION -(DELTA_PROBEABLE_RADIUS)
 	#define RIGHT_PROBE_BED_POSITION DELTA_PROBEABLE_RADIUS
 	#define FRONT_PROBE_BED_POSITION -(DELTA_PROBEABLE_RADIUS)
@@ -780,7 +780,9 @@
   // Compensate by interpolating between the nearest four Z probe values for each point.
   // Useful for deltas where the print surface may appear like a bowl or dome shape.
   // Works best with AUTO_BED_LEVELING_GRID_POINTS 5 or higher.
-  #define AUTO_BED_LEVELING_GRID_POINTS 7
+//  #define AUTO_BED_LEVELING_GRID_POINTS 7
+  #define AUTO_BED_LEVELING_THETA_POINTS 19
+  #define AUTO_BED_LEVELING_RAD_POINTS 4
 
   #else  // !AUTO_BED_LEVELING_GRID
 

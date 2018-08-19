@@ -273,7 +273,7 @@ extern float sw_endstop_min[3];
 extern float sw_endstop_max[3];
 
 #if ENABLED(AUTO_BED_LEVELING_FEATURE)
-extern float bed_level[AUTO_BED_LEVELING_GRID_POINTS][AUTO_BED_LEVELING_GRID_POINTS];
+extern float bed_level[AUTO_BED_LEVELING_THETA_POINTS][AUTO_BED_LEVELING_RAD_POINTS];
 #endif
 
 #define LOGICAL_POSITION(POS, AXIS) (POS + home_offset[AXIS] + position_shift[AXIS])

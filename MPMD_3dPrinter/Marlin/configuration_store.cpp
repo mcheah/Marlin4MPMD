@@ -985,8 +985,8 @@ void Config_StoreSettings()
   /* ABL settings */
   strcpy(cmdStr,"; Mesh Grid settings I=X index J=Y index Z=Z adjust");
   p_card->write_command(cmdStr);
-  for (int y = 0; y < AUTO_BED_LEVELING_GRID_POINTS; y++) {
-    for (int x = 0; x < AUTO_BED_LEVELING_GRID_POINTS; x++) {
+  for (int y = 0; y < AUTO_BED_LEVELING_RAD_POINTS; y++) {
+    for (int x = 0; x < AUTO_BED_LEVELING_THETA_POINTS; x++) {
       strcpy(cmdStr, "M421 I");
       sprintf(numStr, "%d", x);
       strcat(cmdStr, numStr);
