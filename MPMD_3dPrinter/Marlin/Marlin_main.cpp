@@ -2486,6 +2486,11 @@ static void clean_up_after_endstop_or_probe_move() {
      * Print calibration results for plotting or manual frame adjustment.
      */
     static void print_bed_level() {
+      SERIAL_PROTOCOLPGM("Grid spacing X:");
+      SERIAL_PROTOCOL_F(delta_grid_spacing[X_AXIS],2);
+      SERIAL_PROTOCOLPGM(" Grid spacing Y:");
+      SERIAL_PROTOCOL_F(delta_grid_spacing[Y_AXIS],2);
+      SERIAL_EOL;
       for (int y = 0; y < AUTO_BED_LEVELING_GRID_POINTS; y++) {
         for (int x = 0; x < AUTO_BED_LEVELING_GRID_POINTS; x++) {
           SERIAL_PROTOCOL_F(bed_level[x][y], 2);
@@ -3592,6 +3597,13 @@ inline void gcode_G28() {
   }
 
 #elif ENABLED(AUTO_BED_LEVELING_FEATURE)
+//Returns the X/Y position of a particular index given an AXIS X,Y
+static inline float calc_grid_position(int i, AxisEnum axis)
+{
+	return (float)(i-(AUTO_BED_LEVELING_GRID_POINTS-1)/2)*delta_grid_spacing[axis];
+}
+
+
 
   /**
    * G29: Detailed Z probe, probes the bed at 3 or more points.
@@ -3697,11 +3709,16 @@ inline void gcode_G28() {
       #endif
 
       xy_probe_feedrate_mm_m = code_seen('S') ? (int)code_value_linear_units() : XY_PROBE_SPEED;
-
-      float left_probe_bed_position = code_seen('L') ? code_value_axis_units(X_AXIS) : LOGICAL_X_POSITION(LEFT_PROBE_BED_POSITION),
-          right_probe_bed_position = code_seen('R') ? code_value_axis_units(X_AXIS) : LOGICAL_X_POSITION(RIGHT_PROBE_BED_POSITION),
-          front_probe_bed_position = code_seen('F') ? code_value_axis_units(Y_AXIS) : LOGICAL_Y_POSITION(FRONT_PROBE_BED_POSITION),
-          back_probe_bed_position = code_seen('B') ? code_value_axis_units(Y_AXIS) : LOGICAL_Y_POSITION(BACK_PROBE_BED_POSITION);
+      bool hasX = code_seen('X');
+      if(hasX)
+    	  delta_grid_spacing[X_AXIS] = code_value_axis_units(X_AXIS);
+      bool hasY = code_seen('Y');
+      if(hasY)
+    	  delta_grid_spacing[Y_AXIS] = code_value_axis_units(Y_AXIS);
+      float left_probe_bed_position =  code_seen('L') && !hasX ? code_value_axis_units(X_AXIS) : LOGICAL_X_POSITION(calc_grid_position(0,X_AXIS)),
+    		right_probe_bed_position = code_seen('R') && !hasX ? code_value_axis_units(X_AXIS) : LOGICAL_X_POSITION(calc_grid_position(AUTO_BED_LEVELING_GRID_POINTS-1,X_AXIS)),
+            front_probe_bed_position = code_seen('F') && !hasY ? code_value_axis_units(Y_AXIS) : LOGICAL_Y_POSITION(calc_grid_position(0,Y_AXIS)),
+            back_probe_bed_position =  code_seen('B') && !hasY ? code_value_axis_units(Y_AXIS) : LOGICAL_Y_POSITION(calc_grid_position(AUTO_BED_LEVELING_GRID_POINTS-1,Y_AXIS));
 
       bool left_out_l = left_probe_bed_position < LOGICAL_X_POSITION(MIN_PROBE_X),
            left_out = left_out_l || left_probe_bed_position > right_probe_bed_position - (MIN_PROBE_EDGE),
@@ -3788,10 +3805,10 @@ inline void gcode_G28() {
       // probe at the points of a lattice grid
       const float xGridSpacing = (right_probe_bed_position - left_probe_bed_position) / (auto_bed_leveling_grid_points - 1),
                 yGridSpacing = (back_probe_bed_position - front_probe_bed_position) / (auto_bed_leveling_grid_points - 1);
-
+      const float delta_probeable_radius = min(xGridSpacing,yGridSpacing)*((AUTO_BED_LEVELING_GRID_POINTS-1)/2); //To keep shape consistent, recalculate based on grid settings
       #if ENABLED(DELTA)
-        delta_grid_spacing[0] = xGridSpacing;
-        delta_grid_spacing[1] = yGridSpacing;
+        delta_grid_spacing[X_AXIS] = xGridSpacing;
+        delta_grid_spacing[Y_AXIS] = yGridSpacing;
       #else // !DELTA
         /**
          * solve the plane equation ax + by + d = z
@@ -3836,7 +3853,7 @@ inline void gcode_G28() {
           #if ENABLED(DELTA)
             // Avoid probing the corners (outside the round or hexagon print surface) on a delta printer.
             float distance_from_center = HYPOT(xProbe, yProbe);
-            if (distance_from_center > DELTA_PROBEABLE_RADIUS) continue;
+            if (distance_from_center > delta_probeable_radius) continue;
           #endif //DELTA
 
           float measured_z = probe_pt(xProbe, yProbe, stow_probe_after_each, verbose_level);
@@ -6480,12 +6497,16 @@ void quickstop_stepper() {
     if ((hasQ = code_seen('Q'))) q = code_value_axis_units(Z_AXIS);
     hasC = code_seen('C');
     hasE = code_seen('E');
+    if(code_seen('X'))
+    	delta_grid_spacing[X_AXIS] = code_value_axis_units(X_AXIS);
+    if(code_seen('Y'))
+    	delta_grid_spacing[Y_AXIS] = code_value_axis_units(Y_AXIS);
     if(!hasI && !hasJ && (hasZ || hasQ)) //I,J not supplied, check if we are close enough to a grid point
     {
         int half = (AUTO_BED_LEVELING_GRID_POINTS - 1) / 2;
         float h1 = 0.001 - half, h2 = half - 0.001,
-              grid_x = max(h1, min(h2, RAW_X_POSITION(current_position[X_AXIS]) / delta_grid_spacing[0])),
-              grid_y = max(h1, min(h2, RAW_Y_POSITION(current_position[Y_AXIS]) / delta_grid_spacing[1]));
+              grid_x = max(h1, min(h2, RAW_X_POSITION(current_position[X_AXIS]) / delta_grid_spacing[X_AXIS])),
+              grid_y = max(h1, min(h2, RAW_Y_POSITION(current_position[Y_AXIS]) / delta_grid_spacing[Y_AXIS]));
 		//0.07 * 15 ~= 1mm
         if(abs(round(grid_x)-grid_x)<0.07 &&
         		abs(round(grid_y)-grid_y)<0.07)
@@ -6532,10 +6553,9 @@ void quickstop_stepper() {
       if (px >= 0 && px < AUTO_BED_LEVELING_GRID_POINTS && py >= 0 && py < AUTO_BED_LEVELING_GRID_POINTS) {
 	    q = z - bed_level[px][py];
     	bed_level[px][py] = z;
-		int half = (AUTO_BED_LEVELING_GRID_POINTS - 1) / 2;
 		volatile float x,y;
-		x = delta_grid_spacing[0]*(px-half);
-		y = delta_grid_spacing[1]*(py-half);
+		x = calc_grid_position(px,X_AXIS);
+		y = calc_grid_position(py,Y_AXIS);
 		//If we just finished a probe, move up right away to reflect changes
 		if(abs(current_position[X_AXIS]-x)<0.001 &&
 			abs(current_position[Y_AXIS]-y)<0.001 &&
@@ -6552,10 +6572,9 @@ void quickstop_stepper() {
     else if(hasI && hasJ && hasQ) {
         if (px >= 0 && px < AUTO_BED_LEVELING_GRID_POINTS && py >= 0 && py < AUTO_BED_LEVELING_GRID_POINTS) {
 			bed_level[px][py] += q;
-			int half = (AUTO_BED_LEVELING_GRID_POINTS - 1) / 2;
 			float x,y;
-			x = delta_grid_spacing[0]*(px-half);
-			y = delta_grid_spacing[1]*(py-half);
+			x = calc_grid_position(px,X_AXIS);
+			y = calc_grid_position(py,Y_AXIS);
 			//If we just finished a probe, move up right away to reflect changes
 			if(abs(current_position[X_AXIS]-x)<0.001 &&
 					abs(current_position[Y_AXIS]-y)<0.001 &&
@@ -8377,12 +8396,12 @@ void clamp_to_software_endstops(float target[3]) {
 
     // Adjust print surface height by linear interpolation over the bed_level array.
     void adjust_delta(float cartesian[3]) {
-      if (delta_grid_spacing[0] == 0 || delta_grid_spacing[1] == 0) return; // G29 not done!
+      if (delta_grid_spacing[X_AXIS] == 0 || delta_grid_spacing[Y_AXIS] == 0) return; // G29 not done!
 
       int half = (AUTO_BED_LEVELING_GRID_POINTS - 1) / 2;
       float h1 = 0.001 - half, h2 = half - 0.001,
-            grid_x = max(h1, min(h2, RAW_X_POSITION(cartesian[X_AXIS]) / delta_grid_spacing[0])),
-            grid_y = max(h1, min(h2, RAW_Y_POSITION(cartesian[Y_AXIS]) / delta_grid_spacing[1]));
+            grid_x = max(h1, min(h2, RAW_X_POSITION(cartesian[X_AXIS]) / delta_grid_spacing[X_AXIS])),
+            grid_y = max(h1, min(h2, RAW_Y_POSITION(cartesian[Y_AXIS]) / delta_grid_spacing[Y_AXIS]));
       int floor_x = floor(grid_x), floor_y = floor(grid_y);
       float ratio_x = grid_x - floor_x, ratio_y = grid_y - floor_y,
             z1 = bed_level[floor_x + half][floor_y + half],

@@ -848,8 +848,7 @@ void Config_StoreSettings()
 #if DISABLED(ULTIPANEL)
   int preheatHotendTemp1 = PREHEAT_1_TEMP_HOTEND, preheatBedTemp1 = PREHEAT_1_TEMP_BED, preheatFanSpeed1 = PREHEAT_1_FAN_SPEED,
       preheatHotendTemp2 = PREHEAT_2_TEMP_HOTEND, preheatBedTemp2 = PREHEAT_2_TEMP_BED, preheatFanSpeed2 = PREHEAT_2_FAN_SPEED;
-#endif // !ULTIPANEL
-
+#else
   /* Ultipanel */
   strcpy(cmdStr,"M145 S0 H");
   sprintf(numStr, "%d", preheatHotendTemp1);
@@ -874,6 +873,7 @@ void Config_StoreSettings()
   strcat(cmdStr, numStr);
   strcat(cmdStr, " ; S1");
   p_card->write_command(cmdStr);
+#endif // !ULTIPANEL
 
 
 
@@ -983,6 +983,14 @@ void Config_StoreSettings()
   }
   p_card->write_command(cmdStr);
   /* ABL settings */
+  strcpy(cmdStr,"M421 X");
+  sprintf(numStr, "%.2f", delta_grid_spacing[X_AXIS]);
+  strcat(cmdStr, numStr);
+  strcat(cmdStr," Y");
+  sprintf(numStr, "%.2f", delta_grid_spacing[Y_AXIS]);
+  strcat(cmdStr, numStr);
+  strcat(cmdStr, " ; Mesh grid settings(mm)");
+  p_card->write_command(cmdStr);
   strcpy(cmdStr,"; Mesh Grid settings I=X index J=Y index Z=Z adjust");
   p_card->write_command(cmdStr);
   for (int y = 0; y < AUTO_BED_LEVELING_GRID_POINTS; y++) {
@@ -1132,7 +1140,8 @@ void Config_ResetDefault() {
     filament_size[q] = DEFAULT_NOMINAL_FILAMENT_DIA;
   // make sure the bed_level_rotation_matrix is identity or the planner will get it wrong
   planner.bed_level_matrix.set_to_identity();
-
+  delta_grid_spacing[X_AXIS] = ((RIGHT_PROBE_BED_POSITION - LEFT_PROBE_BED_POSITION) / (AUTO_BED_LEVELING_GRID_POINTS - 1));
+  delta_grid_spacing[Y_AXIS] = ((BACK_PROBE_BED_POSITION - FRONT_PROBE_BED_POSITION) / (AUTO_BED_LEVELING_GRID_POINTS - 1));
   reset_bed_level();
   endstops.enable_globally(
     #if ENABLED(ENDSTOPS_ALWAYS_ON_DEFAULT)
