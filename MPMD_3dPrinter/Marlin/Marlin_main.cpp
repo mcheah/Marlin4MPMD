@@ -3805,7 +3805,7 @@ static inline float calc_grid_position(int i, AxisEnum axis)
       // probe at the points of a lattice grid
       const float xGridSpacing = (right_probe_bed_position - left_probe_bed_position) / (auto_bed_leveling_grid_points - 1),
                 yGridSpacing = (back_probe_bed_position - front_probe_bed_position) / (auto_bed_leveling_grid_points - 1);
-      const float delta_probeable_radius = min(xGridSpacing,yGridSpacing)*((AUTO_BED_LEVELING_GRID_POINTS-1)/2); //To keep shape consistent, recalculate based on grid settings
+      const float delta_probeable_radius = 1.06*min(xGridSpacing,yGridSpacing)*((AUTO_BED_LEVELING_GRID_POINTS-1)/2); //To keep shape consistent, recalculate based on grid settings
       #if ENABLED(DELTA)
         delta_grid_spacing[X_AXIS] = xGridSpacing;
         delta_grid_spacing[Y_AXIS] = yGridSpacing;
