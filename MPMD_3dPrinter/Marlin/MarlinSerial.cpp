@@ -126,7 +126,13 @@ void MarlinSerial::begin(long baud) {
 	}
 }
 
-void MarlinSerial::end() {}
+void MarlinSerial::end() {
+	if(type==USB_CDC)
+	{
+		BSP_CdcIfStop();
+		BSP_CdcHwDeInit();
+	}
+}
 
 #if 0  // BDI
 void MarlinSerial::checkRx(void) {

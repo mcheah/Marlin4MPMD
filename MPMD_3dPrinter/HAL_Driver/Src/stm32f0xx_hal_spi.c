@@ -1029,7 +1029,7 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxD
   {
     if ((hspi->Init.Mode == SPI_MODE_SLAVE) || (hspi->TxXferCount == 0x01U))
     {
-      hspi->Instance->DR = *((uint16_t *)pTxData);
+      hspi->Instance->DR = *((__packed uint16_t *)pTxData);
       pTxData += sizeof(uint16_t);
       hspi->TxXferCount--;
     }
@@ -1038,7 +1038,7 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxD
       /* Check TXE flag */
       if (txallowed && (hspi->TxXferCount > 0U) && (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE)))
       {
-        hspi->Instance->DR = *((uint16_t *)pTxData);
+        hspi->Instance->DR = *((__packed uint16_t *)pTxData);
         pTxData += sizeof(uint16_t);
         hspi->TxXferCount--;
         /* Next Data is a reception (Rx). Tx not allowed */
@@ -1061,7 +1061,7 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxD
       /* Check RXNE flag */
       if ((hspi->RxXferCount > 0U) && (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_RXNE)))
       {
-        *((uint16_t *)pRxData) = hspi->Instance->DR;
+        *((__packed uint16_t *)pRxData) = hspi->Instance->DR;
         pRxData += sizeof(uint16_t);
         hspi->RxXferCount--;
         /* Next Data is a Transmission (Tx). Tx is allowed */
@@ -1081,7 +1081,7 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxD
     {
       if (hspi->TxXferCount > 1U)
       {
-        hspi->Instance->DR = *((uint16_t *)pTxData);
+        hspi->Instance->DR = *((__packed uint16_t *)pTxData);
         pTxData += sizeof(uint16_t);
         hspi->TxXferCount -= 2U;
       }
@@ -1098,7 +1098,7 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxD
       {
         if (hspi->TxXferCount > 1U)
         {
-          hspi->Instance->DR = *((uint16_t *)pTxData);
+          hspi->Instance->DR = *((__packed uint16_t *)pTxData);
           pTxData += sizeof(uint16_t);
           hspi->TxXferCount -= 2U;
         }
@@ -1129,7 +1129,7 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxD
       {
         if (hspi->RxXferCount > 1U)
         {
-          *((uint16_t *)pRxData) = hspi->Instance->DR;
+          *((__packed uint16_t *)pRxData) = hspi->Instance->DR;
           pRxData += sizeof(uint16_t);
           hspi->RxXferCount -= 2U;
           if (hspi->RxXferCount <= 1U)

@@ -4,6 +4,7 @@
 #include <strings.h>
 
 #if ENABLED(SDSUPPORT)
+unsigned char readBuff[512];
 
 CardReader::CardReader()
 {
@@ -20,6 +21,9 @@ CardReader::CardReader()
    workDirDepth = 0;
    file_subcall_ctr=0;
    cardReaderInitialized = false;
+   isBinaryMode = false;
+   pReadEnd = readBuff+512;
+   pRead = pReadEnd;
 
    curDir = NULL;
    diveDirName = NULL;
@@ -634,6 +638,92 @@ void CardReader::getStatus()
   else{
     SERIAL_PROTOCOLLNPGM(MSG_SD_NOT_PRINTING);
   }
+}
+
+int CardReader::read_buff(unsigned char *buf,uint32_t len)
+{
+	unsigned int bytesCopied = 0;
+    unsigned int bytesRemaining = len;
+	unsigned int bytesRead = -1;
+	FRESULT readStatus;
+
+	while(bytesCopied<len && bytesRead!=0) {
+		if(pRead>=pReadEnd) {
+			BSP_LED_On(LED_RED);
+			BSP_LED_On(LED_GREEN);
+			BSP_LED_On(LED_BLUE);
+			readStatus = f_read(&file, readBuff, 512, &bytesRead);
+		    if(readStatus != FR_OK)
+		    {
+			  SERIAL_ERROR_START;
+			  SERIAL_ERRORLNPGM(MSG_SD_ERR_READ);
+		    }
+			BSP_LED_Off(LED_RED);
+			BSP_LED_Off(LED_GREEN);
+			BSP_LED_Off(LED_BLUE);
+			pRead = readBuff;
+			pReadEnd = readBuff +bytesRead;
+			sdpos += bytesRead;
+		}
+		int bytesAvailable = pReadEnd - pRead;
+		if(bytesAvailable>0) {
+			unsigned int bytestoCopy = min(bytesAvailable,bytesRemaining);
+			memcpy(buf,pRead,bytestoCopy);
+			bytesCopied+=bytestoCopy;
+            pRead+=bytestoCopy;
+            buf+=bytestoCopy;
+            bytesRemaining-=bytestoCopy;
+		}
+	}
+    return bytesCopied;
+}
+
+void CardReader::push_read_buff(int len)
+{
+    if((pRead-len)<readBuff) {
+    	unsigned int bytesRead;
+    	FSIZE_t curpos = f_tell(&file);
+        f_lseek(&file,curpos-((pReadEnd)-pRead+len));
+        sdpos-=((pReadEnd)-pRead+len);
+        char buff[80];
+        sprintf(buff,"sdpos=%ld curpos=%ld\r\n",sdpos,curpos);
+        serialprintPGM(buff);
+        FRESULT readStatus = f_read(&file, readBuff, 512, &bytesRead);
+	    if(readStatus != FR_OK)
+	    {
+		  SERIAL_ERROR_START;
+		  SERIAL_ERRORLNPGM(MSG_SD_ERR_READ);
+	    }
+        // printf("Rewinding %ld Reading %d bytes, got %d bytes\n",pRead-readBuff-len,512,bytesRead);
+        pRead = readBuff;
+        pReadEnd = readBuff+bytesRead;
+		sdpos += bytesRead;
+    }
+    else
+        pRead = pRead-len;
+}
+
+void CardReader::write_buff(unsigned char *buf,uint32_t len)
+{
+  cli();
+  if(len==512)
+	  BSP_LED_On(LED_RED);
+  BSP_LED_On(LED_GREEN);
+  BSP_LED_On(LED_BLUE);
+  unsigned int bytesWritten;
+  FRESULT writeStatus;
+
+  writeStatus = f_write(&file, buf, len, &bytesWritten);
+  if( 	(writeStatus != FR_OK) ||
+		(bytesWritten != len))
+  {
+    SERIAL_ERROR_START;
+    SERIAL_ERRORLNPGM(MSG_SD_ERR_WRITE_TO_FILE);
+  }
+  BSP_LED_Off(LED_GREEN);
+  BSP_LED_Off(LED_BLUE);
+  BSP_LED_Off(LED_RED);
+  sei();
 }
 
 

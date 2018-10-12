@@ -252,22 +252,22 @@
 // The minimal temperature defines the temperature below which the heater will not be enabled It is used
 // to check that the wiring to the thermistor is not broken.
 // Otherwise this would lead to the heater being powered on all the time.
-#define HEATER_0_MINTEMP 5
+//#define HEATER_0_MINTEMP 5
 //#define HEATER_1_MINTEMP 5
 //#define HEATER_2_MINTEMP 5
 //#define HEATER_3_MINTEMP 5
-#define BED_MINTEMP 5
+//#define BED_MINTEMP 5
 
 // When temperature exceeds max temp, your heater will be switched off.
 // This feature exists to protect your hotend from overheating accidentally, but *NOT* from thermistor short/failure!
 // You should use MINTEMP for thermistor short/failure protection.
-#define HEATER_0_MAXTEMP 275
+//#define HEATER_0_MAXTEMP 275
 //#define HEATER_1_MAXTEMP 275
 //#define HEATER_2_MAXTEMP 275
 //#define HEATER_3_MAXTEMP 275
 #define HEATER_BED_5A_LIMIT
 #if ENABLED(HEATER_BED_5A_LIMIT)
-#define BED_MAXTEMP 90
+//#define BED_MAXTEMP 90
 #else
 #define BED_MAXTEMP 110
 #endif
@@ -372,7 +372,7 @@
 //this prevents dangerous Extruder moves, i.e. if the temperature is under the limit
 //can be software-disabled for whatever purposes by
 #if DISABLED(MINIMAL_BUILD)
-#define PREVENT_DANGEROUS_EXTRUDE
+//#define PREVENT_DANGEROUS_EXTRUDE
 //if PREVENT_DANGEROUS_EXTRUDE is on, you can still disable (uncomment) very long bits of extrusion separately.
 #define PREVENT_LENGTHY_EXTRUDE
 #endif
@@ -395,8 +395,8 @@
  * details can be tuned in Configuration_adv.h
  */
 #if DISABLED(MINIMAL_BUILD)
-#define THERMAL_PROTECTION_HOTENDS // Enable thermal protection for all extruders
-#define THERMAL_PROTECTION_BED     // Enable thermal protection for the heated bed
+//#define THERMAL_PROTECTION_HOTENDS // Enable thermal protection for all extruders
+//#define THERMAL_PROTECTION_BED     // Enable thermal protection for the heated bed
 #endif
 //===========================================================================
 //============================= Mechanical Settings =========================

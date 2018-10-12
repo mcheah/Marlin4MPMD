@@ -33,9 +33,11 @@
 #define STM32_USE_USB_CDC
 // LCD for Malyan M200/300 printers.
 //
-#define MALYAN_LCD
+//#define MALYAN_LCD
 //#define E1_ADC_PA2
+//#define STEPPERS_16X
 //#define MINIMAL_BUILD
+//#define UZLIB
 /* Exported functions ------------------------------------------------------- */
 /* Exported Variables --------------------------------------------------------*/
 

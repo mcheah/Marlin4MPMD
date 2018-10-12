@@ -64,6 +64,9 @@
 #ifdef SDSUPPORT
 #include "ff_gen_drv.h"
 #include "sd_diskio.h"
+//#include "uzlib.h"
+#include "tgunzip.h"
+#include "binGcodeCommand.h"
 #endif
 
 #if ENABLED(USE_WATCHDOG)
@@ -1240,45 +1243,75 @@ inline void get_serial_commands() {
     uint16_t sd_count = 0;
     bool card_eof = p_card->eof();
     while (commands_in_queue < BUFSIZE && !card_eof && !stop_buffering) {
-      int16_t n = p_card->get();
-      char sd_char = (char)n;
-      card_eof = p_card->eof();
-      if (card_eof || n == -1
-          || sd_char == '\n' || sd_char == '\r'
-          || ((sd_char == '#' || sd_char == ':') && !sd_comment_mode)
-      ) {
-        if (card_eof) {
-          SERIAL_PROTOCOLLNPGM(MSG_FILE_PRINTED);
-          p_card->printingHasFinished();
-          p_card->checkautostart(true);
-        }
-        else if (n == -1) {
-          SERIAL_ERROR_START;
-          SERIAL_ECHOLNPGM(MSG_SD_ERR_READ);
-        }
-        if (sd_char == '#') stop_buffering = true;
+      if(!p_card->isBinaryMode) {
+		  int16_t n = p_card->get();
+		  char sd_char = (char)n;
+		  card_eof = p_card->eof();
+		  if (card_eof || n == -1
+			  || sd_char == '\n' || sd_char == '\r'
+			  || ((sd_char == '#' || sd_char == ':') && !sd_comment_mode)
+		  ) {
 
-        sd_comment_mode = false; //for new command
+			if (card_eof) {
+			  SERIAL_PROTOCOLLNPGM(MSG_FILE_PRINTED);
+			  p_card->printingHasFinished();
+			  p_card->checkautostart(true);
+			}
+			else if (n == -1) {
+			  SERIAL_ERROR_START;
+			  SERIAL_ECHOLNPGM(MSG_SD_ERR_READ);
+			}
+			if (sd_char == '#') stop_buffering = true;
 
-        if (!sd_count) continue; //skip empty lines
+			sd_comment_mode = false; //for new command
 
-        command_queue[cmd_queue_index_w][sd_count] = '\0'; //terminate string
-        sd_count = 0; //clear buffer
+			if (!sd_count) continue; //skip empty lines
 
-        _commit_command(false);
-      }
-      else if (sd_count >= MAX_CMD_SIZE - 1) {
-        /**
-         * Keep fetching, but ignore normal characters beyond the max length
-         * The command will be injected when EOL is reached
-         */
-      }
-      else {
-        if (sd_char == ';') sd_comment_mode = true;
-        if (!sd_comment_mode) command_queue[cmd_queue_index_w][sd_count++] = sd_char;
-      }
-    }
-  }
+			command_queue[cmd_queue_index_w][sd_count] = '\0'; //terminate string
+			sd_count = 0; //clear buffer
+
+			_commit_command(false);
+		  } //if(card_eof || n==-1
+		  else if (sd_count >= MAX_CMD_SIZE - 1) {
+			/**
+			 * Keep fetching, but ignore normal characters beyond the max length
+			 * The command will be injected when EOL is reached
+			 */
+		  }
+		  else {
+			if (sd_char == ';') sd_comment_mode = true;
+			if (!sd_comment_mode) command_queue[cmd_queue_index_w][sd_count++] = sd_char;
+		  } //else(card_eof || n==-1
+      	}// if(!p_card->isBinaryMode)
+		else{
+			char buff[81]="";
+			int bytesCopied = -1;
+			bytesCopied = p_card->read_buff((unsigned char *)buff,80);
+			if(bytesCopied==0) {
+			  SERIAL_PROTOCOLLNPGM(MSG_FILE_PRINTED);
+			  p_card->printingHasFinished();
+			  p_card->checkautostart(true);
+			  p_card->sdpos = p_card->filesize;
+			  p_card->isBinaryMode = false;
+			  binGcodePar::resetBuff();
+			}
+			else {
+				unsigned char *rp = (unsigned char *)buff;
+				unsigned char *pStart = rp;
+				binGcodeCommand gc1;
+				static binGcodeCommand gc2;
+				gc1.decodeBinGcode(rp,gc2);
+				gc2.decodeBinGcode(pStart,gc2);
+				int sd_count = gc1.writeGcode(command_queue[cmd_queue_index_w]);
+				p_card->push_read_buff(bytesCopied-((char *)rp-buff));
+
+				command_queue[cmd_queue_index_w][sd_count] = '\0'; //terminate string
+				sd_count = 0; //clear buffer
+				_commit_command(false);
+			}
+		}// else(if(!p_card->isBinaryMode))
+      } //while (commands_in_queue < BUFSIZE && !card_eof && !stop_buffering)
+    } //inline void get_sdcard_commands
 
 #endif // SDSUPPORT
 
@@ -3606,8 +3639,10 @@ inline void gcode_G28() {
     if(do_height_probe)
     {
     	float delta_z_offset = probe_delta_height(zoffset);
-    	if(delta_z_offset<=MIN_Z_HEIGHT_ERROR || delta_z_offset>=MAX_Z_HEIGHT_ERROR )
+    	if(delta_z_offset<=MIN_Z_HEIGHT_ERROR || delta_z_offset>=MAX_Z_HEIGHT_ERROR ) {
 			SERIAL_PROTOCOLPGM("Delta Height is misconfigured, aborting Auto Bed Leveling");
+			do_mesh_probe = false;
+    	}
     }
 
       #if DISABLED(DELTA)
@@ -4289,6 +4324,128 @@ inline void gcode_M31() {
 
   #endif
 
+    /**
+     * M34: Start Binary SD Write
+     */
+    enum M34_state {
+    	M34_IDLE,
+		M34_M,
+		M34_M2,
+		M34_M29,
+		M34_RX
+    };
+	#define M34_TIMEOUT 10000
+    inline void gcode_M34() {
+      unsigned char SDbuff[512];
+      uint8_t M34_state = M34_IDLE;
+      p_card->openFile(current_command_args, false);
+      //Send OK to ensure we are ready
+      SERIAL_PROTOCOLPGM(MSG_OK);
+      SERIAL_EOL;
+      uint32_t last_rx = millis();
+      uint16_t SD_idx = 0;
+      const char M29_CMD[] = "M29\r\n";
+      while(M34_state != M34_RX) {
+    	  if(BSP_CdcGetNbRxAvailableBytes(false)>0) {
+    		  SD_idx += BSP_CdcCopyNextRxBytes(&SDbuff[SD_idx],512-SD_idx);
+    		  if(millis()-last_rx>M34_TIMEOUT)
+    			  M34_state = memcmp(SDbuff,M29_CMD,sizeof(M29_CMD)-1)==0 ? M34_RX : M34_IDLE;
+    		  if(M34_state==M34_IDLE)
+    			  last_rx = millis();
+//    		  char serial_char = MYSERIAL.read();
+//    		  switch(M34_state) {
+//    		  	  case M34_IDLE:
+//    		  		  if((millis()-last_rx>M34_TIMEOUT) && serial_char=='M') {
+//    		  			  SERIAL_PROTOCOLPGM("M Received\r\n");
+//    		  			  M34_state = M34_M; }
+//    		  		  else {
+////    		  			  p_card->write_buff(&serial_char,1);
+//    		  			  SDbuff[SD_idx++] = serial_char;
+//    		  			  last_rx = millis();
+//    		  		  }
+//    		  		  break;
+//    		  	  case M34_M:
+//    		  		  if((millis()-last_rx>M34_TIMEOUT) && serial_char=='2') {
+//    		  			SERIAL_PROTOCOLPGM("M2 Received\r\n");
+//    		  			  M34_state = M34_M2; }
+//    		  		  else {
+//    		  			  SERIAL_PROTOCOLPGM("M Received\r\n");
+////    		  			  p_card->write_buff(&serial_char,1);
+//    		  			  SDbuff[SD_idx++] = serial_char;
+//    		  			  last_rx = millis();
+//    		  			  M34_state = M34_IDLE;
+//    		  		  }
+//    		  		  break;
+//    		  	  case M34_M2:
+//    		  		  if((millis()-last_rx>M34_TIMEOUT) && serial_char=='9') {
+//    		  			  SERIAL_PROTOCOLPGM("M29Received\r\n");
+//    		  			  M34_state = M34_M29; }
+//    		  		  else {
+////    		  			  p_card->write_buff(&serial_char,1);
+//    		  			  SDbuff[SD_idx++] = serial_char;
+//    		  			  last_rx = millis();
+//    		  			  M34_state = M34_IDLE;
+//    		  		  }
+//    		  		  break;
+//    		  	  case M34_M29:
+//    		  		  if((millis()-last_rx>M34_TIMEOUT) && (serial_char=='\r' || serial_char=='\n')) {
+//    		  			  SERIAL_PROTOCOLPGM("M\\r\\n Received\r\n");
+//    		  			  M34_state = M34_RX; }
+//    		  		  else {
+////    		  			  p_card->write_buff(&serial_char,1);
+//    		  			  SDbuff[SD_idx++] = serial_char;
+//    		  			  last_rx = millis();
+//    		  			  M34_state = M34_IDLE;
+//    		  		  }
+//    		  		  break;
+//    		  	  case M34_RX:
+//    		  		  break;
+//    		  } //switch(M34_state)
+    	  } //if MYSERIAL.available()>0
+    	  //Flush buff to SD if timeout or we fill sector size
+    	  if(M34_state !=M34_RX && (SD_idx>0) && (SD_idx==sizeof(SDbuff) || millis()-last_rx > M34_TIMEOUT))  {
+    		  p_card->write_buff(SDbuff,SD_idx);
+    		  SD_idx = 0;
+    	  }
+      } //while(M34_state!= M34_RX)
+      p_card->closefile();
+      SERIAL_PROTOCOLLNPGM(MSG_FILE_SAVED);
+    }
+
+    /**
+     * M35: Decompress gzip file
+     */
+#if ENABLED(UZLIB)
+    inline void gcode_M35() {
+    	volatile uint32_t start = millis();
+//    	p_card->openFile(current_command_args,true,false);
+    	char filename[40];
+    	const char *ext = strrchr(current_command_args,'.'); //find extension
+    	if(ext!=NULL) {
+    		strncpy(filename,current_command_args,ext-current_command_args);
+    		filename[ext-current_command_args] = '\0';
+			decompress_gzip(current_command_args,filename);
+	//    	unsigned int fsize = p_card->filesize;
+			volatile uint32_t total = millis()-start;
+			SERIAL_PROTOCOLLNPGM("decompression took ");
+    	SERIAL_PROTOCOL(total);
+    	}
+    }
+#endif
+
+  inline void gcode_M36() {
+	#if ENABLED(MALYAN_LCD)
+		lcd_setstatuspgm(PSTR(MSG_RESUME));
+		p_card->isBinaryMode = true;
+		p_card->startFileprint();
+		print_job_timer.start();
+		lcd_setstatuspgm(PSTR(MSG_RESUMED));
+	#else
+		p_card->isBinaryMode = true;
+		p_card->startFileprint();
+		print_job_timer.start();
+	#endif
+  }
   /**
    * M928: Start SD Write
    */
@@ -7441,7 +7598,14 @@ void process_next_command() {
           case 33: //M33 - Get the long full path to a file or folder
             gcode_M33(); break;
         #endif // LONG_FILENAME_HOST_SUPPORT
-
+        case 34: //M34 - Start fast SD write
+		  gcode_M34(); break;
+#if ENABLED(UZLIB)
+        case 35: //M35 - Decompress SD file
+          gcode_M35(); break;
+#endif
+        case 36: //M36 - Start binary SD print
+          gcode_M36(); break;
         case 928: //M928 - Start SD write
           gcode_M928(); break;
       #endif //SDSUPPORT

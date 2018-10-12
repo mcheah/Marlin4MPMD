@@ -280,12 +280,14 @@ void process_lcd_j_command(const char* command) {
 void process_lcd_p_command(const char* command) {
 
   switch (command[0]) {
-    case 'X':
+    case 'X': {
       #if ENABLED(SDSUPPORT)
+    	bool sdprint = card.sdprinting;
         // cancel print
         write_to_lcd_P(PSTR("{SYS:CANCELING}"));
         last_printing_status = MALYAN_IDLE;
-        card.pauseSDPrint();
+        if(sdprint)
+        	card.pauseSDPrint();
         clear_command_queue();
         quickstop_stepper();
         print_job_timer.stop();
@@ -295,8 +297,14 @@ void process_lcd_p_command(const char* command) {
         #endif
         wait_for_heatup = false;
         write_to_lcd_P(PSTR("{SYS:STARTED}"));
+        if(!sdprint)
       #endif
-      break;
+		{
+        MYSERIAL.end();
+        delay(2000);
+        MYSERIAL.begin(BAUDRATE);
+		}
+      break; }
     case 'H':
       // Home all axis
     	enqueue_and_echo_command_now("G28");

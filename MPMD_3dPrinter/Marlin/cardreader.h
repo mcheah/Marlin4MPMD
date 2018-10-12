@@ -83,7 +83,7 @@ class CardReader
 {
 public:
 
-	// Public varaibles
+	// Public variables
 	//------------------
 
 	bool saving;
@@ -98,8 +98,11 @@ public:
 	char longFilename[LONG_FILENAME_LENGTH];
 	bool filenameIsDir;
 	int lastnr; //last number of the autostart;
-
+	bool isBinaryMode;
+	unsigned char *pRead;
+	unsigned char *pReadEnd;
 	unsigned long autostart_atmillis;
+	uint32_t filesize;
 
 	// Public methods
 	//----------------
@@ -125,6 +128,7 @@ public:
 	 * \param buf  Pointer to a char buffer.
 	 */
 	void write_command(char *buf);
+	void write_buff(unsigned char *buf,uint32_t len);
 
 	/**
 	 * \fn void checkautostart(bool x)
@@ -207,6 +211,18 @@ public:
 	 */
 	void getStatus();
 
+	/**
+	 * \fn void read_buff()
+	 * \brief copies len bytes from file/read buffer to buf
+	 */
+	int read_buff(unsigned char *buf,uint32_t len);
+	/**
+	 * \fn void push_read_buff()
+	 * \brief pushes the read buffer back len characters to account for discarded characters
+	 */
+	void push_read_buff(int len);
+
+
 	uint16_t get_num_Files();
 	void printingHasFinished();
 
@@ -225,7 +241,7 @@ public:
 	FORCE_INLINE bool isFileOpen() { return (bool)file.obj.fs; }
 	FORCE_INLINE bool eof() { return sdpos>=filesize ;};
 	FORCE_INLINE int16_t get() {
-		BYTE readByte;
+		UINT readByte;
 		UINT rc;
 		if (f_read(&file, &readByte, 1, &rc) != FR_OK)                     {
 			readByte = -1;
@@ -251,7 +267,8 @@ public:
 #if (!MB(STM_3DPRINT))
 	FORCE_INLINE char* getWorkDirName(){workDir.getFilename(filename);return filename;};
 #endif
-  
+	uint32_t sdpos ;
+
 private:
 
 	// Private variables
@@ -266,9 +283,8 @@ private:
 	uint8_t file_subcall_ctr;
 	uint32_t filespos[SD_PROCEDURE_DEPTH];
 	char filenames[SD_PROCEDURE_DEPTH][MAXPATHNAMELENGTH];
-	uint32_t filesize;
+//	uint32_t filesize;
 	//int16_t n;
-	uint32_t sdpos ;
 
 	// This variable is used to determine if the autostart have to be check or not in the function checkautostart()
 	bool autostart_stilltocheck; //the sd start is delayed, because otherwise the serial cannot answer fast enought to make contact with the hostsoftware.

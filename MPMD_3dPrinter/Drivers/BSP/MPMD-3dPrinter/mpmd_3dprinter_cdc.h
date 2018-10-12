@@ -50,8 +50,9 @@
 /* Exported macros ------------------------------------------------------------*/
 //TODO: we should probably adjust these to a smaller size
 #ifdef STM32_USE_USB_CDC
-#define CDC_TX_BUFFER_SIZE (256)
-#define CDC_RX_BUFFER_SIZE (96*4)
+#define CDC_TX_BUFFER_SIZE (128)
+#define CDC_RX_BUFFER_SIZE (96*2)
+//#define CDC_RX_BUFFER_SIZE (96*32)
 #else
 #define CDC_TX_BUFFER_SIZE (1)
 #define CDC_RX_BUFFER_SIZE (1)
@@ -63,12 +64,15 @@
 
 /* Exported functions --------------------------------------------------------*/
 void BSP_CdcHwInit(uint32_t newBaudRate);
+void BSP_CdcHwDeInit(void);
 void BSP_CdcIfStart(void);
+void BSP_CdcIfStop(void);
 void BSP_CdcIfQueueTxData(uint8_t *pBuf, uint8_t nbData);
 void BSP_CdcIfSendQueuedData();
 uint32_t BSP_CdcPrintf(const char* format,...);
-uint32_t BSP_CdcGetNbRxAvailableBytes(void);
+uint32_t BSP_CdcGetNbRxAvailableBytes(uint8_t waitForNewLine);
 int8_t BSP_CdcGetNextRxByte(void);
+uint32_t BSP_CdcCopyNextRxBytes(uint8_t *buff, uint32_t maxlen);
 uint8_t BSP_CdcIsTxOnGoing(void);
 void BSP_CdcLockingTx(uint8_t *pBuf, uint8_t nbData);
 #ifdef __cplusplus

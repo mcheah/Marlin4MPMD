@@ -152,7 +152,7 @@ class MarlinSerial { //: public Stream
     	if(type==UART)
     		return (BSP_UartGetNbRxAvailableBytes());
     	else if(type==USB_CDC)
-    		return (BSP_CdcGetNbRxAvailableBytes());
+    		return (BSP_CdcGetNbRxAvailableBytes(true));
     	else
     		return 0;
     }
