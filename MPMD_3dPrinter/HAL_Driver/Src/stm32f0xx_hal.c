@@ -292,10 +292,10 @@ __weak void HAL_IncTick(void)
   *       implementations in user file.
   * @retval tick value
   */
-__weak uint32_t HAL_GetTick(void)
-{
-  return uwTick;
-}
+//__weak uint32_t HAL_GetTick(void)
+//{
+//  return uwTick;
+//}
 
 /**
   * @brief This function provides accurate delay (in milliseconds) based 

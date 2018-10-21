@@ -113,8 +113,8 @@ const uint8_t BUTTON_IRQn[BUTTONn] = {USER_BUTTON_EXTI_IRQn};
 //
 //#ifdef ADAFRUIT_TFT_JOY_SD_ID802
 #ifdef HAL_SPI_MODULE_ENABLED
-uint32_t SpixTimeout = NUCLEO_SPIx_TIMEOUT_MAX; /*<! Value of Timeout when SPI communication fails */
-static SPI_HandleTypeDef hnucleo_Spi;
+const uint32_t SpixTimeout = NUCLEO_SPIx_TIMEOUT_MAX; /*<! Value of Timeout when SPI communication fails */
+SPI_HandleTypeDef hnucleo_Spi;
 #endif /* HAL_SPI_MODULE_ENABLED */
 
 //#ifdef HAL_ADC_MODULE_ENABLED
@@ -136,6 +136,7 @@ static SPI_HandleTypeDef hnucleo_Spi;
 #ifdef HAL_SPI_MODULE_ENABLED
 static void SPIx_Init(void);
 static void SPIx_Write(uint8_t Value);
+static uint8_t SPIx_WriteRead(uint8_t Value);
 static void SPIx_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLegnth);
 static void SPIx_FlushFifo(void);
 static void SPIx_Error(void);
@@ -145,7 +146,8 @@ static void SPIx_MspInit(SPI_HandleTypeDef *hspi);
 void SD_IO_Init(void);
 void SD_IO_CSState(uint8_t state);
 void SD_IO_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLength);
-uint8_t SD_IO_WriteByte(uint8_t Data);
+void SD_IO_WriteByte(uint8_t Data);
+uint8_t SD_IO_WriteReadByte(uint8_t Data);
 
 ///* LCD IO functions */
 //void LCD_IO_Init(void);
@@ -408,7 +410,7 @@ static void SPIx_Init(void)
 	      - For STM32F412ZG devices: 12,5 MHz maximum (PCLK2/SPI_BAUDRATEPRESCALER_8 = 100 MHz/8 = 12,5 MHz)
 		  - For STM32F446ZE/STM32F429ZI devices: 11,25 MHz maximum (PCLK2/SPI_BAUDRATEPRESCALER_8 = 90 MHz/8 = 11,25 MHz)
    */
-    hnucleo_Spi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
+    hnucleo_Spi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
    hnucleo_Spi.Init.Direction = SPI_DIRECTION_2LINES;
    hnucleo_Spi.Init.CLKPhase = SPI_PHASE_2EDGE;
    hnucleo_Spi.Init.CLKPolarity = SPI_POLARITY_HIGH;
@@ -473,6 +475,39 @@ BSP_LED_Toggle(LED3);
 //  sei();
   return rxdata;
 }
+/**
+ * @brief  SPI Write a byte to device
+ * @param  DataIn: value to be written
+ * @param  DataOut: value to read
+ * @param  DataLegnth: length of data
+ */
+static void SPIx_Write(uint8_t Value) {
+	 HAL_StatusTypeDef status = HAL_OK;
+	 status = HAL_SPI_Transmit(&hnucleo_Spi, &Value,1,SpixTimeout);
+	 if(status != HAL_OK)
+	 {
+	   /* Execute user timeout callback */
+	   SPIx_Error();
+	 }
+}
+/**
+ * @brief  SPI Write a byte to device
+ * @param  DataIn: value to be written
+ * @param  DataOut: value to read
+ * @param  DataLegnth: length of data
+ */
+static uint8_t SPIx_WriteRead(uint8_t Value) {
+	 HAL_StatusTypeDef status = HAL_OK;
+	 uint8_t tmp;
+//	 status = HAL_SPI_TransmitReceive(&hnucleo_Spi, &Value,&tmp,1,SpixTimeout);
+	 status = HAL_SPI_TransmitReceive_Byte(&hnucleo_Spi,Value,&tmp,SpixTimeout);
+//	 if(status != HAL_OK)
+//	 {
+//	   /* Execute user timeout callback */
+//	   SPIx_Error();
+//	 }
+	 return tmp;
+}
 
 /**
  * @brief  SPI Write a byte to device
@@ -480,31 +515,67 @@ BSP_LED_Toggle(LED3);
  * @param  DataOut: value to read
  * @param  DataLegnth: length of data
  */
-static void SPIx_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLegnth)
+static void SPIx_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLength)
 {
  HAL_StatusTypeDef status = HAL_OK;
 #ifdef SOFTWARE_SPI
-  for(uint16_t i=0;i<DataLegnth;i++)
+  for(uint16_t i=0;i<DataLength;i++)
   {
 	  DataOut[i] = SWSPISendReceive(DataIn[i]);
   }
 #else
- status = HAL_SPI_TransmitReceive(&hnucleo_Spi, (uint8_t*) DataIn, DataOut, DataLegnth, SpixTimeout);
+//  status = HAL_SPI_TransmitReceive(&hnucleo_Spi, (uint8_t*) DataIn, DataOut, DataLength, SpixTimeout);
+    status = HAL_SPI_TransmitReceive_Fast(&hnucleo_Spi, (uint8_t*) DataIn, DataOut, DataLength, SpixTimeout);
 #endif
  /* Check the communication status */
- if(status != HAL_OK)
- {
-   /* Execute user timeout callback */
-   SPIx_Error();
- }
+//  if(status != HAL_OK)
+//  {
+//    /* Execute user timeout callback */
+//    SPIx_Error();
+//  }
 }
 
 /**
  * @brief  SPI Write a byte to device.
  * @param  Value: value to be written
  */
-// static void SPIx_Write(uint8_t Value)
+static void SPIx_WriteData(uint8_t *DataIn, uint16_t DataLength)
+{
+  HAL_StatusTypeDef status = HAL_OK;
+  if(DataLength %2)
+	  status = HAL_SPI_Transmit(&hnucleo_Spi, DataIn, DataLength, SpixTimeout);
+  else
+	  status = HAL_SPI_Transmit_Fast(&hnucleo_Spi, DataIn, DataLength, SpixTimeout);
+
+  /* Check the communication status */
+//  if(status != HAL_OK)
 // {
+//    /* Execute user timeout callback */
+//    SPIx_Error();
+//  }
+}
+
+static void SPIx_ReadData(uint8_t *DataOut, uint16_t DataLength) {
+	HAL_StatusTypeDef status = HAL_OK;
+//	if(DataLength % 2)
+//		status = HAL_SPI_Receive(&hnucleo_Spi,DataOut,DataLength,SpixTimeout);
+//	else
+	status = HAL_SPI_Receive_Fast2(&hnucleo_Spi,DataOut,DataLength,SpixTimeout);
+//	status = HAL_SPI_Receive_Fast(&hnucleo_Spi,DataOut,DataLength,SpixTimeout);
+//	if(status != HAL_OK)
+//	{
+//	    /* Execute user timeout callback */
+//	    SPIx_Error();
+//	}
+}
+
+///**
+//  * @brief  SPI Write a byte to device
+//  * @param  Value value to be written
+//  * @retval None
+//  */
+//static void SPIx_Write(uint8_t Value)
+//{
 //  HAL_StatusTypeDef status = HAL_OK;
 //  uint8_t data;
 //
@@ -518,6 +589,15 @@ static void SPIx_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t
 //  }
 // }
 
+/**
+  * @brief  SPIx_FlushFifo
+  * @retval None
+  */
+static void SPIx_FlushFifo(void)
+{
+
+  HAL_SPIEx_FlushRxFifo(&hnucleo_Spi);
+}
 /**
  * @brief  SPI error treatment function
  */
@@ -601,19 +681,77 @@ void SD_IO_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataL
  /* Send the byte */
  SPIx_WriteReadData(DataIn, DataOut, DataLength);
 }
-
-/**
- * @brief  Writes a byte on the SD.
- * @param  Data: byte to send.
- */
+#if 0
 uint8_t SD_IO_WriteByte(uint8_t Data)
 {
  uint8_t tmp;
+
  /* Send the byte */
  SPIx_WriteReadData(&Data,&tmp,1);
  return tmp;
 }
 
+/**
+  * @brief  Write a byte on the SD.
+  * @param  Data byte to send.
+  * @retval Data written
+  */
+uint8_t SD_IO_WriteReadByte(uint8_t Data)
+{
+//  uint8_t tmp;
+
+  /* Send the byte */
+	return SD_IO_WriteByte(Data);
+//  return SPIx_WriteData(&Data,&tmp,1);
+//  return tmp;
+}
+#else
+/**
+  * @brief  Write a byte on the SD.
+  * @param  Data byte to send.
+  * @retval Data written
+ */
+void SD_IO_WriteByte(uint8_t Data)
+{
+ /* Send the byte */
+ SPIx_Write(Data);
+}
+/**
+  * @brief  Write a byte on the SD.
+  * @param  Data byte to send.
+  * @retval Data written
+  */
+uint8_t SD_IO_WriteReadByte(uint8_t Data)
+{
+  /* Send the byte */
+	return SPIx_WriteRead(Data);
+}
+#endif
+/**
+  * @brief  Write an amount of data on the SD.
+  * @param  DataOut byte to send.
+  * @param  DataLength number of bytes to write
+  * @retval none
+  */
+void SD_IO_ReadData(uint8_t *DataOut, uint16_t DataLength)
+{
+  /* Send the byte */
+//  SD_IO_WriteReadData(DataOut, DataOut, DataLength);
+	SPIx_ReadData(DataOut,DataLength);
+}
+
+/**
+  * @brief  Write an amount of data on the SD.
+  * @param  Data byte to send.
+  * @param  DataLength number of bytes to write
+  * @retval none
+  */
+void SD_IO_WriteData(const uint8_t *Data, uint16_t DataLength)
+{
+  /* Send the byte */
+  SPIx_WriteData((uint8_t *)Data, DataLength);
+  SPIx_FlushFifo();
+}
 ///********************************* LINK LCD ***********************************/
 ///**
 //  * @brief  Initializes the LCD

@@ -43,7 +43,11 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+#ifdef STM32_MPMD
 #include "stm32f0xx_mpmd.h"
+#elif defined(NUCLEO_F070RB)
+#include "stm32f0xx_nucleo.h"
+#endif
 
 /** @addtogroup BSP
   * @{
@@ -209,7 +213,17 @@ uint8_t BSP_SD_GetCardInfo(SD_CardInfo *pCardInfo);
 void    SD_IO_Init(void);
 void    SD_IO_CSState(uint8_t state);
 void    SD_IO_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLength);
-uint8_t SD_IO_WriteByte(uint8_t Data);
+void    SD_IO_ReadData(uint8_t *DataOut, uint16_t DataLength);
+void    SD_IO_WriteData(const uint8_t *Data, uint16_t DataLength);
+void	SD_IO_WriteByte(uint8_t Data);
+uint8_t SD_IO_WriteReadByte(uint8_t Data);
+extern const uint32_t SpixTimeout; /*<! Value of Timeout when SPI communication fails */
+
+static __INLINE void SD_IO_WriteDummy(){
+	extern SPI_HandleTypeDef hnucleo_Spi;
+	HAL_SPI_Transmit_Dummy(&hnucleo_Spi,SpixTimeout);
+};
+
 
 /**
   * @}

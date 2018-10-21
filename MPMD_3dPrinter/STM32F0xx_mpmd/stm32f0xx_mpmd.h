@@ -212,7 +212,7 @@ typedef enum
 #define NUCLEO_SPIx_MISO_MOSI_GPIO_CLK_DISABLE()        __HAL_RCC_GPIOB_CLK_DISABLE()
 #define NUCLEO_SPIx_MISO_PIN                            GPIO_PIN_4
 #define NUCLEO_SPIx_MOSI_PIN                            GPIO_PIN_5
-/* Maximum Timeout values for flags waiting loops. These timeout are not based
+/* Maximum Timeout values for flags waiting loops. These timeouts are not based
    on accurate values, they just guarantee that the application will not remain
    stuck if the SPI communication is corrupted.
    You may modify these timeout values depending on CPU frequency and application

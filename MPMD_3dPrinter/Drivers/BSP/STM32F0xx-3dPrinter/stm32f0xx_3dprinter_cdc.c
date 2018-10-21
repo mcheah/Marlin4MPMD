@@ -78,9 +78,9 @@ volatile USBD_HandleTypeDef USBD_Device;
 volatile uint8_t gBspCdcTxBuffer[CDC_TX_BUFFER_SIZE]; // real size is double to easily handle memcpy and tx uart
 volatile uint8_t gBspCdcRxBuffer[CDC_RX_BUFFER_SIZE];
 
-volatile uint8_t *pRxBuffer = gBspCdcRxBuffer;
-volatile uint8_t *pRxWriteBuffer;
-volatile uint8_t *pRxReadBuffer;
+static volatile uint8_t *pRxBuffer = gBspCdcRxBuffer;
+static volatile uint8_t *pRxWriteBuffer;
+static volatile uint8_t *pRxReadBuffer;
 uint32_t debugNbRxFrames = 0;
 uint32_t debugNbTxFrames = 0;
 #ifdef USE_XONXOFF
@@ -249,12 +249,6 @@ uint32_t BSP_CdcPrintf(const char* format,...)
   va_end(args);
    
   retSize = size;   
-  if (*(writeBufferp + size - 1) == '\n')
-  {
-    *(writeBufferp + size - 1) = '\r';
-    *(writeBufferp + size) = '\n';
-    size++;
-  }
   if (size != 0) {
     if ( size > CDC_TX_BUFFER_SIZE ) {
       CDC_ERROR(9);

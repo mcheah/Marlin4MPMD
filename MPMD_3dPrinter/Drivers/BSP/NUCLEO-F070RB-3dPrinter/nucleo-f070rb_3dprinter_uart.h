@@ -53,7 +53,7 @@
 #define UART_RX_BUFFER_SIZE (64)
    
 /* Definition for Usart resources *********************************************/
-
+#if 0
 #define BSP_UART_DEBUG                           (USART2)
 #define __BSP_UART_DEBUG_CLK_ENABLE()              __USART2_CLK_ENABLE()
 #define __BSP_UART_DEBUG_CLK_DISABLE()             __USART2_CLK_DISABLE()
@@ -75,7 +75,29 @@
 
 #define BSP_UART_DEBUG_TX_AF                     (GPIO_AF1_USART2)
 #define BSP_UART_DEBUG_RX_AF                     (GPIO_AF1_USART2)
+#else
+#define BSP_UART_DEBUG                           (USART1)
+#define __BSP_UART_DEBUG_CLK_ENABLE()              __USART1_CLK_ENABLE()
+#define __BSP_UART_DEBUG_CLK_DISABLE()             __USART1_CLK_DISABLE()
+#define __BSP_UART_DEBUG_RX_GPIO_CLK_ENABLE()      __GPIOA_CLK_ENABLE()
+#define __BSP_UART_DEBUG_TX_GPIO_CLK_ENABLE()      __GPIOA_CLK_ENABLE()
+
+#define __BSP_UART_DEBUG_FORCE_RESET()             __USART1_FORCE_RESET()
+#define __BSP_UART_DEBUG_RELEASE_RESET()           __USART1_RELEASE_RESET()
+
+/* Definition for BSP_UART_DEBUG Pins */
+#define BSP_UART_DEBUG_TX_PIN               (GPIO_PIN_9)
+#define BSP_UART_DEBUG_TX_PORT              (GPIOA)
+#define BSP_UART_DEBUG_RX_PIN               (GPIO_PIN_10)
+#define BSP_UART_DEBUG_RX_PORT              (GPIOA)
+
+/* Definition for BSP_UART_DEBUG's NVIC */
+#define BSP_UART_DEBUG_IRQn                      (USART1_IRQn)
+#define BSP_UART_DEBUG_IRQHandler                USART1_IRQHandler
    
+#define BSP_UART_DEBUG_TX_AF                     (GPIO_AF1_USART1)
+#define BSP_UART_DEBUG_RX_AF                     (GPIO_AF1_USART1)
+#endif
 /* Exported types --- --------------------------------------------------------*/
 typedef struct BspUartDataTag
 {
@@ -107,12 +129,13 @@ extern BspUartDataType gBspUartData;
 uint8_t* BSP_UartIfGetFreeTxBuffer(void);
 void BSP_UartHwInit(uint32_t newBaudRate);
 void BSP_UartIfStart(void);
-void BSP_UartIfQueueTxData(uint8_t *pBuf, uint8_t nbData);
+void BSP_UartIfQueueTxData(uint8_t *pBuf, uint32_t nbData);
 void BSP_UartIfSendQueuedData(void);
 void BSP_UartAttachRxDataHandler(void (*callback)(uint8_t *, uint8_t));
 void BSP_UartAttachTxDoneCallback(void (*callback)(void));
 uint32_t BSP_UartPrintf(const char* format,...);
-uint32_t BSP_UartGetNbRxAvalaibleBytes(void);
+uint32_t BSP_UartGetNbRxAvailableBytes(void);
+uint32_t BSP_UartCopyNextRxBytes(uint8_t *buff, uint32_t maxlen);
 int8_t BSP_UartGetNextRxBytes(void);
 uint8_t BSP_UartIsTxOnGoing(void);
 #if defined(MARLIN)

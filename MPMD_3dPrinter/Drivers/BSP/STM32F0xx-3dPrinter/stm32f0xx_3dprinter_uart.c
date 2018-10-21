@@ -76,6 +76,7 @@ static uint8_t  UART_Itf_IsTxQueueEmpty(void);
 BspUartDataType gBspUartData;
 uint8_t gBspUartTxBuffer[UART_TX_BUFFER_SIZE];
 uint8_t gBspUartRxBuffer[UART_RX_BUFFER_SIZE];
+static volatile uint8_t *pRxBuffer = gBspUartRxBuffer;
 #ifdef USE_XONXOFF
 static uint8_t  BspUartXonXoff = 0;
 static uint8_t BspUartXoffBuffer[12] = " SEND XOFF\n";
@@ -506,6 +507,28 @@ uint32_t BSP_UartGetNbRxAvailableBytes(void)
   return ((uint32_t) nxRxBytes );
 }
 
+uint32_t BSP_UartCopyNextRxBytes(uint8_t *buff, uint32_t maxlen)
+{
+	BspUartDataType *pUart = &gBspUartData;
+//	BSP_LED_On(LED_BLUE);
+	volatile uint32_t bytesToCopy = MIN(maxlen,BSP_UartGetNbRxAvailableBytes());
+	volatile uint32_t firstBytesToCopy = MIN(bytesToCopy,
+											&(pUart->pRxReadBuffer[UART_RX_BUFFER_SIZE])-pUart->pRxReadBuffer);
+	volatile uint32_t secondBytesToCopy = bytesToCopy - firstBytesToCopy;
+	memcpy(buff,
+			pUart->pRxReadBuffer,
+			firstBytesToCopy);
+	pUart->pRxReadBuffer += firstBytesToCopy;
+	if(pUart->pRxReadBuffer==&pRxBuffer[UART_RX_BUFFER_SIZE])	{
+		if(secondBytesToCopy)
+			memcpy(&buff[firstBytesToCopy],
+				pRxBuffer,
+				secondBytesToCopy);
+		pUart->pRxReadBuffer = &pRxBuffer[secondBytesToCopy];
+	}
+//	BSP_LED_Off(LED_BLUE);
+	return bytesToCopy;
+}
 
 /******************************************************//**
  * @brief  This function returns the first byte available on the UART
