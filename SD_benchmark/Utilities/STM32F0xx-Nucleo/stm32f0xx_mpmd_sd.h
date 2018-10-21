@@ -217,6 +217,12 @@ void    SD_IO_ReadData(uint8_t *DataOut, uint16_t DataLength);
 void    SD_IO_WriteData(const uint8_t *Data, uint16_t DataLength);
 void	SD_IO_WriteByte(uint8_t Data);
 uint8_t SD_IO_WriteReadByte(uint8_t Data);
+extern const uint32_t SpixTimeout; /*<! Value of Timeout when SPI communication fails */
+
+static __INLINE void SD_IO_WriteDummy(){
+	extern SPI_HandleTypeDef hnucleo_Spi;
+	HAL_SPI_Transmit_Dummy(&hnucleo_Spi,SpixTimeout);
+};
 
 
 /**

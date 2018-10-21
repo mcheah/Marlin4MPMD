@@ -525,10 +525,11 @@ HAL_StatusTypeDef HAL_InitTick (uint32_t TickPriority);
 void              HAL_IncTick(void);
 void              HAL_Delay(__IO uint32_t Delay);
 extern __IO uint32_t uwTick;
-static __INLINE uint32_t          HAL_GetTick(void)
-{
-	  return uwTick;
-};
+//static __INLINE uint32_t          HAL_GetTick(void)
+//{
+//	  return uwTick;
+//};
+#define HAL_GetTick() uwTick
 //uint32_t          HAL_GetTick(void);
 void              HAL_SuspendTick(void);
 void              HAL_ResumeTick(void);

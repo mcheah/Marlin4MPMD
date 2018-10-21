@@ -114,7 +114,7 @@ const uint8_t BUTTON_IRQn[BUTTONn] = {USER_BUTTON_EXTI_IRQn};
 //#ifdef ADAFRUIT_TFT_JOY_SD_ID802
 #ifdef HAL_SPI_MODULE_ENABLED
 const uint32_t SpixTimeout = NUCLEO_SPIx_TIMEOUT_MAX; /*<! Value of Timeout when SPI communication fails */
-static SPI_HandleTypeDef hnucleo_Spi;
+SPI_HandleTypeDef hnucleo_Spi;
 #endif /* HAL_SPI_MODULE_ENABLED */
 
 //#ifdef HAL_ADC_MODULE_ENABLED

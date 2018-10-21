@@ -77,7 +77,6 @@ BspUartDataType gBspUartData;
 uint8_t gBspUartTxBuffer[UART_TX_BUFFER_SIZE];
 uint8_t gBspUartRxBuffer[UART_RX_BUFFER_SIZE];
 static volatile uint8_t *pRxBuffer = gBspUartRxBuffer;
-
 #ifdef USE_XONXOFF
 static uint8_t  BspUartXonXoff = 0;
 static uint8_t BspUartXoffBuffer[12] = " SEND XOFF\n";
