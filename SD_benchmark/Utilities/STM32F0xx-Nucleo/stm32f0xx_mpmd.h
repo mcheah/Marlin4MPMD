@@ -46,7 +46,8 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f0xx_hal.h"
+ #include "configuration_STM.h"
+ #include "stm32f0xx_hal.h"
    
 /* To be defined only if the board is provided with the related shield */
 /* https://www.adafruit.com/products/802 */

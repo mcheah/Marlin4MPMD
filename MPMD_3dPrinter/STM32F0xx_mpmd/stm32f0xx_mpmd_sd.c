@@ -124,7 +124,6 @@ typedef struct {
 /** @defgroup STM32F0XX_MPMD_SD_Private_Constants Private Constants
 * @{
 */
-#define SD_DUMMY_BYTE            0xFF
 
 #define SD_MAX_FRAME_LENGTH        17    /* Lenght = 16 + 1 */
 #define SD_CMD_LENGTH               6
@@ -578,7 +577,7 @@ uint8_t SD_GetCSDRegister(SD_CSD* Csd)
       for (counter = 0; counter < 16; counter++)
       {
         /* Store CSD register value on CSD_Tab */
-        CSD_Tab[counter] = SD_IO_WriteReadByte(SD_DUMMY_BYTE);
+        CSD_Tab[counter] = SD_IO_WriteReadDummy();
       }
 
       /* Get CRC bytes (not really needed by us, but required by SD) */
@@ -692,7 +691,7 @@ uint8_t SD_GetCIDRegister(SD_CID* Cid)
       /* Store CID register value on CID_Tab */
       for (counter = 0; counter < 16; counter++)
       {
-        CID_Tab[counter] = SD_IO_WriteReadByte(SD_DUMMY_BYTE);
+        CID_Tab[counter] = SD_IO_WriteReadDummy();
       }
 
       /* Get CRC bytes (not really needed by us, but required by SD) */
@@ -811,7 +810,7 @@ SD_CmdAnswer_typedef SD_SendCmd(uint8_t Cmd, uint32_t Arg, uint8_t Crc, uint8_t 
     break;
   case SD_ANSWER_R1B_EXPECTED :
     retr.r1 = SD_ReadData();
-    retr.r2 = SD_IO_WriteReadByte(SD_DUMMY_BYTE);
+    retr.r2 = SD_IO_WriteReadDummy();
     /* Set CS High */
     SD_IO_CSState(1);
     HAL_Delay(1);
@@ -819,19 +818,19 @@ SD_CmdAnswer_typedef SD_SendCmd(uint8_t Cmd, uint32_t Arg, uint8_t Crc, uint8_t 
     SD_IO_CSState(0);
 
     /* Wait IO line return 0xFF */
-    while (SD_IO_WriteReadByte(SD_DUMMY_BYTE) != 0xFF);
+    while (SD_IO_WriteReadDummy() != 0xFF);
     break;
   case SD_ANSWER_R2_EXPECTED :
     retr.r1 = SD_ReadData();
-    retr.r2 = SD_IO_WriteReadByte(SD_DUMMY_BYTE);
+    retr.r2 = SD_IO_WriteReadDummy();
     break;
   case SD_ANSWER_R3_EXPECTED :
   case SD_ANSWER_R7_EXPECTED :
     retr.r1 = SD_ReadData();
-    retr.r2 = SD_IO_WriteReadByte(SD_DUMMY_BYTE);
-    retr.r3 = SD_IO_WriteReadByte(SD_DUMMY_BYTE);
-    retr.r4 = SD_IO_WriteReadByte(SD_DUMMY_BYTE);
-    retr.r5 = SD_IO_WriteReadByte(SD_DUMMY_BYTE);
+    retr.r2 = SD_IO_WriteReadDummy();
+    retr.r3 = SD_IO_WriteReadDummy();
+    retr.r4 = SD_IO_WriteReadDummy();
+    retr.r5 = SD_IO_WriteReadDummy();
     break;
   default :
     break;
@@ -852,7 +851,7 @@ uint8_t SD_GetDataResponse(void)
   uint8_t dataresponse;
   uint8_t rvalue = SD_DATA_OTHER_ERROR;
 
-  dataresponse = SD_IO_WriteReadByte(SD_DUMMY_BYTE);
+  dataresponse = SD_IO_WriteReadDummy();
   SD_IO_WriteDummy(); /* read the busy response byte*/
 
   /* Mask unused bits */
@@ -867,7 +866,7 @@ uint8_t SD_GetDataResponse(void)
     SD_IO_CSState(0);
 
     /* Wait IO line return 0xFF */
-    while (SD_IO_WriteReadByte(SD_DUMMY_BYTE) != 0xFF);
+    while (SD_IO_WriteReadDummy() != 0xFF);
     break;
   case SD_DATA_CRC_ERROR:
     rvalue =  SD_DATA_CRC_ERROR;
@@ -996,7 +995,7 @@ uint8_t SD_ReadData(void)
 
   /* Check if response is got or a timeout is happen */
   do {
-    readvalue = SD_IO_WriteReadByte(SD_DUMMY_BYTE);
+    readvalue = SD_IO_WriteReadDummy();
     timeout--;
 
   }while ((readvalue == SD_DUMMY_BYTE || readvalue==0xBF) && timeout);
@@ -1018,7 +1017,7 @@ uint8_t SD_WaitData(uint8_t data)
   /* Check if response is got or a timeout is happen */
 
   do {
-    readvalue = SD_IO_WriteReadByte(SD_DUMMY_BYTE);
+    readvalue = SD_IO_WriteReadDummy();
     timeout--;
   }while ((readvalue != data) && timeout);
 

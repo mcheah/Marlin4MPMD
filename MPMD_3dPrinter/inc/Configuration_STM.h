@@ -38,6 +38,7 @@
 //#define STEPPERS_16X
 //#define MINIMAL_BUILD
 //#define UZLIB
+#define USE_FAST_SPI
 /* Exported functions ------------------------------------------------------- */
 /* Exported Variables --------------------------------------------------------*/
 

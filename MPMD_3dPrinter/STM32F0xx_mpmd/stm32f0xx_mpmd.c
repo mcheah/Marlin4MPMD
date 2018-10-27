@@ -483,12 +483,16 @@ BSP_LED_Toggle(LED3);
  */
 static void SPIx_Write(uint8_t Value) {
 	 HAL_StatusTypeDef status = HAL_OK;
+#ifdef USE_FAST_SPI
+	 status = HAL_SPI_Transmit_Byte(&hnucleo_Spi,Value,SpixTimeout);
+#else
 	 status = HAL_SPI_Transmit(&hnucleo_Spi, &Value,1,SpixTimeout);
 	 if(status != HAL_OK)
 	 {
 	   /* Execute user timeout callback */
 	   SPIx_Error();
 	 }
+#endif
 }
 /**
  * @brief  SPI Write a byte to device
@@ -499,13 +503,16 @@ static void SPIx_Write(uint8_t Value) {
 static uint8_t SPIx_WriteRead(uint8_t Value) {
 	 HAL_StatusTypeDef status = HAL_OK;
 	 uint8_t tmp;
-//	 status = HAL_SPI_TransmitReceive(&hnucleo_Spi, &Value,&tmp,1,SpixTimeout);
+#ifdef USE_FAST_SPI
 	 status = HAL_SPI_TransmitReceive_Byte(&hnucleo_Spi,Value,&tmp,SpixTimeout);
-//	 if(status != HAL_OK)
-//	 {
-//	   /* Execute user timeout callback */
-//	   SPIx_Error();
-//	 }
+#else
+	 status = HAL_SPI_TransmitReceive(&hnucleo_Spi, &Value,&tmp,1,SpixTimeout);
+	 if(status != HAL_OK)
+	 {
+	   /* Execute user timeout callback */
+	   SPIx_Error();
+	 }
+#endif
 	 return tmp;
 }
 
@@ -518,21 +525,23 @@ static uint8_t SPIx_WriteRead(uint8_t Value) {
 static void SPIx_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLength)
 {
  HAL_StatusTypeDef status = HAL_OK;
-#ifdef SOFTWARE_SPI
+
+#ifdef USE_FAST_SPI
+    status = HAL_SPI_TransmitReceive_Fast(&hnucleo_Spi, (uint8_t*) DataIn, DataOut, DataLength, SpixTimeout);
+#elif SOFTWARE_SPI
   for(uint16_t i=0;i<DataLength;i++)
   {
 	  DataOut[i] = SWSPISendReceive(DataIn[i]);
   }
 #else
-//  status = HAL_SPI_TransmitReceive(&hnucleo_Spi, (uint8_t*) DataIn, DataOut, DataLength, SpixTimeout);
-    status = HAL_SPI_TransmitReceive_Fast(&hnucleo_Spi, (uint8_t*) DataIn, DataOut, DataLength, SpixTimeout);
-#endif
+  status = HAL_SPI_TransmitReceive(&hnucleo_Spi, (uint8_t*) DataIn, DataOut, DataLength, SpixTimeout);
  /* Check the communication status */
-//  if(status != HAL_OK)
-//  {
-//    /* Execute user timeout callback */
-//    SPIx_Error();
-//  }
+  if(status != HAL_OK)
+  {
+    /* Execute user timeout callback */
+    SPIx_Error();
+  }
+#endif
 }
 
 /**
@@ -542,31 +551,33 @@ static void SPIx_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t
 static void SPIx_WriteData(uint8_t *DataIn, uint16_t DataLength)
 {
   HAL_StatusTypeDef status = HAL_OK;
-  if(DataLength %2)
-	  status = HAL_SPI_Transmit(&hnucleo_Spi, DataIn, DataLength, SpixTimeout);
-  else
-	  status = HAL_SPI_Transmit_Fast(&hnucleo_Spi, DataIn, DataLength, SpixTimeout);
 
+#ifdef USE_FAST_SPI
+	  status = HAL_SPI_Transmit_Fast(&hnucleo_Spi, DataIn, DataLength, SpixTimeout);
+#else
+  	  status = HAL_SPI_Transmit(&hnucleo_Spi, DataIn, DataLength, SpixTimeout);
+	  if(status != HAL_OK)
+	  {
+	      /* Execute user timeout callback */
+	      SPIx_Error();
+	  }
+#endif
   /* Check the communication status */
-//  if(status != HAL_OK)
-// {
-//    /* Execute user timeout callback */
-//    SPIx_Error();
-//  }
+
 }
 
 static void SPIx_ReadData(uint8_t *DataOut, uint16_t DataLength) {
 	HAL_StatusTypeDef status = HAL_OK;
-//	if(DataLength % 2)
-//		status = HAL_SPI_Receive(&hnucleo_Spi,DataOut,DataLength,SpixTimeout);
-//	else
+#ifdef USE_FAST_SPI
 	status = HAL_SPI_Receive_Fast2(&hnucleo_Spi,DataOut,DataLength,SpixTimeout);
-//	status = HAL_SPI_Receive_Fast(&hnucleo_Spi,DataOut,DataLength,SpixTimeout);
-//	if(status != HAL_OK)
-//	{
-//	    /* Execute user timeout callback */
-//	    SPIx_Error();
-//	}
+#else
+	status = HAL_SPI_Receive(&hnucleo_Spi,DataOut,DataLength,SpixTimeout);
+	if(status != HAL_OK)
+	{
+	    /* Execute user timeout callback */
+	    SPIx_Error();
+	}
+#endif
 }
 
 ///**

@@ -683,6 +683,130 @@ static __INLINE HAL_StatusTypeDef HAL_SPI_Transmit_Dummy(SPI_HandleTypeDef *hspi
 	 return errorcode;
 };
 
+static __INLINE HAL_StatusTypeDef HAL_SPI_Transmit_Dummy(SPI_HandleTypeDef *hspi,
+                                         uint32_t Timeout)
+{
+	extern __IO uint32_t uwTick;
+	const uint8_t SD_DUMMY_BYTE = 0xFF;
+ 	 HAL_StatusTypeDef errorcode = HAL_OK;
+ 	 /* Set the Rx Fifo threshold */
+ 	 SET_BIT(hspi->Instance->CR2, SPI_RXFIFO_THRESHOLD);
+     *(__IO uint8_t *)&hspi->Instance->DR = SD_DUMMY_BYTE;
+	 /* Check the end of the transaction */
+//     uint32_t timeout = HAL_GetTick();
+     uint32_t timeout = uwTick;
+	 SPI_EndRxTxTransaction(hspi, Timeout, timeout);
+	 return errorcode;
+};
+
+/**
+  * @brief  Transmit and Receive an amount of data in blocking mode.
+  * @param  hspi pointer to a SPI_HandleTypeDef structure that contains
+  *               the configuration information for SPI module.
+  * @param  pTxData pointer to transmission data buffer
+  * @param  pRxData pointer to reception data buffer
+  * @param  Size amount of data to be sent and received
+  * @param  Timeout Timeout duration
+  * @retval HAL status
+  */
+static __INLINE HAL_StatusTypeDef HAL_SPI_TransmitReceive_Dummy(SPI_HandleTypeDef *hspi, uint8_t *pRxData,
+                                          uint32_t Timeout)
+{
+//  uint16_t txData[2] = {0xFFFF,0xFFFF};
+//  uint8_t *pTxData = (uint8_t *)txData;
+//  uint32_t tmp = 0U, tmp1 = 0U;
+//  uint32_t tickstart = 0U;
+  /* Variable used to alternate Rx and Tx during transfer */
+//  uint32_t txallowed = 1U;
+  extern __IO uint32_t uwTick;
+  const uint8_t SD_DUMMY_BYTE = 0xFF;
+  HAL_StatusTypeDef errorcode = HAL_OK;
+
+//  if ((hspi->Init.DataSize > SPI_DATASIZE_8BIT) || (Size > 1U))
+//  {
+//    /* in this case, 16-bit access is performed on Data
+//       So, check Data is 16-bit aligned address */
+//    assert_param(IS_SPI_16BIT_ALIGNED_ADDRESS(pTxData));
+//    assert_param(IS_SPI_16BIT_ALIGNED_ADDRESS(pRxData));
+//  }
+
+  /* Check Direction parameter */
+//  assert_param(IS_SPI_DIRECTION_2LINES(hspi->Init.Direction));
+
+  /* Process Locked */
+//  __HAL_LOCK(hspi);
+//  hspi->RxXferCount = Size;
+//  hspi->RxXferSize  = Size;
+  /* Init tickstart for timeout management*/
+//  tickstart = HAL_GetTick();
+
+//  tmp  = hspi->State;
+//  tmp1 = hspi->Init.Mode;
+
+//  if (!((tmp == HAL_SPI_STATE_READY) || \
+//        ((tmp1 == SPI_MODE_MASTER) && (hspi->Init.Direction == SPI_DIRECTION_2LINES) && (tmp == HAL_SPI_STATE_BUSY_RX))))
+//  {
+//    errorcode = HAL_BUSY;
+//    goto error;
+//  }
+
+//  if ((pTxData == NULL) || (pRxData == NULL) || (Size == 0U))
+//  {
+//    errorcode = HAL_ERROR;
+//    goto error;
+//  }
+
+  /* Don't overwrite in case of HAL_SPI_STATE_BUSY_RX */
+//  if (hspi->State != HAL_SPI_STATE_BUSY_RX)
+//  {
+//    hspi->State = HAL_SPI_STATE_BUSY_TX_RX;
+//  }
+
+  /* Set the Rx Fifo threshold */
+//    SET_BIT(hspi->Instance->CR2, SPI_RXFIFO_THRESHOLD);
+  SET_BIT(hspi->Instance->CR2, SPI_RXFIFO_THRESHOLD);
+
+  /* Transmit and Receive data in 8 Bit mode */
+//  else
+//  {
+//    while ((hspi->RxXferCount > 0U))
+//    {
+      /* Send 8-bit data */
+      *(__IO uint8_t *)&hspi->Instance->DR = SD_DUMMY_BYTE;
+//      pTxData+=2;
+      while(!__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_RXNE)) { }
+      /* Wait until RXNE flag is reset */
+      (*(uint8_t *)pRxData) = *(__IO uint8_t *)&hspi->Instance->DR;
+//      pRxData+=2U;
+//	  hspi->RxXferCount-=2U;
+//    }
+//  }
+//  SET_BIT(hspi->Instance->CR2, SPI_RXFIFO_THRESHOLD);
+//  if(hspi->RxXferCount == 1U) {
+//      *(__IO uint8_t *)&hspi->Instance->DR = (*pTxData/*++*/);
+//      while(!__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_RXNE)) { }
+//      (*(uint8_t *)pData) = *(__IO uint8_t *)&hspi->Instance->DR;
+////      (*(uint8_t *)pData++) = *(__IO uint8_t *)&hspi->Instance->DR;
+////	  hspi->RxXferCount-=1;
+//  }
+  /* Check the end of the transaction */
+  SPI_EndRxTxTransaction(hspi, Timeout, HAL_GetTick());
+//  if (SPI_EndRxTxTransaction(hspi, Timeout, tickstart) != HAL_OK)
+//  {
+//    hspi->ErrorCode = HAL_SPI_ERROR_FLAG;
+//  }
+
+//  if (hspi->ErrorCode != HAL_SPI_ERROR_NONE)
+//  {
+//    errorcode = HAL_ERROR;
+//  }
+
+error :
+//  hspi->State = HAL_SPI_STATE_READY;
+//  __HAL_UNLOCK(hspi);
+  return errorcode;
+}
+
 HAL_StatusTypeDef HAL_SPI_Transmit_IT(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size);
 HAL_StatusTypeDef HAL_SPI_Receive_IT(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size);
 HAL_StatusTypeDef HAL_SPI_TransmitReceive_IT(SPI_HandleTypeDef *hspi, uint8_t *pTxData, uint8_t *pRxData,

@@ -185,6 +185,7 @@ typedef struct
   */
 #define SD_PRESENT               ((uint8_t)0x01)
 #define SD_NOT_PRESENT           ((uint8_t)0x00)
+#define SD_DUMMY_BYTE            0xFF
    
 /**
   * @}
@@ -221,9 +222,23 @@ extern const uint32_t SpixTimeout; /*<! Value of Timeout when SPI communication 
 
 static __INLINE void SD_IO_WriteDummy(){
 	extern SPI_HandleTypeDef hnucleo_Spi;
+#ifdef USE_FAST_SPI
 	HAL_SPI_Transmit_Dummy(&hnucleo_Spi,SpixTimeout);
+#else
+	SD_IO_WriteByte(SD_DUMMY_BYTE);
+#endif
 };
 
+static __INLINE uint8_t SD_IO_WriteReadDummy(){
+	extern SPI_HandleTypeDef hnucleo_Spi;
+	uint8_t byte;
+#ifdef USE_FAST_SPI
+	HAL_SPI_TransmitReceive_Dummy(&hnucleo_Spi,&byte,SpixTimeout);
+#else
+	byte = SD_IO_WriteReadByte(SD_DUMMY_BYTE);
+#endif
+	return byte;
+}
 
 /**
   * @}
