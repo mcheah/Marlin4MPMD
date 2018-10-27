@@ -4182,6 +4182,11 @@ inline void gcode_M17() {
    * M23: Open a file
    */
   inline void gcode_M23() {
+	const char *ext  = strrchr(current_command_args,'.')+1;
+	if(strncmp(ext,"bgc",3)==0 || strncmp(ext,"BGC",3)==0)
+		p_card->isBinaryMode = true;
+	else
+		p_card->isBinaryMode = false;
     p_card->openFile(current_command_args, true);
   }
 
@@ -4189,7 +4194,11 @@ inline void gcode_M17() {
    * M24: Start SD Print
    */
   inline void gcode_M24() {
-
+	const char *ext  = strrchr(p_card->filename,'.')+1;
+	if(strncmp(ext,"bgc",3)==0 || strncmp(ext,"BGC",3)==0)
+		p_card->isBinaryMode = true;
+	else
+		p_card->isBinaryMode = false;
 #if ENABLED(MALYAN_LCD)
 	lcd_setstatuspgm(PSTR(MSG_RESUME));
     p_card->startFileprint();
@@ -4334,11 +4343,13 @@ inline void gcode_M31() {
 		M34_M29,
 		M34_RX
     };
-	#define M34_TIMEOUT 10000
+	#define M34_TIMEOUT 1000
     inline void gcode_M34() {
       unsigned char SDbuff[512];
       uint8_t M34_state = M34_IDLE;
       p_card->openFile(current_command_args, false);
+      if(!p_card->saving)
+    	  return;
       //Send OK to ensure we are ready
       SERIAL_PROTOCOLPGM(MSG_OK);
       SERIAL_EOL;

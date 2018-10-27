@@ -203,7 +203,8 @@ void CardReader::lsDive(const char *prepend, DIR *parent, const char * const mat
       if(!filenameIsDir)
       {
         char *ptr = strchr(entry.fname, '.');
-        if ((ptr==NULL) || (ptr-entry.fname >= 12) || (*(ptr+1)!='G'))
+//        if ((ptr==NULL) || (ptr-entry.fname >= 12) || (*(ptr+1)!='G'))
+        if(ptr==NULL)
         {
           continue;
         }
