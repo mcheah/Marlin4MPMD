@@ -565,11 +565,11 @@
 // X and Y axis travel speed (mm/m) between probes
 #define XY_PROBE_SPEED (30*60)
 // Speed for the first approach when double-probing (with PROBE_DOUBLE_TOUCH)
-#define Z_PROBE_SPEED_FAST HOMING_FEEDRATE_Z
+#define Z_PROBE_SPEED_FAST HOMING_FEEDRATE_Z/2
 // Speed for the "accurate" probe of each point
 #define Z_PROBE_SPEED_SLOW (Z_PROBE_SPEED_FAST / 2)
 // Use double touch for probing
-#define PROBE_DOUBLE_TOUCH
+//#define PROBE_DOUBLE_TOUCH
 
 //
 // Allen Key Probe is defined in the Delta example configurations.
@@ -845,7 +845,7 @@
 #ifndef DELTA
 #define HOMING_FEEDRATE_XY (50*60)
 #endif
-  #define HOMING_FEEDRATE_Z  (50*60)
+#define HOMING_FEEDRATE_Z  (50*60)
 
 //
 // MOVEMENT SETTINGS
@@ -855,7 +855,13 @@
 // default settings
 //TODO: adjust these settings
 #define MOTOR_STEPS_PER_REVOLUTION	  200.0//(360/1.8)
+#if ENABLED(STEPPERS_32X)
+#define MOTOR_MICROSTEPS_COUNT		  32.0
+#elif ENABLED(STEPPERS_16X)
+#define MOTOR_MICROSTEPS_COUNT		  16.0
+#else
 #define MOTOR_MICROSTEPS_COUNT		  8.0
+#endif
 #define MOTOR_PULLEY_TEETH_COUNT	  14.0
 #define MOTOR_BELT_PITCH_MM			  2.0
 #define MOTOR_DEFAULT_STEPS_PER_UNIT  (MOTOR_STEPS_PER_REVOLUTION * MOTOR_MICROSTEPS_COUNT / MOTOR_PULLEY_TEETH_COUNT / MOTOR_BELT_PITCH_MM)

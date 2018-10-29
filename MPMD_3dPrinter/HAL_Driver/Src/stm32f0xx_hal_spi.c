@@ -859,7 +859,7 @@ HAL_StatusTypeDef HAL_SPI_Transmit_Byte(SPI_HandleTypeDef *hspi, uint8_t Data, u
 //    while ((hspi->TxXferCount > 0U))
 //    {
       /* Send 8-bit data */
-      *(__IO uint16_t *)&hspi->Instance->DR = Data;
+      *(__IO uint8_t *)&hspi->Instance->DR = Data;
 //      pData+=2;
 //      while(!__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE)) { }
       /* Wait until RXNE flag is reset */

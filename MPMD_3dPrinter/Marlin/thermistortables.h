@@ -1677,9 +1677,9 @@ const short temptable_1047[][2] PROGMEM = {
   #ifndef DUMMY_THERMISTOR_999_VALUE
     #define DUMMY_THERMISTOR_999_VALUE 25
   #endif
-  const short temptable_999[][2] PROGMEM = {
+  const int temptable_999[][2] PROGMEM = {
     {    1 * OVERSAMPLENR, DUMMY_THERMISTOR_999_VALUE },
-    { 1023 * OVERSAMPLENR, DUMMY_THERMISTOR_999_VALUE }
+    { 4095 * OVERSAMPLENR, DUMMY_THERMISTOR_999_VALUE }
 };
 #endif
 
@@ -1688,9 +1688,9 @@ const short temptable_1047[][2] PROGMEM = {
   #ifndef DUMMY_THERMISTOR_998_VALUE
     #define DUMMY_THERMISTOR_998_VALUE 25
   #endif
-  const short temptable_998[][2] PROGMEM = {
+  const int temptable_998[][2] PROGMEM = {
     {    1 * OVERSAMPLENR, DUMMY_THERMISTOR_998_VALUE },
-    { 1023 * OVERSAMPLENR, DUMMY_THERMISTOR_998_VALUE }
+    { 4095 * OVERSAMPLENR, DUMMY_THERMISTOR_998_VALUE }
 };
 #endif
 

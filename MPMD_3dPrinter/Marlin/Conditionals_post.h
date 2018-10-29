@@ -29,6 +29,7 @@
 #define CONDITIONALS_POST_H
 #define min(a,b) (((a)<(b))?(a):(b))
 #define max(a,b) (((a)>(b))?(a):(b))
+#define max3(a,b,c) (max(max(a,b),max(b,c)))
   #if ENABLED(EMERGENCY_PARSER)
     #define EMERGENCY_PARSER_CAPABILITIES " EMERGENCY_CODES:M108,M112,M410"
   #else
@@ -614,10 +615,10 @@
         #define XY_PROBE_SPEED 4000
       #endif
     #endif
-    #if Z_RAISE_BETWEEN_PROBINGS > Z_RAISE_PROBE_DEPLOY_STOW
-      #define _Z_RAISE_PROBE_DEPLOY_STOW Z_RAISE_BETWEEN_PROBINGS
+    #if Z_RAISE_BETWEEN_PROBINGS >= Z_RAISE_PROBE_DEPLOY_STOW
+      #define _Z_RAISE_PROBE_DEPLOY_STOW probing_z_raise
     #else
-      #define _Z_RAISE_PROBE_DEPLOY_STOW Z_RAISE_PROBE_DEPLOY_STOW
+      #define _Z_RAISE_PROBE_DEPLOY_STOW Z_RAISE_BETWEEN_PROBINGS
     #endif
   #else
     #undef X_PROBE_OFFSET_FROM_EXTRUDER

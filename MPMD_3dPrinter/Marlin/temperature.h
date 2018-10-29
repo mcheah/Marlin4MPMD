@@ -31,7 +31,7 @@
 #include "planner.h"
 #include "thermistortables.h"
 
-#if ENABLED(PID_EXTRUSION_SCALING)
+#if ENABLED(PID_EXTRUSION_SCALING) || ENABLED(BABYSTEPPING)
   #include "stepper.h"
 #endif
 

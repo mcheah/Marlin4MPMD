@@ -39,7 +39,9 @@
 #ifdef STM32_MPMD
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f0xx_mpmd.h"
-
+#ifndef USE_FAST_SPI
+#include "string.h"
+#endif
 
 /** @defgroup BSP BSP
   * @{
@@ -411,7 +413,7 @@ static void SPIx_Init(void)
 		  - For STM32F446ZE/STM32F429ZI devices: 11,25 MHz maximum (PCLK2/SPI_BAUDRATEPRESCALER_8 = 90 MHz/8 = 11,25 MHz)
    */
 #ifdef USE_FAST_SPI
-    hnucleo_Spi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
+    hnucleo_Spi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
 #else
     hnucleo_Spi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
 #endif
@@ -429,6 +431,7 @@ static void SPIx_Init(void)
    SPIx_MspInit(&hnucleo_Spi);
 #ifndef SOFTWARE_SPI
    HAL_SPI_Init(&hnucleo_Spi);
+   __HAL_SPI_ENABLE(&hnucleo_Spi);
 #endif
  }
 }
@@ -575,6 +578,7 @@ static void SPIx_ReadData(uint8_t *DataOut, uint16_t DataLength) {
 #ifdef USE_FAST_SPI
 	status = HAL_SPI_Receive_Fast2(&hnucleo_Spi,DataOut,DataLength,SpixTimeout);
 #else
+	memset(DataOut,SD_DUMMY_BYTE,DataLength);
 	status = HAL_SPI_Receive(&hnucleo_Spi,DataOut,DataLength,SpixTimeout);
 	if(status != HAL_OK)
 	{

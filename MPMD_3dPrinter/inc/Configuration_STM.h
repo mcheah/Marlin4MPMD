@@ -36,6 +36,7 @@
 //#define MALYAN_LCD
 //#define E1_ADC_PA2
 //#define STEPPERS_16X
+//#define STEPPERS_32X
 //#define MINIMAL_BUILD
 //#define UZLIB
 #define USE_FAST_SPI
