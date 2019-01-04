@@ -38,6 +38,7 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
+#ifdef USE_USB_CDC
 #include "stm32f0xx_3dprinter_cdc.h"
 #include "stm32f0xx_3dprinter_misc.h"
 // #include "stm32f0xx_3dprinter_wifi.h"
@@ -48,7 +49,11 @@
 #include "usbd_desc.h"
 #include "usbd_cdc.h"
 #include "usbd_cdc_interface.h"
+#ifdef STM32_MPMD
 #include "stm32f0xx_mpmd.h"
+#elif defined(STM32_LERDGEX)
+#include "stm32f4xx_LerdgeX.h"
+#endif
 /* Private defines -----------------------------------------------------------*/
 /* Private constant ----------------------------------------------------------*/
 
@@ -360,5 +365,6 @@ void BSP_CdcLockingTx(uint8_t *pBuf, uint8_t nbData)
 	CDC_Itf_QueueTxBytes(pBuf,nbData);
 	BSP_CdcIfSendQueuedData();
 }
+#endif
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 

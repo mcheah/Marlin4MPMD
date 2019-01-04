@@ -151,8 +151,10 @@ class MarlinSerial { //: public Stream
     FORCE_INLINE int available(void) {
     	if(type==UART)
     		return (BSP_UartGetNbRxAvailableBytes());
+#ifdef STM32_USE_USB_CDC
     	else if(type==USB_CDC)
     		return (BSP_CdcGetNbRxAvailableBytes(true));
+#endif
     	else
     		return 0;
     }
@@ -161,8 +163,10 @@ class MarlinSerial { //: public Stream
     FORCE_INLINE void write(uint8_t c) {
     if(type==UART)
     	BSP_UartIfQueueTxData(&c, 1);
+#ifdef STM32_USE_USB_CDC
 	else if(type==USB_CDC)
 		BSP_CdcIfQueueTxData(&c, 1);
+#endif
     }
 
 #if !defined(NO_WIFI)
@@ -190,8 +194,10 @@ class MarlinSerial { //: public Stream
     FORCE_INLINE void printn(uint8_t *str, uint8_t nbData) {
     	if(type==UART)
     		BSP_UartIfQueueTxData(str, nbData);
+#ifdef STM32_USE_USB_CDC
     	else if(type==USB_CDC)
     		BSP_CdcIfQueueTxData(str, nbData);
+#endif
     }
 
 

@@ -1,6 +1,6 @@
 /** 
   ******************************************************************************
-  * @file    mpmd_3dPrinter_uart.h
+  * @file    lerdgex_3dPrinter_uart.h
   * @author  IPC Rennes
   * @version V1.0.0
   * @date    January 29, 2015
@@ -37,15 +37,15 @@
   */ 
   
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MPMD_3DPRINTER_MISC_H
-#define __MPMD_3DPRINTER_MISC_H
+#ifndef __LERDGEX_3DPRINTER_MISC_H
+#define __LERDGEX_3DPRINTER_MISC_H
 
 #ifdef __cplusplus
  extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f0xx_hal.h"
+#include "stm32f4xx_hal.h"
    
 /* Exported macros ------------------------------------------------------------*/
 
@@ -56,28 +56,28 @@
 
 /* Definition for Stops */
  //TODO: remove unused optical stops
-#define BSP_STOP_X_PIN               (GPIO_PIN_13)
-#define BSP_STOP_X_PORT              (GPIOC)
-#define STOP_X__PULL_UP
-#define BSP_STOP_Y_PIN               (GPIO_PIN_14)
-#define BSP_STOP_Y_PORT              (GPIOC)
-#define STOP_Y__PULL_UP
-#define BSP_STOP_Z_PIN               (GPIO_PIN_15)
-#define BSP_STOP_Z_PORT              (GPIOC)
-#define STOP_Z__PULL_UP
+#define BSP_STOP_X_PIN               (GPIO_PIN_12)
+#define BSP_STOP_X_PORT              (GPIOB)
+#define STOP_X__PULL_DOWN
+#define BSP_STOP_Y_PIN               (GPIO_PIN_13)
+#define BSP_STOP_Y_PORT              (GPIOB)
+#define STOP_Y__PULL_DOWN
+#define BSP_STOP_Z_PIN               (GPIO_PIN_14)
+#define BSP_STOP_Z_PORT              (GPIOB)
+#define STOP_Z__PULL_DOWN
 //#define BSP_STOP_U_PIN               (GPIO_PIN_13)
 //#define BSP_STOP_U_PORT              (GPIOC)
 //#define BSP_STOP_V_PIN               (GPIO_PIN_13)
 //#define BSP_STOP_V_PORT              (GPIOC)
-#define BSP_STOP_W_PIN               (GPIO_PIN_7)
+#define BSP_STOP_W_PIN               (GPIO_PIN_15)
 #define BSP_STOP_W_PORT              (GPIOB)
-#define STOP_W__PULL_UP
-#define BSP_STOP_W_IRQN				 (EXTI4_15_IRQn)
-#define BSP_STOP_W_IRQHandler        (EXTI4_15_IRQHandler)
+#define STOP_W__PULL_DOWN
+#define BSP_STOP_W_IRQN				 (EXTI4_IRQn)
+#define BSP_STOP_W_IRQHandler        (EXTI4_IRQHandler)
 
 /* Definition for Heats*/
  //TODO: removed unused heaters
-#define BSP_HEAT_BED1_PIN              (GPIO_PIN_5)
+#define BSP_HEAT_BED1_PIN              (GPIO_PIN_2)
 #define BSP_HEAT_BED1_PORT             (GPIOA)
 //#define BSP_HEAT_BED2_PIN             (GPIO_PIN_5)
 //#define BSP_HEAT_BED2_PORT            (GPIOA)
@@ -94,8 +94,8 @@
 //TODO: remove unused fans
 #define BSP_FAN_PWM_FREQ			(75) //Desired PWM frequency in hertz
 
-#define BSP_FAN_E1_PIN              (GPIO_PIN_8)
-#define BSP_FAN_E1_PORT             (GPIOA)
+#define BSP_FAN_E1_PIN              (GPIO_PIN_15)
+#define BSP_FAN_E1_PORT             (GPIOC)
 //#define BSP_FAN_E2_PIN              (GPIO_PIN_8)
 //#define BSP_FAN_E2_PORT             (GPIOA)
 //#define BSP_FAN_E3_PIN              (GPIO_PIN_8)
@@ -121,37 +121,35 @@
 
 /// TICK global interrupt
 #define BSP_MISC_TICK_IRQn                    (TIM3_IRQn)
-#define BSP_MISC_TICK_IRQHandler			  (TIM3_IRQHandler)
    
 /* Definition for Tick2 timer  (Marlin Only)*/
 /// Timer used for Tick2
-#define BSP_MISC_TIMER_TICK2                  (TIM14)
+#define BSP_MISC_TIMER_TICK2                  (TIM2)
 /// Channel Timer used for Tick
 #define BSP_MISC_CHAN_TIMER_TICK2              (TIM_CHANNEL_1)
 /// HAL Active Channel Timer used for Tick
 #define BSP_MISC_HAL_ACT_CHAN_TIMER_TICK2      (HAL_TIM_ACTIVE_CHANNEL_1)
 /// Timer Clock Enable for Tick
-#define __BSP_MISC_TIMER_TICK2_CLCK_ENABLE()   __TIM14_CLK_ENABLE()
+#define __BSP_MISC_TIMER_TICK2_CLCK_ENABLE()   __TIM2_CLK_ENABLE()
 /// Timer Clock Disable for Tick
-#define __BSP_MISC_TIMER_TICK2_CLCK_DISABLE()  __TIM14_CLK_DISABLE()
+#define __BSP_MISC_TIMER_TICK2_CLCK_DISABLE()  __TIM2_CLK_DISABLE()
 
 /// TICK global interrupt
-#define BSP_MISC_TICK2_IRQn                    (TIM14_IRQn)
-#define BSP_MISC_TICK2_IRQHandler			   (TIM14_IRQHandler)
+#define BSP_MISC_TICK2_IRQn                    (TIM2_IRQn)
 
 //TODO: update these timers since only FAN PWM is connector to a timer channel
  /// Timer used for PWM_HEAT_BED
-#define BSP_MISC_TIMER_PWM_HEAT_BED                  (TIM1)
+#define BSP_MISC_TIMER_PWM_HEAT_BED                  (TIM4)
 /// Channel Timer used for PWM_HEAT_BED
 #define BSP_MISC_CHAN_TIMER_PWM_HEAT_BED                  (TIM_CHANNEL_1)
 /// HAL Active Channel Timer used for PWM_HEAT_BED
 #define BSP_MISC_HAL_ACT_CHAN_TIMER_PWM_HEAT_BED     (HAL_TIM_ACTIVE_CHANNEL_1)
 /// Timer Clock Enable for PWM_HEAT_BED
-#define __BSP_MISC_TIMER_PWM_HEAT_BED_CLCK_ENABLE()  __TIM1_CLK_ENABLE()
+#define __BSP_MISC_TIMER_PWM_HEAT_BED_CLCK_ENABLE()  __TIM4_CLK_ENABLE()
 /// Timer Clock Disable for PWM_HEAT_BED
-#define __BSP_MISC_TIMER_PWM_HEAT_BED_CLCK_DISABLE() __TIM1_CLK_DISABLE()
+#define __BSP_MISC_TIMER_PWM_HEAT_BED_CLCK_DISABLE() __TIM4_CLK_DISABLE()
 /// PWM_HEAT_BED GPIO alternate function 
-#define BSP_MISC_AFx_TIMx_PWM_HEAT_BED               (GPIO_AF2_TIM1)
+//#define BSP_MISC_AFx_TIMx_PWM_HEAT_BED               (GPIO_AF2_TIM1)
 
 ///// Timer used for PWM_HEAT_BED2
 //#define BSP_MISC_TIMER_PWM_HEAT_BED2                  (TIM1)
@@ -180,17 +178,17 @@
 //#define BSP_MISC_AFx_TIMx_PWM_HEAT_BED3               (GPIO_AF2_TIM1)
    
 /// Timer used for PWM_HEAT_E1
-#define BSP_MISC_TIMER_PWM_HEAT_E1                  (TIM15)
+#define BSP_MISC_TIMER_PWM_HEAT_E1                  (TIM5)
 /// Channel Timer used for PWM_HEAT_E1
 #define BSP_MISC_CHAN_TIMER_PWM_HEAT_E1                  (TIM_CHANNEL_1)
 /// HAL Active Channel Timer used for PWM_HEAT_E1
 #define BSP_MISC_HAL_ACT_CHAN_TIMER_PWM_HEAT_E1     (HAL_TIM_ACTIVE_CHANNEL_1)
 /// Timer Clock Enable for PWM_HEAT_E1
-#define __BSP_MISC_TIMER_PWM_HEAT_E1_CLCK_ENABLE()  __TIM15_CLK_ENABLE()
+#define __BSP_MISC_TIMER_PWM_HEAT_E1_CLCK_ENABLE()  __TIM5_CLK_ENABLE()
 /// Timer Clock Disable for PWM_HEAT_E1
-#define __BSP_MISC_TIMER_PWM_HEAT_E1_CLCK_DISABLE() __TIM15_CLK_DISABLE()
+#define __BSP_MISC_TIMER_PWM_HEAT_E1_CLCK_DISABLE() __TIM5_CLK_DISABLE()
 /// PWM_HEAT_E1 GPIO alternate function 
-#define BSP_MISC_AFx_TIMx_PWM_HEAT_E1               (GPIO_AF3_TIM15)
+//#define BSP_MISC_AFx_TIMx_PWM_HEAT_E1               (GPIO_AF3_TIM15)
    
 ///// Timer used for PWM_HEAT_E2
 //#define BSP_MISC_TIMER_PWM_HEAT_E2                  (TIM15)
@@ -343,7 +341,7 @@ void BSP_MiscUserGpioInit(uint8_t id, uint32_t mode, uint32_t pull);
 }
 #endif
 
-#endif /* __MPMD_3DPRINTER_MISC_H */
+#endif /* __LERDGEX_3DPRINTER_MISC_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 

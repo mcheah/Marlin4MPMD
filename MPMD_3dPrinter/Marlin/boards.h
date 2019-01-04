@@ -94,6 +94,7 @@
 #define BOARD_BQ_ZUM_MEGA_3D    503  // bq ZUM Mega 3D
 #define BOARD_STM_3DPRINT       200  //STMicro 3D printer board
 #define BOARD_STM_MPMD          200  //STMicro 3D printer board
+#define BOARD_STM_LERDGEX		201  //Lerdge X board
 
 #define BOARD_99                99   // This is in pins.h but...?
 

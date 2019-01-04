@@ -69,6 +69,7 @@ void BSP_AdcHwInit(void)
   BspAdcDataType *pAdc = &gBspAdcData;
   
   ADC_ChannelConfTypeDef sConfig;
+#ifdef STM32_MPMD
   pAdc->acquisitionDone = RESET;
     /**Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion) 
     */
@@ -94,13 +95,40 @@ void BSP_AdcHwInit(void)
   pAdc->adcHandle.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
 //  pAdc->adcHandle.Init.Overrun = ADC_OVR_DATA_PRESERVED;
 //  pAdc->adcHandle.Init.SamplingTimeCommon =
-  
+#elif defined(STM32_LERDGEX)
+  pAdc->acquisitionDone = RESET;
+    /**Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion) 
+    */
+  pAdc->adcHandle.Instance = BSP_ADC;
+  pAdc->adcHandle.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV8;
+  pAdc->adcHandle.Init.Resolution = ADC_RESOLUTION_12B;
+  pAdc->adcHandle.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  pAdc->adcHandle.Init.ScanConvMode = ENABLE;
+  pAdc->adcHandle.Init.EOCSelection = 0X0000;
+  //TODO: check these lowpower registers to see if this is valid
+//  pAdc->adcHandle.Init.LowPowerAutoWait = DISABLE;
+//  pAdc->adcHandle.Init.LowPowerAutoPowerOff = DISABLE;
+  pAdc->adcHandle.Init.ContinuousConvMode = ENABLE;
+  //TODO: there's no NbrOfConversion register so we will have to loop manually
+  pAdc->adcHandle.Init.NbrOfConversion = BSP_ADC_CONVERTED_VALUES_BUFFER_SIZE;
+  pAdc->adcHandle.Init.DiscontinuousConvMode = DISABLE;
+  pAdc->adcHandle.Init.NbrOfDiscConversion = 1;
+  //TODO: check eternalTrigConv value
+  pAdc->adcHandle.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  pAdc->adcHandle.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+  pAdc->adcHandle.Init.DMAContinuousRequests = ENABLE;
+  //TODO: verify this
+//  pAdc->adcHandle.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
+//  pAdc->adcHandle.Init.Overrun = ADC_OVR_DATA_PRESERVED;
+//  pAdc->adcHandle.Init.SamplingTimeCommon =
+#endif
   if (HAL_ADC_Init(&pAdc->adcHandle) != HAL_OK)
   {
     /* ADC initialization error */
     ADC_ERROR(1);
   }
 
+  #ifdef STM32_MPMD
   /* Configure ADC for bed thermistor */
   sConfig.Channel = BSP_ADC_CHANNEL_THERM_BED1;
   sConfig.Rank = BSP_ADC_RANK_THERM_BED1;
@@ -120,6 +148,27 @@ void BSP_AdcHwInit(void)
     /* Channel configuration error */
     ADC_ERROR(3);
   }
+  #elif defined(STM32_LERDGEX)
+  /* Configure ADC for bed thermistor */
+  sConfig.Channel = BSP_ADC_CHANNEL_THERM_BED1;
+  sConfig.Rank = BSP_ADC_RANK_THERM_BED1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_480CYCLES;
+  if (HAL_ADC_ConfigChannel(&pAdc->adcHandle, &sConfig) != HAL_OK)
+  {
+    /* Channel configuration error */
+    ADC_ERROR(2);
+  }
+
+  /* Configure ADC for E1 thermistor */
+  sConfig.Channel = BSP_ADC_CHANNEL_THERM_E1;
+  sConfig.Rank = BSP_ADC_RANK_THERM_E1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_480CYCLES;
+  if (HAL_ADC_ConfigChannel(&pAdc->adcHandle, &sConfig) != HAL_OK)
+  {
+    /* Channel configuration error */
+    ADC_ERROR(3);
+  }
+  #endif
 #ifdef BSP_THERM_E2_PIN
   /* Configure ADC for E2 thermistor */
   sConfig.Channel = BSP_ADC_CHANNEL_THERM_E2;
@@ -162,8 +211,9 @@ void BSP_AdcHwInit(void)
     ADC_ERROR(7);
   }  
 #endif
+#ifdef STM32_MPMD
   HAL_ADCEx_Calibration_Start(&pAdc->adcHandle);
-
+#endif
   /* Start conversion */
   if (HAL_ADC_Start_DMA(&pAdc->adcHandle,
                         (uint32_t *)aBspAdcConvertedValues, 

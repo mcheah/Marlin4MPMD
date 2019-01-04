@@ -38,10 +38,13 @@ _estack = 0x20010000;    /* end of RAM */
 _Min_Heap_Size = 0x200;;      /* required amount of heap  */
 _Min_Stack_Size = 0x400;; /* required amount of stack */
 
+_StartRom = DEFINED(VectorTable) ? 0x8010000 : 0x8000000;
+_RomLen = DEFINED(VectorTable) ? 312K : 376K;
+
 /* Specify the memory areas */
 MEMORY
 {
-FLASH (rx)      : ORIGIN = 0x8010000, LENGTH = 312K
+FLASH (rx)      : ORIGIN = _StartRom, LENGTH = _RomLen
 RAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 128K
 CCMRAM (rw)      : ORIGIN = 0x10000000, LENGTH = 64K
 }

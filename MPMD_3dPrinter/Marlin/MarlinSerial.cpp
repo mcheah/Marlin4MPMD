@@ -120,10 +120,12 @@ void MarlinSerial::begin(long baud) {
 		BSP_UartHwInit(baud);
 		BSP_UartIfStart();
 	}
+#ifdef STM32_USE_USB_CDC
 	else if(type==USB_CDC) {
 		BSP_CdcHwInit(baud);
 		BSP_CdcIfStart();
 	}
+#endif
 }
 
 void MarlinSerial::end() {
@@ -150,8 +152,10 @@ int MarlinSerial::peek(void) {
 int MarlinSerial::read(void) {
 	if(type==UART)
 		return BSP_UartGetNextRxBytes();
+#ifdef USE_USB_CDC
 	else if(type==USB_CDC)
 		return BSP_CdcGetNextRxByte();
+#endif
 	else
 		return -1;
 }

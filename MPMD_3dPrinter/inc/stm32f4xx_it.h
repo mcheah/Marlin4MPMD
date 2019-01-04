@@ -1,15 +1,12 @@
-/** 
+/**
   ******************************************************************************
-  * @file    stm32f0xx_3dPrinter_cdc.h
-  * @author  IPC Rennes
-  * @version V1.0.0
-  * @date    January 29, 2015
-  * @brief   Header for motor functions of 3D Printer BSP driver 
-  *  (based on L6474)
+  * @file    stm32f0xx_it.h 
+  * @author  MCD Application Team
+  * @brief   This file contains the headers of the interrupt handlers.
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2014 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT(c) 2016 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -33,30 +30,60 @@
   * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   *
-  ******************************************************************************  
-  */ 
-  
+  ******************************************************************************
+  */
+
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __stm32f0XX_3DPRINTER_CDC_H
-#define __stm32f0XX_3DPRINTER_CDC_H
+#ifndef __STM32F0xx_IT_H
+#define __STM32F0xx_IT_H
 
 #ifdef __cplusplus
  extern "C" {
-#endif
+#endif 
 
-#ifdef STM32_MPMD
-#include "mpmd_3dprinter_cdc.h"
-#elif defined(STM32_LERDGEX)
-#include "lerdgex_3dprinter_cdc.h"
-#elif defined(NUCLEO_F070RB)
-#error "No USB port on Nucleo board, USB CDC is not valid"
-// #include "nucleo-f070rb_3dPrinter_cdc.h"
-#endif
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
+/* Exported types ------------------------------------------------------------*/
+/* Exported constants --------------------------------------------------------*/
+/* Exported macro ------------------------------------------------------------*/
+/* Exported functions ------------------------------------------------------- */
+
+//void NMI_Handler(void);
+//void HardFault_Handler(void);
+//void SVC_Handler(void);
+//void PendSV_Handler(void);
+void SysTick_Handler(void);
+
+void BSP_STOP_W_IRQHandler(void);
+
+//void TIM1_CC_IRQHandler(void);
+//void TIM2_IRQHandler(void);
+void TIM3_IRQHandler(void);
+void TIM4_IRQHandler(void);
+void TIM6_IRQHandler(void);
+//void TIM1_BRK_UP_TRG_COM_IRQHandler(void);
+//void TIM1_UP_TIM10_IRQHandler(void);
+//void TIM1_UP_TIM10_IRQHandler(void);
+void TIM14_IRQHandler(void);
+void BSP_UART_DEBUG_IRQHandler(void);
+void BSP_UART_LCD_IRQHandler(void);
+//void BSP_WIFI_UART_IRQHandler(void);
+void BSP_DMA_IRQHandler(void);
+void BSP_ADC_IRQHandler(void);
+//void DMA1_CH1_IRQHandler(void);
+//void DMA1_CH2_3_IRQHandler(void);
+//void SDIO_IRQHandler(void);
+//void BSP_WIFI_UART_DMA_TX_IRQHandler(void);
+//void BSP_WIFI_UART_DMA_RX_IRQHandler(void);
+void USB_IRQHandler(void);
+void USARTx_IRQHandler(void);
+void USARTx_DMA_TX_RX_IRQHandler(void);
+void TIMx_IRQHandler(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __stm32f0XX_3DPRINTER_CDC_H */
+#endif /* __STM32F0xx_IT_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

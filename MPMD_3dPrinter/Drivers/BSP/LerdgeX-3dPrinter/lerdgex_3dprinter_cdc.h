@@ -1,6 +1,6 @@
 /** 
   ******************************************************************************
-  * @file    stm32f0xx_3dPrinter_cdc.h
+  * @file    lerdgex_3dPrinter_cdc.h
   * @author  IPC Rennes
   * @version V1.0.0
   * @date    January 29, 2015
@@ -37,26 +37,48 @@
   */ 
   
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __stm32f0XX_3DPRINTER_CDC_H
-#define __stm32f0XX_3DPRINTER_CDC_H
+#ifndef __LERDGEX_3DPRINTER_CDC_H
+#define __LERDGEX_3DPRINTER_CDC_H
 
 #ifdef __cplusplus
  extern "C" {
 #endif
 
-#ifdef STM32_MPMD
-#include "mpmd_3dprinter_cdc.h"
-#elif defined(STM32_LERDGEX)
-#include "lerdgex_3dprinter_cdc.h"
-#elif defined(NUCLEO_F070RB)
-#error "No USB port on Nucleo board, USB CDC is not valid"
-// #include "nucleo-f070rb_3dPrinter_cdc.h"
+   /* Includes ------------------------------------------------------------------*/
+#include "stm32f4xx_hal.h"
+#include "Configuration_STM.h"
+/* Exported macros ------------------------------------------------------------*/
+//TODO: we should probably adjust these to a smaller size
+#ifdef STM32_USE_USB_CDC
+#define CDC_TX_BUFFER_SIZE (128)
+#define CDC_RX_BUFFER_SIZE (512*4)
+//#define CDC_RX_BUFFER_SIZE (96*32)
+#else
+#define CDC_TX_BUFFER_SIZE (1)
+#define CDC_RX_BUFFER_SIZE (1)
 #endif
 
+/* Exported types --- --------------------------------------------------------*/
+
+/* Exported variables  --------------------------------------------------------*/
+
+/* Exported functions --------------------------------------------------------*/
+void BSP_CdcHwInit(uint32_t newBaudRate);
+void BSP_CdcHwDeInit(void);
+void BSP_CdcIfStart(void);
+void BSP_CdcIfStop(void);
+void BSP_CdcIfQueueTxData(uint8_t *pBuf, uint8_t nbData);
+void BSP_CdcIfSendQueuedData();
+uint32_t BSP_CdcPrintf(const char* format,...);
+uint32_t BSP_CdcGetNbRxAvailableBytes(uint8_t waitForNewLine);
+int8_t BSP_CdcGetNextRxByte(void);
+uint32_t BSP_CdcCopyNextRxBytes(uint8_t *buff, uint32_t maxlen);
+uint8_t BSP_CdcIsTxOnGoing(void);
+void BSP_CdcLockingTx(uint8_t *pBuf, uint8_t nbData);
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __stm32f0XX_3DPRINTER_CDC_H */
+#endif /* __LERDGEX_3DPRINTER_CDC_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

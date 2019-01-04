@@ -122,12 +122,20 @@
 // The following define selects which electronics board you have.
 // Please choose the name from boards.h that matches your setup
 #ifndef MOTHERBOARD
+#ifdef STM32_MPMD
   #define MOTHERBOARD BOARD_STM_MPMD
-#endif
+#elif defined(STM32_LERDGEX)
+  #define MOTHERBOARD BOARD_STM_LERDGEX
+#endif //ifdef STM32_MPMD
+#endif //ifndef MOTHERBOARD
 
 // Optional custom name for your RepStrap or other custom machine
 // Displayed in the LCD "Ready" message
+#ifdef STM32_MPMD
 #define CUSTOM_MACHINE_NAME "MPMD"
+#elif defined(STM32_LERDGEX)
+#define CUSTOM_MACHINE_NAME "LERDGEX"
+#endif
 
 
 // Define this to set a unique identifier for this printer, (Used by some programs to differentiate between machines)
@@ -854,8 +862,10 @@
 
 // default settings
 //TODO: adjust these settings
-#define MOTOR_STEPS_PER_REVOLUTION	  200.0//(360/1.8)
-#if ENABLED(STEPPERS_32X)
+#define MOTOR_STEPS_PER_REVOLUTION	  400.0//(360/1.8)
+#if ENABLED(STEPPERS_128X)
+#define MOTOR_MICROSTEPS_COUNT		  128.0
+#elif ENABLED(STEPPERS_32X)
 #define MOTOR_MICROSTEPS_COUNT		  32.0
 #elif ENABLED(STEPPERS_16X)
 #define MOTOR_MICROSTEPS_COUNT		  16.0
@@ -1104,7 +1114,7 @@
 // you must uncomment the following option or it won't work.
 //
 #if DISABLED(MINIMAL_BUILD)
-#define SDSUPPORT
+//#define SDSUPPORT
 #endif
 #if ENABLED(SDSUPPORT)
   #define SD_SETTINGS

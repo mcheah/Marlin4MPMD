@@ -1,15 +1,14 @@
 /** 
   ******************************************************************************
-  * @file    stm32f0xx_3dPrinter_cdc.h
+  * @file    lerdgex_3dPrinter_rpi.h
   * @author  IPC Rennes
   * @version V1.0.0
-  * @date    January 29, 2015
-  * @brief   Header for motor functions of 3D Printer BSP driver 
-  *  (based on L6474)
+  * @date    April 13, 2016
+  * @brief   Header for Raspberry Pi Mngt functions of 3D Printer BSP driver
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2014 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT(c) 2016 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -37,26 +36,41 @@
   */ 
   
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __stm32f0XX_3DPRINTER_CDC_H
-#define __stm32f0XX_3DPRINTER_CDC_H
+#ifndef __LERDGEX_3DPRINTER_RPI_H
+#define __LERDGEX_3DPRINTER_RPI_H
 
 #ifdef __cplusplus
  extern "C" {
 #endif
 
-#ifdef STM32_MPMD
-#include "mpmd_3dprinter_cdc.h"
-#elif defined(STM32_LERDGEX)
-#include "lerdgex_3dprinter_cdc.h"
-#elif defined(NUCLEO_F070RB)
-#error "No USB port on Nucleo board, USB CDC is not valid"
-// #include "nucleo-f070rb_3dPrinter_cdc.h"
-#endif
+   /* Includes ---------------------------------------------------------------*/
+#include "stm32f4xx_hal.h"
+   
+/* Exported macros -----------------------------------------------------------*/
+
+/* Definition for RPi resources *********************************************/
+//TODO: remove RPI stuff since there's no connection pin available
+/// GPIO Pin used for the Raspberry Pi ready state pin
+#define BSP_RPI_READY_PIN               (GPIO_PIN_0)
+/// GPIO Port used for the Raspberry Pi ready state pin
+#define BSP_RPI_READY_PORT              (GPIOE)
+
+
+   
+/* Exported types --- --------------------------------------------------------*/
+
+/* Exported variables  --------------------------------------------------------*/
+
+/* Exported functions --------------------------------------------------------*/
+void BSP_RPiGpioInit(void);
+void BSP_RPiWaitUntilReady(void);
+
+
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __stm32f0XX_3DPRINTER_CDC_H */
+#endif /* __LERDGEX_3DPRINTER_RPI_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

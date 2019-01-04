@@ -8,8 +8,14 @@
 / Additional user header to be used  
 /-----------------------------------------------------------------------------*/
 /* Replace 'stm32xxx' with the STM32 Serie used, ex: stm32f4xx_hal.h */
+#ifdef STM32_MPMD
 #include "stm32f0xx_hal.h"
 #include "stm32f0xx_mpmd_sd.h"
+#elif defined(STM32_LERDGEX)
+#include "stm32f4xx_hal.h"
+#include "stm32f4xx_lerdgex_sd.h"
+#endif
+
 #ifndef _FS_SD_CARD
 #  ifdef USE_SD_CARD
 #    define _FS_SD_CARD			1

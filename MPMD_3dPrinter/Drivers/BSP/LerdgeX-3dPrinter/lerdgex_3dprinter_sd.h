@@ -1,6 +1,6 @@
 /** 
   ******************************************************************************
-  * @file    stm32f0xx_3dPrinter_sd.h
+  * @file    lerdgex_3dPrinter_sd.h
   * @author  IPC Rennes
   * @version V1.0.0
   * @date    March 02, 2015
@@ -37,19 +37,15 @@
   */ 
 //TODO: revisit this later, we use soft SD card, so this probably can go
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __stm32f0XX_3DPRINTER_SD_H
-#define __stm32f0XX_3DPRINTER_SD_H
+#ifndef __LERDGEX_3DPRINTER_SD_H
+#define __LERDGEX_3DPRINTER_SD_H
 
 #ifdef __cplusplus
  extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#ifdef STM32_MPMD
-#include "stm32f0xx_hal.h"
-#elif defined(STM32_LERDGEX)
 #include "stm32f4xx_hal.h"
-#endif
    
 /* Exported macros ------------------------------------------------------------*/
 
@@ -74,7 +70,7 @@
 #define BSP_SD_DETECT_PRIORITY	(0x07)
    
 /* DMA definitions for SD DMA transfer */
-#define __BSP_BSP_SD_DMAx_TxRx_CLK_ENABLE            __DMA2_CLK_ENABLE
+#define __BSP_BSP_SD_DMAx_TxRx_CLK_ENABLE     __DMA2_CLK_ENABLE
 #define BSP_SD_DMAx_Tx_CHANNEL                DMA_CHANNEL_3
 #define BSP_SD_DMAx_Rx_CHANNEL                DMA_CHANNEL_2
  //TODO: no concept of DMA streams, we can remove
@@ -119,6 +115,6 @@ uint8_t BSP_SD_IsDetected(void);
 }
 #endif
 
-#endif /* __stm32f0XX_3DPRINTER_SD_H */
+#endif /* __LERDGEX_3DPRINTER_SD_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

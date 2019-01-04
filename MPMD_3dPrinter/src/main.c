@@ -11,11 +11,20 @@
 #include "main.h"
 //Private defines
 #ifdef STM32_USE_BOOTLOADER
+#ifdef STM32_MPMD
 #define APPLICATION_ADDRESS     (uint32_t)0x08002000
+#elif defined(STM32_LERDGEX)
+#define APPLICATION_ADDRESS		(uint32_t)0x08010000
+#endif
+
 //#define APPLICATION_ADDRESS		  (uint32_t)0x08000000
+#if defined STM32_USE_BOOTLOADER && defined(STM32_MPMD)
 //Private variables
 __IO uint32_t VectorTable[48] __attribute__((section(".RAMVectorTable")));
-
+#else
+__IO uint32_t VectorTable[48];
+#endif
+#ifdef STM32_MPMD
 static inline void remapVectorTable(void)
 {
 	for(uint8_t i = 0; i < 48; i++)
@@ -34,8 +43,8 @@ static inline void remapVectorTable(void)
 		 IWDG->RLR = 0x0000AAAAU;
 	 __HAL_RCC_APB2_RELEASE_RESET();
 }
-#endif
-
+#endif //STM32_MPMD
+#endif //STM32_USE_BOOTLOADER
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
@@ -46,7 +55,7 @@ static inline void remapVectorTable(void)
 
 int main(void)
 {
-#ifdef STM32_USE_BOOTLOADER
+#if defined(STM32_USE_BOOTLOADER) && defined(STM32_MPMD)
 	remapVectorTable();
 #endif
 

@@ -46,6 +46,8 @@
 
 #ifdef STM32_MPMD
 #include "mpmd_3dprinter_motor.h"
+#elif defined(STM32_LERDGEX)
+#include "lerdgex_3dprinter_motor.h"
 #elif defined(NUCLEO_F070RB)
 #include "nucleo-f070rb_3dprinter_motor.h"
 #endif
