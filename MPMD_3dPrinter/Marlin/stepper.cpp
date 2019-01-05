@@ -378,7 +378,6 @@ void Stepper::StepperHandler()
     }
     else {
       BSP_MiscTickSetFreq(STEPPER_NOMINAL_FREQ); //1kHz
-      // OCR1A = 2000; // 1kHz.  -- BDI : To supp
     }
   }
 

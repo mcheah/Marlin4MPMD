@@ -110,7 +110,7 @@ void BSP_AdcHwInit(void)
 //  pAdc->adcHandle.Init.LowPowerAutoPowerOff = DISABLE;
   pAdc->adcHandle.Init.ContinuousConvMode = ENABLE;
   //TODO: there's no NbrOfConversion register so we will have to loop manually
-  pAdc->adcHandle.Init.NbrOfConversion = BSP_ADC_CONVERTED_VALUES_BUFFER_SIZE;
+  pAdc->adcHandle.Init.NbrOfConversion = BSP_ADC_NUM_CHANNELS;
   pAdc->adcHandle.Init.DiscontinuousConvMode = DISABLE;
   pAdc->adcHandle.Init.NbrOfDiscConversion = 1;
   //TODO: check eternalTrigConv value
@@ -118,9 +118,6 @@ void BSP_AdcHwInit(void)
   pAdc->adcHandle.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
   pAdc->adcHandle.Init.DMAContinuousRequests = ENABLE;
   //TODO: verify this
-//  pAdc->adcHandle.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
-//  pAdc->adcHandle.Init.Overrun = ADC_OVR_DATA_PRESERVED;
-//  pAdc->adcHandle.Init.SamplingTimeCommon =
 #endif
   if (HAL_ADC_Init(&pAdc->adcHandle) != HAL_OK)
   {

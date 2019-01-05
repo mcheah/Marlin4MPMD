@@ -211,7 +211,7 @@
 #define BSP_MOTOR_CONTROL_BOARD_PWM_Z_PORT  (GPIOA)
    
 /// GPIO Pin used for the L6474 step clock pin of device 3
-#define BSP_MOTOR_CONTROL_BOARD_PWM_E1_PIN   (GPIO_PIN_3)
+#define BSP_MOTOR_CONTROL_BOARD_PWM_E1_PIN   (GPIO_PIN_4)
 /// GPIO port used for the L6474 step clock pin of device 3
 #define BSP_MOTOR_CONTROL_BOARD_PWM_E1_PORT  (GPIOA)
 
@@ -241,7 +241,7 @@
 #define BSP_MOTOR_CONTROL_BOARD_DIR_Z_PORT  (GPIOA)
 
 /// GPIO Pin used for the L6474 direction pin of device 3                      *
-#define BSP_MOTOR_CONTROL_BOARD_DIR_E1_PIN   (GPIO_PIN_4)
+#define BSP_MOTOR_CONTROL_BOARD_DIR_E1_PIN   (GPIO_PIN_3)
 /// GPIO port used for the L6474 direction pin of device 3                     *
 #define BSP_MOTOR_CONTROL_BOARD_DIR_E1_PORT  (GPIOA)
    

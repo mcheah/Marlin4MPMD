@@ -174,6 +174,8 @@
 #elif (MB(STM_MPMD))
 //TODO:update this to have a different pins file
   #include "pins_STM_3DPRINT.h"
+#elif (MB(STM_LERDGEX))
+  #include "pins_STM_LERDGEX.h"
 #else
   #error "Unknown MOTHERBOARD value set in Configuration.h"
 #endif

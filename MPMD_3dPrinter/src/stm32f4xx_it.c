@@ -9,7 +9,7 @@
 */
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f0xx_it.h"
+#include "stm32f4xx_it.h"
 //#include "motorcontrol.h"
 #include "stm32f0xx_3dprinter_uart.h"
 #include "stm32f0xx_3dprinter_sd.h"
@@ -113,7 +113,7 @@ void BSP_STOP_W_IRQHandler(void)
 * @brief This function handles TIM5 global interrupt.
 */
 //TODO: check that these timer handler's match up with that they should be doing
-void BSP_MISC_TICK_IRQHandler(void)
+void BSP_MISC_TICK_IRQHandler(void) //General purpose misc timer for stepper ISR/temperature
 {
   HAL_NVIC_ClearPendingIRQ(BSP_MISC_TICK_IRQn);
   HAL_TIM_IRQHandler(&hTimTick);
@@ -152,7 +152,7 @@ void TIM1_UP_TIM10_IRQHandler(void)
   * @param  None
   * @retval None
   */
-void BSP_MISC_TICK2_IRQHandler(void)
+void BSP_MISC_TICK2_IRQHandler(void) //1ms timer for USB CDC data handling
 {
 	HAL_NVIC_ClearPendingIRQ(BSP_MISC_TICK2_IRQn);
 	HAL_TIM_IRQHandler(&hTimTick2);

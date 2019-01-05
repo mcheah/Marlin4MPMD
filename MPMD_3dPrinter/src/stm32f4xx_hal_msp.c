@@ -68,7 +68,6 @@ extern TIM_HandleTypeDef hTimPwmHeatE2;
 extern TIM_HandleTypeDef hTimPwmHeatE3;
 
 //extern BspAdcDataType gBspAdcData;
-//extern BspWifiDataType gBspWifiData;
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -536,7 +535,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
 //
 //  }
 //#endif//BSP_HEAT_E2_PIN
-//}
+}
 //
 ///**
 //  * @brief PWM MSP De-Initialization
@@ -674,8 +673,8 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
 //  * @param[in] htim PWM handle pointer
 //  * @retval None
 //  */
-//void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
-//{
+void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
+{
 //  if ((htim->Instance == BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_X)&& (htim->Channel == BSP_MOTOR_CONTROL_BOARD_HAL_ACT_CHAN_TIMER_PWM_X))
 //  {
 //    if (BSP_MotorControl_GetDeviceState(0) != INACTIVE)
@@ -730,83 +729,79 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
 //    }
 //  }
 //#endif
-//  if ((htim->Instance == BSP_MISC_TIMER_TICK)&& (htim->Channel == BSP_MISC_HAL_ACT_CHAN_TIMER_TICK))
-//  {
-//#ifdef MARLIN
-//    IsrStepperHandler();
-//#else
-//    TC3_Handler();
-//#endif
-//
-//  }
+  if ((htim->Instance == BSP_MISC_TIMER_TICK)&& (htim->Channel == BSP_MISC_HAL_ACT_CHAN_TIMER_TICK))
+  {
+    IsrStepperHandler();
+  }
 //#if defined(MARLIN) && defined(BSP_SERVO0_PIN)
 //  if ((htim->Instance == BSP_MISC_TIMER_SERVO)&& (htim->Channel == BSP_MISC_HAL_ACT_CHAN_TIMER_SERVO))
 //  {
 //    TimerStService();
 //  }
 //#endif
-//#ifdef MARLIN
-//  if ((htim->Instance == BSP_MISC_TIMER_TICK2)&& (htim->Channel == BSP_MISC_HAL_ACT_CHAN_TIMER_TICK2))
-//  {
-//    IsrTemperatureHandler();
-//  }
-//#endif
-//}
-//
-//void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim)
-//{
-//  if(htim->Instance == TIMx)
-//  {
-//    /* Peripheral clock enable */
-//	TIMx_CLK_ENABLE();
-//
-//    /* Peripheral interrupt init*/
-//    /* Sets the priority grouping field */
-//    //HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_3);   BDI : not needed. Done once at startup
-//    HAL_NVIC_SetPriority(TIMx_IRQn, 3, 0);
-//    HAL_NVIC_EnableIRQ(TIMx_IRQn);
-//  }
-//}
-//
-//void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim)
-//{
-//
-//  if(htim->Instance == TIMx)
-//  {
-//    /* Peripheral clock disable */
-//	  TIMx_CLK_ENABLE();
-//
-//    /* Peripheral interrupt Deinit*/
-//    HAL_NVIC_DisableIRQ(TIMx_IRQn);
-//  }
-//}
-//
-//void HAL_TIM_OC_MspInit(TIM_HandleTypeDef* htim_oc)
-//{
-//  if(htim_oc->Instance == BSP_MISC_TIMER_TICK)
-//  {
-//    /* Peripheral clock enable */
-//    __BSP_MISC_TIMER_TICK_CLCK_ENABLE();
-//
-//    /* Peripheral interrupt init*/
-//    /* Sets the priority grouping field */
-//    //HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_3);   BDI : not needed. Done once at startup
-//    HAL_NVIC_SetPriority(BSP_MISC_TICK_IRQn, 1, 0);
-//    HAL_NVIC_EnableIRQ(BSP_MISC_TICK_IRQn);
-//  }
-//#ifdef MARLIN
-//  if(htim_oc->Instance == BSP_MISC_TIMER_TICK2)
-//  {
-//    /* Peripheral clock enable */
-//    __BSP_MISC_TIMER_TICK2_CLCK_ENABLE();
-//
-//    /* Peripheral interrupt init*/
-//    /* Sets the priority grouping field */
-//    //HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_0);  BDI
-//    //HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_3);  BDI : not needed. Done once at startup
-//    HAL_NVIC_SetPriority(BSP_MISC_TICK2_IRQn, 0, 0);
-//    HAL_NVIC_EnableIRQ(BSP_MISC_TICK2_IRQn);
-//  }
+  if ((htim->Instance == BSP_MISC_TIMER_TICK2)&& (htim->Channel == BSP_MISC_HAL_ACT_CHAN_TIMER_TICK2))
+  {
+    IsrTemperatureHandler();
+  }
+}
+
+void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim)
+{
+#ifdef STM32_USE_USB_CDC
+  if(htim->Instance == TIMx)
+  {
+    /* Peripheral clock enable */
+	TIMx_CLK_ENABLE();
+
+    /* Peripheral interrupt init*/
+    /* Sets the priority grouping field */
+    HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_3);   BDI : not needed. Done once at startup
+    HAL_NVIC_SetPriority(TIMx_IRQn, 3, 0);
+    HAL_NVIC_EnableIRQ(TIMx_IRQn);
+  }
+#endif
+}
+
+void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim)
+{
+#ifdef STM32_USE_USB_CDC
+  if(htim->Instance == TIMx)
+  {
+    /* Peripheral clock disable */
+	  TIMx_CLK_ENABLE();
+
+    /* Peripheral interrupt Deinit*/
+    HAL_NVIC_DisableIRQ(TIMx_IRQn);
+  }
+#endif
+}
+
+void HAL_TIM_OC_MspInit(TIM_HandleTypeDef* htim_oc)
+{
+  if(htim_oc->Instance == BSP_MISC_TIMER_TICK)
+  {
+    /* Peripheral clock enable */
+    __BSP_MISC_TIMER_TICK_CLCK_ENABLE();
+
+    /* Peripheral interrupt init*/
+    /* Sets the priority grouping field */
+    //HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_3);   BDI : not needed. Done once at startup
+    HAL_NVIC_SetPriority(BSP_MISC_TICK_IRQn, 1, 0);
+    HAL_NVIC_EnableIRQ(BSP_MISC_TICK_IRQn);
+  }
+#ifdef MARLIN
+  if(htim_oc->Instance == BSP_MISC_TIMER_TICK2)
+  {
+    /* Peripheral clock enable */
+    __BSP_MISC_TIMER_TICK2_CLCK_ENABLE();
+
+    /* Peripheral interrupt init*/
+    /* Sets the priority grouping field */
+    //HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_0);  BDI
+    //HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_3);  BDI : not needed. Done once at startup
+    HAL_NVIC_SetPriority(BSP_MISC_TICK2_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(BSP_MISC_TICK2_IRQn);
+  }
 //#ifdef BSP_SERVO0_PIN
 //  if(htim_oc->Instance == BSP_MISC_TIMER_SERVO)
 //  {
@@ -822,7 +817,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
 //    HAL_NVIC_EnableIRQ(BSP_MISC_SERVO_IRQn);
 //  }
 //#endif//BSP_SERVO0_PIN
-//#endif//MARLIN
+#endif//MARLIN
 }
 
 void HAL_TIM_OC_MspDeInit(TIM_HandleTypeDef* htim_oc)
@@ -953,7 +948,6 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
 
 void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
 {
-
   if(hadc->Instance==ADC1)
   {
     __BSP_ADC_FORCE_RESET();
@@ -983,8 +977,7 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
     /* Peripheral interrupt Deinit*/
     HAL_NVIC_DisableIRQ(BSP_DMA_IRQn);
     HAL_NVIC_DisableIRQ(BSP_ADC_IRQn);
-  }
-
+  } //if(hadc->Instance==ADC1)
 }
 
 /**

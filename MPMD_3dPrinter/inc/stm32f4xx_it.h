@@ -58,13 +58,11 @@ void BSP_STOP_W_IRQHandler(void);
 
 //void TIM1_CC_IRQHandler(void);
 //void TIM2_IRQHandler(void);
-void TIM3_IRQHandler(void);
-void TIM4_IRQHandler(void);
-void TIM6_IRQHandler(void);
+void BSP_MISC_TICK_IRQHandler(void);
+void BSP_MISC_TICK2_IRQHandler(void);
 //void TIM1_BRK_UP_TRG_COM_IRQHandler(void);
 //void TIM1_UP_TIM10_IRQHandler(void);
 //void TIM1_UP_TIM10_IRQHandler(void);
-void TIM14_IRQHandler(void);
 void BSP_UART_DEBUG_IRQHandler(void);
 void BSP_UART_LCD_IRQHandler(void);
 //void BSP_WIFI_UART_IRQHandler(void);

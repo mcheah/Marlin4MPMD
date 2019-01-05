@@ -109,33 +109,35 @@
    
 /* Definition for Tick timer */
 /// Timer used for Tick
-#define BSP_MISC_TIMER_TICK                  (TIM3)
+#define BSP_MISC_TIMER_TICK                  (TIM2)
 /// Channel Timer used for Tick
 #define BSP_MISC_CHAN_TIMER_TICK              (TIM_CHANNEL_1)
 /// HAL Active Channel Timer used for Tick
 #define BSP_MISC_HAL_ACT_CHAN_TIMER_TICK      (HAL_TIM_ACTIVE_CHANNEL_1)
 /// Timer Clock Enable for Tick
-#define __BSP_MISC_TIMER_TICK_CLCK_ENABLE()   __TIM3_CLK_ENABLE()
+#define __BSP_MISC_TIMER_TICK_CLCK_ENABLE()   __TIM2_CLK_ENABLE()
 /// Timer Clock Disable for Tick
-#define __BSP_MISC_TIMER_TICK_CLCK_DISABLE()  __TIM3_CLK_DISABLE()
+#define __BSP_MISC_TIMER_TICK_CLCK_DISABLE()  __TIM2_CLK_DISABLE()
 
 /// TICK global interrupt
-#define BSP_MISC_TICK_IRQn                    (TIM3_IRQn)
-   
+#define BSP_MISC_TICK_IRQn                    (TIM2_IRQn)
+#define BSP_MISC_TICK_IRQHandler			  (TIM2_IRQHandler)
+
 /* Definition for Tick2 timer  (Marlin Only)*/
 /// Timer used for Tick2
-#define BSP_MISC_TIMER_TICK2                  (TIM2)
+#define BSP_MISC_TIMER_TICK2                  (TIM3)
 /// Channel Timer used for Tick
 #define BSP_MISC_CHAN_TIMER_TICK2              (TIM_CHANNEL_1)
 /// HAL Active Channel Timer used for Tick
 #define BSP_MISC_HAL_ACT_CHAN_TIMER_TICK2      (HAL_TIM_ACTIVE_CHANNEL_1)
 /// Timer Clock Enable for Tick
-#define __BSP_MISC_TIMER_TICK2_CLCK_ENABLE()   __TIM2_CLK_ENABLE()
+#define __BSP_MISC_TIMER_TICK2_CLCK_ENABLE()   __TIM3_CLK_ENABLE()
 /// Timer Clock Disable for Tick
-#define __BSP_MISC_TIMER_TICK2_CLCK_DISABLE()  __TIM2_CLK_DISABLE()
+#define __BSP_MISC_TIMER_TICK2_CLCK_DISABLE()  __TIM3_CLK_DISABLE()
 
 /// TICK global interrupt
-#define BSP_MISC_TICK2_IRQn                    (TIM2_IRQn)
+#define BSP_MISC_TICK2_IRQn                    (TIM3_IRQn)
+#define BSP_MISC_TICK2_IRQHandler			   (TIM3_IRQHandler)
 
 //TODO: update these timers since only FAN PWM is connector to a timer channel
  /// Timer used for PWM_HEAT_BED
@@ -303,7 +305,7 @@
 
 //TODO: review this value
 //Tick timer prescaler
-#define TICK_TIMER_PRESCALER  (32)
+#define TICK_TIMER_PRESCALER  (112) //168Mhz / 112 = 1.5Mhz
    
 /* Exported constants --------------------------------------------------------*/
 extern GPIO_TypeDef* gArrayGpioPort[BSP_MISC_MAX_PIN_NUMBER];
@@ -332,9 +334,9 @@ void BSP_MiscSetOcdThreshold(uint8_t deviceId, uint32_t current);
 void BSP_MiscHeatManualInit(uint8_t heatId);
 void BSP_MiscHeatPwmInit(uint8_t heatId);
 void BSP_MiscHeatPwmSetDutyCycle(uint8_t heatId, uint8_t newDuty);
-void  BSP_MotorControlBoard_ServoInit(void);
-void  BSP_MotorControlBoard_ServoSetTimerValue(uint32_t value);
-void  BSP_MotorControlBoard_ServoStop(void);
+void BSP_MotorControlBoard_ServoInit(void);
+void BSP_MotorControlBoard_ServoSetTimerValue(uint32_t value);
+void BSP_MotorControlBoard_ServoStop(void);
 void BSP_MiscUserGpioInit(uint8_t id, uint32_t mode, uint32_t pull);
 
 #ifdef __cplusplus

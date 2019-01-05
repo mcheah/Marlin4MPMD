@@ -305,7 +305,7 @@
 
 //TODO: review this value
 //Tick timer prescaler
-#define TICK_TIMER_PRESCALER  (32)
+#define TICK_TIMER_PRESCALER  (32) //48Mhz / 32 = 1.5Mhz
    
 /* Exported constants --------------------------------------------------------*/
 extern GPIO_TypeDef* gArrayGpioPort[BSP_MISC_MAX_PIN_NUMBER];
@@ -334,9 +334,9 @@ void BSP_MiscSetOcdThreshold(uint8_t deviceId, uint32_t current);
 void BSP_MiscHeatManualInit(uint8_t heatId);
 void BSP_MiscHeatPwmInit(uint8_t heatId);
 void BSP_MiscHeatPwmSetDutyCycle(uint8_t heatId, uint8_t newDuty);
-void  BSP_MotorControlBoard_ServoInit(void);
-void  BSP_MotorControlBoard_ServoSetTimerValue(uint32_t value);
-void  BSP_MotorControlBoard_ServoStop(void);
+void BSP_MotorControlBoard_ServoInit(void);
+void BSP_MotorControlBoard_ServoSetTimerValue(uint32_t value);
+void BSP_MotorControlBoard_ServoStop(void);
 void BSP_MiscUserGpioInit(uint8_t id, uint32_t mode, uint32_t pull);
 
 #ifdef __cplusplus

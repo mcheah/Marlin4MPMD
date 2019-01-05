@@ -75,14 +75,11 @@
 typedef enum 
 {
   LED1 = 0,
-  LED_GREEN = LED1,
-//  LED_RED = LED1,
+  LED_RED = LED1,
   LED2 = 1,
-  LED_RED = LED2,
-  LED_BLUE = LED2
-//  LED_GREEN = LED2,
-//  LED3 = 2,
-//  LED_BLUE = LED3
+  LED_GREEN = LED2,
+  LED3 = 2,
+  LED_BLUE = LED3
 }Led_TypeDef;
 
 typedef enum 
@@ -126,7 +123,7 @@ typedef enum
 /** @defgroup STM32F4XX_LERDGEX_LOW_LEVEL_LED STM32F4XX NUCLEO 144 LOW LEVEL LED
   * @{
   */
-#define LEDn                                    2
+#define LEDn                                    3
 
 #define LED1_PIN                                GPIO_PIN_6
 #define LED1_GPIO_PORT                          GPIOC
@@ -138,15 +135,15 @@ typedef enum
 #define LED2_GPIO_CLK_ENABLE()                  __HAL_RCC_GPIOC_CLK_ENABLE()
 #define LED2_GPIO_CLK_DISABLE()                 __HAL_RCC_GPIOBC_CLK_DISABLE()
 
-//#define LED3_PIN                                GPIO_PIN_9
-//#define LED3_GPIO_PORT                          GPIOB
-//#define LED3_GPIO_CLK_ENABLE()                  __HAL_RCC_GPIOB_CLK_ENABLE()
-//#define LED3_GPIO_CLK_DISABLE()                 __HAL_RCC_GPIOB_CLK_DISABLE()
+#define LED3_PIN                                GPIO_PIN_8
+#define LED3_GPIO_PORT                          GPIOA
+#define LED3_GPIO_CLK_ENABLE()                  __HAL_RCC_GPIOB_CLK_ENABLE()
+#define LED3_GPIO_CLK_DISABLE()                 __HAL_RCC_GPIOB_CLK_DISABLE()
 
-#define LEDx_GPIO_CLK_ENABLE(__INDEX__)   do { if((__INDEX__) == 0) {__HAL_RCC_GPIOC_CLK_ENABLE();} else\
-                                                                    {__HAL_RCC_GPIOC_CLK_ENABLE();   }} while(0)
-#define LEDx_GPIO_CLK_DISABLE(__INDEX__)  do { if((__INDEX__) == 0) {__HAL_RCC_GPIOC_CLK_DISABLE();} else\
-                                                                    {__HAL_RCC_GPIOC_CLK_DISABLE();   }} while(0)
+#define LEDx_GPIO_CLK_ENABLE(__INDEX__)   do { if((__INDEX__) != 2) {__HAL_RCC_GPIOC_CLK_ENABLE();} else\
+                                                                    {__HAL_RCC_GPIOA_CLK_ENABLE();   }} while(0)
+#define LEDx_GPIO_CLK_DISABLE(__INDEX__)  do { if((__INDEX__) != 2) {__HAL_RCC_GPIOC_CLK_DISABLE();} else\
+                                                                    {__HAL_RCC_GPIOA_CLK_DISABLE();   }} while(0)
 /**
   * @}
   */ 

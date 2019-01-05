@@ -79,7 +79,7 @@
 #define BSP_THERM_BED1_PORT             (GPIOC)
 //#define BSP_THERM_BED2_PIN             (GPIO_PIN_4)
 //#define BSP_THERM_BED2_PORT            (GPIOA)
-#define BSP_THERM_E1_PIN               (GPIO_PIN_1)
+#define BSP_THERM_E1_PIN               (GPIO_PIN_0)
 #define BSP_THERM_E1_PORT              (GPIOC)
 //#define BSP_THERM_E2_PIN               (GPIO_PIN_0)
 //#define BSP_THERM_E2_PORT              (GPIOA)

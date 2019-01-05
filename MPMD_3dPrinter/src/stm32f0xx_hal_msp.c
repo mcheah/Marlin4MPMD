@@ -68,7 +68,6 @@ extern TIM_HandleTypeDef hTimPwmHeatE2;
 extern TIM_HandleTypeDef hTimPwmHeatE3;
 
 //extern BspAdcDataType gBspAdcData;
-//extern BspWifiDataType gBspWifiData;
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/

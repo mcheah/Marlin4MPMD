@@ -435,7 +435,7 @@
   // NOTE NB all values for DELTA_* values MUST be floating point, so always have a decimal point in them
 
   // Center-to-center distance of the holes in the diagonal push rods.
-  #define DELTA_DIAGONAL_ROD 120.8 // mm
+  #define DELTA_DIAGONAL_ROD 222.0 // mm
 
   // Horizontal offset from middle of printer to smooth rod center.
 //  #define DELTA_SMOOTH_ROD_OFFSET 108 // mm
@@ -450,7 +450,7 @@
 //  #define DELTA_RADIUS (DELTA_SMOOTH_ROD_OFFSET-(DELTA_EFFECTOR_OFFSET)-(DELTA_CARRIAGE_OFFSET))
 //  #define DELTA_RADIUS 63.25
 //	#define DELTA_RADIUS 63.90
-	#define DELTA_RADIUS 63.00
+	#define DELTA_RADIUS 132.25
 
 	#define DELTA_ENDSTOP_ADJ_X 0.0
 	#define DELTA_ENDSTOP_ADJ_Y 0.0
@@ -462,7 +462,7 @@
   #define DELTA_TOWER_ANGLE_TRIM { 0.0, 0.0, 0.0 } // get these values from auto calibrate
 
   // Print surface diameter/2 minus unreachable space (avoid collisions with vertical towers).
-  #define DELTA_PRINTABLE_RADIUS 60.0
+  #define DELTA_PRINTABLE_RADIUS 90.0
   // Delta calibration menu
   // uncomment to add three points calibration menu option.
   // See http://minow.blogspot.com/index.html#4918805519571907051
@@ -511,10 +511,10 @@
 // Mechanical endstop with COM to ground and NC to Signal uses "false" here (most common setup).
 #define X_MIN_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
 #define Y_MIN_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
-#define Z_MIN_ENDSTOP_INVERTING true  // For Bicephale, set to true to invert the logic of the endstop.
-#define X_MAX_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
-#define Y_MAX_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
-#define Z_MAX_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
+#define Z_MIN_ENDSTOP_INVERTING false  // For Bicephale, set to true to invert the logic of the endstop.
+#define X_MAX_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
+#define Y_MAX_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
+#define Z_MAX_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
 #define Z_MIN_PROBE_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
 
 //===========================================================================
@@ -699,15 +699,15 @@
 // @section machine
 
 // Travel limits after homing (units are in mm)
-#define X_MIN_POS -60
-#define Y_MIN_POS -60
+#define X_MIN_POS -100
+#define Y_MIN_POS -100
 #define Z_MIN_POS 0
-#define X_MAX_POS 60
-#define Y_MAX_POS 60 //200
-#define Z_MAX_POS 125 //200
+#define X_MAX_POS 100
+#define Y_MAX_POS 100 //200
+#define Z_MAX_POS 300 //200
 
 //#define MAX_RAD (sqrt(sq(X_MAX_POS)+sq(Y_MAX_POS))))
-#define MAX_RAD 60
+#define MAX_RAD 100
 //===========================================================================
 //========================= Filament Runout Sensor ==========================
 //===========================================================================
@@ -828,7 +828,7 @@
 // For DELTA this is the top-center of the Cartesian print volume.
 //#define MANUAL_X_HOME_POS 0
 //#define MANUAL_Y_HOME_POS 0
-#define MANUAL_Z_HOME_POS 125 // Distance between the nozzle to printbed after homing
+#define MANUAL_Z_HOME_POS 297.12 // Distance between the nozzle to printbed after homing
 
 #define MAX_Z_HEIGHT_ERROR 40
 #define MIN_Z_HEIGHT_ERROR -60
@@ -872,12 +872,12 @@
 #else
 #define MOTOR_MICROSTEPS_COUNT		  8.0
 #endif
-#define MOTOR_PULLEY_TEETH_COUNT	  14.0
+#define MOTOR_PULLEY_TEETH_COUNT	  40.0
 #define MOTOR_BELT_PITCH_MM			  2.0
 #define MOTOR_DEFAULT_STEPS_PER_UNIT  (MOTOR_STEPS_PER_REVOLUTION * MOTOR_MICROSTEPS_COUNT / MOTOR_PULLEY_TEETH_COUNT / MOTOR_BELT_PITCH_MM)
 #define MOTOR_EXTRUDER_RADIUS		  5.5
 #define MOTOR_DEFAULT_EXTRUDER_STEPS_PER_UNIT	(MOTOR_STEPS_PER_REVOLUTION *MOTOR_MICROSTEPS_COUNT / (2*pi*MOTOR_EXTRUDER_RADIUS)
-#define DEFAULT_AXIS_STEPS_PER_UNIT   {MOTOR_DEFAULT_STEPS_PER_UNIT,MOTOR_DEFAULT_STEPS_PER_UNIT,MOTOR_DEFAULT_STEPS_PER_UNIT,48.50*(MOTOR_MICROSTEPS_COUNT/8.0)}  // default steps per unit for Ultimaker
+#define DEFAULT_AXIS_STEPS_PER_UNIT   {MOTOR_DEFAULT_STEPS_PER_UNIT,MOTOR_DEFAULT_STEPS_PER_UNIT,MOTOR_DEFAULT_STEPS_PER_UNIT,48.50*(/*MOTOR_MICROSTEPS_COUNT*/8.0/8.0)}  // default steps per unit for Ultimaker
 #define DEFAULT_MAX_FEEDRATE          {150, 150, 150, 50}    // (mm/sec)
 #define DEFAULT_MAX_ACCELERATION      {800,800,800,10000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for Skeinforge 40+, for older versions raise them a lot.
 

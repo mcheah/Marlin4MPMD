@@ -795,14 +795,18 @@ void BSP_MiscTickInit(void)
   hTimTick.Init.Prescaler = TICK_TIMER_PRESCALER - 1;
   hTimTick.Init.CounterMode = TIM_COUNTERMODE_UP;
   //TODO: all timers on STM32F070 are 16-bit
-//  if ((hTimTick.Instance != TIM2) && (hTimTick.Instance != TIM5))
-//  {
+#ifdef STM32_LERDGEX
+  if ((hTimTick.Instance != TIM2) && (hTimTick.Instance != TIM5))
+  {
     hTimTick.Init.Period = 0xFFFF;
-//  }
-//  else
-//  {
-//    hTimTick.Init.Period = 0xFFFFFFFF;
-//  }
+  }
+  else
+  {
+    hTimTick.Init.Period = 0xFFFFFFFF;
+  }
+#else
+  hTimTick.Init.Period = 0xFFFF;
+#endif
   //TODO: check this, unclear what's special about TIM4, it seems all timer's can handle this
   hTimTick.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
 //  if (hTimTick.Instance != TIM4)
@@ -864,9 +868,11 @@ void BSP_MiscTickSetFreq(uint32_t newFreq)
 //    newFreq = (newFreq >> 1)&0x7fff;
 //  }
   
-  timPeriod = (HAL_RCC_GetSysClockFreq()/ (TICK_TIMER_PRESCALER * (uint32_t)newFreq));
+  timPeriod = (HAL_RCC_GetSysClockFreq()/ (TICK_TIMER_PRESCALER * (uint32_t)newFreq))/2;
   if (timPeriod < 100) timPeriod = 100;
+#ifdef STM32_MPMD
   if (timPeriod > 0xFFFF) timPeriod = 0xFFFF;
+#endif
   __HAL_TIM_SetCompare(&hTimTick, BSP_MISC_CHAN_TIMER_TICK, timerCnt + timPeriod);
   
   if (bspTickEnabled == 0)
@@ -955,7 +961,7 @@ void BSP_MiscTick2SetFreq(float newPeriod)
 {
   uint32_t sysFreq = HAL_RCC_GetSysClockFreq();
   uint32_t tick;
-  uint32_t timPeriod = ((uint32_t)(sysFreq * newPeriod)/ TICK_TIMER_PRESCALER) - 1; 
+  uint32_t timPeriod = ((uint32_t)(sysFreq * newPeriod)/ TICK_TIMER_PRESCALER)/2 - 1;
   
   __HAL_TIM_SetAutoreload(&hTimTick2, timPeriod);
   __HAL_TIM_SetCompare(&hTimTick2, BSP_MISC_CHAN_TIMER_TICK2, timPeriod >> 1);
