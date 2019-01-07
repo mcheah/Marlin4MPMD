@@ -67,7 +67,7 @@ typedef uint8_t  byte;
 #define _delay_ms(x)      HAL_Delay(x)   
 #define delay(x)      HAL_Delay(x)   
 #define millis(x)         HAL_GetTick(x)
-#define WRITE(x,y) HAL_GPIO_WritePin(gArrayGpioPort[x],gArrayGpioPin[x],(GPIO_PinState)y)
+#define WRITE(x,y) HAL_GPIO_WritePin(gArrayGpioPort[x],gArrayGpioPin[x],(y)!=0 ? GPIO_PIN_SET : GPIO_PIN_RESET)
 #define READ(x) HAL_GPIO_ReadPin(gArrayGpioPort[x],gArrayGpioPin[x])
 #define INPUT   (0)
 #define OUTPUT  (1)

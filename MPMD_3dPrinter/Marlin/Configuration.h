@@ -260,22 +260,22 @@
 // The minimal temperature defines the temperature below which the heater will not be enabled It is used
 // to check that the wiring to the thermistor is not broken.
 // Otherwise this would lead to the heater being powered on all the time.
-//#define HEATER_0_MINTEMP 5
+#define HEATER_0_MINTEMP 5
 //#define HEATER_1_MINTEMP 5
 //#define HEATER_2_MINTEMP 5
 //#define HEATER_3_MINTEMP 5
-//#define BED_MINTEMP 5
+#define BED_MINTEMP 5
 
 // When temperature exceeds max temp, your heater will be switched off.
 // This feature exists to protect your hotend from overheating accidentally, but *NOT* from thermistor short/failure!
 // You should use MINTEMP for thermistor short/failure protection.
-//#define HEATER_0_MAXTEMP 275
+#define HEATER_0_MAXTEMP 275
 //#define HEATER_1_MAXTEMP 275
 //#define HEATER_2_MAXTEMP 275
 //#define HEATER_3_MAXTEMP 275
 #define HEATER_BED_5A_LIMIT
 #if ENABLED(HEATER_BED_5A_LIMIT)
-//#define BED_MAXTEMP 90
+#define BED_MAXTEMP 90
 #else
 #define BED_MAXTEMP 110
 #endif
@@ -1369,6 +1369,14 @@
 // LCD configuration: http://reprap.org/wiki/SAV_3D_LCD
 //
 //#define SAV_3DLCD
+//=============================================================================
+//=============================== Graphical TFTs ==============================
+//=============================================================================
+
+//
+// Lerdge 480x320 color display
+//
+#define LERDGE_TFT
 
 //=============================================================================
 //=============================== Extra Features ==============================

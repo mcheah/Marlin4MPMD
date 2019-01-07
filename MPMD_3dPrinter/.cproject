@@ -44,6 +44,7 @@
 								</option>
 								<option id="gnu.c.compiler.option.include.paths.1928691307" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/HAL_Driver}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/U8glib/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/FatFsF4/src/option}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/FatFsF4/src/drivers}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/FatFsF4/src}&quot;"/>
@@ -89,6 +90,7 @@
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.1832632602" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/U8glib/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Marlin/binGcode}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/uzLib}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/FatFsF4/src/drivers}&quot;"/>
@@ -128,6 +130,7 @@
 							<tool id="fr.ac6.managedbuild.tool.gnu.cross.assembler.2047366335" name="MCU GCC Assembler" superClass="fr.ac6.managedbuild.tool.gnu.cross.assembler">
 								<option id="gnu.both.asm.option.include.paths.829434477" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/STM32F4xx_LerdgeX}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/U8glib/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/FatFsF4/src/option}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/FatFsF4/src/drivers}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/FatFsF4/src}&quot;"/>
@@ -222,9 +225,10 @@
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/NUCLEO-F070RB-3dPrinter"/>
 						<entry excluding="stm32f0xx_3dprinter_sd.h" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/STM32F0xx-3dPrinter"/>
 						<entry excluding="Src/stm32f4xx_hal_timebase_tim_template.c|Src/stm32f4xx_hal_timebase_rtc_wakeup_template.c|Src/stm32f4xx_hal_timebase_rtc_alarm_template.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="HAL_DriverF4"/>
-						<entry excluding="binGcode/readBuff.cpp|binGcode/testbinGcodeCommand.cpp|exclude|SdFatUtil.cpp|SdFile.cpp|SdBaseFile.cpp|Sd2Card.cpp|ultralcd.cpp|planner_bezier.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Marlin"/>
+						<entry excluding="binGcode/readBuff.cpp|binGcode/testbinGcodeCommand.cpp|exclude|SdFatUtil.cpp|SdFile.cpp|SdBaseFile.cpp|Sd2Card.cpp|planner_bezier.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Marlin"/>
 						<entry excluding="ST/STM32_USB_Device_LibraryF4/Class/Template|ST/STM32_USB_Device_LibraryF4/Class/MSC|ST/STM32_USB_Device_LibraryF4/Class/HID|ST/STM32_USB_Device_LibraryF4/Class/DFU|ST/STM32_USB_Device_LibraryF4/Class/CustomHID|ST/STM32_USB_Device_LibraryF4/Class/AUDIO|ST/STM32_USB_Device_Library" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="STM32F4xx_LerdgeX"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="U8glib/src"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="inc"/>
 						<entry excluding="stm32f0xx_it.c|stm32f0xx_hal_msp.c|system_stm32f0xx.c|clock_f0.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 						<entry excluding="startup_stm32.s" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="startup"/>
@@ -455,6 +459,7 @@
 						<entry excluding="binGcode/readBuff.cpp|binGcode/testbinGcodeCommand.cpp|exclude|SdFatUtil.cpp|SdFile.cpp|SdBaseFile.cpp|Sd2Card.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Marlin"/>
 						<entry excluding="Class/Template|Class/MSC|Class/HID|Class/DFU|Class/CustomHID|Class/AUDIO" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares/ST/STM32_USB_Device_LibraryF4"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="STM32F4xx_LerdgeX"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="U8glib/src"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="inc"/>
 						<entry excluding="stm32f0xx_it.c|stm32f0xx_hal_msp.c|system_stm32f0xx.c|clock_f0.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 						<entry excluding="startup_stm32.s" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="startup"/>
@@ -682,7 +687,7 @@
 						<entry excluding="stm32f0xx_3dprinter_sd.h" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/STM32F0xx-3dPrinter"/>
 						<entry excluding="doc|src/option/ccsbcs.c|src/option/cc950.c|src/option/cc949.c|src/option/cc936.c|src/option/cc932.c|src/drivers/usbh_diskio.c|src/drivers/sram_diskio.c|src/drivers/sdram_diskio.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FatFs"/>
 						<entry excluding="Src/stm32f0xx_hal_crc.c|Src/stm32f0xx_ll_crc.c|Src/stm32f0xx_hal_timebase_tim_template.c|Src/stm32f0xx_hal_timebase_rtc_wakeup_template.c|Src/stm32f0xx_hal_timebase_rtc_alarm_template.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="HAL_Driver"/>
-						<entry excluding="binGcode/readBuff.cpp|binGcode/testbinGcodeCommand.cpp|exclude|SdFatUtil.cpp|SdFile.cpp|SdBaseFile.cpp|Sd2Card.cpp|ultralcd.cpp|planner_bezier.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Marlin"/>
+						<entry excluding="binGcode/readBuff.cpp|binGcode/testbinGcodeCommand.cpp|exclude|SdFatUtil.cpp|SdFile.cpp|SdBaseFile.cpp|Sd2Card.cpp|planner_bezier.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Marlin"/>
 						<entry excluding="ST/STM32_USB_Device_LibraryF4" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="STM32F0xx_mpmd"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="inc"/>

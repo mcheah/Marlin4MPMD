@@ -55,8 +55,6 @@
   int lcd_strlen(const char* s);
   int lcd_strlen_P(const char* s);
   bool lcd_hasstatus();
-  void lcd_setstatus(const char* message, const bool persist=false);
-  void lcd_setstatuspgm(const char* message, const uint8_t level=0);
   void lcd_reset_alert_level();
   bool lcd_detected(void);
   void lcd_kill_screen();

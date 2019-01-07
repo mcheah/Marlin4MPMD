@@ -44,6 +44,7 @@
  */
 #include "ultralcd.h"
 #include "ultralcd_st7920_u8glib_rrd.h"
+#include "ultralcd_ili3941_u8glib_stm32.h"
 #include "dogm_bitmaps.h"
 #include "duration_t.h"
 
@@ -161,6 +162,8 @@
 #elif ENABLED(MINIPANEL)
   // The MINIPanel display
   U8GLIB_MINI12864 u8g(DOGLCD_CS, DOGLCD_A0);
+#elif ENABLED(LERDGE_TFT)
+  U8GLIB_ILI3971_480X320_UPSCALE_FROM_128X64 u8g(0); //FSMC based TFT control
 #else
   // for regular DOGM128 display with HW-SPI
   U8GLIB_DOGM128 u8g(DOGLCD_CS, DOGLCD_A0);  // HW-SPI Com: CS, A0

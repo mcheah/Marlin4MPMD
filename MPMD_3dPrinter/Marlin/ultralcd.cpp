@@ -605,10 +605,15 @@ void kill_screen(const char* lcd_msg) {
   static void lcd_main_menu() {
     START_MENU();
     MENU_ITEM(back, MSG_WATCH);
+#if ENABLED(SDSUPPORT)
     if (planner.movesplanned() || IS_SD_PRINTING) {
       MENU_ITEM(submenu, MSG_TUNE, lcd_tune_menu);
     }
-    else {
+    else
+#else
+if(1)
+#endif
+    {
       MENU_ITEM(submenu, MSG_PREPARE, lcd_prepare_menu);
       #if ENABLED(DELTA_CALIBRATION_MENU)
         MENU_ITEM(submenu, MSG_DELTA_CALIBRATE, lcd_delta_calibrate_menu);
@@ -2700,7 +2705,11 @@ void lcd_update() {
           u8g.setColorIndex(dot_color); // Set color for the alive dot
           u8g.drawPixel(127, 63); // draw alive dot
           u8g.setColorIndex(1); // black on white
+		  #if ENABLED(ULTIPANEL)
           (*currentScreen)();
+		  #else
+          lcd_status_screen();
+		  #endif
         } while (u8g.nextPage());
       #elif ENABLED(ULTIPANEL)
         (*currentScreen)();

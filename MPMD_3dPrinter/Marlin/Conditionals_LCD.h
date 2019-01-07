@@ -168,6 +168,16 @@
     #define NEWPANEL
   #endif
 
+ /**
+  * FSMC/SPI TFT PANELS
+  */
+ #if ENABLED(LERDGE_TFT)
+   #define ULTRA_LCD
+   #define DOGLCD
+//   #define ULTIPANEL
+ #endif
+
+
   // Shift register panels
   // ---------------------
   // 2 wire Non-latching LCD SR from:
