@@ -44,7 +44,7 @@
 
 
 #include <stddef.h>
-
+#include "Marlin_export.h"
 #ifdef __18CXX
 typedef unsigned char uint8_t;
 typedef signed char int8_t;

@@ -38,11 +38,10 @@
 #ifndef _CPP_U8GLIB
 #define _CPP_U8GLIB
 
-#include <Print.h>
 #include "clib/u8g.h"
 
 
-class U8GLIB : public Print
+class U8GLIB
 {
   private:
     u8g_t u8g;
@@ -91,6 +90,7 @@ class U8GLIB : public Print
     void write(uint8_t c) { tx += u8g_DrawGlyph(&u8g, tx, ty, c); }
 #else
     size_t write(uint8_t c) { tx += u8g_DrawGlyph(&u8g, tx, ty, c); return 1;}
+    size_t print(char c) { write(c); return 1;}
 #endif
     
      /* screen rotation */
