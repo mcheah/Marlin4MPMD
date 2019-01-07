@@ -1102,4 +1102,81 @@ void SD_IO_WriteData(const uint8_t *Data, uint16_t DataLength)
   * @}
   */ 
 #endif
+void LCD_GPIO_Init(void) {
+	/* Enable FSMC, GPIOD, GPIOE, GPIOF, GPIOG and AFIO clocks */
+	GPIO_InitTypeDef GPIO_InitStructure;
+	__HAL_RCC_FSMC_CLK_ENABLE();
+	__HAL_RCC_GPIOB_CLK_ENABLE();
+	__HAL_RCC_GPIOD_CLK_ENABLE();
+	__HAL_RCC_GPIOE_CLK_ENABLE();
+	  /* Set PD.00(D2), PD.01(D3), PD.04(NOE), PD.05(NWE), PD.08(D13), PD.09(D14),
+	     PD.10(D15), PD.14(D0), PD.15(D1) as alternate
+	     function push pull */
+	//Init GPIOD FSMC pins
+	GPIO_InitStructure.Pin = LCD_FSMC_D_PINS;
+	GPIO_InitStructure.Mode = GPIO_MODE_AF_PP;
+	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+	GPIO_InitStructure.Pull = GPIO_NOPULL;
+	GPIO_InitStructure.Alternate = LCD_FSMC_AF;
+	HAL_GPIO_Init(GPIOD,&GPIO_InitStructure);
+	//Init GPIOE FSMC pins
+	GPIO_InitStructure.Pin = LCD_FSMC_E_PINS;
+	HAL_GPIO_Init(GPIOE,&GPIO_InitStructure);
+	//Init output pins
+	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStructure.Alternate = GPIO_AF0_MCO;
+	GPIO_InitStructure.Pin = LCD_TOUCHEN_PIN;
+	HAL_GPIO_Init(LCD_TOUCHEN_GPIO_PORT,&GPIO_InitStructure);
+	HAL_GPIO_WritePin(LCD_TOUCHEN_GPIO_PORT,LCD_TOUCHEN_PIN,GPIO_PIN_SET);
+
+	GPIO_InitStructure.Pin = LCD_BACKLIGHT_PIN | LCD_RST_PIN | LCD_BUZZ_PIN;
+	HAL_GPIO_Init(GPIOD,&GPIO_InitStructure);
+	HAL_GPIO_WritePin(LCD_BACKLIGHT_GPIO_PORT,LCD_BACKLIGHT_PIN,GPIO_PIN_SET);
+	HAL_GPIO_WritePin(LCD_RST_GPIO_PORT,LCD_RST_PIN,GPIO_PIN_SET);
+	HAL_GPIO_WritePin(LCD_BUZZ_GPIO_PORT,LCD_BUZZ_PIN,GPIO_PIN_RESET);
+
+}
+SRAM_HandleTypeDef hsram;
+FSMC_NORSRAM_TimingTypeDef SRAM_Timing;
+void LCD_FSMC_Init(void) {
+	hsram.Instance = FSMC_NORSRAM_DEVICE;
+	hsram.Extended = FSMC_NORSRAM_EXTENDED_DEVICE;
+
+	/*-- FSMC Configuration ------------------------------------------------------*/
+	/* FSMC_Bank1_NORSRAM1 timing configuration */
+	SRAM_Timing.AddressSetupTime = 5;
+	SRAM_Timing.AddressHoldTime = 0;
+	SRAM_Timing.DataSetupTime = 5;
+	SRAM_Timing.BusTurnAroundDuration = 0;
+	SRAM_Timing.CLKDivision = 0;
+	SRAM_Timing.DataLatency = 0;
+	SRAM_Timing.AccessMode = FSMC_ACCESS_MODE_A;
+	/* FSMC_Bank1_NORSRAM4 configured as follows:
+		- Data/Address MUX = Disable
+		- Memory Type = SRAM
+		- Data Width = 16bit
+		- Write Operation = Enable
+		- Extended Mode = Disable
+		- Asynchronous Wait = Disable */
+	hsram.Init.NSBank = FSMC_NORSRAM_BANK1;
+	hsram.Init.DataAddressMux = FSMC_DATA_ADDRESS_MUX_DISABLE;
+	hsram.Init.MemoryType = FSMC_MEMORY_TYPE_SRAM;
+	hsram.Init.MemoryDataWidth = FSMC_NORSRAM_MEM_BUS_WIDTH_16;
+	hsram.Init.BurstAccessMode = FSMC_BURST_ACCESS_MODE_DISABLE;
+	hsram.Init.WaitSignalPolarity = FSMC_WAIT_SIGNAL_POLARITY_LOW;
+	hsram.Init.WrapMode = FSMC_WRAP_MODE_DISABLE;
+	hsram.Init.WaitSignalActive = FSMC_WAIT_TIMING_BEFORE_WS;
+	hsram.Init.WriteOperation = FSMC_WRITE_OPERATION_ENABLE;
+	hsram.Init.WaitSignal = FSMC_WAIT_SIGNAL_DISABLE;
+	hsram.Init.ExtendedMode = FSMC_EXTENDED_MODE_ENABLE;
+	hsram.Init.WriteBurst = FSMC_WRITE_BURST_DISABLE;
+
+	HAL_SRAM_Init(&hsram,&SRAM_Timing,&SRAM_Timing);
+
+}
+
+void BSP_LCD_Init(void) {
+	LCD_GPIO_Init();
+	LCD_FSMC_Init();
+}
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

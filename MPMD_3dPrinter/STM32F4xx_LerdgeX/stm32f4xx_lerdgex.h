@@ -271,6 +271,132 @@ typedef enum
 
 #endif /* HAL_SPI_MODULE_ENABLED */
 
+#define LCD_D0_PIN                                 GPIO_PIN_14
+#define LCD_D0_GPIO_PORT                           GPIOD
+#define LCD_D0_GPIO_CLK_ENABLE()                 __HAL_RCC_GPIOD_CLK_ENABLE()
+#define LCD_D0_GPIO_CLK_DISABLE()                __HAL_RCC_GPIOD_CLK_DISABLE()
+#define LCD_D1_PIN                                 GPIO_PIN_15
+#define LCD_D1_GPIO_PORT                           GPIOD
+#define LCD_D1_GPIO_CLK_ENABLE()                 __HAL_RCC_GPIOD_CLK_ENABLE()
+#define LCD_D1_GPIO_CLK_DISABLE()                __HAL_RCC_GPIOD_CLK_DISABLE()
+#define LCD_D2_PIN                                 GPIO_PIN_0
+#define LCD_D2_GPIO_PORT                           GPIOD
+#define LCD_D2_GPIO_CLK_ENABLE()                 __HAL_RCC_GPIOD_CLK_ENABLE()
+#define LCD_D2_GPIO_CLK_DISABLE()                __HAL_RCC_GPIOD_CLK_DISABLE()
+#define LCD_D3_PIN                                 GPIO_PIN_1
+#define LCD_D3_GPIO_PORT                           GPIOD
+#define LCD_D3_GPIO_CLK_ENABLE()                 __HAL_RCC_GPIOD_CLK_ENABLE()
+#define LCD_D3_GPIO_CLK_DISABLE()                __HAL_RCC_GPIOD_CLK_DISABLE()
+#define LCD_D4_PIN                                 GPIO_PIN_7
+#define LCD_D4_GPIO_PORT                           GPIOE
+#define LCD_D4_GPIO_CLK_ENABLE()                 __HAL_RCC_GPIOE_CLK_ENABLE()
+#define LCD_D4_GPIO_CLK_DISABLE()                __HAL_RCC_GPIOE_CLK_DISABLE()
+#define LCD_D5_PIN                                 GPIO_PIN_8
+#define LCD_D5_GPIO_PORT                           GPIOE
+#define LCD_D5_GPIO_CLK_ENABLE()                 __HAL_RCC_GPIOE_CLK_ENABLE()
+#define LCD_D5_GPIO_CLK_DISABLE()                __HAL_RCC_GPIOE_CLK_DISABLE()
+#define LCD_D6_PIN                                 GPIO_PIN_9
+#define LCD_D6_GPIO_PORT                           GPIOE
+#define LCD_D6_GPIO_CLK_ENABLE()                 __HAL_RCC_GPIOE_CLK_ENABLE()
+#define LCD_D6_GPIO_CLK_DISABLE()                __HAL_RCC_GPIOE_CLK_DISABLE()
+#define LCD_D7_PIN                                 GPIO_PIN_10
+#define LCD_D7_GPIO_PORT                           GPIOE
+#define LCD_D7_GPIO_CLK_ENABLE()                 __HAL_RCC_GPIOE_CLK_ENABLE()
+#define LCD_D7_GPIO_CLK_DISABLE()                __HAL_RCC_GPIOE_CLK_DISABLE()
+#define LCD_D8_PIN                                 GPIO_PIN_11
+#define LCD_D8_GPIO_PORT                           GPIOE
+#define LCD_D8_GPIO_CLK_ENABLE()                 __HAL_RCC_GPIOE_CLK_ENABLE()
+#define LCD_D8_GPIO_CLK_DISABLE()                __HAL_RCC_GPIOE_CLK_DISABLE()
+#define LCD_D9_PIN                                 GPIO_PIN_12
+#define LCD_D9_GPIO_PORT                           GPIOE
+#define LCD_D9_GPIO_CLK_ENABLE()                 __HAL_RCC_GPIOE_CLK_ENABLE()
+#define LCD_D9_GPIO_CLK_DISABLE()                __HAL_RCC_GPIOE_CLK_DISABLE()
+#define LCD_D10_PIN                                GPIO_PIN_13
+#define LCD_D10_GPIO_PORT                          GPIOE
+#define LCD_D10_GPIO_CLK_ENABLE()                __HAL_RCC_GPIOE_CLK_ENABLE()
+#define LCD_D10_GPIO_CLK_DISABLE()               __HAL_RCC_GPIOE_CLK_DISABLE()
+#define LCD_D11_PIN                                GPIO_PIN_14
+#define LCD_D11_GPIO_PORT                          GPIOE
+#define LCD_D11_GPIO_CLK_ENABLE()                __HAL_RCC_GPIOE_CLK_ENABLE()
+#define LCD_D11_GPIO_CLK_DISABLE()               __HAL_RCC_GPIOE_CLK_DISABLE()
+#define LCD_D12_PIN                                GPIO_PIN_15
+#define LCD_D12_GPIO_PORT                          GPIOE
+#define LCD_D12_GPIO_CLK_ENABLE()                __HAL_RCC_GPIOE_CLK_ENABLE()
+#define LCD_D12_GPIO_CLK_DISABLE()               __HAL_RCC_GPIOE_CLK_DISABLE()
+#define LCD_D13_PIN                                GPIO_PIN_8
+#define LCD_D13_GPIO_PORT                          GPIOD
+#define LCD_D13_GPIO_CLK_ENABLE()                __HAL_RCC_GPIOD_CLK_ENABLE()
+#define LCD_D13_GPIO_CLK_DISABLE()               __HAL_RCC_GPIOD_CLK_DISABLE()
+#define LCD_D14_PIN                                GPIO_PIN_9
+#define LCD_D14_GPIO_PORT                          GPIOD
+#define LCD_D14_GPIO_CLK_ENABLE()                __HAL_RCC_GPIOD_CLK_ENABLE()
+#define LCD_D14_GPIO_CLK_DISABLE()               __HAL_RCC_GPIOD_CLK_DISABLE()
+#define LCD_D15_PIN                                GPIO_PIN_10
+#define LCD_D15_GPIO_PORT                          GPIOD
+#define LCD_D15_GPIO_CLK_ENABLE()                __HAL_RCC_GPIOD_CLK_ENABLE()
+#define LCD_D15_GPIO_CLK_DISABLE()               __HAL_RCC_GPIOD_CLK_DISABLE()
+
+#define LCD_NOE_PIN                                GPIO_PIN_4
+#define LCD_NOE_GPIO_PORT                          GPIOD
+#define LCD_NOE_GPIO_CLK_ENABLE()                __HAL_RCC_GPIOD_CLK_ENABLE()
+#define LCD_NOE_GPIO_CLK_DISABLE()               __HAL_RCC_GPIOD_CLK_DISABLE()
+
+#define LCD_NWE_PIN                                GPIO_PIN_5
+#define LCD_NWE_GPIO_PORT                          GPIOD
+#define LCD_NWE_GPIO_CLK_ENABLE()                __HAL_RCC_GPIOD_CLK_ENABLE()
+#define LCD_NWE_GPIO_CLK_DISABLE()               __HAL_RCC_GPIOD_CLK_DISABLE()
+
+#define LCD_NE1_PIN                                GPIO_PIN_7
+#define LCD_NE1_GPIO_PORT                          GPIOD
+#define LCD_NE1_GPIO_CLK_ENABLE()                __HAL_RCC_GPIOD_CLK_ENABLE()
+#define LCD_NE1_GPIO_CLK_DISABLE()               __HAL_RCC_GPIOD_CLK_DISABLE()
+
+#define LCD_RS_PIN                                 GPIO_PIN_11
+#define LCD_RS_GPIO_PORT                           GPIOD
+#define LCD_RS_GPIO_CLK_ENABLE()                 __HAL_RCC_GPIOD_CLK_ENABLE()
+#define LCD_RS_GPIO_CLK_DISABLE()                __HAL_RCC_GPIOD_CLK_DISABLE()
+
+#define LCD_FSMC_AF								   GPIO_AF12_FSMC
+#define LCD_FSMC_D_PINS							 (    LCD_D0_PIN | LCD_D1_PIN | LCD_D2_PIN | LCD_D3_PIN | LCD_D13_PIN | LCD_D14_PIN  \
+													| LCD_D15_PIN | LCD_NOE_PIN | LCD_NWE_PIN | LCD_NE1_PIN | LCD_RS_PIN )
+#define LCD_FSMC_E_PINS							 (    LCD_D4_PIN | LCD_D5_PIN | LCD_D6_PIN | LCD_D7_PIN | LCD_D8_PIN | LCD_D9_PIN  \
+													| LCD_D10_PIN | LCD_D11_PIN | LCD_D12_PIN )
+
+#define LCD_TOUCHEN_PIN                            GPIO_PIN_6
+#define LCD_TOUCHEN_GPIO_PORT                      GPIOB
+#define LCD_TOUCHEN_GPIO_CLK_ENABLE()            __HAL_RCC_GPIOB_CLK_ENABLE()
+#define LCD_TOUCHEN_GPIO_CLK_DISABLE()           __HAL_RCC_GPIOB_CLK_DISABLE()
+
+#define LCD_BACKLIGHT_PIN                          GPIO_PIN_3
+#define LCD_BACKLIGHT_GPIO_PORT                    GPIOD
+#define LCD_BACKLIGHT_GPIO_CLK_ENABLE()          __HAL_RCC_GPIOD_CLK_ENABLE()
+#define LCD_BACKLIGHT_GPIO_CLK_DISABLE()         __HAL_RCC_GPIOD_CLK_DISABLE()
+
+#define LCD_RST_PIN                                GPIO_PIN_6
+#define LCD_RST_GPIO_PORT                          GPIOD
+#define LCD_RST_GPIO_CLK_ENABLE()                __HAL_RCC_GPIOD_CLK_ENABLE()
+#define LCD_RST_GPIO_CLK_DISABLE()               __HAL_RCC_GPIOD_CLK_DISABLE()
+
+#define LCD_BUZZ_PIN                               GPIO_PIN_12
+#define LCD_BUZZ_GPIO_PORT                         GPIOD
+#define LCD_BUZZ_GPIO_CLK_ENABLE()               __HAL_RCC_GPIOD_CLK_ENABLE()
+#define LCD_BUZZ_GPIO_CLK_DISABLE()              __HAL_RCC_GPIOD_CLK_DISABLE()
+
+#define LCD_BTN_PIN                                GPIO_PIN_2
+#define LCD_BTN_GPIO_PORT                          GPIOE
+#define LCD_BTN_GPIO_CLK_ENABLE()                __HAL_RCC_GPIOE_CLK_ENABLE()
+#define LCD_BTN_GPIO_CLK_DISABLE()               __HAL_RCC_GPIOE_CLK_DISABLE()
+
+#define LCD_ENC1_PIN                               GPIO_PIN_3
+#define LCD_ENC1_GPIO_PORT                         GPIOE
+#define LCD_ENC1_GPIO_CLK_ENABLE()               __HAL_RCC_GPIOE_CLK_ENABLE()
+#define LCD_ENC1_GPIO_CLK_DISABLE()              __HAL_RCC_GPIOE_CLK_DISABLE()
+
+#define LCD_ENC2_PIN                               GPIO_PIN_4
+#define LCD_ENC2_GPIO_PORT                         GPIOE
+#define LCD_ENC2_GPIO_CLK_ENABLE()               __HAL_RCC_GPIOE_CLK_ENABLE()
+#define LCD_ENC2_GPIO_CLK_DISABLE()              __HAL_RCC_GPIOE_CLK_DISABLE()
+
 /*################################ ADCx for Nucleo 144 board ######################################*/
 /**
   * @brief  ADCx Interface pins
@@ -328,6 +454,7 @@ void             BSP_LED_Toggle(Led_TypeDef Led);
 void             BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef ButtonMode);
 void             BSP_PB_DeInit(Button_TypeDef Button);
 uint32_t         BSP_PB_GetState(Button_TypeDef Button);
+void			 BSP_LCD_Init();
 //#ifdef HAL_ADC_MODULE_ENABLED
 //uint8_t          BSP_JOY_Init(void);
 //JOYState_TypeDef BSP_JOY_GetState(void);
