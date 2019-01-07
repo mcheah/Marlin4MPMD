@@ -88,7 +88,7 @@ GPIO_TypeDef* gArrayGpioPort[BSP_MISC_MAX_PIN_NUMBER] = {
   0,//BSP_MOTOR_CONTROL_BOARD_DIR_E2_PORT,   //E1_DIR_PIN      25
   0,//BSP_MOTOR_CONTROL_BOARD_RESET_E2_PORT, //E1_ENABLE_PIN
   0,                                     //SDPOWER         
-  0,                                     //SDSS            
+  LCD_BUZZ_GPIO_PORT,                    //BUZZER
   0,                                     //LED_PIN        
   BSP_FAN_E1_PORT,                       //FAN_PIN         30
   0,                                     //PS_ON_PIN      
@@ -103,9 +103,9 @@ GPIO_TypeDef* gArrayGpioPort[BSP_MISC_MAX_PIN_NUMBER] = {
   BSP_HEAT_BED1_PORT,                     //HEATER_BED_PIN  
   BSP_THERM_BED1_PORT,                    //TEMP_BED_PIN    40
   0,//BSP_SERVO0_PORT,                       //SERVO0_PIN
-  0,                                     //SERVO1_PIN  
-  0,                                     //SERVO2_PIN  
-  0,                                     //SERVO3_PIN 
+  LCD_BTN_GPIO_PORT,                                     //ENC_BTN
+  LCD_ENC1_GPIO_PORT,                                     //ENC1
+  LCD_ENC2_GPIO_PORT,                                     //ENC2
   0,//BSP_MOTOR_CONTROL_BOARD_PWM_E3_PORT,   //E2_STEP_PIN     45
   0,//BSP_MOTOR_CONTROL_BOARD_DIR_E3_PORT,   //E2_DIR_PIN
   0,//BSP_MOTOR_CONTROL_BOARD_RESET_E3_PORT,  //E2_ENABLE_PIN
@@ -145,7 +145,7 @@ uint16_t gArrayGpioPin[BSP_MISC_MAX_PIN_NUMBER] = {
   0,//BSP_MOTOR_CONTROL_BOARD_DIR_E2_PIN,   //E1_DIR_PIN       25
   0,//BSP_MOTOR_CONTROL_BOARD_RESET_E2_PIN, //E1_ENABLE_PIN
   0,                                    //SDPOWER         
-  0,                                    //SDSS            
+  LCD_BUZZ_PIN,                         //BUZZER
   0,                                    //LED_PIN        
   BSP_FAN_E1_PIN,                       //FAN_PIN          30   
   0,                                    //PS_ON_PIN  
@@ -159,9 +159,9 @@ uint16_t gArrayGpioPin[BSP_MISC_MAX_PIN_NUMBER] = {
   BSP_HEAT_BED1_PIN,                     //HEATER_BED_PIN   
   BSP_THERM_BED1_PIN,                    //TEMP_BED_PIN     40    
   0,//BSP_SERVO0_PIN,                       //SERVO0_PIN
-  0,                                    //SERVO1_PIN  
-  0,                                    //SERVO2_PIN  
-  0,                                    //SERVO3_PIN  
+  LCD_BTN_PIN,                                    //ENC_BTN
+  LCD_ENC1_PIN,                                    //ENC1
+  LCD_ENC2_PIN,                                    //ENC2
   0,//BSP_MOTOR_CONTROL_BOARD_PWM_E3_PIN,   //E2_STEP_PIN      45
   0,//BSP_MOTOR_CONTROL_BOARD_DIR_E3_PIN,   //E2_DIR_PIN
   0,//BSP_MOTOR_CONTROL_BOARD_RESET_E3_PIN, //E2_ENABLE_PIN

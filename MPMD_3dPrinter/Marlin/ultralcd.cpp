@@ -52,7 +52,7 @@ char lcd_status_message[3 * (LCD_WIDTH) + 1] = WELCOME_MSG; // worst case is kan
 
 // The main status screen
 static void lcd_status_screen();
-
+bool use_click();
 millis_t next_lcd_update_ms;
 
 uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to draw, decrements after every draw. Set to 2 in LCD routines so the LCD gets at least 1 full redraw (first redraw is partial)
@@ -108,6 +108,7 @@ uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to 
   static void lcd_control_temperature_preheat_abs_settings_menu();
   static void lcd_control_motion_menu();
   static void lcd_control_volumetric_menu();
+  static void lcd_rgb_menu();
 
   #if ENABLED(LCD_INFO_MENU)
     #if ENABLED(PRINTCOUNTER)
@@ -605,14 +606,15 @@ void kill_screen(const char* lcd_msg) {
   static void lcd_main_menu() {
     START_MENU();
     MENU_ITEM(back, MSG_WATCH);
-#if ENABLED(SDSUPPORT)
-    if (planner.movesplanned() || IS_SD_PRINTING) {
+//TODO: fix this back in when re-adding SD support
+//#if ENABLED(SDSUPPORT)
+    if (planner.movesplanned() /*|| IS_SD_PRINTING*/) {
       MENU_ITEM(submenu, MSG_TUNE, lcd_tune_menu);
     }
     else
-#else
-if(1)
-#endif
+//#else
+//if(1)
+//#endif
     {
       MENU_ITEM(submenu, MSG_PREPARE, lcd_prepare_menu);
       #if ENABLED(DELTA_CALIBRATION_MENU)
@@ -1502,6 +1504,7 @@ if(1)
     MENU_ITEM(submenu, MSG_TEMPERATURE, lcd_control_temperature_menu);
     MENU_ITEM(submenu, MSG_MOTION, lcd_control_motion_menu);
     MENU_ITEM(submenu, MSG_VOLUMETRIC, lcd_control_volumetric_menu);
+    MENU_ITEM(submenu, MSG_LCDRGB, lcd_rgb_menu);
 
     #if HAS_LCD_CONTRAST
       //MENU_ITEM_EDIT(int3, MSG_CONTRAST, &lcd_contrast, 0, 63);
@@ -1729,6 +1732,32 @@ if(1)
     // Preheat ABS conf
     //
     MENU_ITEM(submenu, MSG_PREHEAT_2_SETTINGS, lcd_control_temperature_preheat_abs_settings_menu);
+    END_MENU();
+  }
+
+  /**
+   *
+   * "Control" > "LCD RGB Colors" submenu
+   *
+   */
+  static void lcd_rgb_menu() {
+    START_MENU();
+
+    //
+    // ^ Control
+    //
+    MENU_ITEM(back, MSG_CONTROL);
+
+    //
+    // Nozzle:
+    // Nozzle [1-4]:
+    //
+    MENU_MULTIPLIER_ITEM_EDIT(int3, MSG_LCDFGR, &color_fg_r, 0, 31);
+    MENU_MULTIPLIER_ITEM_EDIT(int3, MSG_LCDFGG, &color_fg_g, 0, 63);
+    MENU_MULTIPLIER_ITEM_EDIT(int3, MSG_LCDFGB, &color_fg_b, 0, 31);
+    MENU_MULTIPLIER_ITEM_EDIT(int3, MSG_LCDBGR, &color_bg_r, 0, 31);
+    MENU_MULTIPLIER_ITEM_EDIT(int3, MSG_LCDBGG, &color_bg_g, 0, 63);
+    MENU_MULTIPLIER_ITEM_EDIT(int3, MSG_LCDBGB, &color_bg_b, 0, 31);
     END_MENU();
   }
 
@@ -2409,20 +2438,21 @@ void lcd_init() {
   lcd_implementation_init();
 
   #if ENABLED(NEWPANEL)
-    #if BUTTON_EXISTS(EN1)
-      SET_INPUT(BTN_EN1);
-      WRITE(BTN_EN1, HIGH);
-    #endif
+  //setup handled in LCD_init()
+//    #if BUTTON_EXISTS(EN1)
+//      SET_INPUT(BTN_EN1);
+//      WRITE(BTN_EN1, HIGH);
+//    #endif
 
-    #if BUTTON_EXISTS(EN2)
-      SET_INPUT(BTN_EN2);
-      WRITE(BTN_EN2, HIGH);
-    #endif
+//    #if BUTTON_EXISTS(EN2)
+//      SET_INPUT(BTN_EN2);
+//      WRITE(BTN_EN2, HIGH);
+//    #endif
 
-    #if BUTTON_EXISTS(ENC)
-      SET_INPUT(BTN_ENC);
-      WRITE(BTN_ENC, HIGH);
-    #endif
+//    #if BUTTON_EXISTS(ENC)
+//      SET_INPUT(BTN_ENC);
+//      WRITE(BTN_ENC, HIGH);
+//    #endif
 
     #if ENABLED(REPRAPWORLD_KEYPAD)
       pinMode(SHIFT_CLK, OUTPUT);
@@ -2630,7 +2660,7 @@ void lcd_update() {
       #endif // REPRAPWORLD_KEYPAD
 
       bool encoderPastThreshold = (abs(encoderDiff) >= ENCODER_PULSES_PER_STEP);
-      if (encoderPastThreshold || LCD_CLICKED) {
+      if (encoderPastThreshold || lcd_clicked) {
         if (encoderPastThreshold) {
           int32_t encoderMultiplier = 1;
 
@@ -2838,6 +2868,23 @@ void lcd_reset_alert_level() { lcd_status_message_level = 0; }
     } \
     DST = ~new_##DST; //invert it, because a pressed switch produces a logical 0
 
+  void LCD_Click_Debounce(bool pinState) {
+	  static millis_t lastClick = 0;
+	  static bool lastPinState = false;
+	  if(pinState==true && lastPinState==false) {
+		  lastClick = millis();
+	  }
+	  if(pinState==false && lastPinState==true && ELAPSED(millis(),lastClick+100)) {
+		  enc_clicked = true;
+	  }
+	  lastPinState = pinState;
+  }
+
+  bool use_click() {
+    const bool click = enc_clicked;
+    enc_clicked = false;
+    return click;
+  }
 
   /**
    * Read encoder buttons from the hardware registers
@@ -2890,6 +2937,7 @@ void lcd_reset_alert_level() { lcd_status_message_level = 0; }
 
       #if BUTTON_EXISTS(ENC)
         if (ELAPSED(now, next_button_update_ms) && BUTTON_PRESSED(ENC)) newbutton |= EN_C;
+        LCD_Click_Debounce(BUTTON_PRESSED(ENC));
       #endif
 
       buttons = newbutton;
@@ -2899,7 +2947,7 @@ void lcd_reset_alert_level() { lcd_status_message_level = 0; }
       #if ENABLED(REPRAPWORLD_KEYPAD)
         GET_BUTTON_STATES(buttons_reprapworld_keypad);
       #endif
-    #else
+    #else//ENABLED(NEWPANEL)
       GET_BUTTON_STATES(buttons);
     #endif //!NEWPANEL
 
@@ -2920,8 +2968,8 @@ void lcd_reset_alert_level() { lcd_status_message_level = 0; }
     #define ENCODER_SPIN(_E1, _E2) switch (lastEncoderBits) { case _E1: ENCODER_DIFF_CW; break; case _E2: ENCODER_DIFF_CCW; }
 
     uint8_t enc = 0;
-    if (buttons & EN_A) enc |= B01;
-    if (buttons & EN_B) enc |= B10;
+    if (buttons & EN_A) enc |= 1;
+    if (buttons & EN_B) enc |= 2;
     if (enc != lastEncoderBits) {
       switch (enc) {
         case encrot0: ENCODER_SPIN(encrot3, encrot1); break;

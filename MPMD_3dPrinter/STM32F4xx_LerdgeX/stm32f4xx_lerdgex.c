@@ -1135,6 +1135,12 @@ void LCD_GPIO_Init(void) {
 	HAL_GPIO_WritePin(LCD_RST_GPIO_PORT,LCD_RST_PIN,GPIO_PIN_SET);
 	HAL_GPIO_WritePin(LCD_BUZZ_GPIO_PORT,LCD_BUZZ_PIN,GPIO_PIN_RESET);
 
+	GPIO_InitStructure.Mode = GPIO_MODE_INPUT;
+	GPIO_InitStructure.Pin = LCD_BTN_PIN | LCD_ENC1_PIN | LCD_ENC2_PIN;
+	GPIO_InitStructure.Pull = GPIO_PULLUP;
+	GPIO_InitStructure.Speed = GPIO_SPEED_LOW;
+	HAL_GPIO_Init(GPIOE,&GPIO_InitStructure);
+
 }
 SRAM_HandleTypeDef hsram;
 FSMC_NORSRAM_TimingTypeDef SRAM_Timing;

@@ -23,7 +23,6 @@
 #ifndef __CIRCULARQUEUE_H__
 #define __CIRCULARQUEUE_H__
 
-#include <Arduino.h>
 
 /**
  * @brief Circular Queue class

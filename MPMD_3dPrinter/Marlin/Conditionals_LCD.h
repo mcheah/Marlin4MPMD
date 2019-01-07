@@ -174,7 +174,8 @@
  #if ENABLED(LERDGE_TFT)
    #define ULTRA_LCD
    #define DOGLCD
-//   #define ULTIPANEL
+   #define ULTIPANEL
+   #define NEWPANEL
  #endif
 
 

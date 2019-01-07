@@ -197,6 +197,30 @@
 #ifndef MSG_NOZZLE
   #define MSG_NOZZLE                          "Nozzle"
 #endif
+#ifndef MSG_LCDRGB
+  #define MSG_LCDRGB						"LCD RGB"
+#endif
+#ifndef MSG_LCD_FGR
+  #define MSG_LCDFGR                          "Foreground R"
+#endif
+#ifndef MSG_LCD_FGG
+  #define MSG_LCDFGG                          "Foreground G"
+#endif
+#ifndef MSG_LCDFGB
+  #define MSG_LCDFGB                          "Foreground B"
+#endif
+
+#ifndef MSG_LCD_BGR
+  #define MSG_LCDBGR                          "Background R"
+#endif
+#ifndef MSG_LCD_BGG
+  #define MSG_LCDBGG                          "Background G"
+#endif
+#ifndef MSG_LCDBGB
+  #define MSG_LCDBGB                          "Background B"
+#endif
+
+
 #ifndef MSG_N1
   #define MSG_N1                              " 1"
 #endif

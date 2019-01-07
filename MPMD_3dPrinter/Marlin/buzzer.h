@@ -23,7 +23,6 @@
 #ifndef __BUZZER_H__
 #define __BUZZER_H__
 
-#include "fastio.h"
 #include "circularqueue.h"
 #include "temperature.h"
 

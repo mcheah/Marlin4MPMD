@@ -54,7 +54,16 @@
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_lerdgex.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+#include "lcd.h"
+#ifdef __cplusplus
+}
+#endif
+
  #include "stm32f0xx_3dprinter_misc.h"
+
 #include "stm32f0xx_3dprinter_uart.h"
 #include "stm32f0xx_3dprinter_cdc.h"
 

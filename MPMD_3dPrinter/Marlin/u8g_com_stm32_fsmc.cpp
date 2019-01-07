@@ -61,7 +61,7 @@ uint8_t u8g_com_stm32hal_fsmc_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void 
       u8g_Delay(100);
 
       if (arg_ptr != NULL)
-        *((uint32_t *)arg_ptr) = LCD_IO_ReadData(LCD_READ_ID, 2);
+        *((uint32_t *)arg_ptr) = LCD_IO_ReadData(LCD_READ_ID, 4);
 
       isCommand = 0;
       break;
@@ -114,7 +114,7 @@ uint32_t LCD_IO_ReadData(uint16_t RegValue, uint8_t ReadSize) {
 	data = LCD_RAM; // dummy read
 
 	while (--ReadSize) {
-		data <<= 16;
+		data <<= 8;
 		data |= LCD_RAM & 0xFFFF;
 	}
 	return (uint32_t)data;

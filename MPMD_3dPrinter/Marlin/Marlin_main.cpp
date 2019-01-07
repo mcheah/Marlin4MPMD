@@ -876,6 +876,266 @@ void servo_init() {
   void enableStepperDrivers() { pinMode(STEPPER_RESET_PIN, INPUT); }  // set to input, which allows it to be pulled high by pullups
 #endif
 
+__IO uint16_t *REG_ADDR = (uint16_t *)0x60000000;
+__IO uint16_t *RAM_ADDR = (uint16_t *)0x60020000;
+#define ROWBOUND 0x002A
+#define COLBOUND 0x002B
+#define RAMWR	 0x002C
+
+void setup5() {
+	  setup_killpin();
+	  setup_powerhold();
+	  MYSERIAL.begin(BAUDRATE);
+	  lcd_init();
+	  while(1) {
+		  delay(100);
+		  if(HAL_GPIO_ReadPin(LCD_BTN_GPIO_PORT,LCD_BTN_PIN)==GPIO_PIN_RESET) {
+			  BSP_LED_Toggle(LED1);
+			  BSP_LED_Toggle(LED2);
+		  }
+		  if(HAL_GPIO_ReadPin(LCD_ENC1_GPIO_PORT,LCD_ENC1_PIN)==GPIO_PIN_RESET)
+			  BSP_LED_Toggle(LED1);
+		  if(HAL_GPIO_ReadPin(LCD_ENC2_GPIO_PORT,LCD_ENC2_PIN)==GPIO_PIN_RESET)
+		  {
+			  BSP_LED_Toggle(LED2);
+		  }
+	  }
+}
+
+void setup4() {
+	char buffer[80];
+	char *pbuff = buffer;
+	  setup_killpin();
+	  setup_powerhold();
+	  MYSERIAL.begin(BAUDRATE);
+//	  BSP_LCD_Init();
+//	  LCD_Init();
+	  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_6,GPIO_PIN_SET);
+	  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_3,GPIO_PIN_SET);
+	  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_6,GPIO_PIN_SET);
+//	  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_12,GPIO_PIN_SET);
+	  delay(1000); //Give USB time to connect and initialize before starting LCD interface
+	  lcd_init();
+	  delay(1000); //Give USB time to connect and initialize before starting LCD interface
+	  while(1) {
+		while(MYSERIAL.available()) {
+			*(pbuff++) = MYSERIAL.read();
+			MYSERIAL.write(*(pbuff-1));
+			if(*(pbuff-1)=='\n' || *(pbuff-1)=='\r') {
+				break;
+			}
+		}
+		if(*(pbuff-1)=='\n' || *(pbuff-1)=='\r') {
+			static uint16_t ADR = 0;
+			bool isRead = false;
+			*pbuff = '\0';
+			pbuff = buffer;
+			switch (buffer[0]) {
+			case 'c':
+			case 'C':
+			{
+				if(buffer[1]==' ') {
+					uint16_t color = atoi(&buffer[2]);
+					*REG_ADDR = 0x2A;
+					*RAM_ADDR = 0x00;
+					*RAM_ADDR = 0x00;
+					*RAM_ADDR = 0x01;
+					*RAM_ADDR = 0xDF;
+
+					*REG_ADDR = 0x2B;
+					*RAM_ADDR = 0x00;
+					*RAM_ADDR = 0x00;
+					*RAM_ADDR = 0x01;
+					*RAM_ADDR = 0x3F;
+
+					*REG_ADDR = 0x2C;
+					for(uint32_t i=0;i<0x1E0*0x140;i++)
+						*RAM_ADDR = color;
+				}
+			break; }
+			case 's':
+			case 'S':
+//				LCD_STR(&buffer[2],20,20,0x0000);
+			break;
+			case 'w':
+			case 'W':
+			{
+				if(buffer[1]!=' ')
+					continue;//continue parsing
+				ADR = atoi((const char *) &buffer[2]);
+				char *loc = strchr(&buffer[2],' ');
+				if(!loc) //no second space, continue
+					continue;
+				uint16_t DAT = atoi(loc);
+				*REG_ADDR = ADR;
+				*RAM_ADDR = DAT;
+			break; }
+			case 'r':
+			case 'R': {
+				if(buffer[1]!=' ') {
+					uint16_t DAT = *RAM_ADDR;
+					MYSERIAL.print(" ");
+					MYSERIAL.println(DAT,HEX);
+				}
+				else {
+					ADR = atoi((const char *) &buffer[2]);
+					*REG_ADDR = ADR;
+					uint16_t rpt = 1;
+					char *loc = strchr(&buffer[2],' ');
+					if(loc)
+						rpt = atoi(loc);
+					for(int i=0;i<rpt;i++) {
+						uint16_t DAT = *RAM_ADDR;
+						if(i==0) {
+						MYSERIAL.print("Read address: ");
+						MYSERIAL.print(ADR,HEX);
+						MYSERIAL.print(" data = "); }
+						else
+							MYSERIAL.print(" ");
+						MYSERIAL.print(DAT,HEX);
+					}
+					MYSERIAL.print("\r\n");
+				}
+			break; }
+			}
+		}
+		BSP_UartIfSendQueuedData();
+	}
+}
+
+void setup3() {
+	while(1) { }
+	char buffer[80];
+	char *pbuff = buffer;
+	  setup_killpin();
+	  setup_powerhold();
+	  MYSERIAL.begin(BAUDRATE);
+	  BSP_LCD_Init();
+	  LCD_Init();
+	  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_6,GPIO_PIN_SET);
+	  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_3,GPIO_PIN_SET);
+	  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_6,GPIO_PIN_SET);
+//	  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_12,GPIO_PIN_SET);
+	while(1) {
+		while(MYSERIAL.available()) {
+			*(pbuff++) = MYSERIAL.read();
+			MYSERIAL.write(*(pbuff-1));
+			if(*(pbuff-1)=='\n' || *(pbuff-1)=='\r') {
+				break;
+			}
+		}
+		if(*(pbuff-1)=='\n' || *(pbuff-1)=='\r') {
+			static uint16_t ADR = 0;
+			bool isRead = false;
+			*pbuff = '\0';
+			pbuff = buffer;
+			if(buffer[0]=='c' || buffer[0]=='C') {
+				if(buffer[1]==' ') {
+					uint16_t color = atoi(&buffer[2]);
+					*REG_ADDR = 0x2A;
+					*RAM_ADDR = 0x00;
+					*RAM_ADDR = 0x00;
+					*RAM_ADDR = 0x01;
+					*RAM_ADDR = 0xDF;
+
+					*REG_ADDR = 0x2B;
+					*RAM_ADDR = 0x00;
+					*RAM_ADDR = 0x00;
+					*RAM_ADDR = 0x01;
+					*RAM_ADDR = 0x3F;
+
+					*REG_ADDR = 0x2C;
+					for(uint32_t i=0;i<0x1E0*0x140;i++)
+						*RAM_ADDR = color;
+				}
+				continue;
+			}
+			if(buffer[0]=='s' || buffer[0]=='S') {
+				LCD_STR(&buffer[2],20,20,0x0000);
+				continue;
+			}
+			if(buffer[0]=='w' || buffer[0]=='W')
+				isRead = false;
+			else if (buffer[0]=='r' || buffer[0]=='R')
+				isRead = true;
+			else
+				continue; //not r or w
+			if(buffer[1]==' ') { //continue parsing
+				ADR = atoi((const char *) &buffer[2]);
+				if(!isRead) {
+					char *loc = strchr(&buffer[2],' ');
+					if(!loc) //no second space, continue
+						continue;
+					uint16_t DAT = atoi(loc);
+					*REG_ADDR = ADR;
+					*RAM_ADDR = DAT;
+				}
+				else { //read command
+					*REG_ADDR = ADR;
+					uint16_t rpt = 1;
+					char *loc = strchr(&buffer[2],' ');
+					if(loc)
+						rpt = atoi(loc);
+					for(int i=0;i<rpt;i++) {
+						uint16_t DAT = *RAM_ADDR;
+						if(i==0) {
+						MYSERIAL.print("Read address: ");
+						MYSERIAL.print(ADR,HEX);
+						MYSERIAL.print(" data = "); }
+						else
+							MYSERIAL.print(" ");
+						MYSERIAL.print(DAT,HEX);
+					}
+					MYSERIAL.print("\r\n");
+				}
+			}
+			else {
+				if(isRead) {
+					uint16_t DAT = *RAM_ADDR;
+					MYSERIAL.print(" ");
+					MYSERIAL.println(DAT,HEX);
+				}
+			}
+		}
+		BSP_UartIfSendQueuedData();
+	}
+}
+void setup2() {
+	  setup_killpin();
+
+	  setup_powerhold();
+	  MYSERIAL.begin(BAUDRATE);
+	  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_6,GPIO_PIN_SET);
+	  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_3,GPIO_PIN_SET);
+	  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_6,GPIO_PIN_SET);
+	  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_12,GPIO_PIN_SET);
+	  while(1) {
+		  *REG_ADDR = ROWBOUND;
+		  *RAM_ADDR = 0x0000;
+		  *RAM_ADDR = 0x0000;
+		  *REG_ADDR = COLBOUND;
+		  *RAM_ADDR = 0x0000;
+		  *RAM_ADDR = 0x0000;
+		  *REG_ADDR = RAMWR;
+		  for(int i=0;i<0x001;i++)
+			  for(int j=0;j<0x001;j++)
+				  *RAM_ADDR = 0xF00F;
+		  delay(2000);
+		  *REG_ADDR = ROWBOUND;
+		  *RAM_ADDR = 0x0000;
+		  *RAM_ADDR = 0x0000;
+		  *REG_ADDR = COLBOUND;
+		  *RAM_ADDR = 0x0000;
+		  *RAM_ADDR = 0x0000;
+		  *REG_ADDR = RAMWR;
+		  for(int i=0;i<0x001;i++)
+			  for(int j=0;j<0x001;j++)
+				  *RAM_ADDR = 0x0;
+		  delay(2000);
+		  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_12,GPIO_PIN_RESET);
+	  }
+}
+
 /**
  * Marlin entry-point: Set up before the program loop
  *  - Set up the kill pin, filament runout, power hold
@@ -4229,9 +4489,11 @@ inline void gcode_G92() {
       while (!lcd_clicked()) idle();
       KEEPALIVE_STATE(IN_HANDLER);
     }
+#if ENABLED(SDSUPPORT)
     if (IS_SD_PRINTING)
       LCD_MESSAGEPGM(MSG_RESUMING);
     else
+#endif
       LCD_MESSAGEPGM(WELCOME_MSG);
   }
 

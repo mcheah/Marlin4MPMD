@@ -27,25 +27,29 @@
 #if ENABLED(LERDGE_TFT)
 #include <U8glib.h>
 
-#define WIDTH 128
+#define WIDTH 128 //Normal LCD width/height
 #define HEIGHT 64
 #define PAGE_HEIGHT 8
 
-#define WIDTH 128
-#define HEIGHT 64
-#define PAGE_HEIGHT 8
+#define TFT_WIDTH 480 //TFT total Width/height
+#define TFT_HEIGHT 320
 
-#define X_MIN 32
-#define Y_MIN 28
-#define X_MAX (X_MIN + 2 * WIDTH  - 1)
-#define Y_MAX (Y_MIN + 2 * HEIGHT - 1)
+#define XSCALE 3 //pixel scaling factor
+#define YSCALE 5
+
+//#define X_MIN ((TFT_WIDTH-(WIDTH*XSCALE))/2)
+//#define Y_MIN ((TFT_HEIGHT-(HEIGHT*XSCALE))/2)
+#define X_MIN ((TFT_WIDTH-(WIDTH*XSCALE))/2)
+//#define Y_MIN ((TFT_HEIGHT-(HEIGHT*YSCALE))/2)
+#define Y_MIN 0
+#define X_MAX (X_MIN + XSCALE * WIDTH  - 1)
+#define Y_MAX (Y_MIN + YSCALE * HEIGHT - 1)
 
 #define LCD_COLUMN      0x2A   /* Colomn address register */
 #define LCD_ROW         0x2B   /* Row address register */
 #define LCD_WRITE_RAM   0x2C
 
 static uint32_t lcd_id = 0;
-uint16_t color = 0xFFFF;
 #define U8G_ESC_DATA(x) (uint8_t)(x >> 8), (uint8_t)(x & 0xFF)
 
 static const uint8_t page_first_sequence[] = {
@@ -104,12 +108,23 @@ static const uint8_t ili3941_init_sequence[] = { // 0x7796 - ~ILI3941
   U8G_ESC_END
 };
 
+static int color_fg_r=0;
+static int color_fg_g=48; //pipboy green
+static int color_fg_b=0;
+
+static int color_bg_r=0;
+static int color_bg_g=0;
+static int color_bg_b=0;
+static uint16_t calcRGB16(uint8_t r, uint8_t g, uint8_t b) {
+	return (b & 0x1F) | ((g & 0x2F)<<5) | ((r & 0x1F) << 11);
+}
+
 uint8_t u8g_dev_tft_480x320_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, uint8_t msg, void *arg) {
 //#if HAS_COLOR_LEDS && ENABLED(PRINTER_EVENT_LEDS)
 //  uint16_t newColor;
 //#endif
   u8g_pb_t *pb = (u8g_pb_t *)(dev->dev_mem);
-  uint16_t buffer[256];
+  uint16_t buffer[128*XSCALE];
   uint32_t i, j, k;
   uint8_t byte;
 
@@ -123,7 +138,7 @@ uint8_t u8g_dev_tft_480x320_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
 
       memset(buffer, 0x00, sizeof(buffer));
 
-      if ((lcd_id & 0xFFFF) == 0x7789) { // ST7789V
+      if ((lcd_id & 0xFFFF) == 0x7796) { // ST7796
         u8g_WriteEscSeqP(u8g, dev, ili3941_init_sequence);
       }
 
@@ -153,18 +168,16 @@ uint8_t u8g_dev_tft_480x320_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
         for (i = 0; i < (uint32_t) pb->width;  i++) {
           byte = *(((uint8_t *)pb->buf) + i);
           if (byte & (1 << j)) {
-            buffer[k++] = color;
-            buffer[k++] = color;
+        	for(uint8_t n=0;n<XSCALE;n++)
+        		buffer[k++] = calcRGB16(color_fg_r,color_fg_g,color_fg_b);
           } else {
-            buffer[k++] = 0x0000;
-            buffer[k++] = 0x0000;
+        	for(uint8_t n=0;n<XSCALE;n++)
+        		buffer[k++] = calcRGB16(color_bg_r,color_bg_g,color_bg_b);
           }
         }
-        for (k = 0; k < 2; k++) {
-          u8g_WriteSequence(u8g, dev, 128, (uint8_t *)buffer);
-          u8g_WriteSequence(u8g, dev, 128, (uint8_t *)&(buffer[64]));
-          u8g_WriteSequence(u8g, dev, 128, (uint8_t *)&(buffer[128]));
-          u8g_WriteSequence(u8g, dev, 128, (uint8_t *)&(buffer[192]));
+        for (k = 0; k < YSCALE; k++) {
+          for(uint16_t n=0;n<XSCALE*128;n+=64)
+        	  u8g_WriteSequence(u8g, dev, 128, (uint8_t *)&buffer[n]);
         }
       }
       break;

@@ -45,6 +45,10 @@
 #endif 
 
 void setup(void);
+void setup2(void);
+void setup3(void);
+void setup4(void);
+void setup5(void);
 void loop(void);
 void IsrStepperHandler(void);
 void IsrTemperatureHandler(void);
@@ -67,20 +71,24 @@ typedef uint8_t  byte;
 #define _delay_ms(x)      HAL_Delay(x)   
 #define delay(x)      HAL_Delay(x)   
 #define millis(x)         HAL_GetTick(x)
+#define TOGGLE(x) HAL_GPIO_TogglePin(gArrayGpioPort[x],gArrayGpioPin[x])
 #define WRITE(x,y) HAL_GPIO_WritePin(gArrayGpioPort[x],gArrayGpioPin[x],(y)!=0 ? GPIO_PIN_SET : GPIO_PIN_RESET)
 #define READ(x) HAL_GPIO_ReadPin(gArrayGpioPort[x],gArrayGpioPin[x])
 #define INPUT   (0)
 #define OUTPUT  (1)
 #define pinMode(x,y)    {}    //not handled 
 #define OUT_WRITE(IO, v) { SET_OUTPUT(IO); WRITE(IO, v); }
-
+#define PGM_P const char *
 #define digitalWrite(x,y) ((x) > (-1))?(HAL_GPIO_WritePin(gArrayGpioPort[x],gArrayGpioPin[x],(GPIO_PinState)y)):(HAL_GPIO_WritePin(0,0,(GPIO_PinState)y))//will generate an assert
 #define digitalRead(x)   ((x) > (-1))?(HAL_GPIO_ReadPin(gArrayGpioPort[x], gArrayGpioPin[x])):0
 #define constrain(x, a, b)  ((x) < (a))?(a):(((x) > (b))? (b) : (x))
 #define SET_OUTPUT(x)
 #define SET_INPUT(x)
 #define PROGMEM
+#define pgm_read_byte *
 #define MCUSR 0
+#define strncpy_P strncpy
+#define strcat_P strcat
 #define strcpy_P strcpy
 #define strstr_P strstr
 #define sprintf_P sprintf

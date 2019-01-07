@@ -166,7 +166,8 @@
 
     #define LCD_CLICKED ((buttons & EN_C) || (buttons_reprapworld_keypad & EN_REPRAPWORLD_KEYPAD_F1))
   #elif ENABLED(NEWPANEL)
-    #define LCD_CLICKED (buttons & EN_C)
+  	  static volatile bool enc_clicked = false;
+	  #define LCD_CLICKED (use_click())
   #endif
 
 #else // MALYAN_LCD or no LCD

@@ -105,6 +105,11 @@
     #define SERVO3_PIN         44
   #endif
 #endif
+#define BTN_ENC 42
+#define BTN_EN1 43
+#define BTN_EN2 44
+#define BEEPER_PIN 28
+
 
 //#define E2_STEP_PIN        45
 //#define E2_DIR_PIN         46
