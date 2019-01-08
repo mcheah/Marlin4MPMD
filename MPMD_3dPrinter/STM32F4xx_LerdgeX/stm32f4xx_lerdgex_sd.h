@@ -65,105 +65,115 @@
 /** 
   * @brief  SD status structure definition  
   */     
-enum {    
-      BSP_SD_OK = 0x00,      
-      MSD_OK = 0x00,
-      BSP_SD_ERROR = 0x01,
-      MSD_ERROR    = 0x01,
-      BSP_SD_TIMEOUT
-};
+//enum {
+//      BSP_SD_OK = 0x00,
+//      MSD_OK = 0x00,
+//      BSP_SD_ERROR = 0x01,
+//      MSD_ERROR    = 0x01,
+//      BSP_SD_TIMEOUT
+//};
 
-typedef struct              
-{
-  uint8_t  Reserved1:2;               /* Reserved */
-  uint16_t DeviceSize:12;             /* Device Size */
-  uint8_t  MaxRdCurrentVDDMin:3;      /* Max. read current @ VDD min */
-  uint8_t  MaxRdCurrentVDDMax:3;      /* Max. read current @ VDD max */
-  uint8_t  MaxWrCurrentVDDMin:3;      /* Max. write current @ VDD min */
-  uint8_t  MaxWrCurrentVDDMax:3;      /* Max. write current @ VDD max */
-  uint8_t  DeviceSizeMul:3;           /* Device size multiplier */
-} struct_v1;
+//typedef struct
+//{
+//  uint8_t  Reserved1:2;               /* Reserved */
+//  uint16_t DeviceSize:12;             /* Device Size */
+//  uint8_t  MaxRdCurrentVDDMin:3;      /* Max. read current @ VDD min */
+//  uint8_t  MaxRdCurrentVDDMax:3;      /* Max. read current @ VDD max */
+//  uint8_t  MaxWrCurrentVDDMin:3;      /* Max. write current @ VDD min */
+//  uint8_t  MaxWrCurrentVDDMax:3;      /* Max. write current @ VDD max */
+//  uint8_t  DeviceSizeMul:3;           /* Device size multiplier */
+//} struct_v1;
 
 
-typedef struct              
-{
-  uint8_t  Reserved1:6;               /* Reserved */
-  uint32_t DeviceSize:22;             /* Device Size */
-  uint8_t  Reserved2:1;               /* Reserved */
-} struct_v2;
+//typedef struct
+//{
+//  uint8_t  Reserved1:6;               /* Reserved */
+//  uint32_t DeviceSize:22;             /* Device Size */
+//  uint8_t  Reserved2:1;               /* Reserved */
+//} struct_v2;
 
 /** 
   * @brief  Card Specific Data: CSD Register
   */ 
-typedef struct
-{
-  /* Header part */
-  uint8_t  CSDStruct:2;            /* CSD structure */
-  uint8_t  Reserved1:6;            /* Reserved */
-  uint8_t  TAAC:8;                 /* Data read access-time 1 */
-  uint8_t  NSAC:8;                 /* Data read access-time 2 in CLK cycles */
-  uint8_t  MaxBusClkFrec:8;        /* Max. bus clock frequency */
-  uint16_t CardComdClasses:12;      /* Card command classes */
-  uint8_t  RdBlockLen:4;           /* Max. read data block length */
-  uint8_t  PartBlockRead:1;        /* Partial blocks for read allowed */
-  uint8_t  WrBlockMisalign:1;      /* Write block misalignment */
-  uint8_t  RdBlockMisalign:1;      /* Read block misalignment */
-  uint8_t  DSRImpl:1;              /* DSR implemented */
+//typedef struct
+//{
+//  /* Header part */
+//  uint8_t  CSDStruct:2;            /* CSD structure */
+//  uint8_t  Reserved1:6;            /* Reserved */
+//  uint8_t  TAAC:8;                 /* Data read access-time 1 */
+//  uint8_t  NSAC:8;                 /* Data read access-time 2 in CLK cycles */
+//  uint8_t  MaxBusClkFrec:8;        /* Max. bus clock frequency */
+//  uint16_t CardComdClasses:12;      /* Card command classes */
+//  uint8_t  RdBlockLen:4;           /* Max. read data block length */
+//  uint8_t  PartBlockRead:1;        /* Partial blocks for read allowed */
+//  uint8_t  WrBlockMisalign:1;      /* Write block misalignment */
+//  uint8_t  RdBlockMisalign:1;      /* Read block misalignment */
+//  uint8_t  DSRImpl:1;              /* DSR implemented */
+//
+//  /* v1 or v2 struct */
+//  union csd_version {
+//    struct_v1 v1;
+//    struct_v2 v2;
+//  } version;
   
-  /* v1 or v2 struct */
-  union csd_version {
-    struct_v1 v1;
-    struct_v2 v2;
-  } version;
-  
-  uint8_t  EraseSingleBlockEnable:1;  /* Erase single block enable */
-  uint8_t  EraseSectorSize:7;         /* Erase group size multiplier */
-  uint8_t  WrProtectGrSize:7;         /* Write protect group size */
-  uint8_t  WrProtectGrEnable:1;       /* Write protect group enable */
-  uint8_t  Reserved2:2;               /* Reserved */
-  uint8_t  WrSpeedFact:3;             /* Write speed factor */
-  uint8_t  MaxWrBlockLen:4;           /* Max. write data block length */
-  uint8_t  WriteBlockPartial:1;       /* Partial blocks for write allowed */
-  uint8_t  Reserved3:5;               /* Reserved */
-  uint8_t  FileFormatGrouop:1;        /* File format group */
-  uint8_t  CopyFlag:1;                /* Copy flag (OTP) */
-  uint8_t  PermWrProtect:1;           /* Permanent write protection */
-  uint8_t  TempWrProtect:1;           /* Temporary write protection */
-  uint8_t  FileFormat:2;              /* File Format */
-  uint8_t  Reserved4:2;               /* Reserved */
-  uint8_t  crc:7;                     /* Reserved */
-  uint8_t  Reserved5:1;               /* always 1*/
-  
-} SD_CSD;
+//  uint8_t  EraseSingleBlockEnable:1;  /* Erase single block enable */
+//  uint8_t  EraseSectorSize:7;         /* Erase group size multiplier */
+//  uint8_t  WrProtectGrSize:7;         /* Write protect group size */
+//  uint8_t  WrProtectGrEnable:1;       /* Write protect group enable */
+//  uint8_t  Reserved2:2;               /* Reserved */
+//  uint8_t  WrSpeedFact:3;             /* Write speed factor */
+//  uint8_t  MaxWrBlockLen:4;           /* Max. write data block length */
+//  uint8_t  WriteBlockPartial:1;       /* Partial blocks for write allowed */
+//  uint8_t  Reserved3:5;               /* Reserved */
+//  uint8_t  FileFormatGrouop:1;        /* File format group */
+//  uint8_t  CopyFlag:1;                /* Copy flag (OTP) */
+//  uint8_t  PermWrProtect:1;           /* Permanent write protection */
+//  uint8_t  TempWrProtect:1;           /* Temporary write protection */
+//  uint8_t  FileFormat:2;              /* File Format */
+//  uint8_t  Reserved4:2;               /* Reserved */
+//  uint8_t  crc:7;                     /* Reserved */
+//  uint8_t  Reserved5:1;               /* always 1*/
+//
+//} SD_CSD;
 
 /** 
   * @brief  Card Identification Data: CID Register   
   */
-typedef struct
-{
-  __IO uint8_t  ManufacturerID;       /* ManufacturerID */
-  __IO uint16_t OEM_AppliID;          /* OEM/Application ID */
-  __IO uint32_t ProdName1;            /* Product Name part1 */
-  __IO uint8_t  ProdName2;            /* Product Name part2*/
-  __IO uint8_t  ProdRev;              /* Product Revision */
-  __IO uint32_t ProdSN;               /* Product Serial Number */
-  __IO uint8_t  Reserved1;            /* Reserved1 */
-  __IO uint16_t ManufactDate;         /* Manufacturing Date */
-  __IO uint8_t  CID_CRC;              /* CID CRC */
-  __IO uint8_t  Reserved2;            /* always 1 */
-} SD_CID;
+//typedef struct
+//{
+//  __IO uint8_t  ManufacturerID;       /* ManufacturerID */
+//  __IO uint16_t OEM_AppliID;          /* OEM/Application ID */
+//  __IO uint32_t ProdName1;            /* Product Name part1 */
+//  __IO uint8_t  ProdName2;            /* Product Name part2*/
+//  __IO uint8_t  ProdRev;              /* Product Revision */
+//  __IO uint32_t ProdSN;               /* Product Serial Number */
+//  __IO uint8_t  Reserved1;            /* Reserved1 */
+//  __IO uint16_t ManufactDate;         /* Manufacturing Date */
+//  __IO uint8_t  CID_CRC;              /* CID CRC */
+//  __IO uint8_t  Reserved2;            /* always 1 */
+//} SD_CID;
 
 /** 
   * @brief SD Card information 
   */
-typedef struct
-{
-  SD_CSD Csd;
-  SD_CID Cid;
-  uint32_t CardCapacity;  /* Card Capacity */
-  uint32_t CardBlockSize; /* Card Block Size */
-} SD_CardInfo;
+//typedef struct
+//{
+//  SD_CSD Csd;
+//  SD_CID Cid;
+//  uint32_t CardCapacity;  /* Card Capacity */
+//  uint32_t CardBlockSize; /* Card Block Size */
+//} SD_CardInfo;
 
+/**
+  * @}
+  */
+/** @addtogroup STM32F413H_DISCOVERY_SD_Private_Variables
+  * @{
+  */
+/**
+  * @brief SD Card information structure
+  */
+#define BSP_SD_CardInfo HAL_SD_CardInfoTypeDef
 /**
   * @}
   */
@@ -173,21 +183,38 @@ typedef struct
   */ 
 
 /**
-  * @brief  Block Size
-  */
-#define SD_BLOCK_SIZE    0x200
+ * @brief  Block Size
+ */
+//#define SD_BLOCK_SIZE    0x200
 
 /**
   * @brief  SD detection on its memory slot
   */
+//#define SD_PRESENT               ((uint8_t)0x01)
+//#define SD_NOT_PRESENT           ((uint8_t)0x00)
+//#define SD_DUMMY_BYTE            0xFF
+
+
+/**
+  * @brief  SD status structure definition
+  */
+#define   MSD_OK                        ((uint8_t)0x00)
+#define   MSD_ERROR                     ((uint8_t)0x01)
+#define   MSD_ERROR_SD_NOT_PRESENT      ((uint8_t)0x02)
+
+/**
+  * @brief  SD transfer state definition
+  */
+#define   SD_TRANSFER_OK                ((uint8_t)0x00)
+#define   SD_TRANSFER_BUSY              ((uint8_t)0x01)
 #define SD_PRESENT               ((uint8_t)0x01)
 #define SD_NOT_PRESENT           ((uint8_t)0x00)
-#define SD_DUMMY_BYTE            0xFF
-   
+
+#define SD_DATATIMEOUT           ((uint32_t)100000000)
+
 /**
   * @}
   */
-  
 /** @defgroup STM32F4XX_LERDGEX_SD_Exported_Macro Exported Macro
   * @{
   */ 
@@ -200,42 +227,52 @@ typedef struct
   * @{
   */   
 uint8_t BSP_SD_Init(void);
-uint8_t BSP_SD_IsDetected(void);
-uint8_t BSP_SD_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint16_t BlockSize, uint32_t NumberOfBlocks);
-uint8_t BSP_SD_WriteBlocks(uint32_t *pData, uint32_t WriteAddr, uint16_t BlockSize, uint32_t NumberOfBlocks);
+uint8_t BSP_SD_DeInit(void);
+uint8_t BSP_SD_ITConfig(void);
+uint8_t BSP_SD_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlocks, uint32_t Timeout);
+uint8_t BSP_SD_WriteBlocks(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBlocks, uint32_t Timeout);
+uint8_t BSP_SD_ReadBlocks_DMA(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlocks);
+uint8_t BSP_SD_WriteBlocks_DMA(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBlocks);
 uint8_t BSP_SD_Erase(uint32_t StartAddr, uint32_t EndAddr);
-uint8_t BSP_SD_GetStatus(void);
-uint8_t BSP_SD_GetCardInfo(SD_CardInfo *pCardInfo);
-   
+uint8_t BSP_SD_GetCardState(void);
+void    BSP_SD_GetCardInfo(HAL_SD_CardInfoTypeDef *CardInfo);
+uint8_t BSP_SD_IsDetected(void);
+void    BSP_SD_MspInit(SD_HandleTypeDef *hsd, void *Params);
+void    BSP_SD_Detect_MspInit(SD_HandleTypeDef *hsd, void *Params);
+void    BSP_SD_MspDeInit(SD_HandleTypeDef *hsd, void *Params);
+void    BSP_SD_AbortCallback(void);
+void    BSP_SD_WriteCpltCallback(void);
+void    BSP_SD_ReadCpltCallback(void);
+
 /* Link functions for SD Card peripheral */
-void    SD_IO_Init(void);
-void    SD_IO_CSState(uint8_t state);
-void    SD_IO_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLength);
-void    SD_IO_ReadData(uint8_t *DataOut, uint16_t DataLength);
-void    SD_IO_WriteData(const uint8_t *Data, uint16_t DataLength);
-void	SD_IO_WriteByte(uint8_t Data);
-uint8_t SD_IO_WriteReadByte(uint8_t Data);
-extern const uint32_t SpixTimeout; /*<! Value of Timeout when SPI communication fails */
-
-static __INLINE void SD_IO_WriteDummy(){
-	extern SPI_HandleTypeDef hnucleo_Spi;
-#ifdef USE_FAST_SPI
-	HAL_SPI_Transmit_Dummy(&hnucleo_Spi,SpixTimeout);
-#else
-	SD_IO_WriteByte(SD_DUMMY_BYTE);
-#endif
-};
-
-static __INLINE uint8_t SD_IO_WriteReadDummy(){
-	extern SPI_HandleTypeDef hnucleo_Spi;
-	uint8_t byte;
-#ifdef USE_FAST_SPI
-	HAL_SPI_TransmitReceive_Dummy(&hnucleo_Spi,&byte,SpixTimeout);
-#else
-	byte = SD_IO_WriteReadByte(SD_DUMMY_BYTE);
-#endif
-	return byte;
-}
+//void    SD_IO_Init(void);
+//void    SD_IO_CSState(uint8_t state);
+//void    SD_IO_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLength);
+//void    SD_IO_ReadData(uint8_t *DataOut, uint16_t DataLength);
+//void    SD_IO_WriteData(const uint8_t *Data, uint16_t DataLength);
+//void	SD_IO_WriteByte(uint8_t Data);
+//uint8_t SD_IO_WriteReadByte(uint8_t Data);
+//extern const uint32_t SpixTimeout; /*<! Value of Timeout when SPI communication fails */
+//
+//static __INLINE void SD_IO_WriteDummy(){
+//	extern SPI_HandleTypeDef hnucleo_Spi;
+//#ifdef USE_FAST_SPI
+//	HAL_SPI_Transmit_Dummy(&hnucleo_Spi,SpixTimeout);
+//#else
+//	SD_IO_WriteByte(SD_DUMMY_BYTE);
+//#endif
+//};
+//
+//static __INLINE uint8_t SD_IO_WriteReadDummy(){
+//	extern SPI_HandleTypeDef hnucleo_Spi;
+//	uint8_t byte;
+//#ifdef USE_FAST_SPI
+//	HAL_SPI_TransmitReceive_Dummy(&hnucleo_Spi,&byte,SpixTimeout);
+//#else
+//	byte = SD_IO_WriteReadByte(SD_DUMMY_BYTE);
+//#endif
+//	return byte;
+//}
 
 /**
   * @}

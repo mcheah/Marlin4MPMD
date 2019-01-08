@@ -79,7 +79,8 @@ void CardReader::initsd()
 		  SERIAL_ERROR_START;
 		  SERIAL_ERRORLNPGM(MSG_SD_VOL_INIT_FAIL);
 		  sprintf((char *)buff,"code=%d\n",code);
-		  BSP_CdcIfQueueTxData(buff,sizeof(buff));
+		  MYSERIAL.print((char *)buff);
+//		  BSP_CdcIfQueueTxData(buff,sizeof(buff));
 		  release();
 		  return;//Previously uninitialized, don't try again
 		}
@@ -88,7 +89,8 @@ void CardReader::initsd()
 		  SERIAL_ERROR_START;
 		  SERIAL_ERRORLNPGM(MSG_SD_OPENROOT_FAIL);
 		  sprintf((char *)buff,"code=%d\n",code);
-		  BSP_CdcIfQueueTxData(buff,sizeof(buff));
+		  MYSERIAL.print((char *)buff);
+//		  BSP_CdcIfQueueTxData(buff,sizeof(buff));
 		  release();
 		  return;//Previously uninitialized, don't try again
 		}
@@ -114,7 +116,8 @@ void CardReader::initsd()
 			  SERIAL_ERROR_START;
 			  SERIAL_ERRORLNPGM(MSG_SD_OPENROOT_FAIL);
 			  sprintf((char *)buff,"code=%d\n",res);
-			  BSP_CdcIfQueueTxData(buff,sizeof(buff));
+			  MYSERIAL.print((char *)buff);
+//			  BSP_CdcIfQueueTxData(buff,sizeof(buff));
 			  release(); //test failed, loop again after releasing
 		}
 		else {

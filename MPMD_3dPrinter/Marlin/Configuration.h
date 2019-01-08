@@ -1114,7 +1114,7 @@
 // you must uncomment the following option or it won't work.
 //
 #if DISABLED(MINIMAL_BUILD)
-//#define SDSUPPORT
+#define SDSUPPORT
 #endif
 #if ENABLED(SDSUPPORT)
   #define SD_SETTINGS

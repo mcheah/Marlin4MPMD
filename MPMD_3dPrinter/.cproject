@@ -224,6 +224,7 @@
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/MotorControl"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/NUCLEO-F070RB-3dPrinter"/>
 						<entry excluding="stm32f0xx_3dprinter_sd.h" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/STM32F0xx-3dPrinter"/>
+						<entry excluding="option/ccsbcs.c|option/cc950.c|option/cc949.c|option/cc936.c|option/cc932.c|drivers/usbh_diskio_template.c|drivers/usbh_diskio_dma_template.c|drivers/sram_diskio_template.c|drivers/sdram_diskio_template.c|drivers/sd_diskio_dma_template.c|drivers/sd_diskio_dma_rtos_template.c|drivers/ppp_diskio_template.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FatFsF4/src"/>
 						<entry excluding="Src/stm32f4xx_hal_timebase_tim_template.c|Src/stm32f4xx_hal_timebase_rtc_wakeup_template.c|Src/stm32f4xx_hal_timebase_rtc_alarm_template.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="HAL_DriverF4"/>
 						<entry excluding="binGcode/readBuff.cpp|binGcode/testbinGcodeCommand.cpp|exclude|SdFatUtil.cpp|SdFile.cpp|SdBaseFile.cpp|Sd2Card.cpp|planner_bezier.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Marlin"/>
 						<entry excluding="ST/STM32_USB_Device_LibraryF4/Class/Template|ST/STM32_USB_Device_LibraryF4/Class/MSC|ST/STM32_USB_Device_LibraryF4/Class/HID|ST/STM32_USB_Device_LibraryF4/Class/DFU|ST/STM32_USB_Device_LibraryF4/Class/CustomHID|ST/STM32_USB_Device_LibraryF4/Class/AUDIO|ST/STM32_USB_Device_Library" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
@@ -455,6 +456,7 @@
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/LerdgeX-3dPrinter"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/MotorControl"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/STM32F0xx-3dPrinter"/>
+						<entry excluding="option/ccsbcs.c|option/cc950.c|option/cc949.c|option/cc936.c|option/cc932.c|drivers/usbh_diskio_template.c|drivers/usbh_diskio_dma_template.c|drivers/sram_diskio_template.c|drivers/sdram_diskio_template.c|drivers/sd_diskio_dma_template.c|drivers/sd_diskio_dma_rtos_template.c|drivers/ppp_diskio_template.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FatFsF4/src"/>
 						<entry excluding="Src/stm32f4xx_hal_timebase_tim_template.c|Src/stm32f4xx_hal_timebase_rtc_wakeup_template.c|Src/stm32f4xx_hal_timebase_rtc_alarm_template.c" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="HAL_DriverF4"/>
 						<entry excluding="binGcode/readBuff.cpp|binGcode/testbinGcodeCommand.cpp|exclude|SdFatUtil.cpp|SdFile.cpp|SdBaseFile.cpp|Sd2Card.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Marlin"/>
 						<entry excluding="Class/Template|Class/MSC|Class/HID|Class/DFU|Class/CustomHID|Class/AUDIO" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares/ST/STM32_USB_Device_LibraryF4"/>

@@ -586,7 +586,8 @@ void kill_screen(const char* lcd_msg) {
     }
 
     static void lcd_sdcard_stop() {
-      card.stopSDPrint();
+//      card.stopSDPrint();
+      card.pauseSDPrint();
       clear_command_queue();
       quickstop_stepper();
       print_job_timer.stop();
@@ -1964,7 +1965,7 @@ void kill_screen(const char* lcd_msg) {
       uint16_t fileCnt = card.getnrfilenames();
       START_MENU();
       MENU_ITEM(back, MSG_MAIN);
-      card.getWorkDirName();
+//      card.getWorkDirName();
       if (card.filename[0] == '/') {
         #if !PIN_EXISTS(SD_DETECT)
           MENU_ITEM(function, LCD_STR_REFRESH MSG_REFRESH, lcd_sd_refresh);
@@ -2660,7 +2661,7 @@ void lcd_update() {
       #endif // REPRAPWORLD_KEYPAD
 
       bool encoderPastThreshold = (abs(encoderDiff) >= ENCODER_PULSES_PER_STEP);
-      if (encoderPastThreshold || lcd_clicked) {
+      if (encoderPastThreshold || enc_clicked) {
         if (encoderPastThreshold) {
           int32_t encoderMultiplier = 1;
 

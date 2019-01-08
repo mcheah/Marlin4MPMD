@@ -270,6 +270,67 @@ typedef enum
 #define LCD_DC_GPIO_CLK_DISABLE()                __HAL_RCC_GPIOF_CLK_DISABLE()
 
 #endif /* HAL_SPI_MODULE_ENABLED */
+#ifdef HAL_SD_MODULE_ENABLED
+#define SDIOx                                     SDIO
+#define LERDGEX_SDIO_CLK_ENABLE()                        __HAL_RCC_SDIO_CLK_ENABLE()
+
+#define LERDGEX_SDIO_D0_AF                              GPIO_AF12_SDIO
+#define LERDGEX_SDIO_D0_GPIO_PORT                       GPIOC
+#define LERDGEX_SDIO_D0_PIN                             GPIO_PIN_8
+#define LERDGEX_SDIO_D0_GPIO_CLK_ENABLE()               __HAL_RCC_GPIOC_CLK_ENABLE()
+#define LERDGEX_SDIO_D0_GPIO_CLK_DISABLE()              __HAL_RCC_GPIOC_CLK_DISABLE()
+
+#define LERDGEX_SDIO_D1_AF                              GPIO_AF12_SDIO
+#define LERDGEX_SDIO_D1_GPIO_PORT                       GPIOC
+#define LERDGEX_SDIO_D1_PIN                             GPIO_PIN_9
+#define LERDGEX_SDIO_D1_GPIO_CLK_ENABLE()               __HAL_RCC_GPIOC_CLK_ENABLE()
+#define LERDGEX_SDIO_D1_GPIO_CLK_DISABLE()              __HAL_RCC_GPIOC_CLK_DISABLE()
+
+#define LERDGEX_SDIO_D2_AF                              GPIO_AF12_SDIO
+#define LERDGEX_SDIO_D2_GPIO_PORT                       GPIOC
+#define LERDGEX_SDIO_D2_PIN                             GPIO_PIN_10
+#define LERDGEX_SDIO_D2_GPIO_CLK_ENABLE()               __HAL_RCC_GPIOC_CLK_ENABLE()
+#define LERDGEX_SDIO_D2_GPIO_CLK_DISABLE()              __HAL_RCC_GPIOC_CLK_DISABLE()
+
+#define LERDGEX_SDIO_D3_AF                              GPIO_AF12_SDIO
+#define LERDGEX_SDIO_D3_GPIO_PORT                       GPIOC
+#define LERDGEX_SDIO_D3_PIN                             GPIO_PIN_11
+#define LERDGEX_SDIO_D3_GPIO_CLK_ENABLE()               __HAL_RCC_GPIOC_CLK_ENABLE()
+#define LERDGEX_SDIO_D3_GPIO_CLK_DISABLE()              __HAL_RCC_GPIOC_CLK_DISABLE()
+
+#define LERDGEX_SDIO_CLK_AF                              GPIO_AF12_SDIO
+#define LERDGEX_SDIO_CLK_GPIO_PORT                       GPIOC
+#define LERDGEX_SDIO_CLK_PIN                             GPIO_PIN_12
+#define LERDGEX_SDIO_CLK_GPIO_CLK_ENABLE()               __HAL_RCC_GPIOC_CLK_ENABLE()
+#define LERDGEX_SDIO_CLK_GPIO_CLK_DISABLE()              __HAL_RCC_GPIOC_CLK_DISABLE()
+
+#define LERDGEX_SDIO_CMD_AF                        GPIO_AF12_SDIO
+#define LERDGEX_SDIO_CMD_GPIO_PORT                 GPIOD
+#define LERDGEX_SDIO_CMD_PIN                            GPIO_PIN_2
+#define LERDGEX_SDIO_CMD_GPIO_CLK_ENABLE()         __HAL_RCC_GPIOD_CLK_ENABLE()
+#define LERDGEX_SDIO_CMD_GPIO_CLK_DISABLE()        __HAL_RCC_GPIOD_CLK_DISABLE()
+
+/* DMA definitions for SD DMA transfer */
+#define SD_DMAx_TxRx_CLK_ENABLE            __HAL_RCC_DMA2_CLK_ENABLE
+#define SD_DMAx_Tx_CHANNEL                DMA_CHANNEL_4
+#define SD_DMAx_Rx_CHANNEL                DMA_CHANNEL_4
+#define SD_DMAx_Tx_STREAM                 DMA2_Stream6
+#define SD_DMAx_Rx_STREAM                 DMA2_Stream3
+#define SD_DMAx_Tx_IRQn                   DMA2_Stream6_IRQn
+#define SD_DMAx_Rx_IRQn                   DMA2_Stream3_IRQn
+#define BSP_SD_IRQHandler                 SDIO_IRQHandler
+#define BSP_SD_DMA_Tx_IRQHandler          DMA2_Stream6_IRQHandler
+#define BSP_SD_DMA_Rx_IRQHandler          DMA2_Stream3_IRQHandler
+#define SD_DetectIRQHandler()             HAL_GPIO_EXTI_IRQHandler(SD_DETECT_PIN)
+
+/* Maximum Timeout values for flags waiting loops. These timeouts are not based
+   on accurate values, they just guarantee that the application will not remain
+   stuck if the SPI communication is corrupted.
+   You may modify these timeout values depending on CPU frequency and application
+   conditions (interrupts routines ...). */   
+#define NUCLEO_SPIx_TIMEOUT_MAX                   1000
+#endif
+
 
 #define LCD_D0_PIN                                 GPIO_PIN_14
 #define LCD_D0_GPIO_PORT                           GPIOD

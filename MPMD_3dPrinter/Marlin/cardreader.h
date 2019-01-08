@@ -264,7 +264,7 @@ public:
 		else return 0;
 	};
 
-#if (!MB(STM_3DPRINT))
+#if (!MB(STM_3DPRINT) && !MB(STM_LERDGEX))
 	FORCE_INLINE char* getWorkDirName(){workDir.getFilename(filename);return filename;};
 #endif
 	uint32_t sdpos ;

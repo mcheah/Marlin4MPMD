@@ -44,12 +44,6 @@
 #include "Marlin_export.h"
 #ifdef STM32_MPMD
 #include "stm32f0xx_hal.h"
-#include "stm32f0xx_3dprinter_misc.h"
-
-#include "stm32f0xx_3dprinter_uart.h"
-#include "stm32f0xx_3dprinter_cdc.h"
-
-#include "stm32f0xx_3dprinter_adc.h"
 #elif defined(STM32_LERDGEX)
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_lerdgex.h"
@@ -62,7 +56,7 @@
 }
 #endif
 
- #include "stm32f0xx_3dprinter_misc.h"
+#include "stm32f0xx_3dprinter_misc.h"
 
 #include "stm32f0xx_3dprinter_uart.h"
 #include "stm32f0xx_3dprinter_cdc.h"
