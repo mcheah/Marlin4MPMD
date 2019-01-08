@@ -1334,7 +1334,19 @@ void kill_screen(const char* lcd_msg) {
     manual_move_start_time = millis() + (move_menu_scale < 0.99 ? 0UL : 250UL); // delay for bigger moves
     manual_move_axis = (int8_t)axis;
   }
-
+  static void _lcd_rgb(const char* name, int *rgb, int min, int max) {
+    if (LCD_CLICKED) { lcd_goto_previous_menu(true); return; }
+    ENCODER_DIRECTION_NORMAL();
+    if (encoderPosition) {
+      refresh_cmd_timeout();
+      *rgb +=(int32_t)encoderPosition * 1;
+      NOLESS((*rgb), min);
+      NOMORE((*rgb), max);
+      encoderPosition = 0;
+      lcdDrawUpdate = LCDVIEW_REDRAW_NOW;
+    }
+    if (lcdDrawUpdate) lcd_implementation_drawedit(name, itostr3(*rgb));
+  }
   /**
    *
    * "Prepare" > "Move Axis" submenu
@@ -1741,6 +1753,13 @@ void kill_screen(const char* lcd_msg) {
    * "Control" > "LCD RGB Colors" submenu
    *
    */
+
+  static void lcd_set_fgr() {_lcd_rgb(MSG_LCDFGR,&color_fg_r,0,31); }
+  static void lcd_set_fgg() {_lcd_rgb(MSG_LCDFGG,&color_fg_g,0,63); }
+  static void lcd_set_fgb() {_lcd_rgb(MSG_LCDFGB,&color_fg_b,0,31); }
+  static void lcd_set_bgr() {_lcd_rgb(MSG_LCDBGR,&color_bg_r,0,31); }
+  static void lcd_set_bgg() {_lcd_rgb(MSG_LCDBGG,&color_bg_g,0,63); }
+  static void lcd_set_bgb() {_lcd_rgb(MSG_LCDBGB,&color_bg_b,0,31); }
   static void lcd_rgb_menu() {
     START_MENU();
 
@@ -1753,12 +1772,12 @@ void kill_screen(const char* lcd_msg) {
     // Nozzle:
     // Nozzle [1-4]:
     //
-    MENU_MULTIPLIER_ITEM_EDIT(int3, MSG_LCDFGR, &color_fg_r, 0, 31);
-    MENU_MULTIPLIER_ITEM_EDIT(int3, MSG_LCDFGG, &color_fg_g, 0, 63);
-    MENU_MULTIPLIER_ITEM_EDIT(int3, MSG_LCDFGB, &color_fg_b, 0, 31);
-    MENU_MULTIPLIER_ITEM_EDIT(int3, MSG_LCDBGR, &color_bg_r, 0, 31);
-    MENU_MULTIPLIER_ITEM_EDIT(int3, MSG_LCDBGG, &color_bg_g, 0, 63);
-    MENU_MULTIPLIER_ITEM_EDIT(int3, MSG_LCDBGB, &color_bg_b, 0, 31);
+    MENU_ITEM(submenu, MSG_LCDFGR, lcd_set_fgr);
+    MENU_ITEM(submenu, MSG_LCDFGG, lcd_set_fgg);
+    MENU_ITEM(submenu, MSG_LCDFGB, lcd_set_fgb);
+    MENU_ITEM(submenu, MSG_LCDBGR, lcd_set_bgr);
+    MENU_ITEM(submenu, MSG_LCDBGG, lcd_set_bgg);
+    MENU_ITEM(submenu, MSG_LCDBGB, lcd_set_bgb);
     END_MENU();
   }
 
