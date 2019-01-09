@@ -147,18 +147,28 @@ class MarlinSerial { //: public Stream
     void end();
     int peek(void);
     int read(void);
+    FORCE_INLINE uint32_t read(uint8_t *buff, uint32_t maxlen) {
+    	if(type==UART)
+    		return BSP_UartCopyNextRxBytes(buff,maxlen);
+    #ifdef USE_USB_CDC
+    	else if(type==USB_CDC)
+    		return BSP_CdcCopyNextRxBytes(buff,maxlen);
+    #endif
+    	else
+    		return -1;
+    }
     void flush(void);
-    FORCE_INLINE int available(void) {
+    FORCE_INLINE int available(uint8_t waitforNewLine) {
     	if(type==UART)
     		return (BSP_UartGetNbRxAvailableBytes());
 #ifdef STM32_USE_USB_CDC
     	else if(type==USB_CDC)
-    		return (BSP_CdcGetNbRxAvailableBytes(true));
+    		return (BSP_CdcGetNbRxAvailableBytes(waitforNewLine));
 #endif
     	else
     		return 0;
     }
-
+    FORCE_INLINE int available() { available(true); }
     FORCE_INLINE void checkRx(void) {}
     FORCE_INLINE void write(uint8_t c) {
     if(type==UART)

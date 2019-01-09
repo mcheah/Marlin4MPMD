@@ -405,9 +405,10 @@ void BSP_MiscErrorHandler(uint16_t error)
   /* Infinite loop */
   while(1)
   {
-	  BSP_LED_Toggle(LED_BLUE);
+	  BSP_LED_Toggle(LED_GREEN);
+	  BSP_LED_Toggle(LED_RED);
 	  //Systick disabled, use loop for delay
-	  for(int i=0;i<10e3;i++) { }
+	  for(int i=0;i<1000e3;i++) { }
   }
 }
 /******************************************************//**
@@ -761,7 +762,14 @@ void HAL_SYSTICK_Callback(void)
 		}
 	}
 #endif//BSP_HEAT_E2_PIN
-
+#ifndef STM32_USE_USB_CDC
+	static int uartcount = 50;
+	uartcount--;
+	if(uartcount==0) {
+		uartcount = 50;
+		BSP_UartIfSendQueuedData();
+	}
+#endif
 }
 
 

@@ -709,7 +709,9 @@ void CardReader::push_read_buff(int len)
 
 void CardReader::write_buff(unsigned char *buf,uint32_t len)
 {
+#ifdef STM32_USE_USB_CDC
   cli();
+#endif
   if(len==512)
 	  BSP_LED_On(LED_RED);
   BSP_LED_On(LED_GREEN);
@@ -727,7 +729,9 @@ void CardReader::write_buff(unsigned char *buf,uint32_t len)
   BSP_LED_Off(LED_GREEN);
   BSP_LED_Off(LED_BLUE);
   BSP_LED_Off(LED_RED);
+#ifdef STM32_USE_USB_CDC
   sei();
+#endif
 }
 
 

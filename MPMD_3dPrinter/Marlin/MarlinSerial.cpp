@@ -170,7 +170,10 @@ uint8_t MarlinSerial::available(void) {
 }
 #endif  // BDI
 
-void MarlinSerial::flush(void) {}
+void MarlinSerial::flush(void) {
+	while(available())
+		read();
+}
 
 #if TX_BUFFER_SIZE > 0
   uint8_t MarlinSerial::availableForWrite(void) {

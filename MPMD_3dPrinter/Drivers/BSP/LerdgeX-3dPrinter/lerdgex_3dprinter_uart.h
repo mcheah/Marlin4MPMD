@@ -51,8 +51,8 @@
 //TODO: we should probably adjust these to a smaller size
 //TODO: find a way to allocate these buffers without wasting RAM when using CDC interface
 #if !defined(STM32_USE_USB_CDC) || defined(MALYAN_LCD)
-#define UART_TX_BUFFER_SIZE (64)
-#define UART_RX_BUFFER_SIZE (96)
+#define UART_TX_BUFFER_SIZE (512)
+#define UART_RX_BUFFER_SIZE (2048)
 #else
 #define UART_TX_BUFFER_SIZE (1)
 #define UART_RX_BUFFER_SIZE (1)
@@ -141,6 +141,7 @@ void BSP_UartAttachRxDataHandler(void (*callback)(uint8_t *, uint8_t));
 void BSP_UartAttachTxDoneCallback(void (*callback)(void));
 uint32_t BSP_UartPrintf(const char* format,...);
 uint32_t BSP_UartGetNbRxAvailableBytes(void);
+uint32_t BSP_UartCopyNextRxBytes(uint8_t *buff, uint32_t maxlen);
 int8_t BSP_UartGetNextRxBytes(void);
 uint8_t BSP_UartIsTxOnGoing(void);
 #if defined(MARLIN)

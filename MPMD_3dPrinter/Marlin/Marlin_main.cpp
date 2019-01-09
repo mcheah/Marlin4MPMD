@@ -4700,82 +4700,145 @@ inline void gcode_M31() {
 	#define M34_TIMEOUT 1000
     inline void gcode_M34() {
 //TODO: re-enable M34 once we have more reliable SD/UART communication
-//      unsigned char SDbuff[512];
-//      uint8_t M34_state = M34_IDLE;
-//      p_card->openFile(current_command_args, false);
-//      if(!p_card->saving)
-//    	  return;
-//      //Send OK to ensure we are ready
-//      SERIAL_PROTOCOLPGM(MSG_OK);
-//      SERIAL_EOL;
-//      uint32_t last_rx = millis();
-//      uint16_t SD_idx = 0;
-//      const char M29_CMD[] = "M29\r\n";
-//      while(M34_state != M34_RX) {
-//    	  if(BSP_CdcGetNbRxAvailableBytes(false)>0) {
-//    		  SD_idx += BSP_CdcCopyNextRxBytes(&SDbuff[SD_idx],512-SD_idx);
-//    		  if(millis()-last_rx>M34_TIMEOUT)
-//    			  M34_state = memcmp(SDbuff,M29_CMD,sizeof(M29_CMD)-1)==0 ? M34_RX : M34_IDLE;
-//    		  if(M34_state==M34_IDLE)
-//    			  last_rx = millis();
-////    		  char serial_char = MYSERIAL.read();
-////    		  switch(M34_state) {
-////    		  	  case M34_IDLE:
-////    		  		  if((millis()-last_rx>M34_TIMEOUT) && serial_char=='M') {
-////    		  			  SERIAL_PROTOCOLPGM("M Received\r\n");
-////    		  			  M34_state = M34_M; }
-////    		  		  else {
-//////    		  			  p_card->write_buff(&serial_char,1);
-////    		  			  SDbuff[SD_idx++] = serial_char;
-////    		  			  last_rx = millis();
-////    		  		  }
-////    		  		  break;
-////    		  	  case M34_M:
-////    		  		  if((millis()-last_rx>M34_TIMEOUT) && serial_char=='2') {
-////    		  			SERIAL_PROTOCOLPGM("M2 Received\r\n");
-////    		  			  M34_state = M34_M2; }
-////    		  		  else {
-////    		  			  SERIAL_PROTOCOLPGM("M Received\r\n");
-//////    		  			  p_card->write_buff(&serial_char,1);
-////    		  			  SDbuff[SD_idx++] = serial_char;
-////    		  			  last_rx = millis();
-////    		  			  M34_state = M34_IDLE;
-////    		  		  }
-////    		  		  break;
-////    		  	  case M34_M2:
-////    		  		  if((millis()-last_rx>M34_TIMEOUT) && serial_char=='9') {
-////    		  			  SERIAL_PROTOCOLPGM("M29Received\r\n");
-////    		  			  M34_state = M34_M29; }
-////    		  		  else {
-//////    		  			  p_card->write_buff(&serial_char,1);
-////    		  			  SDbuff[SD_idx++] = serial_char;
-////    		  			  last_rx = millis();
-////    		  			  M34_state = M34_IDLE;
-////    		  		  }
-////    		  		  break;
-////    		  	  case M34_M29:
-////    		  		  if((millis()-last_rx>M34_TIMEOUT) && (serial_char=='\r' || serial_char=='\n')) {
-////    		  			  SERIAL_PROTOCOLPGM("M\\r\\n Received\r\n");
-////    		  			  M34_state = M34_RX; }
-////    		  		  else {
-//////    		  			  p_card->write_buff(&serial_char,1);
-////    		  			  SDbuff[SD_idx++] = serial_char;
-////    		  			  last_rx = millis();
-////    		  			  M34_state = M34_IDLE;
-////    		  		  }
-////    		  		  break;
-////    		  	  case M34_RX:
-////    		  		  break;
-////    		  } //switch(M34_state)
-//    	  } //if MYSERIAL.available()>0
-//    	  //Flush buff to SD if timeout or we fill sector size
-//    	  if(M34_state !=M34_RX && (SD_idx>0) && (SD_idx==sizeof(SDbuff) || millis()-last_rx > M34_TIMEOUT))  {
-//    		  p_card->write_buff(SDbuff,SD_idx);
-//    		  SD_idx = 0;
-//    	  }
-//      } //while(M34_state!= M34_RX)
-//      p_card->closefile();
-//      SERIAL_PROTOCOLLNPGM(MSG_FILE_SAVED);
+      unsigned char SDbuff[512] = "";
+      char chbuff[1024];
+      uint8_t M34_state = M34_IDLE;
+      p_card->openFile(current_command_args, false);
+      if(!p_card->saving)
+    	  return;
+      //Send OK to ensure we are ready
+      MYSERIAL.flush();
+      SERIAL_PROTOCOLPGM(MSG_OK);
+      SERIAL_EOL;
+      uint32_t last_rx = millis();
+      uint16_t SD_idx = 0;
+      const char M29_CMD[] = "M29\r\n";
+      bool CTS = true;
+      while(M34_state != M34_RX) {
+    	  if(MYSERIAL.available(false)>0) {
+    		  SD_idx += MYSERIAL.read(&SDbuff[SD_idx],512-SD_idx);
+    		  switch(M34_state) {
+    		  case M34_IDLE:
+//    			  sprintf(chbuff,"sState = %d str=%s\r\n",M34_state,SDbuff);
+//    			  MYSERIAL.print(chbuff);
+    			  if(PENDING(millis(),last_rx+M34_TIMEOUT)) {
+    				  last_rx = millis();
+    			  }
+    			  else if(SD_idx < sizeof(M29_CMD)-1 && memcmp(SDbuff,M29_CMD,SD_idx)==0) {
+    				  last_rx = millis();
+    				  M34_state = M34_M29;
+    			  }
+    			  else if(SD_idx==sizeof(M29_CMD)-1 && memcmp(SDbuff,M29_CMD,SD_idx)==0) {
+    				  M34_state = M34_RX;
+    			  }
+    			  else
+    				  last_rx = millis();
+    			  break;
+//    			  sprintf(chbuff,"eState = %d \r\n",M34_state);
+//    			  MYSERIAL.print(chbuff);
+    		  case M34_M29:
+//    			  sprintf(chbuff,"sState = %d str=%s\r\n",M34_state,SDbuff);
+//    			  MYSERIAL.print(chbuff);
+    			  if(PENDING(millis(),last_rx+M34_TIMEOUT)) {
+        			  if(SD_idx < sizeof(M29_CMD)-1 && memcmp(SDbuff,M29_CMD,SD_idx)==0) { }
+        			  else if(SD_idx==sizeof(M29_CMD)-1 && memcmp(SDbuff,M29_CMD,SD_idx)==0) {
+        				  M34_state = M34_RX;
+        			  }
+        			  else
+        				  M34_state = M34_IDLE;
+    			  }
+    			  else
+    				  M34_state = M34_IDLE;
+//    			  sprintf(chbuff,"eState = %d \r\n",M34_state);
+//    			  MYSERIAL.print(chbuff);
+    			  break;
+    		  case M34_RX:
+//    			  sprintf(chbuff,"sState = %d str=%s\r\n",M34_state,SDbuff);
+//    			  MYSERIAL.print(chbuff);
+    			  continue;
+    			  break;
+    		  }
+    		  /*if(millis()-last_rx>M34_TIMEOUT && SD_idx==sizeof(M29_CMD)-1)
+    			  M34_state = memcmp(SDbuff,M29_CMD,sizeof(M29_CMD)-1)==0 ? M34_RX : M34_IDLE;
+    		  else if(millis()-last_rx>M34_TIMEOUT && SD_idx < sizeof(M29_CMD)) {
+    			  if(memcmp(SDbuff,M29_CMD,SD_idx)!=0)
+    				  last_rx = millis();
+    		  }
+    		  else
+    			  last_rx = millis();*/
+
+    			  //if(M34_state==M34_IDLE)
+//    		  char serial_char = MYSERIAL.read();
+//    		  switch(M34_state) {
+//    		  	  case M34_IDLE:
+//    		  		  if((millis()-last_rx>M34_TIMEOUT) && serial_char=='M') {
+//    		  			  SERIAL_PROTOCOLPGM("M Received\r\n");
+//    		  			  M34_state = M34_M; }
+//    		  		  else {
+////    		  			  p_card->write_buff(&serial_char,1);
+//    		  			  SDbuff[SD_idx++] = serial_char;
+//    		  			  last_rx = millis();
+//    		  		  }
+//    		  		  break;
+//    		  	  case M34_M:
+//    		  		  if((millis()-last_rx>M34_TIMEOUT) && serial_char=='2') {
+//    		  			SERIAL_PROTOCOLPGM("M2 Received\r\n");
+//    		  			  M34_state = M34_M2; }
+//    		  		  else {
+//    		  			  SERIAL_PROTOCOLPGM("M Received\r\n");
+////    		  			  p_card->write_buff(&serial_char,1);
+//    		  			  SDbuff[SD_idx++] = serial_char;
+//    		  			  last_rx = millis();
+//    		  			  M34_state = M34_IDLE;
+//    		  		  }
+//    		  		  break;
+//    		  	  case M34_M2:
+//    		  		  if((millis()-last_rx>M34_TIMEOUT) && serial_char=='9') {
+//    		  			  SERIAL_PROTOCOLPGM("M29Received\r\n");
+//    		  			  M34_state = M34_M29; }
+//    		  		  else {
+////    		  			  p_card->write_buff(&serial_char,1);
+//    		  			  SDbuff[SD_idx++] = serial_char;
+//    		  			  last_rx = millis();
+//    		  			  M34_state = M34_IDLE;
+//    		  		  }
+//    		  		  break;
+//    		  	  case M34_M29:
+//    		  		  if((millis()-last_rx>M34_TIMEOUT) && (serial_char=='\r' || serial_char=='\n')) {
+//    		  			  SERIAL_PROTOCOLPGM("M\\r\\n Received\r\n");
+//    		  			  M34_state = M34_RX; }
+//    		  		  else {
+////    		  			  p_card->write_buff(&serial_char,1);
+//    		  			  SDbuff[SD_idx++] = serial_char;
+//    		  			  last_rx = millis();
+//    		  			  M34_state = M34_IDLE;
+//    		  		  }
+//    		  		  break;
+//    		  	  case M34_RX:
+//    		  		  break;
+//    		  } //switch(M34_state)
+    	  } //if MYSERIAL.available()>0
+    	  if(M34_state==M34_M29 && millis()-last_rx > M34_TIMEOUT)
+    		  M34_state = M34_IDLE;
+    	  if(CTS && MYSERIAL.available()>= UART_RX_BUFFER_SIZE/2) {
+    		  CTS = false;
+              SERIAL_ECHOLNPGM(MSG_BUSY_PROCESSING);
+    	  }
+    	  if(!CTS && MYSERIAL.available()< UART_RX_BUFFER_SIZE/2) {
+    		  CTS = true;
+              SERIAL_ECHOLNPGM(MSG_OK);
+    	  }
+
+    	  //Flush buff to SD if timeout or we fill sector size
+    	  if(M34_state==M34_IDLE && ((SD_idx>0) && (SD_idx==sizeof(SDbuff) || millis()-last_rx > M34_TIMEOUT)))  {
+//			  sprintf(chbuff,"%d write to file %s\r\n",millis()-last_rx,SDbuff);
+//			  MYSERIAL.print(chbuff);
+    		  p_card->write_buff(SDbuff,SD_idx);
+    		  SD_idx = 0;
+    	  }
+      } //while(M34_state!= M34_RX)
+      p_card->closefile();
+      SERIAL_PROTOCOLLNPGM(MSG_FILE_SAVED);
     }
 
     /**

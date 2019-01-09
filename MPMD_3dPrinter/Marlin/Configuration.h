@@ -114,7 +114,7 @@
 
 // This determines the communication speed of the printer
 // :[2400,9600,19200,38400,57600,115200,250000]
-#define BAUDRATE (115200)
+#define BAUDRATE (115200*4)
 
 // Enable the Bluetooth serial interface on AT90USB devices
 //#define BLUETOOTH
