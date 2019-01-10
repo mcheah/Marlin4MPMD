@@ -882,6 +882,80 @@ __IO uint16_t *RAM_ADDR = (uint16_t *)0x60020000;
 #define COLBOUND 0x002B
 #define RAMWR	 0x002C
 
+void setup6() {
+	char buffer[80];
+	char *pbuff = buffer;
+	  setup_killpin();
+	  setup_powerhold();
+	  MYSERIAL.begin(BAUDRATE);
+	  lcd_init();
+	  HAL_I2Cx_init();
+	  while(1) {
+		while(MYSERIAL.available()) {
+			*(pbuff++) = MYSERIAL.read();
+			MYSERIAL.write(*(pbuff-1));
+			if(*(pbuff-1)=='\n' || *(pbuff-1)=='\r') {
+				break;
+			}
+		}
+		if(*(pbuff-1)=='\n' || *(pbuff-1)=='\r') {
+			static uint16_t ADR = 0;
+			bool isRead = false;
+			*pbuff = '\0';
+			pbuff = buffer;
+			switch (buffer[0]) {
+			case 'w':
+			case 'W':
+			{
+				if(buffer[1]!=' ')
+					continue;//continue parsing
+				ADR = atoi((const char *) &buffer[2]);
+				char *loc = strchr(&buffer[2],' ');
+				if(!loc) //no second space, continue
+					continue;
+				uint8_t DAT = atoi(loc);
+				HAL_I2C_Mem_Write(&I2cHandle,I2C_FRAM_ADDR,ADR,I2C_MEMADD_SIZE_16BIT,&DAT,1,100);
+			break; }
+			case 'r':
+			case 'R': {
+				if(buffer[1]!=' ') {
+					uint16_t DAT = *RAM_ADDR;
+					MYSERIAL.print(" ");
+					MYSERIAL.println(DAT,HEX);
+				}
+				else {
+					ADR = atoi((const char *) &buffer[2]);
+//					*REG_ADDR = ADR;
+					uint16_t rpt = 1;
+					char *loc = strchr(&buffer[2],' ');
+					if(loc)
+						rpt = atoi(loc);
+					for(int i=0;i<rpt;i++) {
+//						uint16_t DAT = *RAM_ADDR;
+						uint8_t DAT;
+						if(HAL_I2C_Mem_Read(&I2cHandle,I2C_FRAM_ADDR,ADR++,I2C_MEMADD_SIZE_16BIT,&DAT,1,100)!=HAL_OK)
+						{
+							MYSERIAL.println("Read Error");
+							break;
+						}
+//						if(i==0) {
+						MYSERIAL.print("Read address: ");
+						MYSERIAL.print(ADR-1,HEX);
+						MYSERIAL.print(" data = ");
+//						}
+//						else
+//							MYSERIAL.print(" ");
+						MYSERIAL.println(DAT,HEX);
+					}
+					MYSERIAL.print("\r\n");
+				}
+			break; }
+			} //switch(buff[0])
+		} //if =='\n'
+		BSP_UartIfSendQueuedData();
+	} //while(1)
+}
+
 void setup5() {
 	  setup_killpin();
 	  setup_powerhold();
@@ -997,10 +1071,10 @@ void setup4() {
 					MYSERIAL.print("\r\n");
 				}
 			break; }
-			}
-		}
+			} //switch(buff[0])
+		} //if =='\n'
 		BSP_UartIfSendQueuedData();
-	}
+	} //while(1)
 }
 
 void setup3() {

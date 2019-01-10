@@ -49,6 +49,7 @@ void setup2(void);
 void setup3(void);
 void setup4(void);
 void setup5(void);
+void setup6(void);
 void loop(void);
 void IsrStepperHandler(void);
 void IsrTemperatureHandler(void);

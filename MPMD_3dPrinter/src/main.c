@@ -63,7 +63,7 @@ int main(void)
     BSP_LED_Init(LED_RED);
     BSP_LED_Init(LED_BLUE);
     BSP_LED_On(LED_GREEN);
-	setup();
+	setup6();
 
 	for(;;)
 	{

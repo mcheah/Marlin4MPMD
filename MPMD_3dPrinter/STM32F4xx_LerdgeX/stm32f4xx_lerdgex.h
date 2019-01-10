@@ -329,8 +329,28 @@ typedef enum
    You may modify these timeout values depending on CPU frequency and application
    conditions (interrupts routines ...). */   
 #define NUCLEO_SPIx_TIMEOUT_MAX                   1000
-#endif
+#endif //HAL_SD_MODULE_ENABLED
+#ifdef HAL_I2C_MODULE_ENABLED
+/* User can use this section to tailor I2Cx/I2Cx instance used and associated
+   resources */
+/* Definition for I2Cx clock resources */
+#define I2C_FRAM_ADDR					 (0xA0)
+#define I2Cx                             I2C1
+#define I2Cx_CLK_ENABLE()                __HAL_RCC_I2C1_CLK_ENABLE()
+#define I2Cx_SDA_GPIO_CLK_ENABLE()       __HAL_RCC_GPIOB_CLK_ENABLE()
+#define I2Cx_SCL_GPIO_CLK_ENABLE()       __HAL_RCC_GPIOB_CLK_ENABLE()
 
+#define I2Cx_FORCE_RESET()               __HAL_RCC_I2C1_FORCE_RESET()
+#define I2Cx_RELEASE_RESET()             __HAL_RCC_I2C1_RELEASE_RESET()
+
+/* Definition for I2Cx Pins */
+#define I2Cx_SCL_PIN                    GPIO_PIN_8
+#define I2Cx_SCL_GPIO_PORT              GPIOB
+#define I2Cx_SCL_AF                     GPIO_AF4_I2C1
+#define I2Cx_SDA_PIN                    GPIO_PIN_9
+#define I2Cx_SDA_GPIO_PORT              GPIOB
+#define I2Cx_SDA_AF                     GPIO_AF4_I2C1
+#endif //HAL_I2C_MODULE_ENABLED
 
 #define LCD_D0_PIN                                 GPIO_PIN_14
 #define LCD_D0_GPIO_PORT                           GPIOD
@@ -506,6 +526,8 @@ typedef enum
 /** @defgroup STM32F4XX_LERDGEX_LOW_LEVEL_Exported_Functions STM32F4XX NUCLEO 144 LOW LEVEL Exported Functions
   * @{
   */
+
+extern I2C_HandleTypeDef I2cHandle;
 uint32_t         BSP_GetVersion(void);  
 void             BSP_LED_Init(Led_TypeDef Led);
 void             BSP_LED_DeInit(Led_TypeDef Led);
@@ -516,6 +538,7 @@ void             BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef ButtonMod
 void             BSP_PB_DeInit(Button_TypeDef Button);
 uint32_t         BSP_PB_GetState(Button_TypeDef Button);
 void			 BSP_LCD_Init();
+void 			 HAL_I2Cx_init(void);
 //#ifdef HAL_ADC_MODULE_ENABLED
 //uint8_t          BSP_JOY_Init(void);
 //JOYState_TypeDef BSP_JOY_GetState(void);
