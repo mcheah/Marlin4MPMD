@@ -2397,7 +2397,7 @@ static void clean_up_after_endstop_or_probe_move() {
     for(int i=0;i<AUTO_BED_LEVELING_GRID_POINTS;i++) {
 			float xsq = sq(i-HALF_AUTO_BED_LEVELING_GRID_POINTS)/HALF_AUTO_BED_LEVELING_GRID_POINTS;
     		for(int j=0;j<=AUTO_BED_LEVELING_GRID_POINTS;j++) {
-    			float ysq = (j-HALF_AUTO_BED_LEVELING_GRID_POINTS)/HALF_AUTO_BED_LEVELING_GRID_POINTS;
+    			float ysq = sq(j-HALF_AUTO_BED_LEVELING_GRID_POINTS)/HALF_AUTO_BED_LEVELING_GRID_POINTS;
     			float rad;
     			arm_sqrt_f32(xsq+ysq,&rad);
     			if(rad>1.0)
