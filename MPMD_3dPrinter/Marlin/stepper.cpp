@@ -120,7 +120,7 @@ volatile signed char Stepper::count_direction[NUM_AXIS] = { 1, 1, 1, 1 };
   long Stepper::counter_M[MIXING_STEPPERS];
 #endif
 
-unsigned short Stepper::acc_step_rate; // needed for deceleration start point
+unsigned long Stepper::acc_step_rate; // needed for deceleration start point
 uint8_t Stepper::step_loops, Stepper::step_loops_nominal;
 unsigned short Stepper::OCR1A_nominal;
 
@@ -199,7 +199,8 @@ volatile long Stepper::endstops_trigsteps[3];
 // C1 B1 A1 is longIn1
 // D2 C2 B2 A2 is longIn2
 //
-#define MultiU24X32toH16(intRes, longIn1, longIn2)  intRes = (uint16_t)((((uint64_t)longIn1 * (uint64_t)longIn2)>> 24)& 0XFFFF);
+//#define MultiU24X32toH16(intRes, longIn1, longIn2)  intRes = (uint16_t)((((uint64_t)longIn1 * (uint64_t)longIn2)>> 24)& 0XFFFF);
+#define MultiU24X32toH16(intRes, longIn1, longIn2)  intRes = (uint64_t)((((uint64_t)longIn1 * (uint64_t)longIn2)>> 24)& 0XFFFF);
 /* BDI  -- To suppress
 #define MultiU24X32toH16(intRes, longIn1, longIn2) \
   asm volatile ( \
@@ -532,7 +533,8 @@ void Stepper::StepperHandler()
     #endif
 
     // Calculate new timer value
-    unsigned short timer, step_rate;
+    unsigned short timer;
+    unsigned long step_rate;
     if (step_events_completed <= (unsigned long)current_block->accelerate_until) {
 
       MultiU24X32toH16(acc_step_rate, acceleration_time, current_block->acceleration_rate);

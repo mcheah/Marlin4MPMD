@@ -346,6 +346,8 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle)
     }
     /* Set transmission flag: transfer complete*/
     pUart->txBusy = RESET;
+    //Send out any additional queued data
+    BSP_UartIfSendQueuedData();
   }
 }
 

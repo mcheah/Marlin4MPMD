@@ -2633,7 +2633,7 @@ void lcd_update() {
   #endif //SDSUPPORT && SD_DETECT_PIN
 
   millis_t ms = millis();
-  if (ELAPSED(ms, next_lcd_update_ms)) {
+  if (ELAPSED(ms, next_lcd_update_ms) && (commands_in_queue==0 || planner.movesplanned()>MIN_MOVESPLANNED)) {
 
     next_lcd_update_ms = ms + LCD_UPDATE_INTERVAL;
 

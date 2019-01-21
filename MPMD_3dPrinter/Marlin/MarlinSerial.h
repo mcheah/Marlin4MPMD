@@ -168,7 +168,7 @@ class MarlinSerial { //: public Stream
     	else
     		return 0;
     }
-    FORCE_INLINE int available() { available(true); }
+    FORCE_INLINE int available() { return available(true); }
     FORCE_INLINE void checkRx(void) {}
     FORCE_INLINE void write(uint8_t c) {
     if(type==UART)

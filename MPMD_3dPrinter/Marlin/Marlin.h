@@ -231,7 +231,7 @@ extern uint8_t marlin_debug_flags;
 extern bool Running;
 inline bool IsRunning() { return  Running; }
 inline bool IsStopped() { return !Running; }
-
+extern uint8_t commands_in_queue;
 bool enqueue_and_echo_command(const char* cmd, bool say_ok=false); //put a single ASCII command at the end of the current buffer or return false when it is full
 void enqueue_and_echo_command_now(const char* cmd); // enqueue now, only return when the command has been enqueued
 void enqueue_and_echo_commands_P(const char* cmd); //put one or many ASCII commands at the end of the current buffer, read from flash
@@ -398,7 +398,7 @@ inline void do_blocking_move_to(float x, float y, float z, float fr_mm_m=0.0);
 inline void do_blocking_move_to_x(float x, float fr_mm_m=0.0);
 inline void do_blocking_move_to_z(float z, float fr_mm_m=0.0);
 inline void do_blocking_move_to_xy(float x, float y, float fr_mm_m=0.0);
-
+#define MIN_MOVESPLANNED 96
 
 /**
  * position_is_reachable family of functions

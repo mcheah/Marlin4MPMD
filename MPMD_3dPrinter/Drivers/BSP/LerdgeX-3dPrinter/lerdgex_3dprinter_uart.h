@@ -52,7 +52,7 @@
 //TODO: find a way to allocate these buffers without wasting RAM when using CDC interface
 #if !defined(STM32_USE_USB_CDC) || defined(MALYAN_LCD)
 #define UART_TX_BUFFER_SIZE (512)
-#define UART_RX_BUFFER_SIZE (2048)
+#define UART_RX_BUFFER_SIZE (16384)
 #else
 #define UART_TX_BUFFER_SIZE (1)
 #define UART_RX_BUFFER_SIZE (1)

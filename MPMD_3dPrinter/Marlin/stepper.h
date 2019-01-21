@@ -105,7 +105,7 @@ class Stepper {
 
     static long acceleration_time, deceleration_time;
     //unsigned long accelerate_until, decelerate_after, acceleration_rate, initial_rate, final_rate, nominal_rate;
-    static unsigned short acc_step_rate; // needed for deceleration start point
+    static unsigned long acc_step_rate; // needed for deceleration start point
     static uint8_t step_loops, step_loops_nominal;
     static unsigned short OCR1A_nominal;
 
@@ -254,29 +254,30 @@ class Stepper {
 
   private:
 
-    static FORCE_INLINE unsigned short calc_timer(unsigned short step_rate) {
+    static FORCE_INLINE unsigned short calc_timer(unsigned long step_rate) {
       unsigned short timer;
 
-      NOMORE(step_rate, MAX_STEP_FREQUENCY);
-      NOLESS(step_rate,(uint16_t)((F_CPU()/(0xffff*TICK_TIMER_PRESCALER)))/2+1);
-      if(step_rate > 10000) {
-        // If steprate > 20kHz >> step 4 times
-        step_rate = (step_rate >> 2)&0x3fff;
-        step_loops = 4;
-      }
-      else if(step_rate > 5000)
-      {
-        // If steprate > 10kHz >> step 2 times
-        step_rate = (step_rate >> 1)&0x7fff;
-        step_loops = 2;
-      }
-      else
-      {
+//      NOMORE(step_rate, MAX_STEP_FREQUENCY);
+      NOLESS(step_rate,(uint32_t)((F_CPU()/((uint32_t)0xffff*(uint32_t)TICK_TIMER_PRESCALER)))/2u+1u);
+//      if(step_rate > 10000) {
+//        // If steprate > 20kHz >> step 4 times
+//        step_rate = (step_rate >> 2)&0x3fff;
+//        step_loops = 4;
+//      }
+//      else if(step_rate > 5000)
+//      {
+//        // If steprate > 10kHz >> step 2 times
+//        step_rate = (step_rate >> 1)&0x7fff;
+//        step_loops = 2;
+//      }
+//      else
+//      {
         step_loops = 1;
-      }
+//      }
 
       timer = (uint16_t)(F_CPU() / (step_rate * TICK_TIMER_PRESCALER))/2;
-      if(timer < 100)  timer = 100;
+//      NOLESS(timer,100);
+//      if(timer < 100)  timer = 100;
 
       return timer;
     }

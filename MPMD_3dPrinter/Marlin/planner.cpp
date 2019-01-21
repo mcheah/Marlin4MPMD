@@ -545,7 +545,24 @@ void Planner::check_axes_activity() {
 
   // If the buffer is full: good! That means we are well ahead of the robot.
   // Rest here until there is room in the buffer.
-  while (block_buffer_tail == next_buffer_head) idle();
+  bool full = (block_buffer_tail == next_buffer_head);
+  time_t start,end;
+  static time_t maxElap = 0;
+  while (block_buffer_tail == next_buffer_head){
+	  start = millis();
+	  idle();
+	  end = millis();
+	  if((end-start)>maxElap)
+		  maxElap = end-start;
+  }
+  if(full) {
+	  uint16_t temp = 0xBEEF*(end-start);
+	  if(planner.movesplanned==0)
+	  {
+		  uint16_t temp2 = 0xDEAD;
+		  BSP_MiscErrorHandler(0xA000);
+	  }
+  }
 
   #if ENABLED(MESH_BED_LEVELING)
     if (mbl.active())
