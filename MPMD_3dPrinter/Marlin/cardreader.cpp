@@ -686,9 +686,6 @@ void CardReader::push_read_buff(int len)
     	FSIZE_t curpos = f_tell(&file);
         f_lseek(&file,curpos-((pReadEnd)-pRead+len));
         sdpos-=((pReadEnd)-pRead+len);
-        char buff[80];
-        sprintf(buff,"sdpos=%ld curpos=%ld\r\n",sdpos,curpos);
-        serialprintPGM(buff);
         FRESULT readStatus = f_read(&file, readBuff, 512, &bytesRead);
 	    if(readStatus != FR_OK)
 	    {

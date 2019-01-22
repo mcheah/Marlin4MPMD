@@ -239,7 +239,14 @@ public:
 
 	FORCE_INLINE uint32_t fileLength() { return filesize; }
 	FORCE_INLINE bool isFileOpen() { return (bool)file.obj.fs; }
-	FORCE_INLINE bool eof() { return sdpos>=filesize ;};
+	FORCE_INLINE bool eof() {
+		if(!isBinaryMode)
+			return sdpos>=filesize ;
+		else {
+			int bytesAvailable = pReadEnd - pRead;
+			return (sdpos-bytesAvailable)>=filesize;
+		}
+	};
 	FORCE_INLINE int16_t get() {
 		UINT readByte;
 		UINT rc;
