@@ -4667,7 +4667,7 @@ inline void gcode_M31() {
   }
 
   /**
-   * M25: Pause SD Print
+   * M524: Abort SD Print
    */
   inline void gcode_M524() {
 
