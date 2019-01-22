@@ -287,7 +287,7 @@ void process_lcd_p_command(const char* command) {
         write_to_lcd_P(PSTR("{SYS:CANCELING}"));
         last_printing_status = MALYAN_IDLE;
         if(sdprint)
-        	card.pauseSDPrint();
+        	card.stopSDPrint();
         clear_command_queue();
         quickstop_stepper();
         print_job_timer.stop();
@@ -390,8 +390,6 @@ void process_lcd_s_command(const char* command) {
 
     case 'L': {
       #if ENABLED(SDSUPPORT)
-        if (!card.cardOK) card.initsd();
-
         // A more efficient way to do this would be to
         // implement a callback in the ls_SerialPrint code, but
         // that requires changes to the core cardreader class that
@@ -510,7 +508,7 @@ void lcd_update() {
     // The UI needs to see at least one TQ which is not 100%
     // and then when the print is complete, one which is.
   if(card.updateLCD) {
-    if (card.sdprinting) {
+    if (card.sdprinting || card.saving) {
         if (card.percentDone() != progress) {
         char message_buffer[10];
         progress = card.percentDone();
@@ -572,7 +570,19 @@ void lcd_setstatus(const char* message, bool persist) {
 void lcd_setstatuspgm(const char* message, uint8_t level) {
 	write_to_lcd_P(message);
 }
-
+void lcd_setpercent(uint8_t percent) {
+	  progress = percent;
+	  char message_buffer[10];
+      sprintf_P(message_buffer, PSTR("{TQ:%03i}"), (int)progress);
+      lcd_setstatus(message_buffer);
+	  if(progress==0)
+		lcd_setstatuspgm(PSTR(MSG_BUILD));
+	  else if(progress>=100)
+	  {
+		lcd_setstatuspgm(PSTR(MSG_COMPLETE));
+		progress = 0;
+	  }
+}
 
 
 #endif // MALYAN_LCD

@@ -864,7 +864,7 @@ void BSP_MiscTickSetFreq(uint32_t newFreq)
 //    newFreq = (newFreq >> 1)&0x7fff;
 //  }
   
-  timPeriod = (HAL_RCC_GetSysClockFreq()/ (TICK_TIMER_PRESCALER * (uint32_t)newFreq));
+  timPeriod = (HAL_RCC_GetSysClockFreq()/ (TICK_TIMER_PRESCALER * (uint32_t)newFreq))/2;
   if (timPeriod < 100) timPeriod = 100;
   if (timPeriod > 0xFFFF) timPeriod = 0xFFFF;
   __HAL_TIM_SetCompare(&hTimTick, BSP_MISC_CHAN_TIMER_TICK, timerCnt + timPeriod);
@@ -955,7 +955,7 @@ void BSP_MiscTick2SetFreq(float newPeriod)
 {
   uint32_t sysFreq = HAL_RCC_GetSysClockFreq();
   uint32_t tick;
-  uint32_t timPeriod = ((uint32_t)(sysFreq * newPeriod)/ TICK_TIMER_PRESCALER) - 1; 
+  uint32_t timPeriod = ((uint32_t)(sysFreq * newPeriod)/ TICK_TIMER_PRESCALER)/2 - 1;
   
   __HAL_TIM_SetAutoreload(&hTimTick2, timPeriod);
   __HAL_TIM_SetCompare(&hTimTick2, BSP_MISC_CHAN_TIMER_TICK2, timPeriod >> 1);

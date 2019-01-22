@@ -93,5 +93,7 @@
   #define THERMISTOR_NAME "Dummy 1"
 #elif THERMISTOR_ID == 999
   #define THERMISTOR_NAME "Dummy 2"
+#else
+#define THERMISTOR_NAME "THERMISTOR"
 
 #endif // THERMISTOR_ID

@@ -141,6 +141,7 @@ void BSP_UartAttachRxDataHandler(void (*callback)(uint8_t *, uint8_t));
 void BSP_UartAttachTxDoneCallback(void (*callback)(void));
 uint32_t BSP_UartPrintf(const char* format,...);
 uint32_t BSP_UartGetNbRxAvailableBytes(void);
+uint32_t BSP_UartCopyNextRxBytes(uint8_t *buff, uint32_t maxlen);
 int8_t BSP_UartGetNextRxBytes(void);
 uint8_t BSP_UartIsTxOnGoing(void);
 #if defined(MARLIN)

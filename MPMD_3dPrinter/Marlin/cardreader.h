@@ -206,6 +206,12 @@ public:
 	void pauseSDPrint();
 
 	/**
+	 * \fn void pauseSDPrint()
+	 * \brief Function used to pause the printing action.
+	 */
+	void stopSDPrint();
+
+	/**
 	 * \fn void getStatus()
 	 * \brief Function used to status of the printing action.
 	 */
@@ -259,7 +265,12 @@ public:
 		}
 		return (int16_t) readByte;
 	};
-	FORCE_INLINE void setIndex(long index) {sdpos = index;f_lseek(&file, index);};
+	FORCE_INLINE void setIndex(long index) {
+		sdpos = index;
+		f_lseek(&file, index);
+		if(isBinaryMode)
+			flush_buff();
+	};
 	FORCE_INLINE uint8_t percentDone(){
 		if(!isFileOpen())
 			return 0;
@@ -305,6 +316,7 @@ private:
 
 	void lsDive(const char *prepend, DIR *parent, const char * const match=NULL);
 	bool testPath( char *name, char **fname);
+	void flush_buff(void);
 
 
 };

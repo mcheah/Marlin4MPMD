@@ -4454,24 +4454,90 @@ inline void gcode_M31() {
     };
 	#define M34_TIMEOUT 1000
     inline void gcode_M34() {
-      unsigned char SDbuff[512];
+      unsigned char SDbuff[512] = "";
+      int filesize = -1;
+      char* namestartpos = strchr(current_command_args, '!');  // Find ! to indicate filename string start.
+      if (!namestartpos)
+        namestartpos = current_command_args; // Default name position, 4 letters after the M
+      else
+        namestartpos++; //to skip the '!'      
+#if ENABLED(MALYAN_LCD)
+      if(code_seen('S') && (seen_pointer < namestartpos)) {
+    	  filesize = code_value_int();
+    	  lcd_setpercent(0);
+    	  lcd_setstatuspgm(PSTR(MSG_RESUME));
+    	  print_job_timer.start();
+    	  lcd_setstatuspgm(PSTR(MSG_RESUMED));    	  
+      }
+#endif
       uint8_t M34_state = M34_IDLE;
-      p_card->openFile(current_command_args, false);
+      p_card->openFile(namestartpos, false);
       if(!p_card->saving)
     	  return;
+      card.updateLCD = true;
+      p_card->filesize = filesize;
       //Send OK to ensure we are ready
+      MYSERIAL.flush();
       SERIAL_PROTOCOLPGM(MSG_OK);
       SERIAL_EOL;
       uint32_t last_rx = millis();
       uint16_t SD_idx = 0;
       const char M29_CMD[] = "M29\r\n";
+      bool CTS = true;
       while(M34_state != M34_RX) {
-    	  if(BSP_CdcGetNbRxAvailableBytes(false)>0) {
-    		  SD_idx += BSP_CdcCopyNextRxBytes(&SDbuff[SD_idx],512-SD_idx);
-    		  if(millis()-last_rx>M34_TIMEOUT)
+    	  if(MYSERIAL.available(false)>0) {
+    		  SD_idx += MYSERIAL.read(&SDbuff[SD_idx],512-SD_idx);
+    		  switch(M34_state) {
+    		  case M34_IDLE:
+//    			  sprintf(chbuff,"sState = %d str=%s\r\n",M34_state,SDbuff);
+//    			  MYSERIAL.print(chbuff);
+    			  if(PENDING(millis(),last_rx+M34_TIMEOUT)) {
+    				  last_rx = millis();
+    			  }
+    			  else if(SD_idx < sizeof(M29_CMD)-1 && memcmp(SDbuff,M29_CMD,SD_idx)==0) {
+    				  last_rx = millis();
+    				  M34_state = M34_M29;
+    			  }
+    			  else if(SD_idx==sizeof(M29_CMD)-1 && memcmp(SDbuff,M29_CMD,SD_idx)==0) {
+    				  M34_state = M34_RX;
+    			  }
+    			  else
+    				  last_rx = millis();
+    			  break;
+//    			  sprintf(chbuff,"eState = %d \r\n",M34_state);
+//    			  MYSERIAL.print(chbuff);
+    		  case M34_M29:
+//    			  sprintf(chbuff,"sState = %d str=%s\r\n",M34_state,SDbuff);
+//    			  MYSERIAL.print(chbuff);
+    			  if(PENDING(millis(),last_rx+M34_TIMEOUT)) {
+        			  if(SD_idx < sizeof(M29_CMD)-1 && memcmp(SDbuff,M29_CMD,SD_idx)==0) { }
+        			  else if(SD_idx==sizeof(M29_CMD)-1 && memcmp(SDbuff,M29_CMD,SD_idx)==0) {
+        				  M34_state = M34_RX;
+        			  }
+        			  else
+        				  M34_state = M34_IDLE;
+    			  }
+    			  else
+    				  M34_state = M34_IDLE;
+//    			  sprintf(chbuff,"eState = %d \r\n",M34_state);
+//    			  MYSERIAL.print(chbuff);
+    			  break;
+    		  case M34_RX:
+//    			  sprintf(chbuff,"sState = %d str=%s\r\n",M34_state,SDbuff);
+//    			  MYSERIAL.print(chbuff);
+    			  continue;
+    			  break;
+    		  }
+    		  /*if(millis()-last_rx>M34_TIMEOUT && SD_idx==sizeof(M29_CMD)-1)
     			  M34_state = memcmp(SDbuff,M29_CMD,sizeof(M29_CMD)-1)==0 ? M34_RX : M34_IDLE;
-    		  if(M34_state==M34_IDLE)
-    			  last_rx = millis();
+    		  else if(millis()-last_rx>M34_TIMEOUT && SD_idx < sizeof(M29_CMD)) {
+    			  if(memcmp(SDbuff,M29_CMD,SD_idx)!=0)
+    				  last_rx = millis();
+    		  }
+    		  else
+    			  last_rx = millis();*/
+
+    			  //if(M34_state==M34_IDLE)
 //    		  char serial_char = MYSERIAL.read();
 //    		  switch(M34_state) {
 //    		  	  case M34_IDLE:
@@ -4522,14 +4588,47 @@ inline void gcode_M31() {
 //    		  		  break;
 //    		  } //switch(M34_state)
     	  } //if MYSERIAL.available()>0
+    	  else {
+    		  lcd_update();
+    	  }
+    	  if(M34_state==M34_M29 && millis()-last_rx > M34_TIMEOUT)
+    		  M34_state = M34_IDLE;
+#ifndef STM32_USE_USB_CDC
+    	  if(CTS && MYSERIAL.available()>= UART_RX_BUFFER_SIZE/2)
+#else
+          if(CTS && MYSERIAL.available()>= CDC_RX_BUFFER_SIZE/2)
+#endif
+          {
+    		  CTS = false;
+              SERIAL_ECHOLNPGM(MSG_BUSY_PROCESSING);
+    	  }
+#ifndef STM32_USE_USB_CDC
+    	  if(!CTS && MYSERIAL.available()< UART_RX_BUFFER_SIZE/2)
+#else
+          if(!CTS && MYSERIAL.available()< CDC_RX_BUFFER_SIZE/2)
+#endif
+          {
+    		  CTS = true;
+              SERIAL_ECHOLNPGM(MSG_OK);
+    	  }
+
     	  //Flush buff to SD if timeout or we fill sector size
-    	  if(M34_state !=M34_RX && (SD_idx>0) && (SD_idx==sizeof(SDbuff) || millis()-last_rx > M34_TIMEOUT))  {
+    	  if(M34_state==M34_IDLE && ((SD_idx>0) && (SD_idx==sizeof(SDbuff) || millis()-last_rx > M34_TIMEOUT)))  {
+//			  sprintf(chbuff,"%d write to file %s\r\n",millis()-last_rx,SDbuff);
+//			  MYSERIAL.print(chbuff);
     		  p_card->write_buff(SDbuff,SD_idx);
     		  SD_idx = 0;
     	  }
       } //while(M34_state!= M34_RX)
       p_card->closefile();
       SERIAL_PROTOCOLLNPGM(MSG_FILE_SAVED);
+#if ENABLED(MALYAN_LCD)
+      if(filesize>0) {
+    	  print_job_timer.stop();
+    	  lcd_setpercent(100);
+      }
+#endif
+
     }
 
     /**
@@ -4565,6 +4664,21 @@ inline void gcode_M31() {
 		p_card->startFileprint();
 		print_job_timer.start();
 	#endif
+  }
+
+  /**
+   * M25: Pause SD Print
+   */
+  inline void gcode_M524() {
+
+
+#if ENABLED(MALYAN_LCD)
+	lcd_setstatuspgm(PSTR(MSG_PAUSE));
+    p_card->stopSDPrint();
+    lcd_setstatuspgm(PSTR(MSG_PAUSED));
+#else
+    p_card->stopSDPrint();
+#endif
   }
   /**
    * M928: Start SD Write
@@ -4875,17 +4989,7 @@ static inline long random( long howsmall, long howbig )
   inline void gcode_M73() {
 	  bool hasP = code_seen('P');
 	  if(hasP) {
-		  progress = code_value_byte();
-		  char message_buffer[10];
-	        sprintf_P(message_buffer, PSTR("{TQ:%03i}"), (int)progress);
-	        lcd_setstatus(message_buffer);
-		  if(progress==0)
-			lcd_setstatuspgm(PSTR(MSG_BUILD));
-		  else if(progress>=100)
-		  {
-			lcd_setstatuspgm(PSTR(MSG_COMPLETE));
-			progress = 0;
-		  }
+		  lcd_setpercent(code_value_byte());
 	  }
   }
 #endif
@@ -7862,6 +7966,8 @@ void process_next_command() {
 #endif
         case 36: //M36 - Start binary SD print
           gcode_M36(); break;
+        case 524: //M524 - abort SD print job (started with M24)
+          gcode_M524(); break;
         case 928: //M928 - Start SD write
           gcode_M928(); break;
       #endif //SDSUPPORT

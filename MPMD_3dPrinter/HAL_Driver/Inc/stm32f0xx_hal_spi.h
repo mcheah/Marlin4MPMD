@@ -786,7 +786,7 @@ static __INLINE HAL_StatusTypeDef HAL_SPI_TransmitReceive_Dummy(SPI_HandleTypeDe
 //    errorcode = HAL_ERROR;
 //  }
 
-error :
+//error :
 //  hspi->State = HAL_SPI_STATE_READY;
 //  __HAL_UNLOCK(hspi);
   return errorcode;

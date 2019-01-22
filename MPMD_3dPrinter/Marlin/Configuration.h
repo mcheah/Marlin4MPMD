@@ -252,22 +252,22 @@
 // The minimal temperature defines the temperature below which the heater will not be enabled It is used
 // to check that the wiring to the thermistor is not broken.
 // Otherwise this would lead to the heater being powered on all the time.
-//#define HEATER_0_MINTEMP 5
+#define HEATER_0_MINTEMP 5
 //#define HEATER_1_MINTEMP 5
 //#define HEATER_2_MINTEMP 5
 //#define HEATER_3_MINTEMP 5
-//#define BED_MINTEMP 5
+#define BED_MINTEMP 5
 
 // When temperature exceeds max temp, your heater will be switched off.
 // This feature exists to protect your hotend from overheating accidentally, but *NOT* from thermistor short/failure!
 // You should use MINTEMP for thermistor short/failure protection.
-//#define HEATER_0_MAXTEMP 275
+#define HEATER_0_MAXTEMP 275
 //#define HEATER_1_MAXTEMP 275
 //#define HEATER_2_MAXTEMP 275
 //#define HEATER_3_MAXTEMP 275
 #define HEATER_BED_5A_LIMIT
 #if ENABLED(HEATER_BED_5A_LIMIT)
-//#define BED_MAXTEMP 90
+#define BED_MAXTEMP 90
 #else
 #define BED_MAXTEMP 110
 #endif
@@ -773,7 +773,6 @@
 	#define RIGHT_PROBE_BED_POSITION (DELTA_PROBEABLE_RADIUS-10)
 	#define FRONT_PROBE_BED_POSITION -(DELTA_PROBEABLE_RADIUS-10)
 	#define BACK_PROBE_BED_POSITION (DELTA_PROBEABLE_RADIUS-10)
-
 	#define MIN_PROBE_EDGE 10 // The Z probe minimum square sides can be no smaller than this.
 
   // Non-linear bed leveling will be used.
@@ -855,7 +854,9 @@
 // default settings
 //TODO: adjust these settings
 #define MOTOR_STEPS_PER_REVOLUTION	  200.0//(360/1.8)
-#if ENABLED(STEPPERS_32X)
+#if ENABLED(STEPPERS_128X)
+#define MOTOR_MICROSTEPS_COUNT		  128.0
+#elif ENABLED(STEPPERS_32X)
 #define MOTOR_MICROSTEPS_COUNT		  32.0
 #elif ENABLED(STEPPERS_16X)
 #define MOTOR_MICROSTEPS_COUNT		  16.0
