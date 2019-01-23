@@ -631,7 +631,7 @@
 // Probe Raise options provide clearance for the probe to deploy, stow, and travel.
 //
 #define Z_RAISE_PROBE_DEPLOY_STOW 15 // Raise to make room for the probe to deploy / stow
-#define Z_RAISE_BETWEEN_PROBINGS 15  // Raise between probing points.
+#define Z_RAISE_BETWEEN_PROBINGS 25  // Raise between probing points.
 
 //
 // For M851 give a range for adjusting the Z probe offset

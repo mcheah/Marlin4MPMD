@@ -3445,7 +3445,7 @@ inline void gcode_G28() {
     tool_change(old_tool_index, 0, true);
   #endif
 
-  report_current_position();
+//  report_current_position();
 }
 
 #if HAS_PROBING_PROCEDURE
@@ -4136,6 +4136,60 @@ static inline float calc_grid_position(int i, AxisEnum axis)
     KEEPALIVE_STATE(IN_HANDLER);
   }
 
+
+  void static inline pol2Cart(float th, float r, float *x, float *y)
+  {
+  	*x = r*arm_cos_f32(th);
+  	*y = r*arm_sin_f32(th);
+  }
+
+  inline void gcode_G33() {
+	  float probe_radius = code_seen('R') ? code_value_float() : (DELTA_PROBEABLE_RADIUS-5);
+	  int verbose_level = code_seen('V') ? code_value_int() : 3;
+	  if (verbose_level < 0 || verbose_level > 4) {
+	      SERIAL_ECHOLNPGM("?(V)erbose Level is implausible (0-4).");
+	      return;
+	  }
+	  bool clear = code_seen('C');
+	  float adjFactor = code_seen('A') ? 1/code_value_float() : 1/0.85;
+	  const float probeAngles[3] = {RADIANS(210-120),RADIANS(330-120),RADIANS(90-120)};
+	  float xProbe[4] = {0,0,0,0};
+	  float yProbe[4] = {0,0,0,0};
+	  float measured_z[4];
+	  float maxEndStop_adj = max3(endstop_adj[0],endstop_adj[1],endstop_adj[2]);
+	  for (int i=0;i<3;i++) {
+		  pol2Cart(probeAngles[i],probe_radius,&xProbe[i+1],&yProbe[i+1]);
+		  if(clear)
+			  endstop_adj[i] = 0;
+		  else if(maxEndStop_adj<0)
+			  endstop_adj[i]-=maxEndStop_adj;
+	  }
+	  //Reset all leveling parameters
+	  reset_bed_level();
+	  gcode_G28();
+	  //Get initial values
+      for (int i = 0; i<4; i++)
+    	  measured_z[i] = probe_pt(xProbe[i], yProbe[i], false, verbose_level);
+      float highestZ = max3(measured_z[1],measured_z[2],measured_z[3]);
+	  MYSERIAL.print("starting M666 X");MYSERIAL.print(endstop_adj[X_AXIS]);
+	  MYSERIAL.print(" Y");MYSERIAL.print(endstop_adj[Y_AXIS]);
+	  MYSERIAL.print(" Z");MYSERIAL.println(endstop_adj[Z_AXIS]);
+	  for (int i= 0; i<3; i++)
+	  {
+		  endstop_adj[i]-=(highestZ-measured_z[i+1])*adjFactor;
+	  }
+	  maxEndStop_adj = max3(endstop_adj[0],endstop_adj[1],endstop_adj[2]);
+	  for (int i= 0; i<3; i++)
+	  {
+	  if(maxEndStop_adj<0)
+		  endstop_adj[i]-=maxEndStop_adj;
+	  }
+	  MYSERIAL.print("endingAdj M666 X");MYSERIAL.print(endstop_adj[X_AXIS]);
+	  MYSERIAL.print(" Y");MYSERIAL.print(endstop_adj[Y_AXIS]);
+	  MYSERIAL.print(" Z");MYSERIAL.println(endstop_adj[Z_AXIS]);
+	  gcode_G28();
+
+  }
 #endif //AUTO_BED_LEVELING_FEATURE
 
 #if HAS_BED_PROBE
@@ -7897,7 +7951,9 @@ void process_next_command() {
         case 30: // G30 Single Z probe
           gcode_G30();
           break;
-
+        case 33: // G33 endstop auto adjust
+          gcode_G33();
+          break;
         #if ENABLED(Z_PROBE_SLED)
 
             case 31: // G31: dock the sled
