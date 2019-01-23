@@ -37,7 +37,7 @@
 //#define E1_ADC_PA2
 //#define STEPPERS_16X
 #define STEPPERS_32X
-//#define MINIMAL_BUILD
+#define MINIMAL_BUILD
 //#define UZLIB
 #define USE_FAST_SPI
 /* Exported functions ------------------------------------------------------- */

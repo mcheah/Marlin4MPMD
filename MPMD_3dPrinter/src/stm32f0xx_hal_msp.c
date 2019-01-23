@@ -53,6 +53,7 @@
   */
 
 /* Imported variables ---------------------------------------------------------*/
+#ifndef MINIMAL_BUILD
 extern TIM_HandleTypeDef hTimPwmX;
 extern TIM_HandleTypeDef hTimPwmY;
 extern TIM_HandleTypeDef hTimPwmZ;
@@ -77,6 +78,8 @@ extern TIM_HandleTypeDef hTimPwmHeatE3;
 /* Private function prototypes -----------------------------------------------*/
 extern void BSP_MotorControl_StepClockHandler(uint8_t deviceId); 
 extern void BSP_MotorControl_FlagInterruptHandler(void);
+#endif
+
 /* Private functions ---------------------------------------------------------*/
 
 /** @defgroup HAL_MSP_Private_Functions
@@ -217,6 +220,7 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef *hspi)
 void HAL_UART_MspInit(UART_HandleTypeDef* huart)
 {
   GPIO_InitTypeDef GPIO_InitStruct;
+#if !defined(MINIMAL_BUILD) && !defined(STM32_USE_USB_CDC)
   if(huart->Instance == BSP_UART_DEBUG)
   {
     /* Peripheral clock enable */
@@ -247,6 +251,9 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     HAL_NVIC_SetPriority(BSP_UART_DEBUG_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(BSP_UART_DEBUG_IRQn);    
   }
+#else
+  if(0) { }
+#endif
   else if(huart->Instance == BSP_UART_LCD)
   {
     /* Peripheral clock enable */
@@ -288,6 +295,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
   */
 void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
 {
+#if !defined(MINIMAL_BUILD) && !defined(STM32_USE_USB_CDC)
   if(huart->Instance == BSP_UART_DEBUG)
   {
    /* Reset peripherals */
@@ -304,6 +312,9 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
     /* Peripheral clock disable */
     __BSP_UART_DEBUG_CLK_DISABLE();
   }
+#else
+  if(0) { }
+#endif
   else if(huart->Instance == BSP_UART_LCD)
   {
    /* Reset peripherals */
@@ -328,6 +339,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
   * @param[in] htim_pwm PWM handle pointer
   * @retval None
   */
+#ifndef MINIMAL_BUILD
 void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
 {
   GPIO_InitTypeDef GPIO_InitStruct;
@@ -532,137 +544,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
   }
 #endif//BSP_HEAT_E2_PIN
 }
-
-/**
-  * @brief PWM MSP De-Initialization
-  * @param[in] htim_pwm PWM handle pointer
-  * @retval None
-  */
-void HAL_TIM_PWM_MspDeInit(TIM_HandleTypeDef* htim_pwm)
-{
-  if (htim_pwm == &hTimPwmX)
-  {
-    //Do not disable clock as timer can be used by other functionality
-    //__BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_X_CLCK_DISABLE();
-  
-    /* GPIO Deconfiguration */
-    HAL_GPIO_DeInit(BSP_MOTOR_CONTROL_BOARD_PWM_X_PORT, BSP_MOTOR_CONTROL_BOARD_PWM_X_PIN);
-    
-    /* Disable the timer global Interrupt */
-    HAL_NVIC_DisableIRQ(BSP_MOTOR_CONTROL_BOARD_PWM_X_IRQn);
-
-  }
-  else if (htim_pwm == &hTimPwmY)
-  {
-     //Do not disable clock as timer can be used by other functionality
-    //__BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_Y_CLCK_DISABLE();
-  
-    /* GPIO Deconfiguration */
-    HAL_GPIO_DeInit(BSP_MOTOR_CONTROL_BOARD_PWM_Y_PORT, BSP_MOTOR_CONTROL_BOARD_PWM_Y_PIN);
-    
-    /* Disable the timer global Interrupt */
-    HAL_NVIC_DisableIRQ(BSP_MOTOR_CONTROL_BOARD_PWM_Y_IRQn);
-
-  }
-  else if (htim_pwm == &hTimPwmZ)
-  {
-    //Do not disable clock as timer can be used by other functionality
-    //__BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_Z_CLCK_DISABLE();
-    
-    /* GPIO Deconfiguration */
-    HAL_GPIO_DeInit(BSP_MOTOR_CONTROL_BOARD_PWM_Z_PORT, BSP_MOTOR_CONTROL_BOARD_PWM_Z_PIN);
-    
-    /* Disable the timer global Interrupt */
-    HAL_NVIC_DisableIRQ(BSP_MOTOR_CONTROL_BOARD_PWM_Z_IRQn);
-  }
-  else if (htim_pwm == &hTimPwmE1)
-  {
-    //Do not disable clock as timer can be used by other functionality    
-    ////__BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E1_CLCK_DISABLE();
-    
-    /* GPIO Deconfiguration */
-    HAL_GPIO_DeInit(BSP_MOTOR_CONTROL_BOARD_PWM_E1_PORT, BSP_MOTOR_CONTROL_BOARD_PWM_E1_PIN);
-    
-    /* Disable the timer global Interrupt */
-    HAL_NVIC_DisableIRQ(BSP_MOTOR_CONTROL_BOARD_PWM_E1_IRQn);    
-  }
-#ifdef BSP_HEAT_E2_PIN
-  else if (htim_pwm == &hTimPwmE2)
-  {
-    //Do not disable clock as timer can be used by other functionality    
-    //__BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E2_CLCK_DISABLE();
-    
-    /* GPIO Deconfiguration */
-    HAL_GPIO_DeInit(BSP_MOTOR_CONTROL_BOARD_PWM_E2_PORT, BSP_MOTOR_CONTROL_BOARD_PWM_E2_PIN);
-    
-    /* Disable the timer global Interrupt */
-    HAL_NVIC_DisableIRQ(BSP_MOTOR_CONTROL_BOARD_PWM_E2_IRQn);       
-  }
-  else if (htim_pwm == &hTimPwmE3)
-  {
-    //Do not disable clock as timer can be used by other functionality    
-    //__BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E3_CLCK_DISABLE();
-    
-    /* GPIO Deconfiguration */
-    HAL_GPIO_DeInit(BSP_MOTOR_CONTROL_BOARD_PWM_E3_PORT, BSP_MOTOR_CONTROL_BOARD_PWM_E3_PIN);
-    
-    /* Disable the timer global Interrupt */
-    HAL_NVIC_DisableIRQ(BSP_MOTOR_CONTROL_BOARD_PWM_E3_IRQn);       
-  }
-#endif//BSP_HEAT_E2_PIN
-  else if(htim_pwm == &hTimPwmHeatBed)
-  {
-    //Do not disable clock as timer can be used by other functionality
-    //__BSP_MISC_TIMER_PWM_HEAT_BED_CLCK_DISABLE();
-
-    /* GPIO Deconfiguration */
-    HAL_GPIO_DeInit(BSP_HEAT_BED1_PORT, BSP_HEAT_BED1_PIN);
-  }
-#ifdef BSP_HEAT_BED2_PIN
-  else if(htim_pwm == &hTimPwmHeatBed2)
-  {
-    //Do not disable clock as timer can be used by other functionality
-    //__BSP_MISC_TIMER_PWM_HEAT_BED2_CLCK_DISABLE();
-    
-    /* GPIO Deconfiguration */
-    HAL_GPIO_DeInit(BSP_HEAT_BED2_PORT, BSP_HEAT_BED2_PIN);
-  }
-  else if(htim_pwm == &hTimPwmHeatBed3)
-  {
-    //Do not disable clock as timer can be used by other functionality
-    //__BSP_MISC_TIMER_PWM_HEAT_BED3_CLCK_DISABLE();
-    
-    /* GPIO Deconfiguration */
-    HAL_GPIO_DeInit(BSP_HEAT_BED3_PORT, BSP_HEAT_BED3_PIN);
-  }
-#endif//BSP_HEAT_BED2_PIN
-  else if(htim_pwm == &hTimPwmHeatE1)
-  {
-    //Do not disable clock as timer can be used by other functionality 
-    //__BSP_MISC_TIMER_PWM_HEAT_E1_CLCK_DISABLE();
-  
-    /* GPIO Deconfiguration */
-    HAL_GPIO_DeInit(BSP_HEAT_E1_PORT, BSP_HEAT_E1_PIN);    
-  }
-#ifdef BSP_HEAT_E2_PIN
-  else if(htim_pwm == &hTimPwmHeatE2)
-  {
-    //Do not disable clock as timer can be used by other functionality 
-    //__BSP_MISC_TIMER_PWM_HEAT_E2_CLCK_DISABLE();
-  
-    /* GPIO Deconfiguration */
-    HAL_GPIO_DeInit(BSP_HEAT_E2_PORT, BSP_HEAT_E2_PIN);    
-  }
-  else if(htim_pwm == &hTimPwmHeatE3)
-  {
-    //Do not disable clock as timer can be used by other functionality 
-    //__BSP_MISC_TIMER_PWM_HEAT_E3_CLCK_DISABLE();
-  
-    /* GPIO Deconfiguration */
-    HAL_GPIO_DeInit(BSP_HEAT_E3_PORT, BSP_HEAT_E3_PIN);    
-  }
-#endif//BSP_HEAT_E2_PIN
-}
+#endif //MINIMAL_BUILD
 
 /**
   * @brief PWM Callback
@@ -671,6 +553,7 @@ void HAL_TIM_PWM_MspDeInit(TIM_HandleTypeDef* htim_pwm)
   */
 void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
 {
+#ifndef MINIMAL_BUILD
   if ((htim->Instance == BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_X)&& (htim->Channel == BSP_MOTOR_CONTROL_BOARD_HAL_ACT_CHAN_TIMER_PWM_X))
   {
     if (BSP_MotorControl_GetDeviceState(0) != INACTIVE)
@@ -703,6 +586,7 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
       BSP_MotorControl_StepClockHandler(3);
     }
   }
+#endif
 #ifdef BSP_HEAT_E2_PIN
   if ((htim->Instance == BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_E2)&& (htim->Channel == BSP_MOTOR_CONTROL_BOARD_HAL_ACT_CHAN_TIMER_PWM_E2))
   {

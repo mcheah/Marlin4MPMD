@@ -48,7 +48,7 @@
 
 #include "MarlinConfig.h"
 #if ENABLED(MALYAN_LCD)
-
+#include "ultralcd.h"
 #include "temperature.h"
 #include "planner.h"
 #include "stepper.h"
@@ -214,8 +214,12 @@ void process_lcd_j_command(const char* command) {
 //  static bool steppers_enabled = false;
   bool isRelative = relative_mode;
   char axis = command[0];
-
-  if(!card.sdprinting && !card.saving && last_printing_status!=MALYAN_PRINTING && progress<=0) {
+#if ENABLED(SDSUPPORT)
+  if(!card.sdprinting && !card.saving && last_printing_status!=MALYAN_PRINTING && progress<=0)
+#else
+  if(last_printing_status!=MALYAN_PRINTING && progress<=0)
+#endif
+  {
   enqueue_and_echo_command_now("G91");
   switch (axis) {
     case 'E':
@@ -573,7 +577,7 @@ void lcd_setalertstatusPGM(const char* message) {
 /**
  * Send an arbitrary message
  */
-void lcd_setstatus(const char* message, bool persist) {
+void lcd_setstatus(const char* message, const bool persist) {
 	write_to_lcd(message);
 }
 void lcd_setstatuspgm(const char* message, uint8_t level) {

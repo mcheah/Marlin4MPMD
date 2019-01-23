@@ -1816,6 +1816,7 @@ void do_blocking_move_to(float x, float y, float z, float fr_mm_m /*=0.0*/) {
 
     destination[X_AXIS] = x;
     destination[Y_AXIS] = y;
+#if ENABLED(AUTO_BED_LEVELING_FEATURE)
     bool temp_leveling = bed_leveling_in_progress;
     bed_leveling_in_progress = false;
 //    current_position[Z_AXIS]+=calc_delta_adjust(current_position);
@@ -1824,6 +1825,10 @@ void do_blocking_move_to(float x, float y, float z, float fr_mm_m /*=0.0*/) {
 //    current_position[Z_AXIS]-=calc_delta_adjust(current_position);
 //    destination[Z_AXIS]-=calc_delta_adjust(current_position);
     bed_leveling_in_progress = temp_leveling;
+#else //ENABLED(AUTO_BED_LEVELING_FEATURE)
+    prepare_move_to_destination_raw();         // set_current_to_destination
+#endif
+
     #if ENABLED(DEBUG_LEVELING_FEATURE)
       if (DEBUGGING(LEVELING)) DEBUG_POS("xy move", current_position);
     #endif
@@ -4817,7 +4822,7 @@ static inline long random( long howsmall, long howbig )
         out_of_range_error(PSTR("Y"));
         return;
       }
-    #else
+    #elif ENABLED(AUTO_BED_LEVELING_GRID)
       if (HYPOT(RAW_X_POSITION(X_probe_location), RAW_Y_POSITION(Y_probe_location)) > DELTA_PROBEABLE_RADIUS) {
         SERIAL_PROTOCOLLNPGM("? (X,Y) location outside of probeable radius.");
         return;
@@ -4844,9 +4849,8 @@ static inline long random( long howsmall, long howbig )
       SERIAL_PROTOCOLLNPGM("Positioning the probe...");
 
     #if ENABLED(DELTA)
-      // we don't do bed level correction in M48 because we want the raw data when we probe
-      reset_bed_level();
     #elif ENABLED(AUTO_BED_LEVELING_FEATURE)
+    reset_bed_level();
       // we don't do bed level correction in M48 because we want the raw data when we probe
       planner.bed_level_matrix.set_to_identity();
     #endif
@@ -8734,6 +8738,9 @@ void clamp_to_software_endstops(float target[3]) {
       SERIAL_ECHOPGM(" offset="); SERIAL_ECHOLN(offset);
       */
     }
+#else
+  static float calc_delta_adjust(float cartesian[3]) { return 0; }
+
   #endif // AUTO_BED_LEVELING_FEATURE
 
 #endif // DELTA

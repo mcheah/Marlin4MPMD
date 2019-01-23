@@ -627,11 +627,13 @@ void Config_StoreSettings() {
 	_EEPROMWrite(&EEPROMconfig->volumetric_enabled,(uint16_t)volumetric_enabled);
 	for(int i=0;i<EXTRUDERS;i++)
 		_EEPROMWrite(&EEPROMconfig->filament_size[i],filament_size[i]);
+#if ENABLED(AUTO_BED_LEVELING_GRID)
 	for(int i=0;i<2;i++)
 		_EEPROMWrite(&EEPROMconfig->delta_grid_spacing[i],delta_grid_spacing[i]);
 	for(int i=0;i<AUTO_BED_LEVELING_GRID_POINTS;i++)
 		for(int j=0;j<AUTO_BED_LEVELING_GRID_POINTS;j++)
 			_EEPROMWrite(&EEPROMconfig->bed_level[i][j],bed_level[i][j]);
+#endif
 }
 void Config_RetrieveSettings() {
 	char buff[80];
@@ -706,11 +708,14 @@ void Config_RetrieveSettings() {
 	_EEPROMRead(&EEPROMconfig->volumetric_enabled,volumetric_enabled);
 	for(int i=0;i<EXTRUDERS;i++)
 		_EEPROMRead(&EEPROMconfig->filament_size[i],filament_size[i]);
+#if ENABLED(AUTO_BED_LEVELING_GRID)
+
 	for(int i=0;i<2;i++)
 		_EEPROMRead(&EEPROMconfig->delta_grid_spacing[i],delta_grid_spacing[i]);
 	for(int i=0;i<AUTO_BED_LEVELING_GRID_POINTS;i++)
 		for(int j=0;j<AUTO_BED_LEVELING_GRID_POINTS;j++)
 			_EEPROMRead(&EEPROMconfig->bed_level[i][j],bed_level[i][j]);
+#endif
 }
 #elif ENABLED(SD_SETTINGS)
 
@@ -1276,10 +1281,12 @@ void Config_ResetDefault() {
   for (uint8_t q = 0; q < COUNT(filament_size); q++)
     filament_size[q] = DEFAULT_NOMINAL_FILAMENT_DIA;
   // make sure the bed_level_rotation_matrix is identity or the planner will get it wrong
+#if ENABLED(AUTO_BED_LEVELING_FEATURE)
   planner.bed_level_matrix.set_to_identity();
   delta_grid_spacing[X_AXIS] = ((RIGHT_PROBE_BED_POSITION - LEFT_PROBE_BED_POSITION) / (AUTO_BED_LEVELING_GRID_POINTS - 1));
   delta_grid_spacing[Y_AXIS] = ((BACK_PROBE_BED_POSITION - FRONT_PROBE_BED_POSITION) / (AUTO_BED_LEVELING_GRID_POINTS - 1));
   reset_bed_level();
+#endif
   endstops.enable_globally(
     #if ENABLED(ENDSTOPS_ALWAYS_ON_DEFAULT)
       (true)
