@@ -257,6 +257,7 @@ extern int feedrate_percentage;
 #define MMS_SCALED(MM_S) MMM_SCALED(MM_S)
 #define MMM_TO_MMS_SCALED(MM_M) (MMS_SCALED(MMM_TO_MMS(MM_M)))
 
+extern bool relative_mode;
 extern bool axis_relative_modes[];
 extern bool volumetric_enabled;
 extern int extruder_multiplier[EXTRUDERS]; // sets extrude multiply factor (in percent) for each extruder individually

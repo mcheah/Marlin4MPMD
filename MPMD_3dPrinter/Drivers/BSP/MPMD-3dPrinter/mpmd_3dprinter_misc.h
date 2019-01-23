@@ -306,7 +306,8 @@
 //TODO: review this value
 //Tick timer prescaler
 #define TICK_TIMER_PRESCALER  (32) //48Mhz / 32 = 1.5Mhz
-   
+
+#define EEPROM_ADDRESS		(FLASH_BASE+0x0001F800)
 /* Exported constants --------------------------------------------------------*/
 extern GPIO_TypeDef* gArrayGpioPort[BSP_MISC_MAX_PIN_NUMBER];
 extern uint16_t gArrayGpioPin[BSP_MISC_MAX_PIN_NUMBER];
@@ -338,6 +339,10 @@ void BSP_MotorControlBoard_ServoInit(void);
 void BSP_MotorControlBoard_ServoSetTimerValue(uint32_t value);
 void BSP_MotorControlBoard_ServoStop(void);
 void BSP_MiscUserGpioInit(uint8_t id, uint32_t mode, uint32_t pull);
+void BSP_MiscEEPROMErase();
+void BSP_MiscEEPROMWriteF32(void *destination, float value);
+void BSP_MiscEEPROMWriteU16(void *destination, uint16_t value);
+void BSP_MiscEEPROMWriteU32(void *destination, uint32_t value);
 
 #ifdef __cplusplus
 }

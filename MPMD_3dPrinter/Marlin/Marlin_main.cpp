@@ -367,7 +367,7 @@ float sw_endstop_max[3] = { X_MAX_POS, Y_MAX_POS, Z_MAX_POS };
 uint8_t active_extruder = 0;
 
 // Relative Mode. Enable with G91, disable with G90.
-static bool relative_mode = false;
+bool relative_mode = false;
 
 volatile bool wait_for_heatup = true;
 
@@ -818,8 +818,10 @@ void setup_sdcard()
   if(FATFS_LinkDriver(&SD_Driver, SDPath) == 0)
   {
 	  p_card->checkautostart(true);
+#if ENABLED(SD_SETTINGS)
   	  if(p_card->cardOK)
 		Config_RetrieveSettings();
+#endif
   }
 #endif
 }
@@ -950,7 +952,9 @@ void setup() {
 
   // Load data from EEPROM if available (or use defaults)
   // This also updates variables in the planner, elsewhere
-//  Config_RetrieveSettings();
+#if ENABLED(FLASH_SETTINGS)
+  Config_RetrieveSettings();
+#endif
 
   // Initialize current position based on home_offset
   memcpy(current_position, home_offset, sizeof(home_offset));
@@ -5477,7 +5481,7 @@ inline void gcode_M111() {
       if (TEST(marlin_debug_flags, i)) {
         if (comma++) SERIAL_CHAR(',');
         // serialprintPGM((char*)pgm_read_word(&(debug_strings[i])));   // BDI
-        serialprintPGM((char*)&(debug_strings[i]));
+        serialprintPGM((char*)(debug_strings[i]));
 
       }
     }

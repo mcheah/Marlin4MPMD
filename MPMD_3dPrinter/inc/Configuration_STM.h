@@ -27,7 +27,7 @@
 
 /* Exported macro ------------------------------------------------------------*/
 //If uncommented, this will start user code at 0x8002000 to allow use of a bootloader
-#define STM32_USE_BOOTLOADER
+//#define STM32_USE_BOOTLOADER
 // USE USB CDC Serial Interface.  Comment this line out to use USART2 directly instead.
 // Useful if Raspberry Pi GPIO's are hooked directly to UART interface for faster data transfer
 #define STM32_USE_USB_CDC

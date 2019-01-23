@@ -350,13 +350,15 @@ void CardReader::startFileprint()
 //	    enqueue_and_echo_commands_P(PSTR("G90"));
 //	}
 #if ENABLED(MALYAN_LCD)
+#if ENABLED(SD_SETTINGS)
   const char upper_config_file_name[] = UPPER_CONFIG_FILE_NAME;
   updateLCD = ( strncmp(longFilename,
 		  	  upper_config_file_name,
 			  sizeof(upper_config_file_name))!=0);
   if(updateLCD)
+#endif// ENABLED(SD_SETTINGS)
 	lcd_setstatuspgm(PSTR(MSG_BUILD));
-#endif
+#endif// ENABLED(MALYAN_LCD)
   if(isBinaryMode)
 	  flush_buff();
   sdprinting = true;
@@ -921,7 +923,7 @@ uint16_t CardReader::get_num_Files() {
 void CardReader::printingHasFinished()
 {
     stepper.synchronize();
-    if(file_subcall_ctr>0) //heading up to a parent file that called current as a procedure.
+    if(file_subcall_ctr>0 && SD_PROCEDURE_DEPTH>1) //heading up to a parent file that called current as a procedure.
     {
       fileOpened[file_subcall_ctr] = 0;
       f_close(&file);

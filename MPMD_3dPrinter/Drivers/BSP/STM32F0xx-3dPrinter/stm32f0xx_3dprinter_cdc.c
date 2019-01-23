@@ -52,6 +52,8 @@
 /* Private defines -----------------------------------------------------------*/
 /* Private constant ----------------------------------------------------------*/
 
+/*
+ *
 // #ifdef USE_XONXOFF
 // #define BSP_CDC_GET_NB_BYTES_IN_RX_BUFFER()  ((gBspUartData.pRxReadBuffer <= gBspUartData.pRxWriteBuffer)? \
 //                                     ( (unsigned int )(gBspUartData.pRxWriteBuffer - gBspUartData.pRxReadBuffer)): \
@@ -61,7 +63,7 @@
 // #define BSP_CDC_GET_NB_BYTES_IN_TX_BUFFER()  ((gBspUartData.pTxReadBuffer <= gBspUartData.pTxWriteBuffer)? \
 //                                     ( (unsigned int )(gBspUartData.pTxWriteBuffer - gBspUartData.pTxReadBuffer)): \
 //                                     ( (unsigned int )(gBspUartData.pTxWriteBuffer + UART_TX_BUFFER_SIZE - gBspUartData.pTxReadBuffer)))
-
+*/
 
 // #define BSP_CDC_TX_THRESHOLD_XOFF  (UART_TX_BUFFER_SIZE / 50)
 // #define BSP_CDC_TX_THRESHOLD_XON   (UART_TX_BUFFER_SIZE / 100)

@@ -11,7 +11,7 @@
 #include "main.h"
 //Private defines
 #ifdef STM32_USE_BOOTLOADER
-#define APPLICATION_ADDRESS     (uint32_t)0x08002000
+#define APPLICATION_ADDRESS     (uint32_t)(FLASH_BASE + 0x00002000)
 //Private variables
 __IO uint32_t VectorTable[48] __attribute__((section(".RAMVectorTable")));
 

@@ -1418,8 +1418,38 @@ void BSP_MiscUserGpioInit(uint8_t id, uint32_t mode, uint32_t pull)
   HAL_GPIO_Init(gpioPort, &GPIO_InitStruct);      
 }
 #endif
-
-
+/**********************************************************
+ * @brief  Erases user EEPROM emulated in flash
+ * @retval None
+ **********************************************************/
+void BSP_MiscEEPROMErase() {
+	FLASH_If_Init();
+	FLASH_If_Erase(EEPROM_ADDRESS,EEPROM_ADDRESS+FLASH_PAGE_SIZE); //Exactly one page reserved for EEPROM
+}
+/**********************************************************
+ * @brief  Writes a float value to user EEPROM emulated in flash
+ * @retval None
+ **********************************************************/
+void BSP_MiscEEPROMWriteF32(void *destination, float value)
+{
+	FLASH_If_Write((uint32_t)destination,&value,sizeof(float)/sizeof(uint16_t));
+}
+/**********************************************************
+ * @brief  Writes a uint16_t value to user EEPROM emulated in flash
+ * @retval None
+ **********************************************************/
+void BSP_MiscEEPROMWriteU16(void *destination, uint16_t value)
+{
+	FLASH_If_Write((uint32_t)destination,&value,sizeof(uint16_t)/sizeof(uint16_t));
+}
+/**********************************************************
+ * @brief  Writes a uint32_t value to user EEPROM emulated in flash
+ * @retval None
+ **********************************************************/
+void BSP_MiscEEPROMWriteU32(void *destination, uint32_t value)
+{
+	FLASH_If_Write((uint32_t)destination,&value,sizeof(uint32_t)/sizeof(uint16_t));
+}
 /**
   * @}
   */    

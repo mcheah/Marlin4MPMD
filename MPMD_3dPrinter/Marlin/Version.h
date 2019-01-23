@@ -36,7 +36,10 @@
    * Marlin release version identifier
    */
   #define SHORT_BUILD_VERSION "1.3.0-MPMD"
-
+  #define MARLIN_MAJOR_FW_VERSION 1
+  #define MARLIN_MINOR_FW_VERSION 3
+  #define MARLIN_MAJOR_FW_SUBVERSION 0
+  #define MARLIN_MINOR_FW_SUBVERSION 0
   /**
    * Verbose version identifier which should contain a reference to the location
    * from where the binary was downloaded or the source code was compiled.

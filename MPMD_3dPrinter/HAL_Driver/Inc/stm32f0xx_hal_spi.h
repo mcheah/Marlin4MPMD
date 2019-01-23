@@ -727,12 +727,12 @@ static __INLINE HAL_StatusTypeDef HAL_SPI_TransmitReceive_Dummy(SPI_HandleTypeDe
 //  tmp  = hspi->State;
 //  tmp1 = hspi->Init.Mode;
 
-//  if (!((tmp == HAL_SPI_STATE_READY) || \
-//        ((tmp1 == SPI_MODE_MASTER) && (hspi->Init.Direction == SPI_DIRECTION_2LINES) && (tmp == HAL_SPI_STATE_BUSY_RX))))
-//  {
-//    errorcode = HAL_BUSY;
-//    goto error;
-//  }
+  /*if (!((tmp == HAL_SPI_STATE_READY) || \
+        ((tmp1 == SPI_MODE_MASTER) && (hspi->Init.Direction == SPI_DIRECTION_2LINES) && (tmp == HAL_SPI_STATE_BUSY_RX))))
+  {
+    errorcode = HAL_BUSY;
+    goto error;
+  }*/
 
 //  if ((pTxData == NULL) || (pRxData == NULL) || (Size == 0U))
 //  {
