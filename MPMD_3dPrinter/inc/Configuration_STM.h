@@ -37,8 +37,12 @@
 //#define E1_ADC_PA2
 //#define STEPPERS_16X
 #define STEPPERS_32X
+//Experimental, includes UZLIB for zlib compression support
 //#define UZLIB
+//Experimental, uses optimized SPI library for faster SD transfers
 #define USE_FAST_SPI
+//Experimental, uses fastest possible SPI clock for faster SD transfers, requires removing MISO pulldown
+#define USE_FAST_SPI_CLK
 /* Exported functions ------------------------------------------------------- */
 /* Exported Variables --------------------------------------------------------*/
 
