@@ -553,7 +553,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
   */
 void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
 {
-#ifndef MINIMAL_BUILD
+#if !defined(MINIMAL_BUILD) && 0
   if ((htim->Instance == BSP_MOTOR_CONTROL_BOARD_TIMER_PWM_X)&& (htim->Channel == BSP_MOTOR_CONTROL_BOARD_HAL_ACT_CHAN_TIMER_PWM_X))
   {
     if (BSP_MotorControl_GetDeviceState(0) != INACTIVE)
