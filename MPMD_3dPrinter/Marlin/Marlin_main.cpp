@@ -805,8 +805,8 @@ void setup_powerhold() {
 
     //Extruder 0 Fan init
     BSP_MiscFanInit(0);
-    BSP_MiscFanInit(1);
-    BSP_MiscFanInit(2);
+//    BSP_MiscFanInit(1);
+//    BSP_MiscFanInit(2);
 
 }
 

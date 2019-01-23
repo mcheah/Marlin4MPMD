@@ -212,9 +212,9 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="l6474" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/Components"/>
+						<entry excluding="A4985/A4985.c|l6474" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/Components"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/MPMD-3dPrinter"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/MotorControl"/>
+						<entry excluding="motorcontrol.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/MotorControl"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/NUCLEO-F070RB-3dPrinter"/>
 						<entry excluding="stm32f0xx_3dprinter_sd.h" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/STM32F0xx-3dPrinter"/>
 						<entry excluding="doc|src/option/ccsbcs.c|src/option/cc950.c|src/option/cc949.c|src/option/cc936.c|src/option/cc932.c|src/drivers/usbh_diskio.c|src/drivers/sram_diskio.c|src/drivers/sdram_diskio.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FatFs"/>
@@ -440,9 +440,9 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="l6474" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/Components"/>
+						<entry excluding="A4985/A4985.c|l6474" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/Components"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/MPMD-3dPrinter"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/MotorControl"/>
+						<entry excluding="motorcontrol.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/MotorControl"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/NUCLEO-F070RB-3dPrinter"/>
 						<entry excluding="stm32f0xx_3dprinter_rpi.h" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers/BSP/STM32F0xx-3dPrinter"/>
 						<entry excluding="doc|src/option/ccsbcs.c|src/option/cc950.c|src/option/cc949.c|src/option/cc936.c|src/option/cc932.c|src/drivers/usbh_diskio.c|src/drivers/sram_diskio.c|src/drivers/sdram_diskio.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FatFs"/>
