@@ -555,8 +555,8 @@ void lcd_init() {
   write_to_lcd_P(PSTR("{SYS:STARTED}\r\n"));
 
   // send a version that says "unsupported"
-  write_to_lcd_P(PSTR("{VER:99}\r\n"));
-
+  write_to_lcd_P(PSTR("{VER:130}\r\n"));
+  HAL_Delay(2000);
   // No idea why it does this twice.
   write_to_lcd_P(PSTR("{SYS:STARTED}\r\n"));
   update_usb_status(true);
