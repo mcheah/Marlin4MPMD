@@ -295,7 +295,7 @@ uint8_t CDC_Itf_IsTransmitting(void) {
 uint8_t CDC_Itf_IsTxQueueEmpty(void) {
 	return (!CDC_Itf_IsTransmitting() && CDC_Itf_GetNbTxQueuedBytes()==0);
 }
-
+extern bool rxInProgress;
 /**
   * @brief  TIM period elapsed callback
   * Data will be shifted out at CDC_POLLING_INTERVAL, by CDC_DATA_FS_MAX_PACKET_SIZE
@@ -338,6 +338,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
       }
     }
   }
+
+  if(!rxInProgress && CDC_RX_BUFFER_SIZE-BSP_CdcGetNbRxAvailableBytes(0)>CDC_RX_BUFFER_SIZE/2)
+		USBD_CDC_ReceivePacket(&USBD_Device);
 }
 
 /**
@@ -351,7 +354,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 static int8_t CDC_Itf_Receive(uint8_t* Buf, uint32_t *Len)
 {
     BSP_CDC_RxCpltCallback(Buf,Len);
-    USBD_CDC_ReceivePacket(&USBD_Device);
     return (USBD_OK);
 }
 

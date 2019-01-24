@@ -185,8 +185,11 @@ void BSP_CdcIfSendQueuedData()
  * @param[in] *Len pointer containing the number of received bytes
  * @retval None
  **********************************************************/
+uint8_t rxInProgress = 0;
 void BSP_CDC_RxCpltCallback(uint8_t* Buf, uint32_t *Len)
 {
+	rxInProgress = 0;
+	uint32_t startnB = BSP_CdcGetNbRxAvailableBytes(0);
 	BSP_LED_On(LED_GREEN);
 	uint8_t *writePtr = (uint8_t *)(Buf);
 	volatile uint32_t bytesToCopy = MIN(*Len,CDC_RX_BUFFER_SIZE);
@@ -206,6 +209,10 @@ void BSP_CDC_RxCpltCallback(uint8_t* Buf, uint32_t *Len)
 		pRxWriteBuffer = &pRxBuffer[secondBytesToCopy];
 	}
 	BSP_LED_Off(LED_GREEN);
+	if(CDC_RX_BUFFER_SIZE-BSP_CdcGetNbRxAvailableBytes(0)>CDC_RX_BUFFER_SIZE/2)
+		USBD_CDC_ReceivePacket(&USBD_Device);
+	if(BSP_CdcGetNbRxAvailableBytes(0)<=startnB)
+		CDC_ERROR(10);
 	//Copy character by character to avoid wraparound issues
 //	for(uint32_t i=0;i<*Len;i++)
 //	{
@@ -243,11 +250,11 @@ uint32_t BSP_CdcPrintf(const char* format,...)
   va_list args;
   uint32_t size;
   uint32_t retSize = 0;
-  char *writeBufferp = gBspCdcTxBuffer;
+  unsigned char *writeBufferp = gBspCdcTxBuffer;
   /* the string to transmit is copied in the temporary buffer in order to    */
   /* check its size.                                                         */
   va_start(args, format);
-  size=vsprintf(writeBufferp, (const char*)format, args);
+  size=vsprintf((char *)writeBufferp, (const char*)format, args);
   va_end(args);
    
   retSize = size;   
