@@ -678,7 +678,9 @@ void Config_RetrieveSettings() {
 	_EEPROMRead(&EEPROMconfig->zprobe_zoffset,zprobe_zoffset);
 	for(int i=0;i<3;i++)
 		_EEPROMRead(&EEPROMconfig->endstop_adj[i],endstop_adj[i]);
-	_EEPROMRead(&EEPROMconfig->delta_height,delta_height);
+	float height;
+	_EEPROMRead(&EEPROMconfig->delta_height,height);
+	set_delta_height(height);
 	_EEPROMRead(&EEPROMconfig->delta_diagonal_rod,delta_diagonal_rod);
 	_EEPROMRead(&EEPROMconfig->delta_radius,delta_radius);
 	_EEPROMRead(&EEPROMconfig->delta_segments_per_second,delta_segments_per_second);
@@ -698,7 +700,7 @@ void Config_RetrieveSettings() {
 	_EEPROMRead(&EEPROMconfig->preheatBedTemp[1],preheatBedTemp2);
 	_EEPROMRead(&EEPROMconfig->preheatFanSpeed[0],preheatFanSpeed1);
 	_EEPROMRead(&EEPROMconfig->preheatFanSpeed[1],preheatFanSpeed2);
-#endif
+#endif//ULTIPANEL
 	_EEPROMRead(&EEPROMconfig->kP,PID_PARAM(Kp, e));
 	_EEPROMRead(&EEPROMconfig->kI,PID_PARAM(Ki, e));
 	PID_PARAM(Ki,e) = scalePID_i(PID_PARAM(Ki, e));
@@ -714,7 +716,8 @@ void Config_RetrieveSettings() {
 	for(int i=0;i<AUTO_BED_LEVELING_GRID_POINTS;i++)
 		for(int j=0;j<AUTO_BED_LEVELING_GRID_POINTS;j++)
 			_EEPROMRead(&EEPROMconfig->bed_level[i][j],bed_level[i][j]);
-#endif
+	Config_Postprocess();
+#endif//AUTO_BED_LEVELING_GRID
 }
 #elif ENABLED(SD_SETTINGS)
 
@@ -1204,7 +1207,7 @@ void Config_ResetDefault() {
 	endstop_adj[X_AXIS] = DELTA_ENDSTOP_ADJ_X;
 	endstop_adj[Y_AXIS] = DELTA_ENDSTOP_ADJ_Y;
 	endstop_adj[Z_AXIS] = DELTA_ENDSTOP_ADJ_Z;
-    delta_height = Z_HOME_POS;
+	set_delta_height(Z_HOME_POS);
     delta_radius =  DELTA_RADIUS;
     delta_diagonal_rod =  DELTA_DIAGONAL_ROD;
     delta_segments_per_second =  DELTA_SEGMENTS_PER_SECOND;

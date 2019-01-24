@@ -309,6 +309,7 @@ float code_value_temp_diff();
   extern float delta_tower_angle_trim[3];
   extern float delta_clip_start_height;
   void inverse_kinematics(const float cartesian[3]);
+  void set_delta_height(float height);
   void recalc_delta_settings(float radius, float diagonal_rod);
   #if ENABLED(AUTO_BED_LEVELING_FEATURE)
     extern float delta_grid_spacing[2];
