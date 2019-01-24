@@ -517,10 +517,10 @@ uint32_t BSP_UartCopyNextRxBytes(uint8_t *buff, uint32_t maxlen)
 {
 	BspUartDataType *pUart = &gBspUartData;
 //	BSP_LED_On(LED_BLUE);
-	volatile uint32_t bytesToCopy = MIN(maxlen,BSP_UartGetNbRxAvailableBytes());
-	volatile uint32_t firstBytesToCopy = MIN(bytesToCopy,
+	uint32_t bytesToCopy = MIN(maxlen,BSP_UartGetNbRxAvailableBytes());
+	uint32_t firstBytesToCopy = MIN(bytesToCopy,
 											&(pUart->pRxBuffer[UART_RX_BUFFER_SIZE])-pUart->pRxReadBuffer);
-	volatile uint32_t secondBytesToCopy = bytesToCopy - firstBytesToCopy;
+	uint32_t secondBytesToCopy = bytesToCopy - firstBytesToCopy;
 	memcpy(buff,
 			pUart->pRxReadBuffer,
 			firstBytesToCopy);

@@ -189,10 +189,10 @@ void BSP_CDC_RxCpltCallback(uint8_t* Buf, uint32_t *Len)
 {
 	BSP_LED_On(LED_GREEN);
 	uint8_t *writePtr = (uint8_t *)(Buf);
-	volatile uint32_t bytesToCopy = MIN(*Len,CDC_RX_BUFFER_SIZE);
-	volatile uint32_t firstBytesToCopy = MIN(bytesToCopy,
+	uint32_t bytesToCopy = MIN(*Len,CDC_RX_BUFFER_SIZE);
+	uint32_t firstBytesToCopy = MIN(bytesToCopy,
 	&pRxBuffer[CDC_RX_BUFFER_SIZE]-pRxWriteBuffer);
-	volatile uint32_t secondBytesToCopy = bytesToCopy - firstBytesToCopy;
+	uint32_t secondBytesToCopy = bytesToCopy - firstBytesToCopy;
 	memcpy(pRxWriteBuffer,
 			writePtr,
 			firstBytesToCopy);
@@ -289,10 +289,10 @@ uint32_t BSP_CdcGetNbRxAvailableBytes(uint8_t waitForNewLine)
 uint32_t BSP_CdcCopyNextRxBytes(uint8_t *buff, uint32_t maxlen)
 {
 	BSP_LED_On(LED_BLUE);
-	volatile uint32_t bytesToCopy = MIN(maxlen,BSP_CdcGetNbRxAvailableBytes(0));
-	volatile uint32_t firstBytesToCopy = MIN(bytesToCopy,
+	uint32_t bytesToCopy = MIN(maxlen,BSP_CdcGetNbRxAvailableBytes(0));
+	uint32_t firstBytesToCopy = MIN(bytesToCopy,
 											&pRxBuffer[CDC_RX_BUFFER_SIZE]-pRxReadBuffer);
-	volatile uint32_t secondBytesToCopy = bytesToCopy - firstBytesToCopy;
+	uint32_t secondBytesToCopy = bytesToCopy - firstBytesToCopy;
 	memcpy(buff,
 			pRxReadBuffer,
 			firstBytesToCopy);

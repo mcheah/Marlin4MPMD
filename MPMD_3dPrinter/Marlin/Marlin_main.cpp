@@ -364,7 +364,7 @@ float sw_endstop_max[3] = { X_MAX_POS, Y_MAX_POS, Z_MAX_POS };
 #endif
 
 // The active extruder (tool). Set with T<extruder> command.
-uint8_t active_extruder = 0;
+const uint8_t active_extruder = 0;
 
 // Relative Mode. Enable with G91, disable with G90.
 bool relative_mode = false;
@@ -915,12 +915,12 @@ void setup() {
     SERIAL_ECHO_START;
 
     // Check startup - does nothing if bootloader sets MCUSR to 0
-    byte mcu = MCUSR;
-    if (mcu & 1) SERIAL_ECHOLNPGM(MSG_POWERUP);
-    if (mcu & 2) SERIAL_ECHOLNPGM(MSG_EXTERNAL_RESET);
-    if (mcu & 4) SERIAL_ECHOLNPGM(MSG_BROWNOUT_RESET);
-    if (mcu & 8) SERIAL_ECHOLNPGM(MSG_WATCHDOG_RESET);
-    if (mcu & 32) SERIAL_ECHOLNPGM(MSG_SOFTWARE_RESET);
+//    byte mcu = MCUSR;
+//    if (mcu & 1) SERIAL_ECHOLNPGM(MSG_POWERUP);
+//    if (mcu & 2) SERIAL_ECHOLNPGM(MSG_EXTERNAL_RESET);
+//    if (mcu & 4) SERIAL_ECHOLNPGM(MSG_BROWNOUT_RESET);
+//    if (mcu & 8) SERIAL_ECHOLNPGM(MSG_WATCHDOG_RESET);
+//    if (mcu & 32) SERIAL_ECHOLNPGM(MSG_SOFTWARE_RESET);
 //    MCUSR = 0;  // BDI
 
     SERIAL_ECHOPGM(MSG_MARLIN);
@@ -938,11 +938,11 @@ void setup() {
     #endif // STRING_CONFIG_H_AUTHOR
   #endif // STRING_DISTRIBUTION_DATE
 
-  SERIAL_ECHO_START;
-  SERIAL_ECHOPGM(MSG_FREE_MEMORY);
-  SERIAL_ECHO(freeMemory());
-  SERIAL_ECHOPGM(MSG_PLANNER_BUFFER_BYTES);
-  SERIAL_ECHOLN((int)sizeof(block_t)*BLOCK_BUFFER_SIZE);
+//  SERIAL_ECHO_START;
+//  SERIAL_ECHOPGM(MSG_FREE_MEMORY);
+//  SERIAL_ECHO(freeMemory());
+//  SERIAL_ECHOPGM(MSG_PLANNER_BUFFER_BYTES);
+//  SERIAL_ECHOLN((int)sizeof(block_t)*BLOCK_BUFFER_SIZE);
 
   // Send "ok" after commands by default
   for (int8_t i = 0; i < BUFSIZE; i++) send_ok[i] = true;
@@ -1073,9 +1073,11 @@ void loop() {
         else {
           // Write the string from the read buffer to SD
           p_card->write_command(command);
+#if ENABLED(SDLOGGING)
           if (p_card->logging)
             process_next_command(); // The card is saving because it's logging
           else
+#endif //SDLOGGING
             ok_to_send();
         }
       }
@@ -2910,13 +2912,7 @@ inline void gcode_G0_G1() {
       }
 
     #endif //FWRETRACT
-    if(code_seen('R')) {
-    	if(!code_seen('Z'))
-    		destination[Z_AXIS]+=calc_delta_adjust(current_position);
-    	do_blocking_move_to(destination[X_AXIS],destination[Y_AXIS],destination[Z_AXIS],destination[E_AXIS]);
-    }
-    else
-    	prepare_move_to_destination();
+    prepare_move_to_destination();
   }
 }
 
@@ -3719,7 +3715,8 @@ static inline float calc_grid_position(int i, AxisEnum axis)
 
     bool dryrun = code_seen('D');
     float dry_bed_level[AUTO_BED_LEVELING_GRID_POINTS][AUTO_BED_LEVELING_GRID_POINTS];
-    bool stow_probe_after_each = code_seen('E');
+//    bool stow_probe_after_each = code_seen('E');
+    bool stow_probe_after_each = false;
     float zoffset = 0;
     if (code_seen('Z')) zoffset += code_value_axis_units(Z_AXIS);
 
@@ -4142,7 +4139,35 @@ static inline float calc_grid_position(int i, AxisEnum axis)
   	*x = r*arm_cos_f32(th);
   	*y = r*arm_sin_f32(th);
   }
-
+  /**
+   * G33: Detailed Z probe, probes 3 towers and center point
+   *      uses data to automatically set M666 values on each iteration
+   *
+   *	  Calibration will measure the probe distances on the three towers
+   *	  and try to make them equal to compensate for bed tilt.  Calculation is
+   *	  as follows:
+   *	  1. Measure all three tower points
+   *	  2. Calculate the error from each tower point from the highest tower point
+   *	  3. Multiply this error by 1/(Adjustment factor)
+   *	  4. Subtract this value from the current endstop value
+   *	  5. Adjust all endstops so that the highest point has a endstop adjust of 0
+   *
+   * Parameters With M666 Auto tune:
+   *
+   *  R  Sets the radial distance from the center of the bed for the 3
+   *     tower probes
+   *     Example: "G33 R50"
+   *
+   *  C  Clears the M666 endstop settings before probing
+   *
+   *  A  Error adjustment factor. Errors are divided by this factor to determine
+   *  	 the next endstop adjust
+   *
+   * Global Parameters:
+   *
+   * 	 Prior M666 endstop values saved in endstop_adj are used for this probe
+   *
+   */
   inline void gcode_G33() {
 	  float probe_radius = code_seen('R') ? code_value_float() : (DELTA_PROBEABLE_RADIUS-5);
 	  int verbose_level = code_seen('V') ? code_value_int() : 3;
@@ -4171,7 +4196,7 @@ static inline float calc_grid_position(int i, AxisEnum axis)
       for (int i = 0; i<4; i++)
     	  measured_z[i] = probe_pt(xProbe[i], yProbe[i], false, verbose_level);
       float highestZ = max3(measured_z[1],measured_z[2],measured_z[3]);
-	  MYSERIAL.print("starting M666 X");MYSERIAL.print(endstop_adj[X_AXIS]);
+	  MYSERIAL.print("Start M666 X");MYSERIAL.print(endstop_adj[X_AXIS]);
 	  MYSERIAL.print(" Y");MYSERIAL.print(endstop_adj[Y_AXIS]);
 	  MYSERIAL.print(" Z");MYSERIAL.println(endstop_adj[Z_AXIS]);
 	  for (int i= 0; i<3; i++)
@@ -4184,7 +4209,7 @@ static inline float calc_grid_position(int i, AxisEnum axis)
 	  if(maxEndStop_adj<0)
 		  endstop_adj[i]-=maxEndStop_adj;
 	  }
-	  MYSERIAL.print("endingAdj M666 X");MYSERIAL.print(endstop_adj[X_AXIS]);
+	  MYSERIAL.print("End M666 X");MYSERIAL.print(endstop_adj[X_AXIS]);
 	  MYSERIAL.print(" Y");MYSERIAL.print(endstop_adj[Y_AXIS]);
 	  MYSERIAL.print(" Z");MYSERIAL.println(endstop_adj[Z_AXIS]);
 	  gcode_G28();
@@ -4469,7 +4494,11 @@ inline void gcode_M31() {
       namestartpos = current_command_args; // Default name position, 4 letters after the M
     else
       namestartpos++; //to skip the '!'
-
+	const char *ext  = strrchr(namestartpos,'.')+1;
+	if(strncmp(ext,"bgc",3)==0 || strncmp(ext,"BGC",3)==0)
+		p_card->isBinaryMode = true;
+	else
+		p_card->isBinaryMode = false;
     bool call_procedure = code_seen('P') && (seen_pointer < namestartpos);
 
     if (p_card->cardOK) {
@@ -4715,20 +4744,6 @@ inline void gcode_M31() {
     }
 #endif
 
-  inline void gcode_M36() {
-	#if ENABLED(MALYAN_LCD)
-		lcd_setstatuspgm(PSTR(MSG_RESUME));
-		p_card->isBinaryMode = true;
-		p_card->startFileprint();
-		print_job_timer.start();
-		lcd_setstatuspgm(PSTR(MSG_RESUMED));
-	#else
-		p_card->isBinaryMode = true;
-		p_card->startFileprint();
-		print_job_timer.start();
-	#endif
-  }
-
   /**
    * M524: Abort SD Print
    */
@@ -4746,9 +4761,11 @@ inline void gcode_M31() {
   /**
    * M928: Start SD Write
    */
+#if ENABLED(SDLOGGING)
   inline void gcode_M928() {
     p_card->openLogFile(current_command_args);
   }
+#endif SDLOGGING
 
 #endif // SDSUPPORT
 
@@ -4758,6 +4775,7 @@ inline void gcode_M31() {
  *  P<pin>  Pin number (LED if omitted)
  *  S<byte> Pin status from 0 - 255
  */
+#if 0 //Disabling because not all pins are mapped to arduino pins
 inline void gcode_M42() {
   if (!code_seen('S')) return;
 
@@ -4788,7 +4806,7 @@ inline void gcode_M42() {
     }
   #endif
 }
-
+#endif
 #if ENABLED(Z_MIN_PROBE_REPEATABILITY_TEST)
 //TODO: put these in the appropriate header file, got lazy and hacked these in for the bed repeatability test
 static void randomSeed( uint32_t dwSeed )
@@ -5046,7 +5064,7 @@ static inline long random( long howsmall, long howbig )
 
 #if ENABLED(MALYAN_LCD)
   /**
-   * M73: Open a file
+   * M73: Update LCD with progress percentage
    */
   inline void gcode_M73() {
 	  bool hasP = code_seen('P');
@@ -6296,6 +6314,7 @@ inline void gcode_M221() {
 /**
  * M226: Wait until the specified pin reaches the state required (M226 P<pin> S<state>)
  */
+#if 0
 inline void gcode_M226() {
   if (code_seen('P')) {
     int pin_number = code_value_int();
@@ -6338,7 +6357,7 @@ inline void gcode_M226() {
     } // pin_state -1 0 1
   } // code_seen('P')
 }
-
+#endif
 #if HAS_SERVOS
 
   /**
@@ -6899,7 +6918,7 @@ void quickstop_stepper() {
       if (px >= 0 && px < AUTO_BED_LEVELING_GRID_POINTS && py >= 0 && py < AUTO_BED_LEVELING_GRID_POINTS) {
 	    q = z - bed_level[px][py];
     	bed_level[px][py] = z;
-		volatile float x,y;
+		float x,y;
 		x = calc_grid_position(px,X_AXIS);
 		y = calc_grid_position(py,Y_AXIS);
 		//If we just finished a probe, move up right away to reflect changes
@@ -6956,6 +6975,7 @@ void quickstop_stepper() {
  *
  *       Use M206 to set these values directly.
  */
+#if 0
 inline void gcode_M428() {
   bool err = false;
   LOOP_XYZ(i) {
@@ -6988,7 +7008,7 @@ inline void gcode_M428() {
     #endif
   }
 }
-
+#endif
 /**
  * M500: Store settings in EEPROM
  */
@@ -7029,7 +7049,27 @@ inline void gcode_M503() {
 #endif // ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED
 
 #if HAS_BED_PROBE
-
+  /**
+   * M851: Change probe settings
+   *
+   * Adjusts probe settings to allow for tweaking the probing behavior
+   *
+   * Parameters with change probe settings:
+   *
+   *  Z  Sets the Z distance from the nozzle for the probe.  For
+   *     switch-based probes, this value should be negative because
+   *     the switch will not trigger until some distance below the top
+   *     of the plate
+   *
+   *  D  Double tap.  Set to 1 to tap the bed twice.  Only the second tap
+   *     is recorded
+   *
+   *  F  Feedrate.  Feedrate setting used for probing, default is 1500
+   *
+   *  R  Probing Z raise.  This value records how high to raise the nozzle
+   *     when probing.
+   *
+   */
   inline void gcode_M851() {
 
     SERIAL_ECHO_START;
@@ -7315,6 +7355,7 @@ inline void gcode_M503() {
 /**
  * M907: Set digital trimpot motor current using axis codes X, Y, Z, E, B, S
  */
+#if HAS_DIGIPOTSS || ENABLED(DAC_STEPPER_CURRENT)
 inline void gcode_M907() {
   #if HAS_DIGIPOTSS
     LOOP_XYZE(i)
@@ -7345,8 +7386,6 @@ inline void gcode_M907() {
     LOOP_XYZE(i) if (code_seen(axis_codes[i])) dac_current_percent(i, code_value_float());
   #endif
 }
-
-#if HAS_DIGIPOTSS || ENABLED(DAC_STEPPER_CURRENT)
 
   /**
    * M908: Control digital trimpot directly (M908 P<pin> S<current>)
@@ -7772,8 +7811,9 @@ void tool_change(const uint8_t tmp_extruder, const float fr_mm_m/*=0.0*/, bool n
     #else // HOTENDS <= 1
 
       // Set the new active extruder
+#if EXTRUDERS>1
       active_extruder = tmp_extruder;
-
+#endif
       UNUSED(fr_mm_m);
       UNUSED(no_move);
 
@@ -8028,22 +8068,22 @@ void process_next_command() {
         case 35: //M35 - Decompress SD file
           gcode_M35(); break;
 #endif
-        case 36: //M36 - Start binary SD print
-          gcode_M36(); break;
         case 524: //M524 - abort SD print job (started with M24)
           gcode_M524(); break;
+#if ENABLED(SDLOGGING)
         case 928: //M928 - Start SD write
           gcode_M928(); break;
+#endif
       #endif //SDSUPPORT
 
       case 31: //M31 take time since the start of the SD print or an M109 command
         gcode_M31();
         break;
-
+#if 0
       case 42: //M42 -Change pin status via gcode
         gcode_M42();
         break;
-
+#endif
       #if ENABLED(Z_MIN_PROBE_REPEATABILITY_TEST)
         case 48: // M48 Z probe repeatability
           gcode_M48();
@@ -8322,11 +8362,11 @@ void process_next_command() {
       case 221: // M221 - Set Flow Percentage: S<percent>
         gcode_M221();
         break;
-
+#if 0 //disabling because not all arduino pins are mapped correctly
       case 226: // M226 P<pin number> S<pin state>- Wait until the specified pin reaches the state required
         gcode_M226();
         break;
-
+#endif
       #if HAS_SERVOS
         case 280: // M280 - set servo position absolute. P: servo index, S: angle or microseconds
           gcode_M280();
@@ -8439,10 +8479,11 @@ void process_next_command() {
           break;
       #endif
 
+#if 0 //not sure this works with the bed leveling matrix anyway, rem
       case 428: // M428 Apply current_position to home_offset
         gcode_M428();
         break;
-
+#endif
       case 500: // M500 Store settings in EEPROM
         gcode_M500();
         break;
@@ -8485,12 +8526,11 @@ void process_next_command() {
           gcode_M905();
           break;
       #endif
+#if HAS_DIGIPOTSS || ENABLED(DAC_STEPPER_CURRENT)
 
       case 907: // M907 Set digital trimpot motor current using axis codes.
         gcode_M907();
         break;
-
-      #if HAS_DIGIPOTSS || ENABLED(DAC_STEPPER_CURRENT)
 
         case 908: // M908 Control digital trimpot directly.
           gcode_M908();
@@ -8528,9 +8568,11 @@ void process_next_command() {
     }
     break;
 
+#if HOTENDS>1 || EXTRUDERS>1
     case 'T':
       gcode_T(codenum);
       break;
+#endif
 
     default: code_is_good = false;
   }
@@ -8562,8 +8604,6 @@ void ok_to_send() {
   if (!send_ok[cmd_queue_index_r] /*||
 		  MYSERIAL.available() >= (2*(CDC_RX_BUFFER_SIZE-MAX_CMD_SIZE))*/ )
   {
-  	  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_8,GPIO_PIN_RESET);
-  	  volatile int numbytes = MYSERIAL.available();
 	  return;
   }
 #endif //STM32_USE_USB_CDC

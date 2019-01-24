@@ -182,24 +182,24 @@ void manage_inactivity(bool ignore_stepper_queue = false);
     #define  enable_e1() E1_ENABLE_WRITE( E_ENABLE_ON)
     #define disable_e1() E1_ENABLE_WRITE(!E_ENABLE_ON)
   #else
-    #define  enable_e1() BSP_MotorControlBoard_Reset();
-    #define disable_e1() BSP_MotorControlBoard_ReleaseReset();
+    #define  enable_e1()
+    #define disable_e1()
   #endif
 
   #if E_STEPPERS > 2 && HAS_E2_ENABLE
     #define  enable_e2() E2_ENABLE_WRITE( E_ENABLE_ON)
     #define disable_e2() E2_ENABLE_WRITE(!E_ENABLE_ON)
   #else
-    #define  enable_e2() BSP_MotorControlBoard_Reset();
-    #define disable_e2() BSP_MotorControlBoard_ReleaseReset();
+    #define  enable_e2()
+    #define disable_e2()
   #endif
 
   #if E_STEPPERS > 3 && HAS_E3_ENABLE
     #define  enable_e3() E3_ENABLE_WRITE( E_ENABLE_ON)
     #define disable_e3() E3_ENABLE_WRITE(!E_ENABLE_ON)
   #else
-    #define  enable_e3() BSP_MotorControlBoard_Reset();
-    #define disable_e3() BSP_MotorControlBoard_ReleaseReset();
+    #define  enable_e3()
+    #define disable_e3()
   #endif
 
 #endif // !MIXING_EXTRUDER
@@ -374,7 +374,7 @@ float code_value_temp_diff();
 #endif
 extern int8_t progress;
 // Handling multiple extruders pins
-extern uint8_t active_extruder;
+extern const uint8_t active_extruder;
 
 #if HAS_TEMP_HOTEND || HAS_TEMP_BED
   void print_heaterstates();

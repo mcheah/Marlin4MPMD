@@ -588,9 +588,9 @@ void lcd_setpercent(uint8_t percent) {
 	  char message_buffer[10];
       sprintf_P(message_buffer, PSTR("{TQ:%03i}"), (int)progress);
       lcd_setstatus(message_buffer);
-	  if(progress==0)
+	  if(percent==0)
 		lcd_setstatuspgm(PSTR(MSG_BUILD));
-	  else if(progress>=100)
+	  else if(percent>=100)
 	  {
 		lcd_setstatuspgm(PSTR(MSG_COMPLETE));
 		progress = 0;

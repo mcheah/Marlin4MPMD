@@ -136,7 +136,6 @@
 
 uint16_t eeprom_checksum;
 
-
 void _EEPROM_writeData(int &pos, uint8_t* value, uint8_t size) {
 #if 0  // BDI : Code to modify later
   uint8_t c;
@@ -637,9 +636,9 @@ void Config_StoreSettings() {
 }
 void Config_RetrieveSettings() {
 	char buff[80];
-	volatile struct { uint8_t api_major_version; uint8_t api_minor_version; } api_version;
-	volatile struct { uint8_t api_major_version; uint8_t api_minor_version; } fw_version;
-	volatile struct { uint8_t api_major_version; uint8_t api_minor_version; } fw_subversion;
+	struct { uint8_t api_major_version; uint8_t api_minor_version; } api_version;
+	struct { uint8_t api_major_version; uint8_t api_minor_version; } fw_version;
+	struct { uint8_t api_major_version; uint8_t api_minor_version; } fw_subversion;
 	_EEPROMRead(&EEPROMconfig->API_MAJOR_VERSION,api_version.api_major_version);
 	_EEPROMRead(&EEPROMconfig->API_MINOR_VERSION,api_version.api_minor_version);
 	_EEPROMRead(&EEPROMconfig->MAJOR_FW_VERSION,fw_version.api_major_version);
