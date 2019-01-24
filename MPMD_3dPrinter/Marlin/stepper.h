@@ -259,21 +259,31 @@ class Stepper {
 
 //      NOMORE(step_rate, MAX_STEP_FREQUENCY);
       NOLESS(step_rate,(uint32_t)((F_CPU()/((uint32_t)0xffff*(uint32_t)TICK_TIMER_PRESCALER)))/2u+1u);
-//      if(step_rate > 10000) {
-//        // If steprate > 20kHz >> step 4 times
-//        step_rate = (step_rate >> 2)&0x3fff;
-//        step_loops = 4;
-//      }
-//      else if(step_rate > 5000)
-//      {
-//        // If steprate > 10kHz >> step 2 times
-//        step_rate = (step_rate >> 1)&0x7fff;
-//        step_loops = 2;
-//      }
-//      else
-//      {
+      if(step_rate > MAX_STEP_FREQUENCY*8) {
+        // If steprate > 20kHz >> step 4 times
+        step_rate = (step_rate >> 4);
+        step_loops = 16;
+      }
+      if(step_rate > MAX_STEP_FREQUENCY*4) {
+        // If steprate > 20kHz >> step 4 times
+        step_rate = (step_rate >> 3);
+        step_loops = 8;
+      }
+      if(step_rate > MAX_STEP_FREQUENCY*2) {
+        // If steprate > 20kHz >> step 4 times
+        step_rate = (step_rate >> 2);
+        step_loops = 4;
+      }
+      else if(step_rate > MAX_STEP_FREQUENCY)
+      {
+        // If steprate > 10kHz >> step 2 times
+        step_rate = (step_rate >> 1);
+        step_loops = 2;
+      }
+      else
+      {
         step_loops = 1;
-//      }
+      }
 
       timer = (uint16_t)(F_CPU() / (step_rate * TICK_TIMER_PRESCALER))/2;
 //      NOLESS(timer,100);

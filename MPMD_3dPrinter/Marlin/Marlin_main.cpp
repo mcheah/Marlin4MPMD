@@ -2943,7 +2943,7 @@ inline void gcode_G0_G1() {
     if(code_seen('R')) {
     	if(!code_seen('Z'))
     		destination[Z_AXIS]+=calc_delta_adjust(current_position);
-    	do_blocking_move_to2(destination);
+    	do_blocking_move_to2(destination,feedrate_mm_m);
     }
     else
     	prepare_move_to_destination();
