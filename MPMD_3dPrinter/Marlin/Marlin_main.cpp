@@ -1328,6 +1328,13 @@ inline void get_serial_commands() {
 			}
 		}// else(if(!p_card->isBinaryMode))
       } //while (commands_in_queue < BUFSIZE && !card_eof && !stop_buffering)
+    if(card_eof && p_card->isBinaryMode && p_card->sdprinting) {
+		  SERIAL_PROTOCOLLNPGM(MSG_FILE_PRINTED);
+		  p_card->printingHasFinished();
+		  p_card->checkautostart(true);
+		  p_card->sdpos = p_card->filesize;
+		  p_card->isBinaryMode = false;
+		  binGcodePar::resetBuff();    }
     } //inline void get_sdcard_commands
 
 #endif // SDSUPPORT
@@ -3464,7 +3471,7 @@ inline void gcode_G28() {
   #if ENABLED(DELTA)
     // move to a height where we can use the full xy-area
     if(safeHome)
-    	do_blocking_move_to_z(delta_clip_start_height);
+    	do_blocking_move_to_z(delta_clip_start_height-3);
   #endif
 
   clean_up_after_endstop_or_probe_move();
@@ -3766,7 +3773,7 @@ static inline float calc_grid_position(int i, AxisEnum axis)
     		reset_bed_level();
     	float delta_z_offset = probe_delta_height(zoffset,/*stow*/true,verbose_level);
     	if(delta_z_offset<=MIN_Z_HEIGHT_ERROR || delta_z_offset>=MAX_Z_HEIGHT_ERROR ) {
-			SERIAL_PROTOCOLPGM("Delta Height is misconfigured, aborting Auto Bed Leveling");
+    		SERIAL_PROTOCOLLN("Delta Height is misconfigured, aborting Auto Bed Leveling");
 			do_mesh_probe = false;
     	}
     	if(do_mesh_probe)
@@ -4214,6 +4221,7 @@ static inline float calc_grid_position(int i, AxisEnum axis)
 	      SERIAL_ECHOLNPGM("?(V)erbose Level is implausible (0-4).");
 	      return;
 	  }
+	  bool dryrun = code_seen('D');
 	  bool clear = code_seen('C');
 	  float adjFactor = code_seen('A') ? 1/code_value_float() : 1/0.85;
 	  const float probeAngles[3] = {RADIANS(210-120),RADIANS(330-120),RADIANS(90-120)};
@@ -4232,25 +4240,29 @@ static inline float calc_grid_position(int i, AxisEnum axis)
 	  reset_bed_level();
 	  gcode_G28();
 	  //Get initial values
+	  probing_z_raise+=15.0; //increase probing height to avoid clipping
       for (int i = 0; i<4; i++)
     	  measured_z[i] = probe_pt(xProbe[i], yProbe[i], false, verbose_level);
+      probing_z_raise-=15.0; //reset to normal
       float highestZ = max3(measured_z[1],measured_z[2],measured_z[3]);
 	  MYSERIAL.print("Start M666 X");MYSERIAL.print(endstop_adj[X_AXIS]);
 	  MYSERIAL.print(" Y");MYSERIAL.print(endstop_adj[Y_AXIS]);
 	  MYSERIAL.print(" Z");MYSERIAL.println(endstop_adj[Z_AXIS]);
-	  for (int i= 0; i<3; i++)
-	  {
-		  endstop_adj[i]-=(highestZ-measured_z[i+1])*adjFactor;
+	  if(dryrun) {
+		  for (int i= 0; i<3; i++)
+		  {
+			  endstop_adj[i]-=(highestZ-measured_z[i+1])*adjFactor;
+		  }
+		  maxEndStop_adj = max3(endstop_adj[0],endstop_adj[1],endstop_adj[2]);
+		  for (int i= 0; i<3; i++)
+		  {
+		  if(maxEndStop_adj<0)
+			  endstop_adj[i]-=maxEndStop_adj;
+		  }
+		  MYSERIAL.print("End M666 X");MYSERIAL.print(endstop_adj[X_AXIS]);
+		  MYSERIAL.print(" Y");MYSERIAL.print(endstop_adj[Y_AXIS]);
+		  MYSERIAL.print(" Z");MYSERIAL.println(endstop_adj[Z_AXIS]);
 	  }
-	  maxEndStop_adj = max3(endstop_adj[0],endstop_adj[1],endstop_adj[2]);
-	  for (int i= 0; i<3; i++)
-	  {
-	  if(maxEndStop_adj<0)
-		  endstop_adj[i]-=maxEndStop_adj;
-	  }
-	  MYSERIAL.print("End M666 X");MYSERIAL.print(endstop_adj[X_AXIS]);
-	  MYSERIAL.print(" Y");MYSERIAL.print(endstop_adj[Y_AXIS]);
-	  MYSERIAL.print(" Z");MYSERIAL.println(endstop_adj[Z_AXIS]);
 	  gcode_G28();
 
   }
