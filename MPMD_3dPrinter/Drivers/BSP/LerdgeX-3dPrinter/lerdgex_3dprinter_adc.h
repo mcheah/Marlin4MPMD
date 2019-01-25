@@ -96,7 +96,7 @@
    
 /* Definition for DMA resources used by ADC************************************/
 
-#define BSP_DMA                 (DMA2_Stream4_BASE)
+#define BSP_DMA                 ((DMA_Stream_TypeDef*)DMA2_Stream4_BASE)
 //DMA channels not re-mappable on F0
 //#define BSP_DMA_CHANNEL         (DMA_CHANNEL_0)
 #define __BSP_DMA_CLK_ENABLE()    __DMA2_CLK_ENABLE()

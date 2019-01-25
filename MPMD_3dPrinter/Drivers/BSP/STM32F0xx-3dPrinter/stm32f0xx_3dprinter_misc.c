@@ -39,7 +39,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f0xx_3dprinter_misc.h"
-#include "motorcontrol.h"
 #include "stm32f0xx_3dprinter_motor.h"
 #include "stm32f0xx_3dprinter_adc.h"
 #include "stm32f0xx_3dprinter_uart.h"
@@ -47,7 +46,6 @@
 #ifdef MOTOR_L6474
 #include "l6474.h"
 #elif defined(MOTOR_A4985)
-#include "A4985.h"
 #endif
 
 #include "string.h"
@@ -272,17 +270,11 @@ void BSP_MiscOverallInit(uint8_t nbDevices)
   
   //----- Init of the Motor control library to use nB device */
   bspMiscNbMotorDevices = nbDevices;
-#ifdef MOTOR_L6474
-  BSP_MotorControl_Init(BSP_MOTOR_CONTROL_BOARD_ID_L6474, nbDevices);
-#elif defined(MOTOR_A4985)
-  BSP_MotorControl_Init(BSP_MOTOR_CONTROL_BOARD_ID_A4985, nbDevices);
-#endif
-  
+  BSP_MotorControlBoard_GpioInit(nbDevices);
   /* Attach the function MyFlagInterruptHandler (defined below) to the flag interrupt */
 //  BSP_MotorControl_AttachFlagInterrupt(BSP_MiscFlagInterruptHandler);
 
   /* Attach the function Error_Handler (defined below) to the error Handler*/
-  BSP_MotorControl_AttachErrorHandler(BSP_MiscErrorHandler); 
 }
 
 /******************************************************//**
@@ -290,81 +282,6 @@ void BSP_MiscOverallInit(uint8_t nbDevices)
  * @param None
  * @retval None
  **********************************************************/
-void BSP_MiscFlagInterruptHandler(void)
-{
-  uint16_t statusRegister;
-  uint8_t loop;
-  
-  for (loop =0; loop < bspMiscNbMotorDevices; loop++)
-  {
-    /* Get the value of the status register via the L6474 command GET_STATUS */
-    statusRegister = BSP_MotorControl_CmdGetStatus(loop);
-#ifdef MOTOR_L6474
-    /* Check HIZ flag: if set, power brigdes are disabled */
-    if ((statusRegister & L6474_STATUS_HIZ) == L6474_STATUS_HIZ)
-    {
-      // HIZ state
-      // Action to be customized            
-    }
-
-    /* Check direction bit */
-    if ((statusRegister & L6474_STATUS_DIR) == L6474_STATUS_DIR)
-    {
-      // Forward direction is set
-      // Action to be customized            
-    }  
-    else
-    {
-      // Backward direction is set
-      // Action to be customized            
-    }  
-
-    /* Check NOTPERF_CMD flag: if set, the command received by SPI can't be performed */
-    /* This often occures when a command is sent to the L6474 */
-    /* while it is in HIZ state */
-    if ((statusRegister & L6474_STATUS_NOTPERF_CMD) == L6474_STATUS_NOTPERF_CMD)
-    {
-        // Command received by SPI can't be performed
-       // Action to be customized            
-    }  
-
-    /* Check WRONG_CMD flag: if set, the command does not exist */
-    if ((statusRegister & L6474_STATUS_WRONG_CMD) == L6474_STATUS_WRONG_CMD)
-    {
-       //command received by SPI does not exist 
-       // Action to be customized          
-    }  
-
-    /* Check UVLO flag: if not set, there is an undervoltage lock-out */
-    if ((statusRegister & L6474_STATUS_UVLO) == 0)
-    {
-       //undervoltage lock-out 
-       // Action to be customized          
-    }  
-
-    /* Check TH_WRN flag: if not set, the thermal warning threshold is reached */
-    if ((statusRegister & L6474_STATUS_TH_WRN) == 0)
-    {
-      //thermal warning threshold is reached
-      // Action to be customized          
-    }    
-
-    /* Check TH_SHD flag: if not set, the thermal shut down threshold is reached */
-    if ((statusRegister & L6474_STATUS_TH_SD) == 0)
-    {
-      //thermal shut down threshold is reached 
-      // Action to be customized          
-    }    
-
-    /* Check OCD  flag: if not set, there is an overcurrent detection */
-    if ((statusRegister & L6474_STATUS_OCD) == 0)
-    {
-      //overcurrent detection 
-      // Action to be customized          
-    }
-#endif
-  }
-}
 
 
 /******************************************************//**
@@ -408,7 +325,11 @@ void BSP_MiscErrorHandler(uint16_t error)
 	  BSP_LED_Toggle(LED_GREEN);
 	  BSP_LED_Toggle(LED_RED);
 	  //Systick disabled, use loop for delay
+#ifdef STM32_MPMD
+	  for(int i=0;i<10e3;i++) { }
+#else
 	  for(int i=0;i<1000e3;i++) { }
+#endif
   }
 }
 /******************************************************//**
@@ -813,7 +734,7 @@ void BSP_MiscTickInit(void)
     hTimTick.Init.Period = 0xFFFFFFFF;
   }
 #else
-  hTimTick.Init.Period = 0xFFFF;
+    hTimTick.Init.Period = 0xFFFF;
 #endif
   //TODO: check this, unclear what's special about TIM4, it seems all timer's can handle this
   hTimTick.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -1004,7 +925,7 @@ void BSP_MiscSetStepClockToSwMode(void)
   uint8_t deviceId;
   uint32_t gpioPin;
   GPIO_TypeDef* gpioPort;  
-  
+
   for (deviceId = 0; deviceId < bspMiscNbMotorDevices; deviceId++) 
   {
     switch (deviceId)
@@ -1049,7 +970,6 @@ void BSP_MiscSetStepClockToSwMode(void)
         break;
 #endif//BSP_HEAT_E2_PIN
     }
-    HAL_TIM_PWM_DeInit(pHTim);
   
   /* GPIO configuration */
     GPIO_InitStruct.Pin = gpioPin;
@@ -1432,8 +1352,38 @@ void BSP_MiscUserGpioInit(uint8_t id, uint32_t mode, uint32_t pull)
   HAL_GPIO_Init(gpioPort, &GPIO_InitStruct);      
 }
 #endif
-
-
+/**********************************************************
+ * @brief  Erases user EEPROM emulated in flash
+ * @retval None
+ **********************************************************/
+void BSP_MiscEEPROMErase() {
+	FLASH_If_Init();
+	FLASH_If_Erase(EEPROM_ADDRESS,EEPROM_ADDRESS+FLASH_PAGE_SIZE); //Exactly one page reserved for EEPROM
+}
+/**********************************************************
+ * @brief  Writes a float value to user EEPROM emulated in flash
+ * @retval None
+ **********************************************************/
+void BSP_MiscEEPROMWriteF32(void *destination, float value)
+{
+	FLASH_If_Write((uint32_t)destination,&value,sizeof(float)/sizeof(uint16_t));
+}
+/**********************************************************
+ * @brief  Writes a uint16_t value to user EEPROM emulated in flash
+ * @retval None
+ **********************************************************/
+void BSP_MiscEEPROMWriteU16(void *destination, uint16_t value)
+{
+	FLASH_If_Write((uint32_t)destination,&value,sizeof(uint16_t)/sizeof(uint16_t));
+}
+/**********************************************************
+ * @brief  Writes a uint32_t value to user EEPROM emulated in flash
+ * @retval None
+ **********************************************************/
+void BSP_MiscEEPROMWriteU32(void *destination, uint32_t value)
+{
+	FLASH_If_Write((uint32_t)destination,&value,sizeof(uint32_t)/sizeof(uint16_t));
+}
 /**
   * @}
   */    

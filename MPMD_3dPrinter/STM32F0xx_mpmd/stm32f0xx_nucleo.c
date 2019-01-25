@@ -401,7 +401,7 @@ static void SPIx_Init(void)
           - SD card SPI interface max baudrate is 25MHz for write/read
           - PCLK1 max frequency is 48 MHz
        */
-#ifdef USE_FAST_SPI
+#ifdef USE_FAST_SPI_CLK
     hnucleo_Spi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
 #else
     hnucleo_Spi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;

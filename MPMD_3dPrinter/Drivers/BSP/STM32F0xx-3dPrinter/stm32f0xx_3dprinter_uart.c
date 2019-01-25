@@ -352,12 +352,15 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle)
 }
 
 /******************************************************//**
- * @brief  Rx Transfer completed callback
+ * @brief  Rx Transfer callback
+ *         called on every byte reception to update fifo
  * @param[in] UartHandle UART handle. 
  * @retval None
  **********************************************************/
-void HAL_UART_RxCallback(UART_HandleTypeDef *UartHandle) {
+void HAL_UART_RxCallback(UART_HandleTypeDef *UartHandle)
+{
 	  BspUartDataType *pUart = &gBspUartData;
+  
 	  if (UartHandle == &(pUart->handle))
 	  {
 	    pUart->pRxWriteBuffer++;
@@ -371,6 +374,7 @@ void HAL_UART_RxCallback(UART_HandleTypeDef *UartHandle) {
 
 /******************************************************//**
  * @brief  Rx Transfer completed callback
+ *         called when entire buffer has been filled
  * @param[in] UartHandle UART handle.
  * @retval None
  **********************************************************/
@@ -381,16 +385,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
   if (UartHandle == &(pUart->handle))
   {
     pUart->pRxWriteBuffer = pUart->pRxBuffer;
-#ifdef USE_XONXOFF    
-    if ((BSP_UART_GET_NB_BYTES_IN_RX_BUFFER()  > BSP_UART_RX_THRESHOLD_XOFF) && (BspUartXonXoff == 0))
-    {
-      BspUartXonXoff = 2;
-    }
-    else if ((BSP_UART_GET_NB_BYTES_IN_RX_BUFFER()  < BSP_UART_RX_THRESHOLD_XON) && (BspUartXonXoff == 3)&& (BSP_UART_GET_NB_BYTES_IN_TX_BUFFER() <BSP_UART_TX_THRESHOLD_XON))
-    {
-      BspUartXonXoff = 1;
-    }
-#endif    
+
     if (pUart->pRxWriteBuffer == pUart->pRxReadBuffer)
     {
       // Rx buffer is full 
@@ -522,10 +517,10 @@ uint32_t BSP_UartCopyNextRxBytes(uint8_t *buff, uint32_t maxlen)
 {
 	BspUartDataType *pUart = &gBspUartData;
 	BSP_LED_On(LED_BLUE);
-	volatile uint32_t bytesToCopy = MIN(maxlen,BSP_UartGetNbRxAvailableBytes());
-	volatile uint32_t firstBytesToCopy = MIN(bytesToCopy,
+	uint32_t bytesToCopy = MIN(maxlen,BSP_UartGetNbRxAvailableBytes());
+	uint32_t firstBytesToCopy = MIN(bytesToCopy,
 											&(pUart->pRxBuffer[UART_RX_BUFFER_SIZE])-pUart->pRxReadBuffer);
-	volatile uint32_t secondBytesToCopy = bytesToCopy - firstBytesToCopy;
+	uint32_t secondBytesToCopy = bytesToCopy - firstBytesToCopy;
 	memcpy(buff,
 			pUart->pRxReadBuffer,
 			firstBytesToCopy);

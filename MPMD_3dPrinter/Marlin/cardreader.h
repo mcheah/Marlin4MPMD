@@ -47,7 +47,7 @@
 #define MAX_FILES (24) //MAX_FILES*LONG_FILENAME_LENGTH < 4096
 
 // Number of UTF-16 characters per entry
-#define FILENAME_LENGTH (13)
+#define FILENAME_LENGTH (255)
 
 // Number of VFAT entries used. Every entry has 13 UTF-16 characters
 //#define MAX_VFAT_ENTRIES (2)
@@ -206,6 +206,12 @@ public:
 	void pauseSDPrint();
 
 	/**
+	 * \fn void stopSDPrint()
+	 * \brief Function used to stop the printing action.
+	 */
+	void stopSDPrint();
+
+	/**
 	 * \fn void getStatus()
 	 * \brief Function used to status of the printing action.
 	 */
@@ -239,7 +245,14 @@ public:
 
 	FORCE_INLINE uint32_t fileLength() { return filesize; }
 	FORCE_INLINE bool isFileOpen() { return (bool)file.obj.fs; }
-	FORCE_INLINE bool eof() { return sdpos>=filesize ;};
+	FORCE_INLINE bool eof() {
+		if(!isBinaryMode)
+			return sdpos>=filesize ;
+		else {
+			int bytesAvailable = pReadEnd - pRead;
+			return (sdpos-bytesAvailable)>=filesize;
+		}
+	};
 	FORCE_INLINE int16_t get() {
 		UINT readByte;
 		UINT rc;
@@ -252,7 +265,12 @@ public:
 		}
 		return (int16_t) readByte;
 	};
-	FORCE_INLINE void setIndex(long index) {sdpos = index;f_lseek(&file, index);};
+	FORCE_INLINE void setIndex(long index) {
+		sdpos = index;
+		f_lseek(&file, index);
+		if(isBinaryMode)
+			flush_buff();
+	};
 	FORCE_INLINE uint8_t percentDone(){
 		if(!isFileOpen())
 			return 0;
@@ -275,7 +293,7 @@ private:
 	//-------------------
 
 	uint16_t workDirDepth;
-	DIR root, *curDir, workDir, workDirParents[MAX_DIR_DEPTH];
+	DIR root, *curDir, workDir, workDirParents[MAX_DIR_DEPTH+1];
 	FIL file;  // Current file
 	FATFS fileSystem;
 	char SDPath[4]; /* SD card logical drive path */
@@ -298,6 +316,7 @@ private:
 
 	void lsDive(const char *prepend, DIR *parent, const char * const match=NULL);
 	bool testPath( char *name, char **fname);
+	void flush_buff(void);
 
 
 };

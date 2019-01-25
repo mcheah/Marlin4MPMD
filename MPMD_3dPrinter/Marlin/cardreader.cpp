@@ -80,7 +80,6 @@ void CardReader::initsd()
 		  SERIAL_ERRORLNPGM(MSG_SD_VOL_INIT_FAIL);
 		  sprintf((char *)buff,"code=%d\n",code);
 		  MYSERIAL.print((char *)buff);
-//		  BSP_CdcIfQueueTxData(buff,sizeof(buff));
 		  release();
 		  return;//Previously uninitialized, don't try again
 		}
@@ -90,7 +89,6 @@ void CardReader::initsd()
 		  SERIAL_ERRORLNPGM(MSG_SD_OPENROOT_FAIL);
 		  sprintf((char *)buff,"code=%d\n",code);
 		  MYSERIAL.print((char *)buff);
-//		  BSP_CdcIfQueueTxData(buff,sizeof(buff));
 		  release();
 		  return;//Previously uninitialized, don't try again
 		}
@@ -117,7 +115,6 @@ void CardReader::initsd()
 			  SERIAL_ERRORLNPGM(MSG_SD_OPENROOT_FAIL);
 			  sprintf((char *)buff,"code=%d\n",res);
 			  MYSERIAL.print((char *)buff);
-//			  BSP_CdcIfQueueTxData(buff,sizeof(buff));
 			  release(); //test failed, loop again after releasing
 		}
 		else {
@@ -337,6 +334,8 @@ void CardReader::release()
   disk_deinitialize(fileSystem.drv);
   SERIAL_ECHO_START;
   SERIAL_ECHOLNPGM(MSG_SD_INIT_FAIL);
+  if(isBinaryMode)
+	  flush_buff();
 }
 
 void CardReader::startFileprint()
@@ -351,14 +350,18 @@ void CardReader::startFileprint()
 //	    enqueue_and_echo_commands_P(PSTR("G90"));
 //	}
 #if ENABLED(MALYAN_LCD)
+#if ENABLED(SD_SETTINGS)
   const char upper_config_file_name[] = UPPER_CONFIG_FILE_NAME;
   updateLCD = ( strncmp(longFilename,
 		  	  upper_config_file_name,
 			  sizeof(upper_config_file_name))!=0);
   if(updateLCD)
+#endif// ENABLED(SD_SETTINGS)
 	lcd_setstatuspgm(PSTR(MSG_BUILD));
-#endif
-    sdprinting = true;
+#endif// ENABLED(MALYAN_LCD)
+  if(isBinaryMode)
+	  flush_buff();
+  sdprinting = true;
 }
 
 void CardReader::pauseSDPrint()
@@ -370,6 +373,17 @@ void CardReader::pauseSDPrint()
 //    enqueue_and_echo_command_now("M91");
 //    enqueue_and_echo_commands_P(PSTR("G1 Z50 S1"));
   }
+}
+
+void CardReader::stopSDPrint() {
+	  if(sdprinting)
+	  {
+	    sdprinting = false;
+	    //TODO: add behavior to correctly raise the print head but currently causes deadlock
+	//    enqueue_and_echo_command_now("M91");
+	//    enqueue_and_echo_commands_P(PSTR("G1 Z50 S1"));
+	    closefile();
+	  }
 }
 
 
@@ -578,6 +592,7 @@ void CardReader::openFile(char* name,bool read, bool replace_current/*=true*/)
     }
     else
     {
+      sdpos = 0;
       saving = true;
       SERIAL_PROTOCOLPGM(MSG_SD_WRITE_TO_FILE);
       SERIAL_PROTOCOLLN(name);
@@ -621,6 +636,8 @@ void CardReader::removeFile(char* name)
 		SERIAL_PROTOCOLPGM("File deleted:");
 		SERIAL_PROTOCOLLN(fname);
 		sdpos = 0;
+		if(isBinaryMode)
+			flush_buff();
 	}
 	else
 	{
@@ -642,6 +659,11 @@ void CardReader::getStatus()
   else{
     SERIAL_PROTOCOLLNPGM(MSG_SD_NOT_PRINTING);
   }
+}
+
+void CardReader::flush_buff() {
+	pReadEnd = readBuff+512;
+	pRead = pReadEnd;
 }
 
 int CardReader::read_buff(unsigned char *buf,uint32_t len)
@@ -671,7 +693,7 @@ int CardReader::read_buff(unsigned char *buf,uint32_t len)
 		}
 		int bytesAvailable = pReadEnd - pRead;
 		if(bytesAvailable>0) {
-			unsigned int bytestoCopy = min(bytesAvailable,bytesRemaining);
+			unsigned int bytestoCopy = min(bytesAvailable,(int)bytesRemaining);
 			memcpy(buf,pRead,bytestoCopy);
 			bytesCopied+=bytestoCopy;
             pRead+=bytestoCopy;
@@ -689,9 +711,6 @@ void CardReader::push_read_buff(int len)
     	FSIZE_t curpos = f_tell(&file);
         f_lseek(&file,curpos-((pReadEnd)-pRead+len));
         sdpos-=((pReadEnd)-pRead+len);
-        char buff[80];
-        sprintf(buff,"sdpos=%ld curpos=%ld\r\n",sdpos,curpos);
-        serialprintPGM(buff);
         FRESULT readStatus = f_read(&file, readBuff, 512, &bytesRead);
 	    if(readStatus != FR_OK)
 	    {
@@ -709,9 +728,6 @@ void CardReader::push_read_buff(int len)
 
 void CardReader::write_buff(unsigned char *buf,uint32_t len)
 {
-#ifdef STM32_USE_USB_CDC
-  cli();
-#endif
   if(len==512)
 	  BSP_LED_On(LED_RED);
   BSP_LED_On(LED_GREEN);
@@ -720,6 +736,7 @@ void CardReader::write_buff(unsigned char *buf,uint32_t len)
   FRESULT writeStatus;
 
   writeStatus = f_write(&file, buf, len, &bytesWritten);
+  sdpos+=bytesWritten;
   if( 	(writeStatus != FR_OK) ||
 		(bytesWritten != len))
   {
@@ -729,9 +746,6 @@ void CardReader::write_buff(unsigned char *buf,uint32_t len)
   BSP_LED_Off(LED_GREEN);
   BSP_LED_Off(LED_BLUE);
   BSP_LED_Off(LED_RED);
-#ifdef STM32_USE_USB_CDC
-  sei();
-#endif
 }
 
 
@@ -821,7 +835,10 @@ void CardReader::closefile(bool store_location)
   f_close(&file);
   saving = false; 
   logging = false;
-  
+  sdpos = 0;
+  updateLCD = false;
+  if(isBinaryMode)
+	  flush_buff();
   if(store_location)
   {
     //future: store printer state, filename and position for continuing a stopped print
@@ -843,6 +860,9 @@ void CardReader::getfilename(uint16_t nr, const char * const match/*=NULL*/)
 
 uint16_t CardReader::getnrfilenames()
 {
+  initsd();
+  if(!cardOK)
+	return 0;
   curDir=&workDir;
   lsAction=LS_Count;
   nrFiles=0;
@@ -897,7 +917,7 @@ uint16_t CardReader::get_num_Files() {
 void CardReader::printingHasFinished()
 {
     stepper.synchronize();
-    if(file_subcall_ctr>0) //heading up to a parent file that called current as a procedure.
+    if(file_subcall_ctr>0 && SD_PROCEDURE_DEPTH>1) //heading up to a parent file that called current as a procedure.
     {
       fileOpened[file_subcall_ctr] = 0;
       f_close(&file);

@@ -199,7 +199,6 @@ volatile long Stepper::endstops_trigsteps[3];
 // C1 B1 A1 is longIn1
 // D2 C2 B2 A2 is longIn2
 //
-//#define MultiU24X32toH16(intRes, longIn1, longIn2)  intRes = (uint16_t)((((uint64_t)longIn1 * (uint64_t)longIn2)>> 24)& 0XFFFF);
 #define MultiU24X32toH16(intRes, longIn1, longIn2)  intRes = (uint64_t)((((uint64_t)longIn1 * (uint64_t)longIn2)>> 24)& 0XFFFF);
 /* BDI  -- To suppress
 #define MultiU24X32toH16(intRes, longIn1, longIn2) \

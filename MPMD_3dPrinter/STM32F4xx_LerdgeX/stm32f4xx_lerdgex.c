@@ -412,7 +412,7 @@ static void SPIx_Init(void)
 	      - For STM32F412ZG devices: 12,5 MHz maximum (PCLK2/SPI_BAUDRATEPRESCALER_8 = 100 MHz/8 = 12,5 MHz)
 		  - For STM32F446ZE/STM32F429ZI devices: 11,25 MHz maximum (PCLK2/SPI_BAUDRATEPRESCALER_8 = 90 MHz/8 = 11,25 MHz)
    */
-#ifdef USE_FAST_SPI
+#ifdef USE_FAST_SPI_CLK
     hnucleo_Spi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
 #else
     hnucleo_Spi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
@@ -1085,7 +1085,156 @@ void SD_IO_WriteData(const uint8_t *Data, uint16_t DataLength)
 //
 //#endif /* ADAFRUIT_TFT_JOY_SD_ID802 */
 
+///******************************* Flash driver ********************************/
+static uint32_t GetSector(uint32_t Address);
+/**
+  * @brief  Unlocks Flash for write access
+  * @param  None
+  * @retval None
+  */
+void FLASH_If_Init(void)
+{
+  /* Unlock the Program memory */
+  HAL_FLASH_Unlock();
 
+  /* Clear all FLASH flags */
+  __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_EOP | FLASH_FLAG_OPERR | FLASH_FLAG_WRPERR | FLASH_FLAG_PGAERR | FLASH_FLAG_PGPERR | FLASH_FLAG_PGSERR);
+  /* Unlock the Program memory */
+//  HAL_FLASH_Lock();
+}
+
+/**
+  * @brief  This function does an erase of all user flash area
+  * @param  start: start of user flash area
+  * @retval FLASHIF_OK : user flash area successfully erased
+  *         FLASHIF_ERASEKO : error occurred
+  */
+uint32_t FLASH_If_Erase(uint32_t start,uint32_t end)
+{
+  uint32_t UserStartSector;
+  uint32_t UserStopSector;
+  uint32_t SectorError;
+  FLASH_EraseInitTypeDef pEraseInit;
+  HAL_StatusTypeDef status = HAL_OK;
+
+  /* Unlock the Flash to enable the flash control register access *************/
+//  HAL_FLASH_Unlock();
+
+  UserStartSector = GetSector(start);
+  UserStopSector = GetSector(end);
+
+  pEraseInit.TypeErase = TYPEERASE_SECTORS;
+  pEraseInit.Sector = UserStartSector;
+  pEraseInit.NbSectors = UserStopSector-UserStartSector-1;;
+  pEraseInit.VoltageRange = VOLTAGE_RANGE_3;
+  status = HAL_FLASHEx_Erase(&pEraseInit, &SectorError);
+
+
+  /* Lock the Flash to disable the flash control register access (recommended
+     to protect the FLASH memory against possible unwanted operation) *********/
+//  HAL_FLASH_Lock();
+
+  if (status != HAL_OK)
+  {
+    /* Error occurred while page erase */
+    return FLASHIF_ERASEKO;
+  }
+
+  return FLASHIF_OK;
+}
+
+/* Public functions ---------------------------------------------------------*/
+/**
+  * @brief  This function writes a data buffer in flash (data are 32-bit aligned).
+  * @note   After writing data buffer, the flash content is checked.
+  * @param  destination: start address for target location
+  * @param  p_source: pointer on buffer with data to write
+  * @param  length: length of data buffer (unit is 32-bit word)
+  * @retval uint32_t 0: Data successfully written to Flash memory
+  *         1: Error occurred while writing data in Flash memory
+  *         2: Written Data in flash memory is different from expected one
+  */
+uint32_t FLASH_If_Write(uint32_t destination, uint16_t *p_source, uint32_t length)
+{
+  uint32_t i = 0;
+
+  /* Unlock the Flash to enable the flash control register access *************/
+//  HAL_FLASH_Unlock();
+
+  for (i = 0; (i < length) && (destination <= (FLASH_BANK1_END-1)); i++)
+  {
+    /* Device voltage range supposed to be [2.7V to 3.6V], the operation will
+       be done by word */
+	  //STM32F070 only supports HALFWORD programming
+    if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, destination, *(uint16_t*)(p_source+i)) == HAL_OK)
+    {
+     /* Check the written value */
+      if (*(uint16_t*)destination != *(uint16_t*)(p_source+i))
+      {
+        /* Flash content doesn't match SRAM content */
+        return(FLASHIF_WRITINGCTRL_ERROR);
+      }
+      /* Increment FLASH destination address */
+      destination += sizeof(uint16_t);
+    }
+    else
+    {
+      /* Error occurred while writing data in Flash memory */
+      return (FLASHIF_WRITING_ERROR);
+    }
+  }
+
+  /* Lock the Flash to disable the flash control register access (recommended
+     to protect the FLASH memory against possible unwanted operation) *********/
+//  HAL_FLASH_Lock();
+
+  return (FLASHIF_OK);
+}
+/**
+  * @brief  Gets the sector of a given address
+  * @param  Address: Flash address
+  * @retval The sector of a given address
+  */
+static uint32_t GetSector(uint32_t Address)
+{
+  uint32_t sector = 0;
+
+  if((Address < ADDR_FLASH_SECTOR_1) && (Address >= ADDR_FLASH_SECTOR_0))
+  {
+    sector = FLASH_SECTOR_0;
+  }
+  else if((Address < ADDR_FLASH_SECTOR_2) && (Address >= ADDR_FLASH_SECTOR_1))
+  {
+    sector = FLASH_SECTOR_1;
+  }
+  else if((Address < ADDR_FLASH_SECTOR_3) && (Address >= ADDR_FLASH_SECTOR_2))
+  {
+    sector = FLASH_SECTOR_2;
+  }
+  else if((Address < ADDR_FLASH_SECTOR_4) && (Address >= ADDR_FLASH_SECTOR_3))
+  {
+    sector = FLASH_SECTOR_3;
+  }
+  else if((Address < ADDR_FLASH_SECTOR_5) && (Address >= ADDR_FLASH_SECTOR_4))
+  {
+    sector = FLASH_SECTOR_4;
+  }
+  else if((Address < ADDR_FLASH_SECTOR_6) && (Address >= ADDR_FLASH_SECTOR_5))
+  {
+    sector = FLASH_SECTOR_5;
+  }
+  else if((Address < ADDR_FLASH_SECTOR_11) && (Address >= ADDR_FLASH_SECTOR_6))
+  {
+    sector = FLASH_SECTOR_6;
+  }
+
+
+  else/*(Address < FLASH_END_ADDR) && (Address >= ADDR_FLASH_SECTOR_7))*/
+  {
+    sector = FLASH_SECTOR_11;
+  }
+  return sector;
+}
 /**
   * @}
   */ 
@@ -1101,7 +1250,6 @@ void SD_IO_WriteData(const uint8_t *Data, uint16_t DataLength)
 /**
   * @}
   */ 
-#endif
 void LCD_GPIO_Init(void) {
 	/* Enable FSMC, GPIOD, GPIOE, GPIOF, GPIOG and AFIO clocks */
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -1185,4 +1333,5 @@ void BSP_LCD_Init(void) {
 	LCD_GPIO_Init();
 	LCD_FSMC_Init();
 }
+#endif //ifdef STM32_LERDGEX
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

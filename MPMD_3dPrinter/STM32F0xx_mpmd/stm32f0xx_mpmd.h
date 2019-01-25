@@ -271,6 +271,15 @@ typedef enum
 
 #endif /* HAL_SPI_MODULE_ENABLED */
 
+/* Error code */
+enum
+{
+  FLASHIF_OK = 0,
+  FLASHIF_ERASEKO,
+  FLASHIF_WRITINGCTRL_ERROR,
+  FLASHIF_WRITING_ERROR,
+  FLASHIF_PROTECTION_ERRROR
+};
 /*################################ ADCx for Nucleo 144 board ######################################*/
 /**
   * @brief  ADCx Interface pins
@@ -328,6 +337,10 @@ void             BSP_LED_Toggle(Led_TypeDef Led);
 void             BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef ButtonMode);
 void             BSP_PB_DeInit(Button_TypeDef Button);
 uint32_t         BSP_PB_GetState(Button_TypeDef Button);
+void 			 FLASH_If_Init(void);
+uint32_t 		 FLASH_If_Erase(uint32_t start,uint32_t end);
+uint32_t 		 FLASH_If_Write(uint32_t destination, uint16_t *p_source, uint32_t length);
+
 //#ifdef HAL_ADC_MODULE_ENABLED
 //uint8_t          BSP_JOY_Init(void);
 //JOYState_TypeDef BSP_JOY_GetState(void);

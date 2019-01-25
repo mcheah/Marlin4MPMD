@@ -53,6 +53,7 @@
   */
 
 /* Imported variables ---------------------------------------------------------*/
+#ifndef MINIMAL_BUILD
 extern TIM_HandleTypeDef hTimPwmX;
 extern TIM_HandleTypeDef hTimPwmY;
 extern TIM_HandleTypeDef hTimPwmZ;
@@ -77,6 +78,8 @@ extern TIM_HandleTypeDef hTimPwmHeatE3;
 /* Private function prototypes -----------------------------------------------*/
 extern void BSP_MotorControl_StepClockHandler(uint8_t deviceId); 
 extern void BSP_MotorControl_FlagInterruptHandler(void);
+#endif
+
 /* Private functions ---------------------------------------------------------*/
 
 /** @defgroup HAL_MSP_Private_Functions
@@ -217,6 +220,7 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef *hspi)
 void HAL_UART_MspInit(UART_HandleTypeDef* huart)
 {
   GPIO_InitTypeDef GPIO_InitStruct;
+#if !defined(MINIMAL_BUILD) && !defined(STM32_USE_USB_CDC)
   if(huart->Instance == BSP_UART_DEBUG)
   {
     /* Peripheral clock enable */
@@ -247,6 +251,9 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     HAL_NVIC_SetPriority(BSP_UART_DEBUG_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(BSP_UART_DEBUG_IRQn);    
   }
+#else
+  if(0) { }
+#endif
 #ifdef MALYANLCD
   else if(huart->Instance == BSP_UART_LCD)
   {
@@ -290,6 +297,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
   */
 void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
 {
+#if !defined(MINIMAL_BUILD) && !defined(STM32_USE_USB_CDC)
   if(huart->Instance == BSP_UART_DEBUG)
   {
    /* Reset peripherals */
@@ -306,6 +314,9 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
     /* Peripheral clock disable */
     __BSP_UART_DEBUG_CLK_DISABLE();
   }
+#else
+  if(0) { }
+#endif
 #ifdef MALYAN_LED
   else if(huart->Instance == BSP_UART_LCD)
   {

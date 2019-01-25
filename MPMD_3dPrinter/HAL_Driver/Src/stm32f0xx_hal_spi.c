@@ -725,14 +725,14 @@ HAL_StatusTypeDef HAL_SPI_Transmit_Fast(SPI_HandleTypeDef *hspi, uint8_t *pData,
 
 //  tmp  = hspi->State;
 //  tmp1 = hspi->Init.Mode;
-
+/*
 //  if (!((tmp == HAL_SPI_STATE_READY) || \
 //        ((tmp1 == SPI_MODE_MASTER) && (hspi->Init.Direction == SPI_DIRECTION_2LINES) && (tmp == HAL_SPI_STATE_BUSY_RX))))
 //  {
 //    errorcode = HAL_BUSY;
 //    goto error;
 //  }
-
+*/
 //  if ((pTxData == NULL) || (pRxData == NULL) || (Size == 0U))
 //  {
 //    errorcode = HAL_ERROR;
@@ -784,7 +784,7 @@ HAL_StatusTypeDef HAL_SPI_Transmit_Fast(SPI_HandleTypeDef *hspi, uint8_t *pData,
 //    errorcode = HAL_ERROR;
 //  }
 
-error :
+//error :
 //  hspi->State = HAL_SPI_STATE_READY;
 //  __HAL_UNLOCK(hspi);
   return errorcode;
@@ -829,14 +829,14 @@ HAL_StatusTypeDef HAL_SPI_Transmit_Byte(SPI_HandleTypeDef *hspi, uint8_t Data, u
 
 //  tmp  = hspi->State;
 //  tmp1 = hspi->Init.Mode;
-
+/*
 //  if (!((tmp == HAL_SPI_STATE_READY) || \
 //        ((tmp1 == SPI_MODE_MASTER) && (hspi->Init.Direction == SPI_DIRECTION_2LINES) && (tmp == HAL_SPI_STATE_BUSY_RX))))
 //  {
 //    errorcode = HAL_BUSY;
 //    goto error;
 //  }
-
+*/
 //  if ((pTxData == NULL) || (pRxData == NULL) || (Size == 0U))
 //  {
 //    errorcode = HAL_ERROR;
@@ -888,7 +888,7 @@ HAL_StatusTypeDef HAL_SPI_Transmit_Byte(SPI_HandleTypeDef *hspi, uint8_t Data, u
 //    errorcode = HAL_ERROR;
 //  }
 
-error :
+//error :
 //  hspi->State = HAL_SPI_STATE_READY;
 //  __HAL_UNLOCK(hspi);
   return errorcode;
@@ -1171,14 +1171,14 @@ HAL_StatusTypeDef HAL_SPI_Receive_Fast(SPI_HandleTypeDef *hspi, uint8_t *pData, 
 
 //  tmp  = hspi->State;
 //  tmp1 = hspi->Init.Mode;
-
+/*
 //  if (!((tmp == HAL_SPI_STATE_READY) || \
 //        ((tmp1 == SPI_MODE_MASTER) && (hspi->Init.Direction == SPI_DIRECTION_2LINES) && (tmp == HAL_SPI_STATE_BUSY_RX))))
 //  {
 //    errorcode = HAL_BUSY;
 //    goto error;
 //  }
-
+*/
 //  if ((pTxData == NULL) || (pRxData == NULL) || (Size == 0U))
 //  {
 //    errorcode = HAL_ERROR;
@@ -1386,14 +1386,14 @@ HAL_StatusTypeDef HAL_SPI_Receive_Fast2(SPI_HandleTypeDef *hspi, uint8_t *pData,
 
 //  tmp  = hspi->State;
 //  tmp1 = hspi->Init.Mode;
-
+/*
 //  if (!((tmp == HAL_SPI_STATE_READY) || \
 //        ((tmp1 == SPI_MODE_MASTER) && (hspi->Init.Direction == SPI_DIRECTION_2LINES) && (tmp == HAL_SPI_STATE_BUSY_RX))))
 //  {
 //    errorcode = HAL_BUSY;
 //    goto error;
 //  }
-
+*/
 //  if ((pTxData == NULL) || (pRxData == NULL) || (Size == 0U))
 //  {
 //    errorcode = HAL_ERROR;
@@ -1444,7 +1444,7 @@ HAL_StatusTypeDef HAL_SPI_Receive_Fast2(SPI_HandleTypeDef *hspi, uint8_t *pData,
 //    errorcode = HAL_ERROR;
 //  }
 
-error :
+//error :
 //  hspi->State = HAL_SPI_STATE_READY;
 //  __HAL_UNLOCK(hspi);
   return errorcode;
@@ -1791,14 +1791,14 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive_Byte(SPI_HandleTypeDef *hspi, uint8_t 
 
 //  tmp  = hspi->State;
 //  tmp1 = hspi->Init.Mode;
-
+/*
 //  if (!((tmp == HAL_SPI_STATE_READY) || \
 //        ((tmp1 == SPI_MODE_MASTER) && (hspi->Init.Direction == SPI_DIRECTION_2LINES) && (tmp == HAL_SPI_STATE_BUSY_RX))))
 //  {
 //    errorcode = HAL_BUSY;
 //    goto error;
 //  }
-
+*/
 //  if ((pTxData == NULL) || (pRxData == NULL) || (Size == 0U))
 //  {
 //    errorcode = HAL_ERROR;
@@ -1850,7 +1850,7 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive_Byte(SPI_HandleTypeDef *hspi, uint8_t 
 //    errorcode = HAL_ERROR;
 //  }
 
-error :
+//error :
 //  hspi->State = HAL_SPI_STATE_READY;
 //  __HAL_UNLOCK(hspi);
   return errorcode;
@@ -1897,14 +1897,14 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive_Fast(SPI_HandleTypeDef *hspi, uint8_t 
 
 //  tmp  = hspi->State;
 //  tmp1 = hspi->Init.Mode;
-
+/*
 //  if (!((tmp == HAL_SPI_STATE_READY) || \
 //        ((tmp1 == SPI_MODE_MASTER) && (hspi->Init.Direction == SPI_DIRECTION_2LINES) && (tmp == HAL_SPI_STATE_BUSY_RX))))
 //  {
 //    errorcode = HAL_BUSY;
 //    goto error;
 //  }
-
+*/
 //  if ((pTxData == NULL) || (pRxData == NULL) || (Size == 0U))
 //  {
 //    errorcode = HAL_ERROR;
@@ -1956,7 +1956,7 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive_Fast(SPI_HandleTypeDef *hspi, uint8_t 
 //    errorcode = HAL_ERROR;
 //  }
 
-error :
+//error :
 //  hspi->State = HAL_SPI_STATE_READY;
 //  __HAL_UNLOCK(hspi);
   return errorcode;

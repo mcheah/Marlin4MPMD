@@ -878,7 +878,7 @@ uint8_t  USBD_CDC_TransmitPacket(USBD_HandleTypeDef *pdev)
   }
 }
 
-
+extern uint8_t rxInProgress;
 /**
   * @brief  USBD_CDC_ReceivePacket
   *         prepare OUT Endpoint for reception
@@ -908,6 +908,7 @@ uint8_t  USBD_CDC_ReceivePacket(USBD_HandleTypeDef *pdev)
                              hcdc->RxBuffer,
                              CDC_DATA_FS_OUT_PACKET_SIZE);
     }
+    rxInProgress = 1;
     return USBD_OK;
   }
   else

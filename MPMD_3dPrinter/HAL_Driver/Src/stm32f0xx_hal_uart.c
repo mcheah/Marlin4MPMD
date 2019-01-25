@@ -1846,6 +1846,20 @@ __weak void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
             the HAL_UART_RxCpltCallback can be implemented in the user file.
    */
 }
+/**
+  * @brief  Rx Transfer callbacks.
+  * @param  huart pointer to a UART_HandleTypeDef structure that contains
+  *                the configuration information for the specified UART module.
+  * @retval None
+  */
+__weak void HAL_UART_RxCallback(UART_HandleTypeDef *huart)
+{
+  /* Prevent unused argument(s) compilation warning */
+  UNUSED(huart);
+  /* NOTE: This function Should not be modified, when the callback is needed,
+           the HAL_UART_TxCpltCallback could be implemented in the user file
+   */
+}
 
 /**
   * @brief  Rx Half Transfer completed callback.
@@ -2752,7 +2766,7 @@ HAL_StatusTypeDef UART_Receive_IT(UART_HandleTypeDef *huart)
     {
       *huart->pRxBuffPtr++ = (uint8_t)(uhdata & (uint8_t)uhMask);
     }
-
+    HAL_UART_RxCallback(huart); //called on every reception
     if(--huart->RxXferCount == 0U)
     {
       /* Disable the UART Parity Error Interrupt and RXNE interrupt*/

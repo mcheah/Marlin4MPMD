@@ -48,7 +48,6 @@
 //#include "stm32f4xx_nucleo.h"
 //#include "stm32f4xx_hal.h"
 #include "stm32f4xx_it.h"
-#include "motorcontrol.h"
 #include "stm32f0xx_3dprinter_uart.h"
 //#include "stm32f4xx_3dprinter_sd.h"
 /** @addtogroup BSP
@@ -339,7 +338,10 @@
 //
 ///// SPI MOSI AF
 //#define SPIx_MOSI_AF                     (SPIx_SCK_AF)
-
+ ///Reset the A4985 reset pin
+ void BSP_MotorControlBoard_ReleaseReset(void);
+ ///Set the A4985 reset pin
+ void BSP_MotorControlBoard_Reset(void);
 /**
   * @}
   */

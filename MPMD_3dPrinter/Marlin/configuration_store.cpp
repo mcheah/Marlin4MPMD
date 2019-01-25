@@ -36,11 +36,8 @@
  *
  */
 
-#define EEPROM_VERSION "V24"
 
 // Change EEPROM version if these are changed:
-#define EEPROM_OFFSET 100
-#define MAX_EXTRUDERS 4
 
 /**
  * V24 EEPROM Layout:
@@ -138,8 +135,6 @@
 #endif
 
 uint16_t eeprom_checksum;
-const char version[4] = EEPROM_VERSION;
-
 
 void _EEPROM_writeData(int &pos, uint8_t* value, uint8_t size) {
 #if 0  // BDI : Code to modify later
@@ -574,6 +569,156 @@ void Config_RetrieveSettings() {
 }
 
 // end EEPROM_SETTINGS
+
+#elif ENABLED(FLASH_SETTINGS)
+volatile ConfigSettings *EEPROMconfig = (ConfigSettings *)EEPROM_ADDRESS; //create pointer to virtual struct so we can save memory
+void Config_StoreSettings() {
+	BSP_MiscEEPROMErase();
+	_EEPROMWrite(&EEPROMconfig->API_MAJOR_VERSION,uint16_t(CONFIG_API_MAJOR_VERSION | CONFIG_API_MINOR_VERSION<<8));
+	_EEPROMWrite(&EEPROMconfig->MAJOR_FW_VERSION,uint16_t(MARLIN_MAJOR_FW_VERSION | MARLIN_MINOR_FW_VERSION<<8));
+	_EEPROMWrite(&EEPROMconfig->MAJOR_FW_SUBVERSION,uint16_t(MARLIN_MAJOR_FW_SUBVERSION | MARLIN_MINOR_FW_SUBVERSION<<8));
+	for(int i=0;i<NUM_AXIS;i++)
+		_EEPROMWrite(&EEPROMconfig->axis_steps_per_mm[i],planner.axis_steps_per_mm[i]);
+	for(int i=0;i<NUM_AXIS;i++)
+			_EEPROMWrite(&EEPROMconfig->max_feedrate_mm_s[i],planner.max_feedrate_mm_s[i]);
+	for(int i=0;i<NUM_AXIS;i++)
+			_EEPROMWrite(&EEPROMconfig->max_acceleration_mm_per_s2[i],planner.max_acceleration_mm_per_s2[i]);
+	_EEPROMWrite(&EEPROMconfig->acceleration,planner.acceleration);
+	_EEPROMWrite(&EEPROMconfig->retract_acceleration,planner.retract_acceleration);
+	_EEPROMWrite(&EEPROMconfig->travel_acceleration,planner.travel_acceleration);
+	_EEPROMWrite(&EEPROMconfig->min_feedrate_mm_s,planner.min_feedrate_mm_s);
+	_EEPROMWrite(&EEPROMconfig->min_travel_feedrate_mm_s,planner.min_travel_feedrate_mm_s);
+	_EEPROMWrite(&EEPROMconfig->min_segment_time,planner.min_segment_time);
+	_EEPROMWrite(&EEPROMconfig->max_xy_jerk,planner.max_xy_jerk);
+	_EEPROMWrite(&EEPROMconfig->max_z_jerk,planner.max_z_jerk);
+	_EEPROMWrite(&EEPROMconfig->max_e_jerk,planner.max_e_jerk);
+	for(int i=0;i<3;i++)
+		_EEPROMWrite(&EEPROMconfig->home_offset[i],home_offset[i]);
+	_EEPROMWrite(&EEPROMconfig->zprobe_zoffset,zprobe_zoffset);
+	for(int i=0;i<3;i++)
+		_EEPROMWrite(&EEPROMconfig->endstop_adj[i],endstop_adj[i]);
+	_EEPROMWrite(&EEPROMconfig->delta_height,delta_height);
+	_EEPROMWrite(&EEPROMconfig->delta_diagonal_rod,delta_diagonal_rod);
+	_EEPROMWrite(&EEPROMconfig->delta_radius,delta_radius);
+	_EEPROMWrite(&EEPROMconfig->delta_segments_per_second,delta_segments_per_second);
+	_EEPROMWrite(&EEPROMconfig->delta_diagonal_rod_trim[A_AXIS],delta_diagonal_rod_trim_tower_1);
+	_EEPROMWrite(&EEPROMconfig->delta_diagonal_rod_trim[B_AXIS],delta_diagonal_rod_trim_tower_2);
+	_EEPROMWrite(&EEPROMconfig->delta_diagonal_rod_trim[C_AXIS],delta_diagonal_rod_trim_tower_3);
+	_EEPROMWrite(&EEPROMconfig->delta_radius_trim[A_AXIS],delta_radius_trim_tower_1);
+	_EEPROMWrite(&EEPROMconfig->delta_radius_trim[B_AXIS],delta_radius_trim_tower_2);
+	_EEPROMWrite(&EEPROMconfig->delta_radius_trim[C_AXIS],delta_radius_trim_tower_3);
+	for(int i=0;i<3;i++)
+		_EEPROMWrite(&EEPROMconfig->delta_angle_trim[i],delta_tower_angle_trim[i]);
+
+#if DISABLED(ULTIPANEL)
+  int preheatHotendTemp1 = PREHEAT_1_TEMP_HOTEND, preheatBedTemp1 = PREHEAT_1_TEMP_BED, preheatFanSpeed1 = PREHEAT_1_FAN_SPEED,
+      preheatHotendTemp2 = PREHEAT_2_TEMP_HOTEND, preheatBedTemp2 = PREHEAT_2_TEMP_BED, preheatFanSpeed2 = PREHEAT_2_FAN_SPEED;
+#endif
+	_EEPROMWrite(&EEPROMconfig->preheatHotendTemp[0],(uint16_t)preheatHotendTemp1);
+	_EEPROMWrite(&EEPROMconfig->preheatHotendTemp[1],(uint16_t)preheatHotendTemp2);
+	_EEPROMWrite(&EEPROMconfig->preheatBedTemp[0],(uint16_t)preheatBedTemp1);
+	_EEPROMWrite(&EEPROMconfig->preheatBedTemp[1],(uint16_t)preheatBedTemp2);
+	_EEPROMWrite(&EEPROMconfig->preheatFanSpeed[0],(uint16_t)preheatFanSpeed1);
+	_EEPROMWrite(&EEPROMconfig->preheatFanSpeed[1],(uint16_t)preheatFanSpeed2);
+	_EEPROMWrite(&EEPROMconfig->kP,PID_PARAM(Kp, e));
+	_EEPROMWrite(&EEPROMconfig->kI,(float)unscalePID_i(PID_PARAM(Ki, e)));
+	_EEPROMWrite(&EEPROMconfig->kD,(float)unscalePID_d(PID_PARAM(Kd, e)));
+	_EEPROMWrite(&EEPROMconfig->volumetric_enabled,(uint16_t)volumetric_enabled);
+	for(int i=0;i<EXTRUDERS;i++)
+		_EEPROMWrite(&EEPROMconfig->filament_size[i],filament_size[i]);
+#if ENABLED(AUTO_BED_LEVELING_GRID)
+	for(int i=0;i<2;i++)
+		_EEPROMWrite(&EEPROMconfig->delta_grid_spacing[i],delta_grid_spacing[i]);
+	for(int i=0;i<AUTO_BED_LEVELING_GRID_POINTS;i++)
+		for(int j=0;j<AUTO_BED_LEVELING_GRID_POINTS;j++)
+			_EEPROMWrite(&EEPROMconfig->bed_level[i][j],bed_level[i][j]);
+#endif
+}
+void Config_RetrieveSettings() {
+	char buff[80];
+	struct { uint8_t api_major_version; uint8_t api_minor_version; } api_version;
+	struct { uint8_t api_major_version; uint8_t api_minor_version; } fw_version;
+	struct { uint8_t api_major_version; uint8_t api_minor_version; } fw_subversion;
+	_EEPROMRead(&EEPROMconfig->API_MAJOR_VERSION,api_version.api_major_version);
+	_EEPROMRead(&EEPROMconfig->API_MINOR_VERSION,api_version.api_minor_version);
+	_EEPROMRead(&EEPROMconfig->MAJOR_FW_VERSION,fw_version.api_major_version);
+	_EEPROMRead(&EEPROMconfig->MINOR_FW_VERSION,fw_version.api_minor_version);
+	_EEPROMRead(&EEPROMconfig->MAJOR_FW_SUBVERSION,fw_subversion.api_major_version);
+	_EEPROMRead(&EEPROMconfig->MINOR_FW_SUBVERSION,fw_subversion.api_minor_version);
+	if(api_version.api_major_version != CONFIG_API_MAJOR_VERSION || api_version.api_minor_version != CONFIG_API_MINOR_VERSION) {
+		sprintf(buff,"config API version does not match Req:%d.%d Got:%d.%d\r\n",
+				CONFIG_API_MAJOR_VERSION,CONFIG_API_MINOR_VERSION,
+				api_version.api_major_version,api_version.api_minor_version);
+		MYSERIAL.write(buff);
+		return;
+	}
+	sprintf(buff,"current FW version:%d.%d.%d\r\n",
+			MARLIN_MAJOR_FW_VERSION,MARLIN_MINOR_FW_VERSION,MARLIN_MAJOR_FW_SUBVERSION);
+	MYSERIAL.write(buff);
+	sprintf(buff,"EEPROM FW version:%d.%d.%d\r\n",
+			fw_version.api_major_version,fw_version.api_minor_version,fw_subversion.api_major_version);
+	MYSERIAL.write(buff);
+	for(int i=0;i<NUM_AXIS;i++)
+		_EEPROMRead(&EEPROMconfig->axis_steps_per_mm[i],planner.axis_steps_per_mm[i]);
+	for(int i=0;i<NUM_AXIS;i++)
+			_EEPROMRead(&EEPROMconfig->max_feedrate_mm_s[i],planner.max_feedrate_mm_s[i]);
+	for(int i=0;i<NUM_AXIS;i++)
+			_EEPROMRead(&EEPROMconfig->max_acceleration_mm_per_s2[i],planner.max_acceleration_mm_per_s2[i]);
+	_EEPROMRead(&EEPROMconfig->acceleration,planner.acceleration);
+	_EEPROMRead(&EEPROMconfig->retract_acceleration,planner.retract_acceleration);
+	_EEPROMRead(&EEPROMconfig->travel_acceleration,planner.travel_acceleration);
+	_EEPROMRead(&EEPROMconfig->min_feedrate_mm_s,planner.min_feedrate_mm_s);
+	_EEPROMRead(&EEPROMconfig->min_travel_feedrate_mm_s,planner.min_travel_feedrate_mm_s);
+	_EEPROMRead(&EEPROMconfig->min_segment_time,planner.min_segment_time);
+	_EEPROMRead(&EEPROMconfig->max_xy_jerk,planner.max_xy_jerk);
+	_EEPROMRead(&EEPROMconfig->max_z_jerk,planner.max_z_jerk);
+	_EEPROMRead(&EEPROMconfig->max_e_jerk,planner.max_e_jerk);
+	for(int i=0;i<3;i++)
+		_EEPROMRead(&EEPROMconfig->home_offset[i],home_offset[i]);
+	_EEPROMRead(&EEPROMconfig->zprobe_zoffset,zprobe_zoffset);
+	for(int i=0;i<3;i++)
+		_EEPROMRead(&EEPROMconfig->endstop_adj[i],endstop_adj[i]);
+	float height;
+	_EEPROMRead(&EEPROMconfig->delta_height,height);
+	set_delta_height(height);
+	_EEPROMRead(&EEPROMconfig->delta_diagonal_rod,delta_diagonal_rod);
+	_EEPROMRead(&EEPROMconfig->delta_radius,delta_radius);
+	_EEPROMRead(&EEPROMconfig->delta_segments_per_second,delta_segments_per_second);
+	_EEPROMRead(&EEPROMconfig->delta_diagonal_rod_trim[A_AXIS],delta_diagonal_rod_trim_tower_1);
+	_EEPROMRead(&EEPROMconfig->delta_diagonal_rod_trim[B_AXIS],delta_diagonal_rod_trim_tower_2);
+	_EEPROMRead(&EEPROMconfig->delta_diagonal_rod_trim[C_AXIS],delta_diagonal_rod_trim_tower_3);
+	_EEPROMRead(&EEPROMconfig->delta_radius_trim[A_AXIS],delta_radius_trim_tower_1);
+	_EEPROMRead(&EEPROMconfig->delta_radius_trim[B_AXIS],delta_radius_trim_tower_2);
+	_EEPROMRead(&EEPROMconfig->delta_radius_trim[C_AXIS],delta_radius_trim_tower_3);
+	for(int i=0;i<3;i++)
+		_EEPROMRead(&EEPROMconfig->delta_angle_trim[i],delta_tower_angle_trim[i]);
+
+#if ENABLED(ULTIPANEL)
+	_EEPROMRead(&EEPROMconfig->preheatHotendTemp[0],preheatHotendTemp1);
+	_EEPROMRead(&EEPROMconfig->preheatHotendTemp[1],preheatHotendTemp2);
+	_EEPROMRead(&EEPROMconfig->preheatBedTemp[0],preheatBedTemp1);
+	_EEPROMRead(&EEPROMconfig->preheatBedTemp[1],preheatBedTemp2);
+	_EEPROMRead(&EEPROMconfig->preheatFanSpeed[0],preheatFanSpeed1);
+	_EEPROMRead(&EEPROMconfig->preheatFanSpeed[1],preheatFanSpeed2);
+#endif//ULTIPANEL
+	_EEPROMRead(&EEPROMconfig->kP,PID_PARAM(Kp, e));
+	_EEPROMRead(&EEPROMconfig->kI,PID_PARAM(Ki, e));
+	PID_PARAM(Ki,e) = scalePID_i(PID_PARAM(Ki, e));
+	_EEPROMRead(&EEPROMconfig->kD,PID_PARAM(Kd, e));
+	PID_PARAM(Kd,e) = scalePID_d(PID_PARAM(Kd, e));
+	_EEPROMRead(&EEPROMconfig->volumetric_enabled,volumetric_enabled);
+	for(int i=0;i<EXTRUDERS;i++)
+		_EEPROMRead(&EEPROMconfig->filament_size[i],filament_size[i]);
+#if ENABLED(AUTO_BED_LEVELING_GRID)
+
+	for(int i=0;i<2;i++)
+		_EEPROMRead(&EEPROMconfig->delta_grid_spacing[i],delta_grid_spacing[i]);
+	for(int i=0;i<AUTO_BED_LEVELING_GRID_POINTS;i++)
+		for(int j=0;j<AUTO_BED_LEVELING_GRID_POINTS;j++)
+			_EEPROMRead(&EEPROMconfig->bed_level[i][j],bed_level[i][j]);
+	Config_Postprocess();
+#endif//AUTO_BED_LEVELING_GRID
+}
 #elif ENABLED(SD_SETTINGS)
 
 
@@ -740,7 +885,6 @@ void Config_StoreSettings()
 
       p_card->write_command(cmdStr);
     }
-#else
   // Mesh bed levelin is disabled
   strcpy(cmdStr,"M420 S0 ; Mesh bed leveling disabled");
   p_card->write_command(cmdStr);
@@ -848,8 +992,7 @@ void Config_StoreSettings()
 #if DISABLED(ULTIPANEL)
   int preheatHotendTemp1 = PREHEAT_1_TEMP_HOTEND, preheatBedTemp1 = PREHEAT_1_TEMP_BED, preheatFanSpeed1 = PREHEAT_1_FAN_SPEED,
       preheatHotendTemp2 = PREHEAT_2_TEMP_HOTEND, preheatBedTemp2 = PREHEAT_2_TEMP_BED, preheatFanSpeed2 = PREHEAT_2_FAN_SPEED;
-#endif // !ULTIPANEL
-
+#else
   /* Ultipanel */
   strcpy(cmdStr,"M145 S0 H");
   sprintf(numStr, "%d", preheatHotendTemp1);
@@ -874,6 +1017,7 @@ void Config_StoreSettings()
   strcat(cmdStr, numStr);
   strcat(cmdStr, " ; S1");
   p_card->write_command(cmdStr);
+#endif // !ULTIPANEL
 
 
 
@@ -983,6 +1127,14 @@ void Config_StoreSettings()
   }
   p_card->write_command(cmdStr);
   /* ABL settings */
+  strcpy(cmdStr,"M421 X");
+  sprintf(numStr, "%.2f", delta_grid_spacing[X_AXIS]);
+  strcat(cmdStr, numStr);
+  strcat(cmdStr, " Y");
+  sprintf(numStr, "%.2f", delta_grid_spacing[Y_AXIS]);
+  strcat(cmdStr, numStr);
+  strcat(cmdStr, " ; Mesh grid settings(mm)");
+  p_card->write_command(cmdStr);
   strcpy(cmdStr,"; Mesh Grid settings I=X index J=Y index Z=Z adjust");
   p_card->write_command(cmdStr);
   for (int y = 0; y < AUTO_BED_LEVELING_GRID_POINTS; y++) {
@@ -1055,7 +1207,7 @@ void Config_ResetDefault() {
 	endstop_adj[X_AXIS] = DELTA_ENDSTOP_ADJ_X;
 	endstop_adj[Y_AXIS] = DELTA_ENDSTOP_ADJ_Y;
 	endstop_adj[Z_AXIS] = DELTA_ENDSTOP_ADJ_Z;
-    delta_height = Z_HOME_POS;
+	set_delta_height(Z_HOME_POS);
     delta_radius =  DELTA_RADIUS;
     delta_diagonal_rod =  DELTA_DIAGONAL_ROD;
     delta_segments_per_second =  DELTA_SEGMENTS_PER_SECOND;
@@ -1131,9 +1283,12 @@ void Config_ResetDefault() {
   for (uint8_t q = 0; q < COUNT(filament_size); q++)
     filament_size[q] = DEFAULT_NOMINAL_FILAMENT_DIA;
   // make sure the bed_level_rotation_matrix is identity or the planner will get it wrong
+#if ENABLED(AUTO_BED_LEVELING_FEATURE)
   planner.bed_level_matrix.set_to_identity();
-
+  delta_grid_spacing[X_AXIS] = ((RIGHT_PROBE_BED_POSITION - LEFT_PROBE_BED_POSITION) / (AUTO_BED_LEVELING_GRID_POINTS - 1));
+  delta_grid_spacing[Y_AXIS] = ((BACK_PROBE_BED_POSITION - FRONT_PROBE_BED_POSITION) / (AUTO_BED_LEVELING_GRID_POINTS - 1));
   reset_bed_level();
+#endif
   endstops.enable_globally(
     #if ENABLED(ENDSTOPS_ALWAYS_ON_DEFAULT)
       (true)

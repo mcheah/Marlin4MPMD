@@ -660,7 +660,9 @@
 #if DISABLED(STM32_USE_USB_CDC) && (ENABLED(MALYAN_LCD))
   #error "Cannot use UART and Malyan LCD at the same time"
 #endif
-
+#if ENABLED(SD_SETTINGS) && ENABLED(FLASH_SETTINGS)
+  #error "Cannot enable SD_SETTINGS and FLASH_SETTINGS at the same time"
+#endif
  /**
  * Warnings for old configurations
  */

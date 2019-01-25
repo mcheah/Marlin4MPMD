@@ -586,8 +586,7 @@ void kill_screen(const char* lcd_msg) {
     }
 
     static void lcd_sdcard_stop() {
-//      card.stopSDPrint();
-      card.pauseSDPrint();
+      card.stopSDPrint();
       clear_command_queue();
       quickstop_stepper();
       print_job_timer.stop();
@@ -607,16 +606,11 @@ void kill_screen(const char* lcd_msg) {
   static void lcd_main_menu() {
     START_MENU();
     MENU_ITEM(back, MSG_WATCH);
-//TODO: fix this back in when re-adding SD support
-//#if ENABLED(SDSUPPORT)
-    if (planner.movesplanned() /*|| IS_SD_PRINTING*/) {
+    if (planner.movesplanned() || IS_SD_PRINTING) {
       MENU_ITEM(submenu, MSG_TUNE, lcd_tune_menu);
     }
-    else
-//#else
-//if(1)
-//#endif
-    {
+    else 
+	{
       MENU_ITEM(submenu, MSG_PREPARE, lcd_prepare_menu);
       #if ENABLED(DELTA_CALIBRATION_MENU)
         MENU_ITEM(submenu, MSG_DELTA_CALIBRATE, lcd_delta_calibrate_menu);

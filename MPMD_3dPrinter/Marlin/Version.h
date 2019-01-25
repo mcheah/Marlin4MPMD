@@ -35,7 +35,11 @@
   /**
    * Marlin release version identifier
    */
-  #define SHORT_BUILD_VERSION "1.2.2-LERDGEX"
+  #define SHORT_BUILD_VERSION "1.3.0-LERDGEX"
+  #define MARLIN_MAJOR_FW_VERSION 1
+  #define MARLIN_MINOR_FW_VERSION 3
+  #define MARLIN_MAJOR_FW_SUBVERSION 0
+  #define MARLIN_MINOR_FW_SUBVERSION 0
 
   /**
    * Verbose version identifier which should contain a reference to the location
@@ -48,7 +52,7 @@
    * here we define this default string as the date where the latest release
    * version was tagged.
    */
-  #define STRING_DISTRIBUTION_DATE "2019-01-04 00:00"
+  #define STRING_DISTRIBUTION_DATE "2019-01-25 00:00"
 
   /**
    * Required minimum Configuration.h and Configuration_adv.h file versions.

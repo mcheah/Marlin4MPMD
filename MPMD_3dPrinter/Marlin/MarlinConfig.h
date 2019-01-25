@@ -54,7 +54,7 @@
 #include "lcd.h"
 #ifdef __cplusplus
 }
-#endif
+#endif //__cplusplus
 
 #include "stm32f0xx_3dprinter_misc.h"
 
@@ -62,11 +62,10 @@
 #include "stm32f0xx_3dprinter_cdc.h"
 
 #include "stm32f0xx_3dprinter_adc.h"
-#endif
+#endif //STM32_MPMD
+#include "stm32f0xx_3dprinter_motor.h"
 #include "motorcontrol.h"
-#ifdef SDSUPPORT
 #include "ff.h" /* for FATS and FIL*/
-#endif
 #include "arm_math.h"
 // -STM32
 

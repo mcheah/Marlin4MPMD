@@ -458,6 +458,23 @@ typedef enum
 #define LCD_ENC2_GPIO_CLK_ENABLE()               __HAL_RCC_GPIOE_CLK_ENABLE()
 #define LCD_ENC2_GPIO_CLK_DISABLE()              __HAL_RCC_GPIOE_CLK_DISABLE()
 
+/* Error code */
+enum
+{
+  FLASHIF_OK = 0,
+  FLASHIF_ERASEKO,
+  FLASHIF_WRITINGCTRL_ERROR,
+  FLASHIF_WRITING_ERROR,
+  FLASHIF_PROTECTION_ERRROR
+};
+#define ADDR_FLASH_SECTOR_0     ((uint32_t)0x08000000) /* Base @ of Sector 0, 16 Kbyte */
+#define ADDR_FLASH_SECTOR_1     ((uint32_t)0x08004000) /* Base @ of Sector 1, 16 Kbyte */
+#define ADDR_FLASH_SECTOR_2     ((uint32_t)0x08008000) /* Base @ of Sector 2, 16 Kbyte */
+#define ADDR_FLASH_SECTOR_3     ((uint32_t)0x0800C000) /* Base @ of Sector 3, 16 Kbyte */
+#define ADDR_FLASH_SECTOR_4     ((uint32_t)0x08010000) /* Base @ of Sector 4, 64 Kbyte */
+#define ADDR_FLASH_SECTOR_5     ((uint32_t)0x08020000) /* Base @ of Sector 5, 128 Kbyte */
+#define ADDR_FLASH_SECTOR_6     ((uint32_t)0x08040000) /* Base @ of Sector 6, 128 Kbyte */
+#define ADDR_FLASH_SECTOR_11     ((uint32_t)0x080E0000) /* Base @ of Sector 11, 128 Kbyte */
 /*################################ ADCx for Nucleo 144 board ######################################*/
 /**
   * @brief  ADCx Interface pins
@@ -516,6 +533,10 @@ void             BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef ButtonMod
 void             BSP_PB_DeInit(Button_TypeDef Button);
 uint32_t         BSP_PB_GetState(Button_TypeDef Button);
 void			 BSP_LCD_Init();
+void 			 FLASH_If_Init(void);
+uint32_t 		 FLASH_If_Erase(uint32_t start,uint32_t end);
+uint32_t 		 FLASH_If_Write(uint32_t destination, uint16_t *p_source, uint32_t length);
+
 //#ifdef HAL_ADC_MODULE_ENABLED
 //uint8_t          BSP_JOY_Init(void);
 //JOYState_TypeDef BSP_JOY_GetState(void);

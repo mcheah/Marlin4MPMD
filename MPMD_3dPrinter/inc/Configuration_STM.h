@@ -40,7 +40,10 @@
 #define STEPPERS_128X
 //#define MINIMAL_BUILD
 //#define UZLIB
+//Experimental, uses optimized SPI library for faster SD transfers
 //#define USE_FAST_SPI
+//Experimental, uses fastest possible SPI clock for faster SD transfers, requires removing MISO pulldown
+//#define USE_FAST_SPI_CLK
 /* Exported functions ------------------------------------------------------- */
 /* Exported Variables --------------------------------------------------------*/
 

@@ -114,7 +114,7 @@
 
 // This determines the communication speed of the printer
 // :[2400,9600,19200,38400,57600,115200,250000]
-#define BAUDRATE (115200*4)
+#define BAUDRATE (115200)
 
 // Enable the Bluetooth serial interface on AT90USB devices
 //#define BLUETOOTH
@@ -122,20 +122,12 @@
 // The following define selects which electronics board you have.
 // Please choose the name from boards.h that matches your setup
 #ifndef MOTHERBOARD
-#ifdef STM32_MPMD
   #define MOTHERBOARD BOARD_STM_MPMD
-#elif defined(STM32_LERDGEX)
-  #define MOTHERBOARD BOARD_STM_LERDGEX
-#endif //ifdef STM32_MPMD
-#endif //ifndef MOTHERBOARD
+#endif
 
 // Optional custom name for your RepStrap or other custom machine
 // Displayed in the LCD "Ready" message
-#ifdef STM32_MPMD
 #define CUSTOM_MACHINE_NAME "MPMD"
-#elif defined(STM32_LERDGEX)
-#define CUSTOM_MACHINE_NAME "LERDGEX"
-#endif
 
 
 // Define this to set a unique identifier for this printer, (Used by some programs to differentiate between machines)
@@ -286,12 +278,13 @@
 // PID Tuning Guide here: http://reprap.org/wiki/PID_Tuning
 
 // Comment the following line to disable PID and enable bang-bang.
-//TODO: re-enable PID temp control
+//#if DISABLED(MINIMAL_BUILD)
 #define PIDTEMP
+//#endif
 #define BANG_MAX 255 // limits current to nozzle while in bang-bang mode; 255=full current
 #define PID_MAX BANG_MAX // limits current to nozzle while PID is active (see PID_FUNCTIONAL_RANGE below); 255=full current
 #if ENABLED(PIDTEMP)
-  #define PID_AUTOTUNE_MENU // Add PID Autotune to the LCD "Temperature" menu to run M303 and apply the result.
+  //#define PID_AUTOTUNE_MENU // Add PID Autotune to the LCD "Temperature" menu to run M303 and apply the result.
   //#define PID_DEBUG // Sends debug data to the serial port.
   //#define PID_OPENLOOP 1 // Puts PID in open loop. M104/M140 sets the output power from 0 to PID_MAX
   //#define SLOW_PWM_HEATERS // PWM with very low frequency (roughly 0.125Hz=8s) and minimum state time of approximately 1s useful for heaters driven by a relay
@@ -338,7 +331,9 @@
 // If your configuration is significantly different than this and you don't understand the issues involved, you probably
 // shouldn't use bed PID until someone else verifies your hardware works.
 // If this is enabled, find your own PID constants below.
+//#if DISABLED(MINIMAL_BUILD)
 #define PIDTEMPBED
+//#endif
 
 //#define BED_LIMIT_SWITCHING
 
@@ -379,11 +374,11 @@
 
 //this prevents dangerous Extruder moves, i.e. if the temperature is under the limit
 //can be software-disabled for whatever purposes by
-#if DISABLED(MINIMAL_BUILD)
-//#define PREVENT_DANGEROUS_EXTRUDE
+//#if DISABLED(MINIMAL_BUILD)
+#define PREVENT_DANGEROUS_EXTRUDE
 //if PREVENT_DANGEROUS_EXTRUDE is on, you can still disable (uncomment) very long bits of extrusion separately.
 #define PREVENT_LENGTHY_EXTRUDE
-#endif
+//#endif
 #define EXTRUDE_MINTEMP 170
 #define EXTRUDE_MAXLENGTH (X_MAX_LENGTH+Y_MAX_LENGTH) //prevent extrusion of very large distances.
 
@@ -402,10 +397,10 @@
  * If you get "Thermal Runaway" or "Heating failed" errors the
  * details can be tuned in Configuration_adv.h
  */
-#if DISABLED(MINIMAL_BUILD)
-//#define THERMAL_PROTECTION_HOTENDS // Enable thermal protection for all extruders
-//#define THERMAL_PROTECTION_BED     // Enable thermal protection for the heated bed
-#endif
+//#if DISABLED(MINIMAL_BUILD)
+#define THERMAL_PROTECTION_HOTENDS // Enable thermal protection for all extruders
+#define THERMAL_PROTECTION_BED     // Enable thermal protection for the heated bed
+//#endif
 //===========================================================================
 //============================= Mechanical Settings =========================
 //===========================================================================
@@ -435,7 +430,7 @@
   // NOTE NB all values for DELTA_* values MUST be floating point, so always have a decimal point in them
 
   // Center-to-center distance of the holes in the diagonal push rods.
-  #define DELTA_DIAGONAL_ROD 222.0 // mm
+  #define DELTA_DIAGONAL_ROD 120.8 // mm
 
   // Horizontal offset from middle of printer to smooth rod center.
 //  #define DELTA_SMOOTH_ROD_OFFSET 108 // mm
@@ -450,7 +445,7 @@
 //  #define DELTA_RADIUS (DELTA_SMOOTH_ROD_OFFSET-(DELTA_EFFECTOR_OFFSET)-(DELTA_CARRIAGE_OFFSET))
 //  #define DELTA_RADIUS 63.25
 //	#define DELTA_RADIUS 63.90
-	#define DELTA_RADIUS 132.25
+	#define DELTA_RADIUS 63.00
 
 	#define DELTA_ENDSTOP_ADJ_X 0.0
 	#define DELTA_ENDSTOP_ADJ_Y 0.0
@@ -462,13 +457,14 @@
   #define DELTA_TOWER_ANGLE_TRIM { 0.0, 0.0, 0.0 } // get these values from auto calibrate
 
   // Print surface diameter/2 minus unreachable space (avoid collisions with vertical towers).
-  #define DELTA_PRINTABLE_RADIUS 90.0
+  #define DELTA_PRINTABLE_RADIUS 60.0
+  #define DELTA_PROBEABLE_RADIUS (DELTA_PRINTABLE_RADIUS - 5)
   // Delta calibration menu
   // uncomment to add three points calibration menu option.
   // See http://minow.blogspot.com/index.html#4918805519571907051
   // If needed, adjust the X, Y, Z calibration coordinates
   // in ultralcd.cpp@lcd_delta_calibrate_menu()
-  #define DELTA_CALIBRATION_MENU
+  //#define DELTA_CALIBRATION_MENU
 
 #endif
 
@@ -511,10 +507,10 @@
 // Mechanical endstop with COM to ground and NC to Signal uses "false" here (most common setup).
 #define X_MIN_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
 #define Y_MIN_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
-#define Z_MIN_ENDSTOP_INVERTING false  // For Bicephale, set to true to invert the logic of the endstop.
-#define X_MAX_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
-#define Y_MAX_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
-#define Z_MAX_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
+#define Z_MIN_ENDSTOP_INVERTING true  // For Bicephale, set to true to invert the logic of the endstop.
+#define X_MAX_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
+#define Y_MAX_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
+#define Z_MAX_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
 #define Z_MIN_PROBE_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
 
 //===========================================================================
@@ -568,7 +564,7 @@
 //  (0,0)
 #define X_PROBE_OFFSET_FROM_EXTRUDER 0 // X offset: -left  +right  [of the nozzle]
 #define Y_PROBE_OFFSET_FROM_EXTRUDER 0 // Y offset: -front +behind [the nozzle]
-#define Z_PROBE_OFFSET_FROM_EXTRUDER -0.0 //  Z offset: -below +above  [the nozzle]
+#define Z_PROBE_OFFSET_FROM_EXTRUDER -0.6 //  Z offset: -below +above  [the nozzle]
 
 // X and Y axis travel speed (mm/m) between probes
 #define XY_PROBE_SPEED (30*60)
@@ -628,13 +624,13 @@
 //#define DISABLE_Z_MIN_PROBE_ENDSTOP
 
 // Enable Z Probe Repeatability test to see how accurate your probe is
-#define Z_MIN_PROBE_REPEATABILITY_TEST
+//#define Z_MIN_PROBE_REPEATABILITY_TEST
 
 //
 // Probe Raise options provide clearance for the probe to deploy, stow, and travel.
 //
 #define Z_RAISE_PROBE_DEPLOY_STOW 15 // Raise to make room for the probe to deploy / stow
-#define Z_RAISE_BETWEEN_PROBINGS 40  // Raise between probing points.
+#define Z_RAISE_BETWEEN_PROBINGS 25  // Raise between probing points.
 
 //
 // For M851 give a range for adjusting the Z probe offset
@@ -676,7 +672,7 @@
 // @section extruder
 
 // For direct drive extruder v9 set to true, for geared extruder set to false.
-#define INVERT_E0_DIR false
+#define INVERT_E0_DIR true
 #define INVERT_E1_DIR false
 #define INVERT_E2_DIR false
 #define INVERT_E3_DIR false
@@ -699,15 +695,15 @@
 // @section machine
 
 // Travel limits after homing (units are in mm)
-#define X_MIN_POS -100
-#define Y_MIN_POS -100
+#define X_MIN_POS -60
+#define Y_MIN_POS -60
 #define Z_MIN_POS 0
-#define X_MAX_POS 100
-#define Y_MAX_POS 100 //200
-#define Z_MAX_POS 300 //200
+#define X_MAX_POS 60
+#define Y_MAX_POS 60 //200
+#define Z_MAX_POS 125 //200
 
 //#define MAX_RAD (sqrt(sq(X_MAX_POS)+sq(Y_MAX_POS))))
-#define MAX_RAD 100
+#define MAX_RAD 60
 //===========================================================================
 //========================= Filament Runout Sensor ==========================
 //===========================================================================
@@ -735,7 +731,7 @@
 
   //#define MESH_G28_REST_ORIGIN // After homing all axes ('G28' or 'G28 XYZ') rest at origin [0,0,0]
 
-  #define MANUAL_BED_LEVELING  // Add display menu option for bed leveling.
+  //#define MANUAL_BED_LEVELING  // Add display menu option for bed leveling.
 
   #if ENABLED(MANUAL_BED_LEVELING)
     #define MBL_Z_STEP 0.025  // Step size while manually probing Z axis.
@@ -749,7 +745,7 @@
 
 // @section bedlevel
 //TODO: re-enable later
-#if DISABLED(MINIMAL_BUILD)
+#if DISABLED(MINIMAL_BUILD) || 1
 #define AUTO_BED_LEVELING_FEATURE // Delete the comment to enable (remove // at the start of the line)
 #endif
 // Enable this feature to get detailed logging of G28, G29, M48, etc.
@@ -776,12 +772,10 @@
 
   #if ENABLED(AUTO_BED_LEVELING_GRID)
 
-	#define DELTA_PROBEABLE_RADIUS (DELTA_PRINTABLE_RADIUS - 15)
-	#define LEFT_PROBE_BED_POSITION -(DELTA_PROBEABLE_RADIUS)
-	#define RIGHT_PROBE_BED_POSITION DELTA_PROBEABLE_RADIUS
-	#define FRONT_PROBE_BED_POSITION -(DELTA_PROBEABLE_RADIUS)
-	#define BACK_PROBE_BED_POSITION DELTA_PROBEABLE_RADIUS
-
+	#define LEFT_PROBE_BED_POSITION -(DELTA_PROBEABLE_RADIUS-10)
+	#define RIGHT_PROBE_BED_POSITION (DELTA_PROBEABLE_RADIUS-10)
+	#define FRONT_PROBE_BED_POSITION -(DELTA_PROBEABLE_RADIUS-10)
+	#define BACK_PROBE_BED_POSITION (DELTA_PROBEABLE_RADIUS-10)
 	#define MIN_PROBE_EDGE 10 // The Z probe minimum square sides can be no smaller than this.
 
   // Non-linear bed leveling will be used.
@@ -828,7 +822,7 @@
 // For DELTA this is the top-center of the Cartesian print volume.
 //#define MANUAL_X_HOME_POS 0
 //#define MANUAL_Y_HOME_POS 0
-#define MANUAL_Z_HOME_POS 297.12 // Distance between the nozzle to printbed after homing
+#define MANUAL_Z_HOME_POS 125 // Distance between the nozzle to printbed after homing
 
 #define MAX_Z_HEIGHT_ERROR 40
 #define MIN_Z_HEIGHT_ERROR -60
@@ -862,7 +856,7 @@
 
 // default settings
 //TODO: adjust these settings
-#define MOTOR_STEPS_PER_REVOLUTION	  400.0//(360/1.8)
+#define MOTOR_STEPS_PER_REVOLUTION	  200.0//(360/1.8)
 #if ENABLED(STEPPERS_128X)
 #define MOTOR_MICROSTEPS_COUNT		  128.0
 #elif ENABLED(STEPPERS_32X)
@@ -872,12 +866,12 @@
 #else
 #define MOTOR_MICROSTEPS_COUNT		  8.0
 #endif
-#define MOTOR_PULLEY_TEETH_COUNT	  40.0
+#define MOTOR_PULLEY_TEETH_COUNT	  14.0
 #define MOTOR_BELT_PITCH_MM			  2.0
 #define MOTOR_DEFAULT_STEPS_PER_UNIT  (MOTOR_STEPS_PER_REVOLUTION * MOTOR_MICROSTEPS_COUNT / MOTOR_PULLEY_TEETH_COUNT / MOTOR_BELT_PITCH_MM)
 #define MOTOR_EXTRUDER_RADIUS		  5.5
 #define MOTOR_DEFAULT_EXTRUDER_STEPS_PER_UNIT	(MOTOR_STEPS_PER_REVOLUTION *MOTOR_MICROSTEPS_COUNT / (2*pi*MOTOR_EXTRUDER_RADIUS)
-#define DEFAULT_AXIS_STEPS_PER_UNIT   {MOTOR_DEFAULT_STEPS_PER_UNIT,MOTOR_DEFAULT_STEPS_PER_UNIT,MOTOR_DEFAULT_STEPS_PER_UNIT,48.50*(/*MOTOR_MICROSTEPS_COUNT*/8.0/8.0)}  // default steps per unit for Ultimaker
+#define DEFAULT_AXIS_STEPS_PER_UNIT   {MOTOR_DEFAULT_STEPS_PER_UNIT,MOTOR_DEFAULT_STEPS_PER_UNIT,MOTOR_DEFAULT_STEPS_PER_UNIT,48.50*(MOTOR_MICROSTEPS_COUNT/8.0)}  // default steps per unit for Ultimaker
 #define DEFAULT_MAX_FEEDRATE          {150, 150, 150, 50}    // (mm/sec)
 #define DEFAULT_MAX_ACCELERATION      {800,800,800,10000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for Skeinforge 40+, for older versions raise them a lot.
 
@@ -1114,7 +1108,7 @@
 // you must uncomment the following option or it won't work.
 //
 #define FLASH_SETTINGS
-#if DISABLED(MINIMAL_BUILD)
+#if DISABLED(MINIMAL_BUILD) || 1
 #define SDSUPPORT
 #endif
 #if ENABLED(SDSUPPORT) && DISABLED(FLASH_SETTINGS)
@@ -1146,13 +1140,13 @@
 // This option overrides the default number of encoder pulses needed to
 // produce one step. Should be increased for high-resolution encoders.
 //
-#define ENCODER_PULSES_PER_STEP 1
+//#define ENCODER_PULSES_PER_STEP 1
 
 //
 // Use this option to override the number of step signals required to
 // move between next/prev menu items.
 //
-#define ENCODER_STEPS_PER_MENU_ITEM 3
+//#define ENCODER_STEPS_PER_MENU_ITEM 5
 
 /**
  * Encoder Direction Options
@@ -1169,7 +1163,7 @@
 //
 //  Set this option if CLOCKWISE causes values to DECREASE
 //
-#define REVERSE_ENCODER_DIRECTION
+//#define REVERSE_ENCODER_DIRECTION
 
 //
 // This option reverses the encoder direction for navigating LCD menus.

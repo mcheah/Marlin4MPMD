@@ -181,7 +181,6 @@ void BSP_UART_DEBUG_IRQHandler(void)
 {
   HAL_UART_IRQHandler(&gBspUartData.handle);
 }
-
 /**
   * @brief  This function handles LCD interrupt request for debug.
   * @param  None

@@ -57,7 +57,6 @@
 //#include "stm32f0xx_3dprinter_sd.h"
 //#include "stm32f0xx_3dprinter_wifi.h"
 #include "stm32f0xx_3dprinter_cdc.h"
-#include "motorcontrol.h"
 #include "usbd_core.h"
 #include "usbd_desc.h"
 #include "usbd_cdc.h"

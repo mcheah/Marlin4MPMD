@@ -48,7 +48,6 @@
 //#include "stm32f0xx_nucleo.h"
 //#include "stm32f0xx_hal.h"
 #include "stm32f0xx_it.h"
-#include "motorcontrol.h"
 #include "stm32f0xx_3dprinter_uart.h"
 //#include "stm32f0xx_3dprinter_sd.h"
 /** @addtogroup BSP
@@ -255,19 +254,9 @@
 //#define BSP_MOTOR_CONTROL_BOARD_DIR_E3_PORT  (GPIOF)
 //TODO: rename RESET to enable etc.  Although all are shared so who knows
 /// GPIO Pin used for the L6474 reset pin (device 0)                           *
-#define BSP_MOTOR_CONTROL_BOARD_RESET_X_PIN  (GPIO_PIN_10)
+#define BSP_MOTOR_CONTROL_BOARD_RESET_XYZ_PIN  (GPIO_PIN_10)
 /// GPIO port used for the L6474 reset  (device 0)                             *
-#define BSP_MOTOR_CONTROL_BOARD_RESET_X_PORT (GPIOB)
-   
-/// GPIO Pin used for the L6474 reset pin  (device 1)                          *
-#define BSP_MOTOR_CONTROL_BOARD_RESET_Y_PIN  (GPIO_PIN_10)
-/// GPIO port used for the L6474 reset pin (device 1)                          *
-#define BSP_MOTOR_CONTROL_BOARD_RESET_Y_PORT (GPIOB)
-
-/// GPIO Pin used for the L6474 reset pin (device 2)                           *
-#define BSP_MOTOR_CONTROL_BOARD_RESET_Z_PIN  (GPIO_PIN_10)
-/// GPIO port used for the L6474 reset pin (device 2)                          *
-#define BSP_MOTOR_CONTROL_BOARD_RESET_Z_PORT (GPIOB)
+#define BSP_MOTOR_CONTROL_BOARD_RESET_XYZ_PORT (GPIOB)
    
 /// GPIO Pin used for the L6474 reset pin (device 3)                           *
 #define BSP_MOTOR_CONTROL_BOARD_RESET_E1_PIN  (GPIO_PIN_0)
@@ -338,7 +327,10 @@
 //
 ///// SPI MOSI AF
 //#define SPIx_MOSI_AF                     (SPIx_SCK_AF)
-
+ ///Reset the A4985 reset pin
+ void BSP_MotorControlBoard_ReleaseReset(void);
+ ///Set the A4985 reset pin
+ void BSP_MotorControlBoard_Reset(void);
 /**
   * @}
   */

@@ -114,21 +114,4 @@ typedef uint8_t  byte;
 }
 #endif
 
-// __INLINE void IsrStepperHandler(void) {
-//
-// }
-// __INLINE void IsrTemperatureHandler(void) {
-//
-// }
-// __INLINE void TimerStService(void) {
-//
-// }
-// __INLINE void setup() {
-//
-// }
-//
-// __INLINE void loop() {
-//
-// }
-
-#endif
+#endif //MARLIN_EXPORT_H

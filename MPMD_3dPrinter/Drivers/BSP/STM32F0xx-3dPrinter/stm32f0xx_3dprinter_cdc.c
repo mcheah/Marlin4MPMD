@@ -38,7 +38,6 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#ifdef USE_USB_CDC
 #include "stm32f0xx_3dprinter_cdc.h"
 #include "stm32f0xx_3dprinter_misc.h"
 // #include "stm32f0xx_3dprinter_wifi.h"
@@ -49,14 +48,12 @@
 #include "usbd_desc.h"
 #include "usbd_cdc.h"
 #include "usbd_cdc_interface.h"
-#ifdef STM32_MPMD
 #include "stm32f0xx_mpmd.h"
-#elif defined(STM32_LERDGEX)
-#include "stm32f4xx_LerdgeX.h"
-#endif
 /* Private defines -----------------------------------------------------------*/
 /* Private constant ----------------------------------------------------------*/
 
+/*
+ *
 // #ifdef USE_XONXOFF
 // #define BSP_CDC_GET_NB_BYTES_IN_RX_BUFFER()  ((gBspUartData.pRxReadBuffer <= gBspUartData.pRxWriteBuffer)? \
 //                                     ( (unsigned int )(gBspUartData.pRxWriteBuffer - gBspUartData.pRxReadBuffer)): \
@@ -66,7 +63,7 @@
 // #define BSP_CDC_GET_NB_BYTES_IN_TX_BUFFER()  ((gBspUartData.pTxReadBuffer <= gBspUartData.pTxWriteBuffer)? \
 //                                     ( (unsigned int )(gBspUartData.pTxWriteBuffer - gBspUartData.pTxReadBuffer)): \
 //                                     ( (unsigned int )(gBspUartData.pTxWriteBuffer + UART_TX_BUFFER_SIZE - gBspUartData.pTxReadBuffer)))
-
+*/
 
 // #define BSP_CDC_TX_THRESHOLD_XOFF  (UART_TX_BUFFER_SIZE / 50)
 // #define BSP_CDC_TX_THRESHOLD_XON   (UART_TX_BUFFER_SIZE / 100)
@@ -188,14 +185,17 @@ void BSP_CdcIfSendQueuedData()
  * @param[in] *Len pointer containing the number of received bytes
  * @retval None
  **********************************************************/
+uint8_t rxInProgress = 0;
 void BSP_CDC_RxCpltCallback(uint8_t* Buf, uint32_t *Len)
 {
+	rxInProgress = 0;
+	uint32_t startnB = BSP_CdcGetNbRxAvailableBytes(0);
 	BSP_LED_On(LED_GREEN);
 	uint8_t *writePtr = (uint8_t *)(Buf);
-	volatile uint32_t bytesToCopy = MIN(*Len,CDC_RX_BUFFER_SIZE);
-	volatile uint32_t firstBytesToCopy = MIN(bytesToCopy,
+	uint32_t bytesToCopy = MIN(*Len,CDC_RX_BUFFER_SIZE);
+	uint32_t firstBytesToCopy = MIN(bytesToCopy,
 	&pRxBuffer[CDC_RX_BUFFER_SIZE]-pRxWriteBuffer);
-	volatile uint32_t secondBytesToCopy = bytesToCopy - firstBytesToCopy;
+	uint32_t secondBytesToCopy = bytesToCopy - firstBytesToCopy;
 	memcpy(pRxWriteBuffer,
 			writePtr,
 			firstBytesToCopy);
@@ -209,6 +209,10 @@ void BSP_CDC_RxCpltCallback(uint8_t* Buf, uint32_t *Len)
 		pRxWriteBuffer = &pRxBuffer[secondBytesToCopy];
 	}
 	BSP_LED_Off(LED_GREEN);
+	if(CDC_RX_BUFFER_SIZE-BSP_CdcGetNbRxAvailableBytes(0)>CDC_RX_BUFFER_SIZE/2)
+		USBD_CDC_ReceivePacket(&USBD_Device);
+	if(BSP_CdcGetNbRxAvailableBytes(0)<=startnB)
+		CDC_ERROR(10);
 	//Copy character by character to avoid wraparound issues
 //	for(uint32_t i=0;i<*Len;i++)
 //	{
@@ -246,11 +250,11 @@ uint32_t BSP_CdcPrintf(const char* format,...)
   va_list args;
   uint32_t size;
   uint32_t retSize = 0;
-  char *writeBufferp = gBspCdcTxBuffer;
+  unsigned char *writeBufferp = gBspCdcTxBuffer;
   /* the string to transmit is copied in the temporary buffer in order to    */
   /* check its size.                                                         */
   va_start(args, format);
-  size=vsprintf(writeBufferp, (const char*)format, args);
+  size=vsprintf((char *)writeBufferp, (const char*)format, args);
   va_end(args);
    
   retSize = size;   
@@ -292,10 +296,10 @@ uint32_t BSP_CdcGetNbRxAvailableBytes(uint8_t waitForNewLine)
 uint32_t BSP_CdcCopyNextRxBytes(uint8_t *buff, uint32_t maxlen)
 {
 	BSP_LED_On(LED_BLUE);
-	volatile uint32_t bytesToCopy = MIN(maxlen,BSP_CdcGetNbRxAvailableBytes(0));
-	volatile uint32_t firstBytesToCopy = MIN(bytesToCopy,
+	uint32_t bytesToCopy = MIN(maxlen,BSP_CdcGetNbRxAvailableBytes(0));
+	uint32_t firstBytesToCopy = MIN(bytesToCopy,
 											&pRxBuffer[CDC_RX_BUFFER_SIZE]-pRxReadBuffer);
-	volatile uint32_t secondBytesToCopy = bytesToCopy - firstBytesToCopy;
+	uint32_t secondBytesToCopy = bytesToCopy - firstBytesToCopy;
 	memcpy(buff,
 			pRxReadBuffer,
 			firstBytesToCopy);
@@ -365,6 +369,5 @@ void BSP_CdcLockingTx(uint8_t *pBuf, uint8_t nbData)
 	CDC_Itf_QueueTxBytes(pBuf,nbData);
 	BSP_CdcIfSendQueuedData();
 }
-#endif
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 

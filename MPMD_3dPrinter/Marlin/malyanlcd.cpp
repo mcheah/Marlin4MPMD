@@ -48,7 +48,7 @@
 
 #include "MarlinConfig.h"
 #if ENABLED(MALYAN_LCD)
-
+#include "ultralcd.h"
 #include "temperature.h"
 #include "planner.h"
 #include "stepper.h"
@@ -188,8 +188,8 @@ void process_lcd_eb_command(const char* command) {
       sprintf_P(message_buffer,
     		  PSTR("{TT:%02u%02u%02u}"),
 			  uint16_t(elapsed.hour()),
-			  uint16_t(elapsed.minute()) % 60UL,
-			  elapsed.second() % 60UL);
+			  uint16_t(elapsed.minute()) % 60,
+			  uint16_t(elapsed.second()) % 60);
       write_to_lcd(message_buffer);
     } break;
 
@@ -211,9 +211,16 @@ void process_lcd_eb_command(const char* command) {
  * X, Y, Z, A (extruder)
  */
 void process_lcd_j_command(const char* command) {
-  static bool steppers_enabled = false;
+//  static bool steppers_enabled = false;
+  bool isRelative = relative_mode;
   char axis = command[0];
-
+#if ENABLED(SDSUPPORT)
+  if(!card.sdprinting && !card.saving && last_printing_status!=MALYAN_PRINTING && progress<=0)
+#else
+  if(last_printing_status!=MALYAN_PRINTING && progress<=0)
+#endif
+  {
+  enqueue_and_echo_command_now("G91");
   switch (axis) {
     case 'E':
       // enable or disable steppers
@@ -222,13 +229,12 @@ void process_lcd_j_command(const char* command) {
 //		Since there is no method for moving the XYZ axes manually by LCD (at least for M300), this
 //    	functionality seems dangerous to leave in, as the next commands issued will think it's relative
 //    	and dive into the bed
-//    	enqueue_and_echo_command_now("G91");
 //    	enqueue_and_echo_command_now(steppers_enabled ? "M18" : "M17");
 //      steppers_enabled = !steppers_enabled;
       break;
     case 'A':
       axis = 'E';
-      // fallthru
+      // no break
     case 'Y':
     case 'Z':
     case 'X': {
@@ -242,6 +248,9 @@ void process_lcd_j_command(const char* command) {
       SERIAL_ECHOPAIR("UNKNOWN J COMMAND", command);
       SERIAL_EOL;
       return;
+  }
+  if(!isRelative)
+	  enqueue_and_echo_command_now("G90"); //Set back to absolute positioning afterwards
   }
 }
 
@@ -287,7 +296,7 @@ void process_lcd_p_command(const char* command) {
         write_to_lcd_P(PSTR("{SYS:CANCELING}"));
         last_printing_status = MALYAN_IDLE;
         if(sdprint)
-        	card.pauseSDPrint();
+        	card.stopSDPrint();
         clear_command_queue();
         quickstop_stepper();
         print_job_timer.stop();
@@ -297,13 +306,14 @@ void process_lcd_p_command(const char* command) {
         #endif
         wait_for_heatup = false;
         write_to_lcd_P(PSTR("{SYS:STARTED}"));
-        if(!sdprint)
-      #endif
-		{
-        MYSERIAL.end();
-        delay(2000);
-        MYSERIAL.begin(BAUDRATE);
-		}
+//        if(!sdprint)
+      #endif //ENABLED(SDSUPPORT)
+//		{
+//        MYSERIAL.end();
+//        delay(2000);
+//        MYSERIAL.begin(BAUDRATE);
+//		}
+        MYSERIAL.write("//action:cancel\n");
       break; }
     case 'H':
       // Home all axis
@@ -316,6 +326,7 @@ void process_lcd_p_command(const char* command) {
     	write_to_lcd(PSTR(MSG_PAUSE));
     	card.pauseSDPrint();
     	write_to_lcd(PSTR(MSG_PAUSED));
+    	MYSERIAL.write("//action:paused\n");
 #endif
     	break;
     case 'R':
@@ -325,6 +336,7 @@ void process_lcd_p_command(const char* command) {
     	write_to_lcd(PSTR(MSG_RESUME));
     	card.startFileprint();
     	write_to_lcd(PSTR(MSG_RESUMED));
+    	MYSERIAL.write("//action:resumed\n");
 #endif
     	break;
     default: {
@@ -347,7 +359,8 @@ void process_lcd_p_command(const char* command) {
           write_to_lcd_P(PSTR("{SYS:DIR}"));
         }
         else {
-          card.openAndPrintFile(card.filename);
+          card.openAndPrintFile(card.longFilename);
+      	  MYSERIAL.write("//action:resumed\n");
         }
       #endif
     } break; // default
@@ -390,8 +403,6 @@ void process_lcd_s_command(const char* command) {
 
     case 'L': {
       #if ENABLED(SDSUPPORT)
-        if (!card.cardOK) card.initsd();
-
         // A more efficient way to do this would be to
         // implement a callback in the ls_SerialPrint code, but
         // that requires changes to the core cardreader class that
@@ -402,7 +413,7 @@ void process_lcd_s_command(const char* command) {
         uint16_t file_count = card.get_num_Files();
         for (uint16_t i = 0; i < file_count; i++) {
           card.getfilename(i);
-          sprintf_P(message_buffer, card.filenameIsDir ? PSTR("{DIR:%s}") : PSTR("{FILE:%s}"), card.filename);
+          sprintf_P(message_buffer, card.filenameIsDir ? PSTR("{DIR:%s}") : PSTR("{FILE:%s}"), card.longFilename);
           write_to_lcd(message_buffer);
         }
 
@@ -510,7 +521,7 @@ void lcd_update() {
     // The UI needs to see at least one TQ which is not 100%
     // and then when the print is complete, one which is.
   if(card.updateLCD) {
-    if (card.sdprinting) {
+    if (card.sdprinting || card.saving) {
         if (card.percentDone() != progress) {
         char message_buffer[10];
         progress = card.percentDone();
@@ -548,8 +559,8 @@ void lcd_init() {
   write_to_lcd_P(PSTR("{SYS:STARTED}\r\n"));
 
   // send a version that says "unsupported"
-  write_to_lcd_P(PSTR("{VER:99}\r\n"));
-
+  write_to_lcd_P(PSTR("{VER:130}\r\n"));
+  HAL_Delay(2000); //Leave version on the screen
   // No idea why it does this twice.
   write_to_lcd_P(PSTR("{SYS:STARTED}\r\n"));
   update_usb_status(true);
@@ -566,13 +577,25 @@ void lcd_setalertstatusPGM(const char* message) {
 /**
  * Send an arbitrary message
  */
-void lcd_setstatus(const char* message, bool persist) {
+void lcd_setstatus(const char* message, const bool persist) {
 	write_to_lcd(message);
 }
 void lcd_setstatuspgm(const char* message, uint8_t level) {
 	write_to_lcd_P(message);
 }
-
+void lcd_setpercent(uint8_t percent) {
+	  progress = percent;
+	  char message_buffer[10];
+      sprintf_P(message_buffer, PSTR("{TQ:%03i}"), (int)progress);
+      lcd_setstatus(message_buffer);
+	  if(percent==0)
+		lcd_setstatuspgm(PSTR(MSG_BUILD));
+	  else if(percent>=100)
+	  {
+		lcd_setstatuspgm(PSTR(MSG_COMPLETE));
+		progress = 0;
+	  }
+}
 
 
 #endif // MALYAN_LCD
