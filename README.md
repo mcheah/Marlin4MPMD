@@ -1,3 +1,18 @@
+# Updates for the 1.3.0 Release Candidate
+If you've made it to try out the latest 1.3.0 Release Candidate, here are some random notes.  I haven't had a chance to document everything yet, so please contact me on gitter.im or report an issue as you notice changes.
+## List of changes
+1. Rotate the towers by default to place +Y directly opposite the LCD screen and +X to the right of the LCD.  Many of you had done this in hardware by swapping the cables. To go back, issue `M665 X-120 Y-120 Z-120`
+2. Settings are now stored in flash instead of on the SD card.  To load your old settings, just run `M32 M_CFG.G` followed by `M500`.  If you get an error about the API version not matching this indicates the data in flash isn't valid and should be overwritten
+3. Fixed a bug that caused feedrates to be half of what they were programmed to.  This means for the same G-code the printer will now run twice as fast (matching the stock firmware).  The bug also prematurely limited the max travel speeds, you can now issue commands as fast as 150mm/s (although motors will likely start grinding at this speed).  As a result, you will have to half the feed rates in your slicer settings to compensate.
+4. Added G33 command to auto calibrate the M666 settings for leveling the endstops.  This may take multiple iterations to complete.  Issue `G33 V3 R<Radius>` to set the radius to probe at and display the individual probing data.  If the delta height/radius is not adjusted right, the head might crash into the bed when probing G33.  To fix this issue `M851 R<Raise Height>` beforehand to increase the probe raise height.
+5. Mesh grids will automatically be adjusted so that the center point is 0.00 adjustment.  This was done because the mesh calibration would override the delta height adjust.  If your delta height is wrong (did not run `G29 P0` or `G29 P2`) doing a `G29 P1` will potentially cause the print to fail.  The correct way to adjust for your first layer height is to either change your probe offset `M851 Z<Offset>` and issue `G29 P0`, or manually edit `M665 H`.
+6. Manually changing mesh settings is made easier by detecting if you're on a mesh adjust point when changing with `M421 Z/Q`.  The effects are immediate so if you probe with G30, get an error of +1.2, if you issue `M421 Q1.2`, you should immediately be able to go to `G1 Z0` and run the paper test.  Obviously doesn't work if you're in between mesh probe points.
+7. Long file names should now be supported
+8. Removed `M48`, `M290`, and several other unused functions.  Added `M524` to abort SD prints
+9. Better handling of cancelling prints.  Should not correctly trigger octoprint to stop using action commands, requires 1.3.9 or greater.  Have not tested with USB printing from pronterface/repetier/cura.
+10. Hopefully fixed the errant thermal runaway triggering when heating the bed first on 5A firmware.  Would like testing with high bed temps to confirm.
+11. Fixed mesh extrapolation issue noted in [#16](https://github.com/mcheah/Marlin4MPMD/pull/16)
+
 This is a port of [Marlin4ST](https://github.com/St3dPrinter/Marlin4ST) to work with the [Monoprice Mini Delta 3D Printer](https://mpminidelta.monoprice.com/).  Marlin4ST itself is based off of [MarlinFW](https://github.com/MarlinFirmware/Marlin) version 1.1.0-RC7.  Much of this work was necessary to accommodate the less powerful STM32F070CBT microprocessor used in the Monoprice mini delta as well as supporting the specific hardware of thise machine.
 The motivation for this project was to correct some of the issues with the stock firmware of the printer, most notably the slow communication speed over USB, the inconsistent heater controls, disablement of the some of the safety features, and some of the delta calibrations.  The stock firmware is closed-source although it seems to be based off of Marlin, and as as result there's now way of confirming there are no hidden bugs or issues.
 That said, this is development firmware that has been tested only handful of times by me on two printers.  Relevant Marlin safety features have been turned on, but there is no guarantee it is bug free.  
@@ -25,7 +40,7 @@ Printer is now online.
 echo:Marlin4MPMD
 echo: Last Updated: 2018-06-21 00:00 | Author: (MCheah, MPMD)
 Compiled: Jun 24 2018
-Issue G28 from the terminal window to make sure that communication is working correctly.  
+Issue G28 from the terminal window to make sure that communication is working correctly.  F
 Calibration settings from stock firmware should be directly applicable from the stock firmware, so it is advised to write down the M503 results before re-flashing the firmware.  You may need to adjust M92, M666 and M665 for your specific printer.  The M301/M304 PID settings are not directly comparable to the stock firmware, but the default values should work fairly nicely.
 There is no non-volatile storage implemented right now, so whatever calibration settings you set will need to be written in your start g-code on every print or at least on power-up.
   
