@@ -2627,7 +2627,7 @@ static void clean_up_after_endstop_or_probe_move() {
 				SERIAL_ECHOPAIR(" Y", planner.axis_steps_per_mm[Y_AXIS]);
 				SERIAL_ECHOPAIR(" Z", planner.axis_steps_per_mm[Z_AXIS]);
 				SERIAL_ECHOPAIR(" E", planner.axis_steps_per_mm[E_AXIS]);
-			}
+			} //height too small
 			else if(z_at_pt >= MAX_Z_HEIGHT_ERROR) //If we are this far off, then steps/mm is too big, try 1/2
 			{
 				LOOP_XYZE(axis) {
@@ -2639,10 +2639,10 @@ static void clean_up_after_endstop_or_probe_move() {
 				SERIAL_ECHOPAIR(" Y", planner.axis_steps_per_mm[Y_AXIS]);
 				SERIAL_ECHOPAIR(" Z", planner.axis_steps_per_mm[Z_AXIS]);
 				SERIAL_ECHOPAIR(" E", planner.axis_steps_per_mm[E_AXIS]);
-			}
+			} //height too large
 			else //within range
 				break;
-    	}
+    	} // try at least twice
     	set_delta_height(delta_height-z_at_pt);
 		//do_blocking_move_to_z(current_position[Z_AXIS]-z_at_pt);
     	return z_at_pt;
@@ -3775,13 +3775,13 @@ static inline float calc_grid_position(int i, AxisEnum axis)
     	if(delta_z_offset<=MIN_Z_HEIGHT_ERROR || delta_z_offset>=MAX_Z_HEIGHT_ERROR ) {
     		SERIAL_PROTOCOLLN("Delta Height is misconfigured, aborting Auto Bed Leveling");
 			do_mesh_probe = false;
-    	}
+    	} // height_error
     	if(do_mesh_probe)
     	{
     	    gcode_G28();
     	    do_blocking_move_to_z(current_position[Z_AXIS]-1);
-    	}
-    }
+    	} //do_mesh_probe
+    } //do_height_probe
 
       #if DISABLED(DELTA)
         bool do_topography_map = verbose_level > 2 || code_seen('T');
@@ -4013,15 +4013,15 @@ static inline float calc_grid_position(int i, AxisEnum axis)
       		clear_extrapolated_bed_level();
         extrapolate_unprobed_bed_level();
         zero_bed_level();
-      }
         print_bed_level();
-        if(dryrun && do_mesh_probe) {
+      } // do_mesh_probe
+      if(dryrun && do_mesh_probe) {
         for (int y = 0; y < AUTO_BED_LEVELING_GRID_POINTS; y++) {
           for (int x = 0; x < AUTO_BED_LEVELING_GRID_POINTS; x++) {
         	  bed_level[x][y] = dry_bed_level[x][y];
-        }
-      }
-    }
+			} // x
+		  } // y
+		} // dryrun && do_mesh_probe
       #else // !DELTA
 
         // solve lsq problem
@@ -8800,7 +8800,8 @@ void clamp_to_software_endstops(float target[3]) {
     float p12[3] = { delta_tower2_x - delta_tower1_x, delta_tower2_y - delta_tower1_y, z2 - z1 };
 
     //Get the Magnitude of vector.
-    float d = sqrt( p12[0]*p12[0] + p12[1]*p12[1] + p12[2]*p12[2] );
+    float d;
+    arm_sqrt_f32(( p12[0]*p12[0] + p12[1]*p12[1] + p12[2]*p12[2] ),&d);
 
     //Create unit vector by dividing by magnitude.
     float ex[3] = { p12[0]/d, p12[1]/d, p12[2]/d };
@@ -8980,14 +8981,21 @@ void mesh_line_to_destination(float fr_mm_m, uint8_t x_splits = 0xff, uint8_t y_
     float difference[NUM_AXIS];
     LOOP_XYZE(i) difference[i] = target[i] - current_position[i];
     float seconds = 0;
-    float cartesian_mm = sqrt(sq(difference[X_AXIS]) + sq(difference[Y_AXIS]) + sq(difference[Z_AXIS]));
+    float cartesian_mm;
+    arm_sqrt_f32(sq(difference[X_AXIS]) + sq(difference[Y_AXIS]) + sq(difference[Z_AXIS]),&cartesian_mm);
     if (cartesian_mm < 0.000001) cartesian_mm = abs(difference[E_AXIS]);
     if (cartesian_mm < 0.000001) return false;
     float _feedrate_mm_s = MMM_TO_MMS_SCALED(feedrate_mm_m);
     // Fail if attempting move outside printable radius
     if (!position_is_reachable_xy(target[X_AXIS], target[Y_AXIS])) return true;
+    int steps;
+    if (!difference[X_AXIS] && !difference[Y_AXIS])
+    	steps = 1;
+    else {
     	seconds = cartesian_mm / _feedrate_mm_s;
-    int steps = max(1, int(delta_segments_per_second * seconds));
+    	steps = max(1, int(delta_segments_per_second * seconds));
+    }
+
     float inv_steps = 1.0/steps;
 
     // SERIAL_ECHOPGM("mm="); SERIAL_ECHO(cartesian_mm);

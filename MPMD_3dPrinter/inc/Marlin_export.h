@@ -98,7 +98,7 @@ typedef uint8_t  byte;
 #define cli()       __disable_irq()
 #define sei()       __enable_irq()
 
-#define F_CPU()	HAL_RCC_GetSysClockFreq()
+#define F_CPU()	CORE_CPU_FREQ
 
 #define map(x,in_min,in_max,out_min,out_max) ((long)(((long)(x) - (long)(in_min)) * ((long)(out_max) - (long)(out_min)) / ((long)(in_max) - (long)(in_min)) + (long)(out_min)))
 
