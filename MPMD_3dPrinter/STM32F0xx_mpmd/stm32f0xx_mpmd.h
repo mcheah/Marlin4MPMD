@@ -123,6 +123,8 @@ typedef enum
 /** @defgroup STM32F0XX_MPMD_LOW_LEVEL_LED STM32F0XX NUCLEO 144 LOW LEVEL LED
   * @{
   */
+
+#define CORE_CPU_FREQ							48000000u
 #define LEDn                                    3
 
 #define LED1_PIN                                GPIO_PIN_15

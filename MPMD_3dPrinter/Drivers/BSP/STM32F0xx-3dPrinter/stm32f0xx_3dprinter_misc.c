@@ -798,7 +798,7 @@ void BSP_MiscTickSetFreq(uint32_t newFreq)
 //    newFreq = (newFreq >> 1)&0x7fff;
 //  }
   
-  timPeriod = (HAL_RCC_GetSysClockFreq()/ (TICK_TIMER_PRESCALER * (uint32_t)newFreq))-1;
+  timPeriod = (CORE_CPU_FREQ/ (TICK_TIMER_PRESCALER * (uint32_t)newFreq))-1;
   if (timPeriod < 100) timPeriod = 100;
 #ifdef STM32_MPMD
   if (timPeriod > 0xFFFF) timPeriod = 0xFFFF;
@@ -835,7 +835,7 @@ void BSP_MiscTickSetFreq(uint32_t newFreq)
  * @retval None
  * @note The frequency is directly the current speed of the device
  **********************************************************/
-void BSP_MiscTickSetPeriod(uint32_t newTimPeriod)
+inline void BSP_MiscTickSetPeriod(uint32_t newTimPeriod)
 {
   uint32_t timerCnt = hTimTick.Instance->CNT + newTimPeriod;
   __HAL_TIM_SetCompare(&hTimTick, BSP_MISC_CHAN_TIMER_TICK, timerCnt);
@@ -889,7 +889,7 @@ void BSP_MiscTick2Init(void)
  **********************************************************/
 void BSP_MiscTick2SetFreq(float newPeriod)
 {
-  uint32_t sysFreq = HAL_RCC_GetSysClockFreq();
+  uint32_t sysFreq = CORE_CPU_FREQ;
   uint32_t tick;
   uint32_t timPeriod = ((uint32_t)(sysFreq * newPeriod)/ TICK_TIMER_PRESCALER) - 1;
   
