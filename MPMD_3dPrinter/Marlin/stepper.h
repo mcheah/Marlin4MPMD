@@ -258,7 +258,7 @@ class Stepper {
       unsigned short timer;
 
 //      NOMORE(step_rate, MAX_STEP_FREQUENCY);
-      NOLESS(step_rate,(uint32_t)((F_CPU()/((uint32_t)0xffff*(uint32_t)TICK_TIMER_PRESCALER)))/2u+1u);
+      NOLESS(step_rate,(uint32_t)((F_CPU()/((uint32_t)0xffff*(uint32_t)TICK_TIMER_PRESCALER)))+1u);
 //      if(step_rate > MAX_STEP_FREQUENCY*8) {
 //        // If steprate > 20kHz >> step 4 times
 //        step_rate = (step_rate >> 4);
@@ -285,7 +285,7 @@ class Stepper {
         step_loops = 1;
 //      }
 
-      timer = (uint16_t)(F_CPU() / (step_rate * TICK_TIMER_PRESCALER))/2;
+      timer = (uint16_t)(F_CPU() / (step_rate * TICK_TIMER_PRESCALER))-1;
 //      NOLESS(timer,100);
 //      if(timer < 100)  timer = 100;
 

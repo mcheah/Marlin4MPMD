@@ -2627,7 +2627,7 @@ void lcd_update() {
   #endif //SDSUPPORT && SD_DETECT_PIN
 
   millis_t ms = millis();
-  if (ELAPSED(ms, next_lcd_update_ms) && (commands_in_queue==0 || planner.movesplanned()>MIN_MOVESPLANNED)) {
+  if (ELAPSED(ms, next_lcd_update_ms) && (commands_in_queue==0 || planner.movesplanned()>MIN_MOVESPLANNED || wait_for_heatup)) {
 
     next_lcd_update_ms = ms + LCD_UPDATE_INTERVAL;
 
@@ -2786,6 +2786,10 @@ void lcd_update() {
     }
 
   }
+}
+
+void lcd_setpercent(uint8_t percent) {
+	  progress = percent;
 }
 
 void set_utf_strlen(char* s, uint8_t n) {

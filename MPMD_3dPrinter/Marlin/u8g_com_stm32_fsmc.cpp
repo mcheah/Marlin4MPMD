@@ -84,7 +84,7 @@ uint8_t u8g_com_stm32hal_fsmc_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void 
     case U8G_COM_MSG_WRITE_SEQ:
 
       for (uint8_t i = 0; i < arg_val; i += 2) {
-    	  if(commands_in_queue==0 || planner.movesplanned()>MIN_MOVESPLANNED)
+    	  if(commands_in_queue==0 || planner.movesplanned()>MIN_MOVESPLANNED || wait_for_heatup)
     		  LCD_IO_WriteData(*(uint16_t *)(((uint32_t)arg_ptr) + i));
     	  else
     		  return 0;

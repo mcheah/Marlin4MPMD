@@ -74,13 +74,26 @@
 #define BSP_UART_DEBUG_TX_PORT              (GPIOA)
 #define BSP_UART_DEBUG_RX_PIN               (GPIO_PIN_10)
 #define BSP_UART_DEBUG_RX_PORT              (GPIOA)
+#define BSP_UART_DEBUG_TX_AF                (GPIO_AF7_USART1)
+#define BSP_UART_DEBUG_RX_AF                (GPIO_AF7_USART1)
+
+/* Definition for USARTx's DMA */
+#define USARTx_TX_DMA_CHANNEL            DMA_CHANNEL_4
+#define USARTx_TX_DMA_STREAM             DMA2_Stream7
+#define USARTx_RX_DMA_CHANNEL            DMA_CHANNEL_4
+#define USARTx_RX_DMA_STREAM             DMA2_Stream5
+
+/* Definition for USARTx's NVIC */
+#define USARTx_DMA_TX_IRQn               DMA2_Stream7_IRQn
+#define USARTx_DMA_RX_IRQn               DMA2_Stream5_IRQn
+#define USARTx_DMA_TX_IRQHandler         DMA2_Stream7_IRQHandler
+#define USARTx_DMA_RX_IRQHandler         DMA2_Stream5_IRQHandler
 
 /* Definition for BSP_UART_DEBUG's NVIC */
 #define BSP_UART_DEBUG_IRQn                      (USART1_IRQn)
 #define BSP_UART_DEBUG_IRQHandler                USART1_IRQHandler
 
-#define BSP_UART_DEBUG_TX_AF                     (GPIO_AF7_USART1)
-#define BSP_UART_DEBUG_RX_AF                     (GPIO_AF7_USART1)
+
 
 //#define BSP_UART_LCD                           (USART1)
 //#define __BSP_UART_LCD_CLK_ENABLE()              __USART1_CLK_ENABLE()
@@ -143,6 +156,7 @@ uint32_t BSP_UartPrintf(const char* format,...);
 uint32_t BSP_UartGetNbRxAvailableBytes(void);
 uint32_t BSP_UartCopyNextRxBytes(uint8_t *buff, uint32_t maxlen);
 int8_t BSP_UartGetNextRxBytes(void);
+uint8_t  UART_Itf_IsTransmitting(void);
 uint8_t BSP_UartIsTxOnGoing(void);
 #if defined(MARLIN)
 uint32_t BSP_UartCommandsFilter(char *pBufCmd, uint8_t nxRxBytes);

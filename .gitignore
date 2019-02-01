@@ -463,4 +463,4 @@ STM32072B_EVAL*/
 STM32F070CB_SD_TEST/
 *language.settings.xml
 *.cfg
-.settings/
+stm32MemStream/

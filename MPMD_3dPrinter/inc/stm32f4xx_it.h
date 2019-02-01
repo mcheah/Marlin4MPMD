@@ -66,6 +66,8 @@ void BSP_MISC_TICK2_IRQHandler(void);
 void BSP_UART_DEBUG_IRQHandler(void);
 void BSP_UART_LCD_IRQHandler(void);
 //void BSP_WIFI_UART_IRQHandler(void);
+void USARTx_DMA_TX_IRQHandler(void);
+void USARTx_DMA_RX_IRQHandler(void);
 void BSP_DMA_IRQHandler(void);
 void BSP_ADC_IRQHandler(void);
 //void DMA1_CH1_IRQHandler(void);
@@ -75,7 +77,6 @@ void BSP_ADC_IRQHandler(void);
 //void BSP_WIFI_UART_DMA_RX_IRQHandler(void);
 void USB_IRQHandler(void);
 void USARTx_IRQHandler(void);
-void USARTx_DMA_TX_RX_IRQHandler(void);
 void TIMx_IRQHandler(void);
 
 #ifdef __cplusplus

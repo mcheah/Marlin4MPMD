@@ -328,7 +328,7 @@ HAL_StatusTypeDef HAL_DMA_DeInit(DMA_HandleTypeDef *hdma)
   DMA_Base_Registers *regs;
 
   /* Check the DMA peripheral state */
-  if(hdma == NULL)
+  if(hdma == NULL || hdma->Instance==NULL)
   {
     return HAL_ERROR;
   }

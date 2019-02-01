@@ -138,7 +138,7 @@ uint8_t u8g_dev_tft_480x320_upscale_from_128x64_fn(u8g_t *u8g, u8g_dev_t *dev, u
 
       memset(buffer, 0x00, sizeof(buffer));
 
-      if ((lcd_id & 0xFFFF) == 0x7796) { // ST7796
+      if ((lcd_id & 0xFFFF) == 0x7796 || (lcd_id & 0xFFFF) == 0x7396) { // ST7796
         u8g_WriteEscSeqP(u8g, dev, ili3941_init_sequence);
       }
 

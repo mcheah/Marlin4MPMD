@@ -40,15 +40,13 @@
   void lcd_setstatus(const char* message, const bool persist=false);
   void lcd_setstatuspgm(const char* message, const uint8_t level=0);
   void lcd_setalertstatuspgm(const char* message);
+  void lcd_setpercent(uint8_t percent);
 #else
   FORCE_INLINE void lcd_update() {}
   FORCE_INLINE void lcd_init() {}
   FORCE_INLINE void lcd_setstatus(const char* message, const bool persist=false) {UNUSED(message); UNUSED(persist);}
   FORCE_INLINE void lcd_setstatuspgm(const char* message, const uint8_t level=0) {UNUSED(message); UNUSED(level);}
   FORCE_INLINE void lcd_setalertstatuspgm(const char* message) {}
-#endif
-#if ENABLED(MALYAN_LCD)
-  void lcd_setpercent(uint8_t percent);
 #endif
 #if ENABLED(ULTRA_LCD)
   #define BUTTON_EXISTS(BN) (defined(BTN_## BN) && BTN_## BN >= 0)

@@ -292,7 +292,7 @@ void BSP_MiscOverallInit(uint8_t nbDevices)
 void BSP_MiscErrorHandler(uint16_t error)
 {
   __disable_irq();
-  static char errorTxt[15] = "Error = 0x";
+  volatile static char errorTxt[15] = "Error = 0x";
   char* errorTxtPtr;
   errorTxtPtr = errorTxt + strlen(errorTxt);
   /* Backup error number */
@@ -324,6 +324,7 @@ void BSP_MiscErrorHandler(uint16_t error)
   {
 	  BSP_LED_Toggle(LED_GREEN);
 	  BSP_LED_Toggle(LED_RED);
+	  BSP_LED_Toggle(LED_BLUE);
 	  //Systick disabled, use loop for delay
 #ifdef STM32_MPMD
 	  for(int i=0;i<10e3;i++) { }
@@ -797,7 +798,7 @@ void BSP_MiscTickSetFreq(uint32_t newFreq)
 //    newFreq = (newFreq >> 1)&0x7fff;
 //  }
   
-  timPeriod = (HAL_RCC_GetSysClockFreq()/ (TICK_TIMER_PRESCALER * (uint32_t)newFreq))/2;
+  timPeriod = (HAL_RCC_GetSysClockFreq()/ (TICK_TIMER_PRESCALER * (uint32_t)newFreq))-1;
   if (timPeriod < 100) timPeriod = 100;
 #ifdef STM32_MPMD
   if (timPeriod > 0xFFFF) timPeriod = 0xFFFF;
@@ -890,7 +891,7 @@ void BSP_MiscTick2SetFreq(float newPeriod)
 {
   uint32_t sysFreq = HAL_RCC_GetSysClockFreq();
   uint32_t tick;
-  uint32_t timPeriod = ((uint32_t)(sysFreq * newPeriod)/ TICK_TIMER_PRESCALER)/2 - 1;
+  uint32_t timPeriod = ((uint32_t)(sysFreq * newPeriod)/ TICK_TIMER_PRESCALER) - 1;
   
   __HAL_TIM_SetAutoreload(&hTimTick2, timPeriod);
   __HAL_TIM_SetCompare(&hTimTick2, BSP_MISC_CHAN_TIMER_TICK2, timPeriod >> 1);
@@ -1366,7 +1367,7 @@ void BSP_MiscEEPROMErase() {
  **********************************************************/
 void BSP_MiscEEPROMWriteF32(void *destination, float value)
 {
-	FLASH_If_Write((uint32_t)destination,&value,sizeof(float)/sizeof(uint16_t));
+	FLASH_If_Write((uint32_t)destination,(uint16_t *)&value,sizeof(float)/sizeof(uint16_t));
 }
 /**********************************************************
  * @brief  Writes a uint16_t value to user EEPROM emulated in flash
@@ -1382,7 +1383,7 @@ void BSP_MiscEEPROMWriteU16(void *destination, uint16_t value)
  **********************************************************/
 void BSP_MiscEEPROMWriteU32(void *destination, uint32_t value)
 {
-	FLASH_If_Write((uint32_t)destination,&value,sizeof(uint32_t)/sizeof(uint16_t));
+	FLASH_If_Write((uint32_t)destination,(uint16_t *)&value,sizeof(uint32_t)/sizeof(uint16_t));
 }
 /**
   * @}

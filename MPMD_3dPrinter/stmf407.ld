@@ -39,7 +39,7 @@ _Min_Heap_Size = 0x200;;      /* required amount of heap  */
 _Min_Stack_Size = 0x400;; /* required amount of stack */
 
 _StartRom = DEFINED(VectorTable) ? 0x8010000 : 0x8000000;
-_RomLen = DEFINED(VectorTable) ? 312K : 376K;
+_RomLen = DEFINED(VectorTable) ? 312K-128K : 376K-128K;
 
 /* Specify the memory areas */
 MEMORY

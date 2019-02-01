@@ -38,6 +38,7 @@ extern TIM_HandleTypeDef hTimTick2;
 extern TIM_HandleTypeDef hTimServo;
 #endif//BSP_SERVO0_PIN
 extern BspAdcDataType gBspAdcData;
+extern BspUartDataType gBspUartData;
 extern PCD_HandleTypeDef hpcd;
 extern TIM_HandleTypeDef TimHandle;
 /* Private function prototypes -----------------------------------------------*/
@@ -195,6 +196,24 @@ void BSP_UART_LCD_IRQHandler(void)
   HAL_UART_IRQHandler(&gBspUartData.handle);
 }
 #endif
+
+/**
+* @brief This function handles DMA global interrupt.
+*/
+void USARTx_DMA_TX_IRQHandler(void)
+{
+  HAL_NVIC_ClearPendingIRQ(USARTx_DMA_TX_IRQn);
+  HAL_DMA_IRQHandler((gBspUartData.handle.hdmatx));
+}
+
+/**
+* @brief This function handles DMA global interrupt.
+*/
+void USARTx_DMA_RX_IRQHandler(void)
+{
+  HAL_NVIC_ClearPendingIRQ(USARTx_DMA_RX_IRQn);
+  HAL_DMA_IRQHandler((gBspUartData.handle.hdmarx));
+}
 
 /**
 * @brief This function handles DMA global interrupt.

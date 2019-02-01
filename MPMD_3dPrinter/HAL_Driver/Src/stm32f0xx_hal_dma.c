@@ -222,7 +222,7 @@ HAL_StatusTypeDef HAL_DMA_Init(DMA_HandleTypeDef *hdma)
 HAL_StatusTypeDef HAL_DMA_DeInit(DMA_HandleTypeDef *hdma)
 {
   /* Check the DMA handle allocation */
-  if(NULL == hdma)
+  if(NULL == hdma|| hdma->Instance==NULL)
   {
     return HAL_ERROR;
   }

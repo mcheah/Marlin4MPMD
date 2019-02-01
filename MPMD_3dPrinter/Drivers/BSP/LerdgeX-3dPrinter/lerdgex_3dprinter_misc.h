@@ -109,35 +109,35 @@
    
 /* Definition for Tick timer */
 /// Timer used for Tick
-#define BSP_MISC_TIMER_TICK                  (TIM2)
+#define BSP_MISC_TIMER_TICK                  (TIM10)
 /// Channel Timer used for Tick
 #define BSP_MISC_CHAN_TIMER_TICK              (TIM_CHANNEL_1)
 /// HAL Active Channel Timer used for Tick
 #define BSP_MISC_HAL_ACT_CHAN_TIMER_TICK      (HAL_TIM_ACTIVE_CHANNEL_1)
 /// Timer Clock Enable for Tick
-#define __BSP_MISC_TIMER_TICK_CLCK_ENABLE()   __TIM2_CLK_ENABLE()
+#define __BSP_MISC_TIMER_TICK_CLCK_ENABLE()   __TIM10_CLK_ENABLE()
 /// Timer Clock Disable for Tick
-#define __BSP_MISC_TIMER_TICK_CLCK_DISABLE()  __TIM2_CLK_DISABLE()
+#define __BSP_MISC_TIMER_TICK_CLCK_DISABLE()  __TIM10_CLK_DISABLE()
 
 /// TICK global interrupt
-#define BSP_MISC_TICK_IRQn                    (TIM2_IRQn)
-#define BSP_MISC_TICK_IRQHandler			  (TIM2_IRQHandler)
+#define BSP_MISC_TICK_IRQn                    (TIM1_UP_TIM10_IRQn)
+#define BSP_MISC_TICK_IRQHandler			  (TIM1_UP_TIM10_IRQHandler)
 
 /* Definition for Tick2 timer  (Marlin Only)*/
 /// Timer used for Tick2
-#define BSP_MISC_TIMER_TICK2                  (TIM3)
+#define BSP_MISC_TIMER_TICK2                  (TIM11)
 /// Channel Timer used for Tick
 #define BSP_MISC_CHAN_TIMER_TICK2              (TIM_CHANNEL_1)
 /// HAL Active Channel Timer used for Tick
 #define BSP_MISC_HAL_ACT_CHAN_TIMER_TICK2      (HAL_TIM_ACTIVE_CHANNEL_1)
 /// Timer Clock Enable for Tick
-#define __BSP_MISC_TIMER_TICK2_CLCK_ENABLE()   __TIM3_CLK_ENABLE()
+#define __BSP_MISC_TIMER_TICK2_CLCK_ENABLE()   __TIM11_CLK_ENABLE()
 /// Timer Clock Disable for Tick
-#define __BSP_MISC_TIMER_TICK2_CLCK_DISABLE()  __TIM3_CLK_DISABLE()
+#define __BSP_MISC_TIMER_TICK2_CLCK_DISABLE()  __TIM11_CLK_DISABLE()
 
 /// TICK global interrupt
-#define BSP_MISC_TICK2_IRQn                    (TIM3_IRQn)
-#define BSP_MISC_TICK2_IRQHandler			   (TIM3_IRQHandler)
+#define BSP_MISC_TICK2_IRQn                    (TIM1_TRG_COM_TIM11_IRQn)
+#define BSP_MISC_TICK2_IRQHandler			   (TIM1_TRG_COM_TIM11_IRQHandler)
 
 //TODO: update these timers since only FAN PWM is connector to a timer channel
  /// Timer used for PWM_HEAT_BED

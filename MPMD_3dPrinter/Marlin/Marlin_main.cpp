@@ -369,7 +369,7 @@ const uint8_t active_extruder = 0;
 // Relative Mode. Enable with G91, disable with G90.
 bool relative_mode = false;
 
-volatile bool wait_for_heatup = true;
+volatile bool wait_for_heatup = false;
 
 const char errormagic[] PROGMEM = "Error:";
 const char echomagic[] PROGMEM = "echo:";
@@ -1175,7 +1175,6 @@ void setup() {
     SERIAL_PROTOCOLLNPGM("start");
     SERIAL_ECHO_START;
 
-    // Check startup - does nothing if bootloader sets MCUSR to 0
 #ifdef STM32_LERDGEX
     byte mcu = MCUSR;
     if (mcu & 1) SERIAL_ECHOLNPGM(MSG_POWERUP);
@@ -3180,7 +3179,6 @@ void unknown_command_error() {
         case IN_PROCESS:
           SERIAL_ECHO_START;
           SERIAL_ECHOLNPGM(MSG_BUSY_PROCESSING);
-          MYSERIAL.println((int)planner.movesplanned());
           break;
         case PAUSED_FOR_USER:
           SERIAL_ECHO_START;
@@ -4519,7 +4517,7 @@ static inline float calc_grid_position(int i, AxisEnum axis)
 	  MYSERIAL.print("Start M666 X");MYSERIAL.print(endstop_adj[X_AXIS]);
 	  MYSERIAL.print(" Y");MYSERIAL.print(endstop_adj[Y_AXIS]);
 	  MYSERIAL.print(" Z");MYSERIAL.println(endstop_adj[Z_AXIS]);
-	  if(dryrun) {
+	  if(!dryrun) {
 		  for (int i= 0; i<3; i++)
 		  {
 			  endstop_adj[i]-=(highestZ-measured_z[i+1])*adjFactor;
@@ -4884,6 +4882,12 @@ inline void gcode_M31() {
     	  print_job_timer.start();
     	  lcd_setstatuspgm(PSTR(MSG_RESUMED));    	  
       }
+#elif ENABLED(ULTRA_LCD)
+      if(code_seen('S') && (seen_pointer < namestartpos)) {
+    	  filesize = code_value_int();
+    	  lcd_setpercent(0);
+    	  print_job_timer.start();
+      }
 #endif
       uint8_t M34_state = M34_IDLE;
       p_card->openFile(namestartpos, false);
@@ -5041,7 +5045,7 @@ inline void gcode_M31() {
       } //while(M34_state!= M34_RX)
       p_card->closefile();
       SERIAL_PROTOCOLLNPGM(MSG_FILE_SAVED);
-#if ENABLED(MALYAN_LCD)
+#if ENABLED(MALYAN_LCD) || ENABLED(ULTRA_LCD)
       if(filesize>0) {
     	  print_job_timer.stop();
     	  lcd_setpercent(100);
@@ -5389,7 +5393,7 @@ static inline long random( long howsmall, long howbig )
 
 #endif // Z_MIN_PROBE_REPEATABILITY_TEST
 
-#if ENABLED(MALYAN_LCD)
+#if ENABLED(MALYAN_LCD) || ENABLED(ULTRA_LCD)
   /**
    * M73: Update LCD with progress percentage
    */
@@ -5716,7 +5720,7 @@ inline void gcode_M109() {
     }
 
   } while (wait_for_heatup && TEMP_CONDITIONS);
-
+  wait_for_heatup = false;
   LCD_MESSAGEPGM(MSG_HEATING_COMPLETE);
   KEEPALIVE_STATE(IN_HANDLER);
 }
@@ -5840,7 +5844,7 @@ inline void gcode_M109() {
       }
 
     } while (wait_for_heatup && TEMP_BED_CONDITIONS);
-
+    wait_for_heatup = false;
     LCD_MESSAGEPGM(MSG_BED_DONE);
     KEEPALIVE_STATE(IN_HANDLER);
   }
@@ -6971,7 +6975,7 @@ inline void gcode_M303() {
     KEEPALIVE_STATE(NOT_BUSY); // don't send "busy: processing" messages during autotune output
 
     thermalManager.PID_autotune(temp, e, c, u);
-
+    wait_for_heatup = false;
     KEEPALIVE_STATE(IN_HANDLER);
   #else
     SERIAL_ERROR_START;
@@ -8428,7 +8432,7 @@ void process_next_command() {
           break;
       #endif // Z_MIN_PROBE_REPEATABILITY_TEST
 
-#if ENABLED(MALYAN_LCD)
+#if ENABLED(MALYAN_LCD) || ENABLED(ULTRA_LCD)
       case 73: //Set percentage
     	gcode_M73();
     	break;

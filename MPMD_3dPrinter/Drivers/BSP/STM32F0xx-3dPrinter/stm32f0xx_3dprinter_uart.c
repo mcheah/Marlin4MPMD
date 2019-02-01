@@ -70,7 +70,7 @@
 /* Private functions ---------------------------------------------------------*/
 static uint32_t UART_Itf_GetNbTxQueuedBytes(void);
 static uint32_t UART_Itf_GetNbTxAvailableBytes(void);
-static uint8_t  UART_Itf_IsTransmitting(void);
+uint8_t  UART_Itf_IsTransmitting(void);
 static uint8_t  UART_Itf_IsTxQueueEmpty(void);
 /* Global variables ----------------------------------------------------------*/
 BspUartDataType gBspUartData;
@@ -145,10 +145,8 @@ void BSP_UartIfStart(void)
   pUart->gCodeDataMode = 0;
     
   /* wait for 1 bytes on the RX uart */
-  if (HAL_UART_Receive_IT(&pUart->handle, pUart->pRxBuffer, UART_RX_BUFFER_SIZE) != HAL_OK)
-  {
-    UART_ERROR(3);
-  }  
+  if (HAL_UART_Receive_DMA(&pUart->handle,pUart->pRxBuffer, UART_RX_BUFFER_SIZE) != HAL_OK)
+	  UART_ERROR(3);
 
   pUart->rxBusy = SET;
 }
@@ -214,7 +212,7 @@ static uint32_t UART_Itf_GetNbTxAvailableBytes(void)
   *         Returns 1 if the USB device is currently transmitting
   * @retval 1 if connected, 0 otherwise
   */
-static uint8_t UART_Itf_IsTransmitting(void) {
+uint8_t UART_Itf_IsTransmitting(void) {
     BspUartDataType *pUart= &gBspUartData;
     return (pUart->txBusy == SET);
 }
@@ -269,7 +267,6 @@ void BSP_UartIfSendQueuedData(void)
       }
     }
 #endif
-	//TODO: we don't really use newTxRequestInThePipe, probably should remove at some point
     if ((pUart->newTxRequestInThePipe == 0)&&
         (pUart->txBusy == RESET)&&
         (pUart->pTxReadBuffer != pUart->pTxWriteBuffer))
@@ -282,18 +279,13 @@ void BSP_UartIfSendQueuedData(void)
       {
         nbTxBytes = pUart->pTxWriteBuffer - pUart->pTxReadBuffer;
       }
-//      pUart->newTxRequestInThePipe++;
       pUart->txBusy = SET;
       pUart->nbTxBytesOnGoing = nbTxBytes;       
       
-      //use of HAL_UART_Transmit_IT is safe as real buffer size is 2 * UART_TX_BUFFER_SIZE
-      if(HAL_UART_Transmit_IT(&pUart->handle, (uint8_t *) pUart->pTxReadBuffer, nbTxBytes)!= HAL_OK)
-      {
-        UART_ERROR(5);
-      }
+      if(HAL_UART_Transmit_DMA(&pUart->handle, (uint8_t *) pUart->pTxReadBuffer,nbTxBytes)!= HAL_OK)
+    	  UART_ERROR(5);
       
       pUart->debugNbTxFrames++;
-//      pUart->newTxRequestInThePipe--;
     }
 }
 
@@ -391,10 +383,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
       // Rx buffer is full 
       UART_ERROR(7);
     }
-    if (HAL_UART_Receive_IT(&pUart->handle, pUart->pRxWriteBuffer, UART_RX_BUFFER_SIZE) != HAL_OK)
-    {
-      UART_ERROR(6);
-    }
+    if (HAL_UART_Receive_DMA(&pUart->handle,pUart->pRxBuffer, UART_RX_BUFFER_SIZE) != HAL_OK)
+    	UART_ERROR(6);
     if (pUart->uartRxDataCallback != 0)
     {
       pUart->uartRxDataCallback((uint8_t *)pUart->pRxReadBuffer,pUart->pRxWriteBuffer - pUart->pRxReadBuffer);
@@ -498,14 +488,14 @@ uint32_t BSP_UartPrintf(const char* format,...)
 uint32_t BSP_UartGetNbRxAvailableBytes(void)
 {
   BspUartDataType *pUart = &gBspUartData;  
-  uint8_t *writePtr = (uint8_t *)(pUart->pRxWriteBuffer - 1);
-  
+  uint8_t *writePtr = gBspUartRxBuffer +  UART_RX_BUFFER_SIZE-pUart->handle.hdmarx->Instance->NDTR;
+
   if (writePtr < pUart->pRxBuffer)
   {
     writePtr += UART_RX_BUFFER_SIZE;
   }  
   
-  int32_t nxRxBytes = pUart->pRxWriteBuffer - pUart->pRxReadBuffer;
+  int32_t nxRxBytes = writePtr - pUart->pRxReadBuffer;
   if (nxRxBytes < 0)
   {
     nxRxBytes += UART_RX_BUFFER_SIZE;
@@ -546,7 +536,7 @@ int8_t BSP_UartGetNextRxBytes(void)
   BspUartDataType *pUart = &gBspUartData;  
   int8_t byteValue;
 
-  uint8_t *writePtr = (uint8_t *)(pUart->pRxWriteBuffer);
+  uint8_t *writePtr = (uint8_t *)(pUart->pRxBuffer) + UART_RX_BUFFER_SIZE-pUart->handle.hdmarx->Instance->NDTR;
   
   if (writePtr < pUart->pRxBuffer)
   {
