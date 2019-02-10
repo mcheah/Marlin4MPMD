@@ -1,3 +1,6 @@
+# Updates for the 1.3.1 Release Candidate
+- I reverted the changes that doubled the feedrates.  This was a bug related to the Lerdge board specifically and didn't apply to the MPMD.  Oops.  That said, there was a bug in accelerations on 16x stepper boards that has been fixed as well as a bug that prevented step rates above ~70mm/sec that was fixed, so in general things should be a little bit snappier.
+
 # Updates for the 1.3.0 Release Candidate
 If you've made it to try out the latest 1.3.0 Release Candidate, here are some random notes.  I haven't had a chance to document everything yet, so please contact me on gitter.im or report an issue as you notice changes.
 ## List of changes
