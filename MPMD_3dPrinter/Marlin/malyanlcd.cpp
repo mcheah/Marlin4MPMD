@@ -390,7 +390,7 @@ void process_lcd_s_command(const char* command) {
         // would not benefit the majority of users. Since one can't
         // select a file for printing during a print, there's
         // little reason not to do it this way.
-        char message_buffer[MAX_CURLY_COMMAND];
+        static char message_buffer[MAX_CURLY_COMMAND];
         uint16_t file_count = card.get_num_Files();
         for (uint16_t i = 0; i < file_count; i++) {
           card.getfilename(i);

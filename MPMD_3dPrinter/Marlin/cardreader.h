@@ -40,6 +40,13 @@
 // Maximum directory depth
 #define MAX_DIR_DEPTH (1)
 
+#if _USE_LFN != 0
+// We're going to "cheat" and assume that Path+LFN is less than MAX_LFN
+// We'll need to add protection to truncate strcat calls to do this.
+#define MAXPATHNAMELENGTH		(_MAX_LFN)
+#define FILENAME_LENGTH 		(_MAX_LFN)
+#define LONG_FILENAME_LENGTH 	(_MAX_LFN)
+#else
 // Maximum length of path
 #define MAXPATHNAMELENGTH (13*MAX_DIR_DEPTH+MAX_DIR_DEPTH+1)
 
@@ -54,7 +61,8 @@
 
 // Total size of the buffer used to store the long filenames
 //#define LONG_FILENAME_LENGTH (FILENAME_LENGTH*MAX_VFAT_ENTRIES+1)
-#define LONG_FILENAME_LENGTH (FILENAME_LENGTH+MAXPATHNAMELENGTH) 
+#define LONG_FILENAME_LENGTH (FILENAME_LENGTH+MAXPATHNAMELENGTH)
+#endif
 
 // Number of possible sub-function call (call of a G file by another one)
 #define SD_PROCEDURE_DEPTH (1)
@@ -94,8 +102,12 @@ public:
 	bool cardReaderInitialized;
 	bool cardOK ;
 	bool rootIsOpened;
+#if _USE_LFN != 0
+	char filename[LONG_FILENAME_LENGTH+1];
+#else
 	char filename[13];
-	char longFilename[LONG_FILENAME_LENGTH];
+#endif
+	char longFilename[LONG_FILENAME_LENGTH+1];
 	bool filenameIsDir;
 	int lastnr; //last number of the autostart;
 
