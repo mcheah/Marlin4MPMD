@@ -112,6 +112,7 @@ void CardReader::initsd()
 			  sprintf((char *)buff,"code=%d\n",res);
 			  BSP_CdcIfQueueTxData(buff,sizeof(buff));
 			  release(); //test failed, loop again after releasing
+        BSP_SD_Init(); // Re-initialize the SD card
 		}
 		else {
 			f_closedir(&testroot);
