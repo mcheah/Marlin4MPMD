@@ -2498,15 +2498,18 @@ static void clean_up_after_endstop_or_probe_move() {
      * All DELTA leveling in the Marlin uses NONLINEAR_BED_LEVELING
      */
     static void extrapolate_one_point(int x, int y, int xdir, int ydir) {
-      if (bed_level[x][y] != 0.0) {
+      if (!isnanf(bed_level[x][y])) {
         return;  // Don't overwrite good values.
       }
 //TODO: Verify that this doesn't break non 3 bed leveling grid points
 //Pretty sure this gets fixed in later versions of Marlin, but hard-coding this for now
 #if AUTO_BED_LEVELING_GRID_POINTS!=3
-      float a = 2 * bed_level[x + xdir][y] - bed_level[x + xdir * 2][y]; // Left to right.
-      float b = 2 * bed_level[x][y + ydir] - bed_level[x][y + ydir * 2]; // Front to back.
-      float c = 2 * bed_level[x + xdir][y + ydir] - bed_level[x + xdir * 2][y + ydir * 2]; // Diagonal.
+      float a2 = 2 * bed_level[x + xdir][y], a1 = bed_level[x + xdir * 2][y];
+      float b2 = 2 * bed_level[x][y + ydir], b1 = bed_level[x][y + ydir * 2];
+      float c2 = 2 * bed_level[x + xdir][y + ydir], c1 = bed_level[x + xdir * 2][y + ydir * 2];
+      float a = (isnanf(a2) ? 0 : a2) - (isnanf(a1) ? 0 : a1);
+      float b = (isnanf(b2) ? 0 : b2) - (isnanf(b1) ? 0 : b1);
+      float c = (isnanf(c2) ? 0 : c2) - (isnanf(c1) ? 0 : c1);
 #else
       float a = bed_level[x + xdir][y]; // Left to right.
       float b = bed_level[x][y + ydir]; // Front to back.
@@ -2539,7 +2542,7 @@ static void clean_up_after_endstop_or_probe_move() {
     			float rad;
     			arm_sqrt_f32(xsq+ysq,&rad);
     			if(rad>1.0)
-    				bed_level[i][j] = 0;
+    				bed_level[i][j] = NAN;
     		}
     	}
     }
@@ -4248,7 +4251,7 @@ static inline float calc_grid_position(int i, AxisEnum axis)
 	  MYSERIAL.print("Start M666 X");MYSERIAL.print(endstop_adj[X_AXIS]);
 	  MYSERIAL.print(" Y");MYSERIAL.print(endstop_adj[Y_AXIS]);
 	  MYSERIAL.print(" Z");MYSERIAL.println(endstop_adj[Z_AXIS]);
-	  if(dryrun) {
+	  if(!dryrun) {
 		  for (int i= 0; i<3; i++)
 		  {
 			  endstop_adj[i]-=(highestZ-measured_z[i+1])*adjFactor;
@@ -4805,6 +4808,7 @@ inline void gcode_M31() {
 	lcd_setstatuspgm(PSTR(MSG_PAUSE));
     p_card->stopSDPrint();
     lcd_setstatuspgm(PSTR(MSG_PAUSED));
+    lcd_setstatuspgm(PSTR(MSG_COMPLETE));
 #else
     p_card->stopSDPrint();
 #endif

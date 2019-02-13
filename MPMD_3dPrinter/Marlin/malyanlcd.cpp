@@ -409,11 +409,12 @@ void process_lcd_s_command(const char* command) {
         // would not benefit the majority of users. Since one can't
         // select a file for printing during a print, there's
         // little reason not to do it this way.
+    	// MalyanLCD crashes if you send more than 20 characters
         char message_buffer[MAX_CURLY_COMMAND];
         uint16_t file_count = card.get_num_Files();
         for (uint16_t i = 0; i < file_count; i++) {
           card.getfilename(i);
-          sprintf_P(message_buffer, card.filenameIsDir ? PSTR("{DIR:%s}") : PSTR("{FILE:%s}"), card.longFilename);
+          sprintf_P(message_buffer, card.filenameIsDir ? PSTR("{DIR:%.20s}") : PSTR("{FILE:%.20s}"), card.longFilename);
           write_to_lcd(message_buffer);
         }
 

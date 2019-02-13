@@ -356,11 +356,11 @@ void CardReader::startFileprint()
 		  	  upper_config_file_name,
 			  sizeof(upper_config_file_name))!=0);
   if(updateLCD)
+#else
+  updateLCD = true;
 #endif// ENABLED(SD_SETTINGS)
 	lcd_setstatuspgm(PSTR(MSG_BUILD));
 #endif// ENABLED(MALYAN_LCD)
-  if(isBinaryMode)
-	  flush_buff();
   sdprinting = true;
 }
 
@@ -602,7 +602,8 @@ void CardReader::openFile(char* name,bool read, bool replace_current/*=true*/)
 #endif
     }
   }
-
+  if(isBinaryMode)
+	flush_buff();
 }
 
 void CardReader::openAndPrintFile(const char *name) {
