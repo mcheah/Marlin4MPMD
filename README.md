@@ -1,3 +1,9 @@
+# Updates for the 1.3.2 Release Candidate
+- Fixed progress bar not updating during SD prints
+- Fixed issues listing files on the LCD with filenames longer than 20 characters
+- Fixed longstanding bug where `M421 E` would erroneously corrupt points in the bed level matrix == 0.0
+- Inverted G33 D flag to represent "dryrun" when enabled
+
 # Updates for the 1.3.1 Release Candidate
 - I reverted the changes that doubled the feedrates.  This was a bug related to the Lerdge board specifically and didn't apply to the MPMD.  Oops.  That said, there was a bug in accelerations on 16x stepper boards that has been fixed as well as a bug that prevented step rates above ~70mm/sec that was fixed, so in general things should be a little bit snappier.
 
