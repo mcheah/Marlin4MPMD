@@ -211,7 +211,7 @@ void BSP_CDC_RxCpltCallback(uint8_t* Buf, uint32_t *Len)
 	BSP_LED_Off(LED_GREEN);
 	if(CDC_RX_BUFFER_SIZE-BSP_CdcGetNbRxAvailableBytes(0)>CDC_RX_BUFFER_SIZE/2)
 		USBD_CDC_ReceivePacket(&USBD_Device);
-	if(BSP_CdcGetNbRxAvailableBytes(0)<=startnB)
+	if(*Len>0 && BSP_CdcGetNbRxAvailableBytes(0)<=startnB)
 		CDC_ERROR(10);
 	//Copy character by character to avoid wraparound issues
 //	for(uint32_t i=0;i<*Len;i++)

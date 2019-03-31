@@ -620,9 +620,11 @@ void Config_StoreSettings() {
 	_EEPROMWrite(&EEPROMconfig->preheatBedTemp[1],(uint16_t)preheatBedTemp2);
 	_EEPROMWrite(&EEPROMconfig->preheatFanSpeed[0],(uint16_t)preheatFanSpeed1);
 	_EEPROMWrite(&EEPROMconfig->preheatFanSpeed[1],(uint16_t)preheatFanSpeed2);
+#if ENABLED(PIDTEMP)
 	_EEPROMWrite(&EEPROMconfig->kP,PID_PARAM(Kp, e));
 	_EEPROMWrite(&EEPROMconfig->kI,(float)unscalePID_i(PID_PARAM(Ki, e)));
 	_EEPROMWrite(&EEPROMconfig->kD,(float)unscalePID_d(PID_PARAM(Kd, e)));
+#endif
 	_EEPROMWrite(&EEPROMconfig->volumetric_enabled,(uint16_t)volumetric_enabled);
 	for(int i=0;i<EXTRUDERS;i++)
 		_EEPROMWrite(&EEPROMconfig->filament_size[i],filament_size[i]);
@@ -701,11 +703,13 @@ void Config_RetrieveSettings() {
 	_EEPROMRead(&EEPROMconfig->preheatFanSpeed[0],preheatFanSpeed1);
 	_EEPROMRead(&EEPROMconfig->preheatFanSpeed[1],preheatFanSpeed2);
 #endif//ULTIPANEL
+#if ENABLED(PIDTEMP)
 	_EEPROMRead(&EEPROMconfig->kP,PID_PARAM(Kp, e));
 	_EEPROMRead(&EEPROMconfig->kI,PID_PARAM(Ki, e));
 	PID_PARAM(Ki,e) = scalePID_i(PID_PARAM(Ki, e));
 	_EEPROMRead(&EEPROMconfig->kD,PID_PARAM(Kd, e));
 	PID_PARAM(Kd,e) = scalePID_d(PID_PARAM(Kd, e));
+#endif
 	_EEPROMRead(&EEPROMconfig->volumetric_enabled,volumetric_enabled);
 	for(int i=0;i<EXTRUDERS;i++)
 		_EEPROMRead(&EEPROMconfig->filament_size[i],filament_size[i]);

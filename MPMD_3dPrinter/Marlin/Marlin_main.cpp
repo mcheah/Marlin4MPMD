@@ -2611,7 +2611,7 @@ static void clean_up_after_endstop_or_probe_move() {
 
     static float probe_delta_height(float probe_offset, bool stow=true, int verbose=3) {
     	float z_at_pt;
-		SERIAL_PROTOCOLPGM("Probing Delta Height");
+    	SERIAL_PROTOCOLLNPGM("Probing Delta Height");
     	for(int i=0;i<2;i++) { //iterate up to 2 times in case the wrong steps per mm detected
 			set_delta_height(Z_HOME_POS); //set default home position
 			current_position[Z_AXIS] = 0; //set to 0 to ensure we get a safe homing
@@ -3159,7 +3159,9 @@ inline void gcode_G28() {
   #if ENABLED(DEBUG_LEVELING_FEATURE)
     if (DEBUGGING(LEVELING)) SERIAL_ECHOLNPGM(">>> gcode_G28");
   #endif
-
+  static bool safeHomeEN = true;
+  if(code_seen('S'))
+	  safeHomeEN = code_value_bool();
   // Wait for planner moves to finish!
   stepper.synchronize();
 
@@ -3473,7 +3475,7 @@ inline void gcode_G28() {
 
   #if ENABLED(DELTA)
     // move to a height where we can use the full xy-area
-    if(safeHome)
+    if(safeHome && safeHomeEN)
     	do_blocking_move_to_z(delta_clip_start_height-3);
   #endif
 
@@ -4227,7 +4229,9 @@ static inline float calc_grid_position(int i, AxisEnum axis)
 	  bool dryrun = code_seen('D');
 	  bool clear = code_seen('C');
 	  float adjFactor = code_seen('A') ? 1/code_value_float() : 1/0.85;
-	  const float probeAngles[3] = {RADIANS(210-120),RADIANS(330-120),RADIANS(90-120)};
+	  const float probeAngles[3] = {RADIANS(210-120 + delta_tower_angle_trim[A_AXIS]),
+			  	  	  	  	  	  	  RADIANS(330-120 + delta_tower_angle_trim[B_AXIS]),
+									  RADIANS(90-120 + delta_tower_angle_trim[C_AXIS]) };
 	  float xProbe[4] = {0,0,0,0};
 	  float yProbe[4] = {0,0,0,0};
 	  float measured_z[4];
@@ -4734,9 +4738,9 @@ inline void gcode_M31() {
 //    		  		  break;
 //    		  } //switch(M34_state)
     	  } //if MYSERIAL.available()>0
-    	  else {
+//    	  else {
     		  lcd_update();
-    	  }
+//    	  }
     	  if(M34_state==M34_M29 && millis()-last_rx > M34_TIMEOUT)
     		  M34_state = M34_IDLE;
 #ifndef STM32_USE_USB_CDC
@@ -4766,7 +4770,15 @@ inline void gcode_M31() {
     		  SD_idx = 0;
     	  }
       } //while(M34_state!= M34_RX)
+      uint32_t byteswritten = p_card->sdpos;
       p_card->closefile();
+      if(filesize>0 && byteswritten!=filesize) {
+          SERIAL_ERROR_START;
+          SERIAL_ERRORLNPGM(MSG_ERR_M34_FILESIZE);
+      }
+      SERIAL_PROTOCOLPAIR("Bytes Received ",byteswritten);
+	  SERIAL_PROTOCOLPAIR("/",filesize);
+      SERIAL_EOL;
       SERIAL_PROTOCOLLNPGM(MSG_FILE_SAVED);
 #if ENABLED(MALYAN_LCD)
       if(filesize>0) {
@@ -6669,7 +6681,11 @@ inline void gcode_M226() {
     else if (!seen_S) {
       // Report current state
       SERIAL_ECHO_START;
-      SERIAL_ECHOPAIR("Cold extrudes are ", (thermalManager.allow_cold_extrude ? "en" : "dis"));
+      SERIAL_ECHOPGM("Cold extrudes are ");
+      if(thermalManager.allow_cold_extrude)
+    	  SERIAL_ECHOPGM("en");
+      else
+    	  SERIAL_ECHOPGM("dis");
       SERIAL_ECHOPAIR("abled (min temp ", int(thermalManager.extrude_min_temp + 0.5));
       SERIAL_ECHOLNPGM("C)");
     }

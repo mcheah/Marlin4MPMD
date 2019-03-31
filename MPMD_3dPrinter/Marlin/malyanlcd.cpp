@@ -85,10 +85,11 @@ typedef enum {
 // in case we encounter some data we don't recognize
 // There is no evidence a line will ever be this long, but better safe than sorry
 #define MAX_CURLY_COMMAND (32 + LONG_FILENAME_LENGTH) * 2
+#define LCD_MAX_FILES 64
 
 // Track incoming command bytes from the LCD
 int inbound_count;
-
+static int listing_ind = 0;
 // For sending print completion messages
 MALYAN_PRINT_STATUS last_printing_status = MALYAN_IDLE;
 
@@ -348,20 +349,39 @@ void process_lcd_p_command(const char* command) {
         // Find the name of the file to print.
         // It's needed to echo the PRINTFILE option.
         // The {S:L} command should've ensured the SD card was mounted.
-        card.getfilename(atoi(command));
-
-        // There may be a difference in how V1 and V2 LCDs handle subdirectory
-        // prints. Investigate more. This matches the V1 motion controller actions
-        // but the V2 LCD switches to "print" mode on {SYS:DIR} response.
-        if (card.filenameIsDir) {
-		//TODO: traversing directories works, but selecting files within them.  Disabling folders for now
+    	int fileInd = atoi(command);
+    	if(fileInd==LCD_MAX_FILES-1) { //63 is a special case to continue listing the next page
+            char message_buffer[MAX_CURLY_COMMAND];
+            listing_ind += LCD_MAX_FILES-1;
+            uint16_t file_count = card.get_num_Files();
+            for (uint16_t i = listing_ind; i < MIN(file_count,listing_ind+LCD_MAX_FILES-1); i++) {
+              card.getfilename(i);
+              sprintf_P(message_buffer, card.filenameIsDir ? PSTR("{DIR:%.20s}") : PSTR("{FILE:%.20s}"), card.longFilename);
+              write_to_lcd(message_buffer);
+            }
+            if(file_count-(listing_ind)>=LCD_MAX_FILES) {
+            	sprintf_P(message_buffer, "{DIR:Next...}");
+                write_to_lcd(message_buffer);
+            }
+            write_to_lcd_P(PSTR("{SYS:OK}"));
+    	}
+    	else {
+			card.getfilename(listing_ind + fileInd);
+			// There may be a difference in how V1 and V2 LCDs handle subdirectory
+			// prints. Investigate more. This matches the V1 motion controller actions
+			// but the V2 LCD switches to "print" mode on {SYS:DIR} response.
+			if (card.filenameIsDir) {
+			//TODO: traversing directories works, but selecting files within them.  Disabling folders for now
 //          card.chdir(card.filename);
-          write_to_lcd_P(PSTR("{SYS:DIR}"));
-        }
-        else {
-          card.openAndPrintFile(card.longFilename);
-      	  MYSERIAL.write("//action:resumed\n");
-        }
+			  write_to_lcd_P(PSTR("{SYS:DIR}"));
+			}
+			else {
+				write_to_lcd_P(PSTR("{SYS:BUILD}"));
+			  card.openAndPrintFile(card.longFilename);
+			  MYSERIAL.write("//action:resumed\n");
+			}
+    	}
+
       #endif
     } break; // default
   } // switch
@@ -411,13 +431,17 @@ void process_lcd_s_command(const char* command) {
         // little reason not to do it this way.
     	// MalyanLCD crashes if you send more than 20 characters
         char message_buffer[MAX_CURLY_COMMAND];
+        listing_ind = 0;
         uint16_t file_count = card.get_num_Files();
-        for (uint16_t i = 0; i < file_count; i++) {
+        for (uint16_t i = listing_ind; i < MIN(file_count,listing_ind+LCD_MAX_FILES-1); i++) {
           card.getfilename(i);
           sprintf_P(message_buffer, card.filenameIsDir ? PSTR("{DIR:%.20s}") : PSTR("{FILE:%.20s}"), card.longFilename);
           write_to_lcd(message_buffer);
         }
-
+        if(file_count-(listing_ind)>=LCD_MAX_FILES) {
+        	sprintf_P(message_buffer, "{DIR:Next...}");
+            write_to_lcd(message_buffer);
+        }
         write_to_lcd_P(PSTR("{SYS:OK}"));
       #endif
     } break;
@@ -560,7 +584,7 @@ void lcd_init() {
   write_to_lcd_P(PSTR("{SYS:STARTED}\r\n"));
 
   // send a version that says "unsupported"
-  write_to_lcd_P(PSTR("{VER:130}\r\n"));
+  write_to_lcd_P(PSTR("{VER:133}\r\n"));
   HAL_Delay(2000); //Leave version on the screen
   // No idea why it does this twice.
   write_to_lcd_P(PSTR("{SYS:STARTED}\r\n"));

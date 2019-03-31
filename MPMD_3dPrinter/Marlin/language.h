@@ -149,6 +149,7 @@
 #define MSG_ERR_MESH_XY                     "Mesh XY or IJ cannot be resolved"
 #define MSG_ERR_M428_TOO_FAR                "Too far from reference point"
 #define MSG_ERR_M303_DISABLED               "PIDTEMP disabled"
+#define MSG_ERR_M34_FILESIZE                "File size does not match"
 #define MSG_M119_REPORT                     "Reporting endstop status"
 #define MSG_ENDSTOP_HIT                     "TRIGGERED"
 #define MSG_ENDSTOP_OPEN                    "open"

@@ -1,3 +1,9 @@
+# Updates for the 1.3.3 Release Candidate
+- M20 now lists folders correctly and hides hidden folders
+- Changed dropsegments to 0 to allow for very small microstepping movements
+- Added a "Next" entry to LCD file listing to allow selecting more than 64 files, folders are still not supported
+- Fixed a bug where G33 would not work if towers were rotated in software
+- Added a check for fast file upload with M34.  Stay tuned for a standalone app supporting this command, transfer speeds > 20x over USB are possible...
 # Updates for the 1.3.2 Release Candidate
 - Fixed progress bar not updating during SD prints
 - Fixed issues listing files on the LCD with filenames longer than 20 characters

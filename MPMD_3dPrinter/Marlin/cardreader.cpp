@@ -162,8 +162,7 @@ void CardReader::lsDive(const char *prepend, DIR *parent, const char * const mat
       DIR subDir;
       char path[MAXPATHNAMELENGTH];
       char lfilename[FILENAME_LENGTH];
-      createFilename(lfilename,&entry);
-      
+      strcpy(lfilename,entry.altname);
       path[0]=0;
       if(strlen(prepend)==0) //avoid leading / if already in prepend
       {
@@ -181,15 +180,14 @@ void CardReader::lsDive(const char *prepend, DIR *parent, const char * const mat
           SERIAL_ECHOLN(path);
         }
       }
-      else
+	  //Do not include hidden folders in the listing
+      else if(entry.fname[0]!='.' && (entry.fattrib & (AM_HID | AM_SYS)) == 0)
       {
         strcat(path,"/");
         lsDive(path,&subDir);  
         //close done automatically by destructor of SdFile
       }
     }
-
-
     else
     {
       char fn0 = entry.fname[0];
