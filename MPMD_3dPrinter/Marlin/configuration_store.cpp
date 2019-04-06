@@ -1429,7 +1429,8 @@ void Config_PrintSettings(bool forReplay) {
     SERIAL_EOL;
     CONFIG_ECHO_START;
     if (!forReplay) {
-      SERIAL_ECHOLNPGM("Delta settings: L=diagonal_rod, R=radius, S=segments_per_second, ABC=diagonal_rod_trim_tower_[123]");
+      SERIAL_ECHOLNPGM("Delta settings: L=diagonal_rod, R=radius, S=segments_per_second, ABC=diagonal_rod_trim_tower[123]");
+      SERIAL_ECHOLNPGM("                DEF=diagonal_rad_trim_tower[123],XYZ=delta_tower_angle_trim[123]");
       CONFIG_ECHO_START;
     }
     SERIAL_ECHOPAIR("  M665 L", delta_diagonal_rod);
