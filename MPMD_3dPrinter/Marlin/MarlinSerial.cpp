@@ -126,7 +126,13 @@ void MarlinSerial::begin(long baud) {
 	}
 }
 
-void MarlinSerial::end() {}
+void MarlinSerial::end() {
+	if(type==USB_CDC)
+	{
+		BSP_CdcIfStop();
+		BSP_CdcHwDeInit();
+	}
+}
 
 #if 0  // BDI
 void MarlinSerial::checkRx(void) {
@@ -160,7 +166,10 @@ uint8_t MarlinSerial::available(void) {
 }
 #endif  // BDI
 
-void MarlinSerial::flush(void) {}
+void MarlinSerial::flush(void) {
+	while(available())
+		read();
+}
 
 #if TX_BUFFER_SIZE > 0
   uint8_t MarlinSerial::availableForWrite(void) {

@@ -48,7 +48,7 @@
 
 #include "MarlinConfig.h"
 #if ENABLED(MALYAN_LCD)
-
+#include "ultralcd.h"
 #include "temperature.h"
 #include "planner.h"
 #include "stepper.h"
@@ -85,10 +85,11 @@ typedef enum {
 // in case we encounter some data we don't recognize
 // There is no evidence a line will ever be this long, but better safe than sorry
 #define MAX_CURLY_COMMAND (32 + LONG_FILENAME_LENGTH) * 2
+#define LCD_MAX_FILES 64
 
 // Track incoming command bytes from the LCD
 int inbound_count;
-
+static int listing_ind = 0;
 // For sending print completion messages
 MALYAN_PRINT_STATUS last_printing_status = MALYAN_IDLE;
 
@@ -188,8 +189,8 @@ void process_lcd_eb_command(const char* command) {
       sprintf_P(message_buffer,
     		  PSTR("{TT:%02u%02u%02u}"),
 			  uint16_t(elapsed.hour()),
-			  uint16_t(elapsed.minute()) % 60UL,
-			  elapsed.second() % 60UL);
+			  uint16_t(elapsed.minute()) % 60,
+			  uint16_t(elapsed.second()) % 60);
       write_to_lcd(message_buffer);
     } break;
 
@@ -211,9 +212,16 @@ void process_lcd_eb_command(const char* command) {
  * X, Y, Z, A (extruder)
  */
 void process_lcd_j_command(const char* command) {
-  static bool steppers_enabled = false;
+//  static bool steppers_enabled = false;
+  bool isRelative = relative_mode;
   char axis = command[0];
-
+#if ENABLED(SDSUPPORT)
+  if(!card.sdprinting && !card.saving && last_printing_status!=MALYAN_PRINTING && progress<=0)
+#else
+  if(last_printing_status!=MALYAN_PRINTING && progress<=0)
+#endif
+  {
+  enqueue_and_echo_command_now("G91");
   switch (axis) {
     case 'E':
       // enable or disable steppers
@@ -222,13 +230,12 @@ void process_lcd_j_command(const char* command) {
 //		Since there is no method for moving the XYZ axes manually by LCD (at least for M300), this
 //    	functionality seems dangerous to leave in, as the next commands issued will think it's relative
 //    	and dive into the bed
-//    	enqueue_and_echo_command_now("G91");
 //    	enqueue_and_echo_command_now(steppers_enabled ? "M18" : "M17");
 //      steppers_enabled = !steppers_enabled;
       break;
     case 'A':
       axis = 'E';
-      // fallthru
+      // no break
     case 'Y':
     case 'Z':
     case 'X': {
@@ -242,6 +249,9 @@ void process_lcd_j_command(const char* command) {
       SERIAL_ECHOPAIR("UNKNOWN J COMMAND", command);
       SERIAL_EOL;
       return;
+  }
+  if(!isRelative)
+	  enqueue_and_echo_command_now("G90"); //Set back to absolute positioning afterwards
   }
 }
 
@@ -280,12 +290,14 @@ void process_lcd_j_command(const char* command) {
 void process_lcd_p_command(const char* command) {
 
   switch (command[0]) {
-    case 'X':
+    case 'X': {
       #if ENABLED(SDSUPPORT)
+    	bool sdprint = card.sdprinting;
         // cancel print
         write_to_lcd_P(PSTR("{SYS:CANCELING}"));
         last_printing_status = MALYAN_IDLE;
-        card.pauseSDPrint();
+        if(sdprint)
+        	card.stopSDPrint();
         clear_command_queue();
         quickstop_stepper();
         print_job_timer.stop();
@@ -295,8 +307,10 @@ void process_lcd_p_command(const char* command) {
         #endif
         wait_for_heatup = false;
         write_to_lcd_P(PSTR("{SYS:STARTED}"));
-      #endif
-      break;
+      #endif //ENABLED(SDSUPPORT)
+		//Send command to octoprint to cancel print
+        MYSERIAL.write("//action:cancel\n");
+      break; }
     case 'H':
       // Home all axis
     	enqueue_and_echo_command_now("G28");
@@ -308,6 +322,8 @@ void process_lcd_p_command(const char* command) {
     	write_to_lcd(PSTR(MSG_PAUSE));
     	card.pauseSDPrint();
     	write_to_lcd(PSTR(MSG_PAUSED));
+		//Send command to octoprint to pause print
+    	MYSERIAL.write("//action:paused\n");
 #endif
     	break;
     case 'R':
@@ -317,6 +333,8 @@ void process_lcd_p_command(const char* command) {
     	write_to_lcd(PSTR(MSG_RESUME));
     	card.startFileprint();
     	write_to_lcd(PSTR(MSG_RESUMED));
+		//Send command to octoprint to resume print
+    	MYSERIAL.write("//action:resumed\n");
 #endif
     	break;
     default: {
@@ -328,19 +346,40 @@ void process_lcd_p_command(const char* command) {
         // Find the name of the file to print.
         // It's needed to echo the PRINTFILE option.
         // The {S:L} command should've ensured the SD card was mounted.
-        card.getfilename(atoi(command));
-
-        // There may be a difference in how V1 and V2 LCDs handle subdirectory
-        // prints. Investigate more. This matches the V1 motion controller actions
-        // but the V2 LCD switches to "print" mode on {SYS:DIR} response.
-        if (card.filenameIsDir) {
-		//TODO: traversing directories works, but selecting files within them.  Disabling folders for now
+    	int fileInd = atoi(command);
+    	if(fileInd==LCD_MAX_FILES-1) { //63 is a special case to continue listing the next page
+            char message_buffer[MAX_CURLY_COMMAND];
+            listing_ind += LCD_MAX_FILES-1;
+            uint16_t file_count = card.get_num_Files();
+            for (uint16_t i = listing_ind; i < MIN(file_count,listing_ind+LCD_MAX_FILES-1); i++) {
+              card.getfilename(i);
+              sprintf_P(message_buffer, card.filenameIsDir ? PSTR("{DIR:%.20s}") : PSTR("{FILE:%.20s}"), card.longFilename);
+              write_to_lcd(message_buffer);
+            }
+            if(file_count-(listing_ind)>=LCD_MAX_FILES) {
+            	sprintf_P(message_buffer, "{DIR:Next...}");
+                write_to_lcd(message_buffer);
+            }
+            write_to_lcd_P(PSTR("{SYS:OK}"));
+    	}
+    	else {
+			card.getfilename(listing_ind + fileInd);
+			// There may be a difference in how V1 and V2 LCDs handle subdirectory
+			// prints. Investigate more. This matches the V1 motion controller actions
+			// but the V2 LCD switches to "print" mode on {SYS:DIR} response.
+			if (card.filenameIsDir) {
+			//TODO: traversing directories works, but selecting files within them.  Disabling folders for now
 //          card.chdir(card.filename);
-          write_to_lcd_P(PSTR("{SYS:DIR}"));
-        }
-        else {
-          card.openAndPrintFile(card.filename);
-        }
+			  write_to_lcd_P(PSTR("{SYS:DIR}"));
+			}
+			else {
+				write_to_lcd_P(PSTR("{SYS:BUILD}"));
+			  card.openAndPrintFile(card.longFilename);
+			  //Let octoprint knwo we're starting a print
+			  MYSERIAL.write("//action:resumed\n");
+			}
+    	}
+
       #endif
     } break; // default
   } // switch
@@ -382,22 +421,25 @@ void process_lcd_s_command(const char* command) {
 
     case 'L': {
       #if ENABLED(SDSUPPORT)
-        if (!card.cardOK) card.initsd();
-
         // A more efficient way to do this would be to
         // implement a callback in the ls_SerialPrint code, but
         // that requires changes to the core cardreader class that
         // would not benefit the majority of users. Since one can't
         // select a file for printing during a print, there's
         // little reason not to do it this way.
+    	// MalyanLCD crashes if you send more than 20 characters
         char message_buffer[MAX_CURLY_COMMAND];
+        listing_ind = 0;
         uint16_t file_count = card.get_num_Files();
-        for (uint16_t i = 0; i < file_count; i++) {
+        for (uint16_t i = listing_ind; i < MIN(file_count,listing_ind+LCD_MAX_FILES-1); i++) {
           card.getfilename(i);
-          sprintf_P(message_buffer, card.filenameIsDir ? PSTR("{DIR:%s}") : PSTR("{FILE:%s}"), card.filename);
+          sprintf_P(message_buffer, card.filenameIsDir ? PSTR("{DIR:%.20s}") : PSTR("{FILE:%.20s}"), card.longFilename);
           write_to_lcd(message_buffer);
         }
-
+        if(file_count-(listing_ind)>=LCD_MAX_FILES) {
+        	sprintf_P(message_buffer, "{DIR:Next...}");
+            write_to_lcd(message_buffer);
+        }
         write_to_lcd_P(PSTR("{SYS:OK}"));
       #endif
     } break;
@@ -502,7 +544,7 @@ void lcd_update() {
     // The UI needs to see at least one TQ which is not 100%
     // and then when the print is complete, one which is.
   if(card.updateLCD) {
-    if (card.sdprinting) {
+    if (card.sdprinting || card.saving) {
         if (card.percentDone() != progress) {
         char message_buffer[10];
         progress = card.percentDone();
@@ -540,8 +582,8 @@ void lcd_init() {
   write_to_lcd_P(PSTR("{SYS:STARTED}\r\n"));
 
   // send a version that says "unsupported"
-  write_to_lcd_P(PSTR("{VER:99}\r\n"));
-
+  write_to_lcd_P(PSTR("{VER:133}\r\n"));
+  HAL_Delay(2000); //Leave version on the screen
   // No idea why it does this twice.
   write_to_lcd_P(PSTR("{SYS:STARTED}\r\n"));
   update_usb_status(true);
@@ -558,13 +600,25 @@ void lcd_setalertstatusPGM(const char* message) {
 /**
  * Send an arbitrary message
  */
-void lcd_setstatus(const char* message, bool persist) {
+void lcd_setstatus(const char* message, const bool persist) {
 	write_to_lcd(message);
 }
 void lcd_setstatuspgm(const char* message, uint8_t level) {
 	write_to_lcd_P(message);
 }
-
+void lcd_setpercent(uint8_t percent) {
+	  progress = percent;
+	  char message_buffer[10];
+      sprintf_P(message_buffer, PSTR("{TQ:%03i}"), (int)progress);
+      lcd_setstatus(message_buffer);
+	  if(percent==0)
+		lcd_setstatuspgm(PSTR(MSG_BUILD));
+	  else if(percent>=100)
+	  {
+		lcd_setstatuspgm(PSTR(MSG_COMPLETE));
+		progress = 0;
+	  }
+}
 
 
 #endif // MALYAN_LCD

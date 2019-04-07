@@ -50,6 +50,7 @@
 
 #include "stm32f0xx_3dprinter_adc.h"
 #include "motorcontrol.h"
+#include "stm32f0xx_3dprinter_motor.h"
 #include "ff.h" /* for FATS and FIL*/
 #include "arm_math.h"
 // -STM32

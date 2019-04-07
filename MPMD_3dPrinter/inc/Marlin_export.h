@@ -67,20 +67,24 @@ typedef uint8_t  byte;
 #define _delay_ms(x)      HAL_Delay(x)   
 #define delay(x)      HAL_Delay(x)   
 #define millis(x)         HAL_GetTick(x)
-#define WRITE(x,y) HAL_GPIO_WritePin(gArrayGpioPort[x],gArrayGpioPin[x],(GPIO_PinState)y)
+#define TOGGLE(x) HAL_GPIO_TogglePin(gArrayGpioPort[x],gArrayGpioPin[x])
+#define WRITE(x,y) HAL_GPIO_WritePin(gArrayGpioPort[x],gArrayGpioPin[x],(y)!=0 ? GPIO_PIN_SET : GPIO_PIN_RESET)
 #define READ(x) HAL_GPIO_ReadPin(gArrayGpioPort[x],gArrayGpioPin[x])
 #define INPUT   (0)
 #define OUTPUT  (1)
 #define pinMode(x,y)    {}    //not handled 
 #define OUT_WRITE(IO, v) { SET_OUTPUT(IO); WRITE(IO, v); }
-
+#define PGM_P const char *
 #define digitalWrite(x,y) ((x) > (-1))?(HAL_GPIO_WritePin(gArrayGpioPort[x],gArrayGpioPin[x],(GPIO_PinState)y)):(HAL_GPIO_WritePin(0,0,(GPIO_PinState)y))//will generate an assert
 #define digitalRead(x)   ((x) > (-1))?(HAL_GPIO_ReadPin(gArrayGpioPort[x], gArrayGpioPin[x])):0
 #define constrain(x, a, b)  ((x) < (a))?(a):(((x) > (b))? (b) : (x))
 #define SET_OUTPUT(x)
 #define SET_INPUT(x)
 #define PROGMEM
+#define pgm_read_byte *
 #define MCUSR 0
+#define strncpy_P strncpy
+#define strcat_P strcat
 #define strcpy_P strcpy
 #define strstr_P strstr
 #define sprintf_P sprintf
@@ -94,31 +98,16 @@ typedef uint8_t  byte;
 #define cli()       __disable_irq()
 #define sei()       __enable_irq()
 
-#define F_CPU()	HAL_RCC_GetSysClockFreq()
+#define F_CPU()	CORE_CPU_FREQ
 
 #define map(x,in_min,in_max,out_min,out_max) ((long)(((long)(x) - (long)(in_min)) * ((long)(out_max) - (long)(out_min)) / ((long)(in_max) - (long)(in_min)) + (long)(out_min)))
 
 #define clockCyclesPerMicrosecond() ( F_CPU() / 1000000L )
 
+#define _GPIO_PIN_STATE(x) ((x)!=0 ? GPIO_PIN_SET : GPIO_PIN_RESET)
+
 #ifdef __cplusplus
 }
 #endif
 
-// __INLINE void IsrStepperHandler(void) {
-//
-// }
-// __INLINE void IsrTemperatureHandler(void) {
-//
-// }
-// __INLINE void TimerStService(void) {
-//
-// }
-// __INLINE void setup() {
-//
-// }
-//
-// __INLINE void loop() {
-//
-// }
-
-#endif
+#endif //MARLIN_EXPORT_H

@@ -43,6 +43,7 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f0xx_hal_def.h"
+#include "stm32f0xx_hal.h"
 
 /** @addtogroup STM32F0xx_HAL_Driver
   * @{
@@ -642,9 +643,77 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef *hspi);
   */
 /* I/O operation functions  ***************************************************/
 HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size, uint32_t Timeout);
+HAL_StatusTypeDef HAL_SPI_Transmit_Fast(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size, uint32_t Timeout);
+HAL_StatusTypeDef HAL_SPI_Transmit_Byte(SPI_HandleTypeDef *hspi, uint8_t Data, uint32_t Timeout);
 HAL_StatusTypeDef HAL_SPI_Receive(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size, uint32_t Timeout);
+HAL_StatusTypeDef HAL_SPI_Receive_Fast(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size, uint32_t Timeout);
+HAL_StatusTypeDef HAL_SPI_Receive_Fast2(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size, uint32_t Timeout);
 HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxData, uint8_t *pRxData, uint16_t Size,
                                           uint32_t Timeout);
+HAL_StatusTypeDef HAL_SPI_TransmitReceive_Fast(SPI_HandleTypeDef *hspi, uint8_t *pTxData, uint8_t *pRxData, uint16_t Size,
+                                          uint32_t Timeout);
+HAL_StatusTypeDef HAL_SPI_TransmitReceive_Byte(SPI_HandleTypeDef *hspi, uint8_t TxData, uint8_t *pRxData,
+                                          uint32_t Timeout);
+ /**
+ * @brief  Transmit and Receive an amount of data in blocking mode.
+ * @param  hspi pointer to a SPI_HandleTypeDef structure that contains
+ *               the configuration information for SPI module.
+ * @param  pTxData pointer to transmission data buffer
+ * @param  pRxData pointer to reception data buffer
+ * @param  Size amount of data to be sent and received
+ * @param  Timeout Timeout duration
+ * @retval HAL status
+ */
+
+HAL_StatusTypeDef SPI_EndRxTxTransaction(SPI_HandleTypeDef *hspi, uint32_t Timeout, uint32_t Tickstart);
+
+static __INLINE HAL_StatusTypeDef HAL_SPI_Transmit_Dummy(SPI_HandleTypeDef *hspi,
+                                         uint32_t Timeout)
+{
+	extern __IO uint32_t uwTick;
+	const uint8_t SD_DUMMY_BYTE = 0xFF;
+ 	 HAL_StatusTypeDef errorcode = HAL_OK;
+ 	 /* Set the Rx Fifo threshold */
+ 	 SET_BIT(hspi->Instance->CR2, SPI_RXFIFO_THRESHOLD);
+     *(__IO uint8_t *)&hspi->Instance->DR = SD_DUMMY_BYTE;
+	 /* Check the end of the transaction */
+//	 uint32_t timeout = HAL_GetTick();
+     uint32_t timeout = uwTick;
+	 SPI_EndRxTxTransaction(hspi, Timeout, timeout);
+	 return errorcode;
+};
+
+/**
+  * @brief  Transmit and Receive an amount of data in blocking mode.
+  * @param  hspi pointer to a SPI_HandleTypeDef structure that contains
+  *               the configuration information for SPI module.
+  * @param  pTxData pointer to transmission data buffer
+  * @param  pRxData pointer to reception data buffer
+  * @param  Size amount of data to be sent and received
+  * @param  Timeout Timeout duration
+  * @retval HAL status
+  */
+static __INLINE HAL_StatusTypeDef HAL_SPI_TransmitReceive_Dummy(SPI_HandleTypeDef *hspi, uint8_t *pRxData,
+                                          uint32_t Timeout)
+{
+  extern __IO uint32_t uwTick;
+  const uint8_t SD_DUMMY_BYTE = 0xFF;
+  HAL_StatusTypeDef errorcode = HAL_OK;
+  /* Set the Rx Fifo threshold */
+  SET_BIT(hspi->Instance->CR2, SPI_RXFIFO_THRESHOLD);
+
+  /* Transmit and Receive data in 8 Bit mode */
+      /* Send 8-bit data */
+      *(__IO uint8_t *)&hspi->Instance->DR = SD_DUMMY_BYTE;
+      while(!__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_RXNE)) { }
+      /* Wait until RXNE flag is reset */
+      (*(uint8_t *)pRxData) = *(__IO uint8_t *)&hspi->Instance->DR;
+  /* Check the end of the transaction */
+  uint32_t timeout = uwTick;
+  SPI_EndRxTxTransaction(hspi, Timeout, timeout);
+  return errorcode;
+}
+
 HAL_StatusTypeDef HAL_SPI_Transmit_IT(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size);
 HAL_StatusTypeDef HAL_SPI_Receive_IT(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size);
 HAL_StatusTypeDef HAL_SPI_TransmitReceive_IT(SPI_HandleTypeDef *hspi, uint8_t *pTxData, uint8_t *pRxData,

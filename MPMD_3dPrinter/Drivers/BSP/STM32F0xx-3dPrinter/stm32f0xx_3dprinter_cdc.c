@@ -52,22 +52,6 @@
 /* Private defines -----------------------------------------------------------*/
 /* Private constant ----------------------------------------------------------*/
 
-// #ifdef USE_XONXOFF
-// #define BSP_CDC_GET_NB_BYTES_IN_RX_BUFFER()  ((gBspUartData.pRxReadBuffer <= gBspUartData.pRxWriteBuffer)? \
-//                                     ( (unsigned int )(gBspUartData.pRxWriteBuffer - gBspUartData.pRxReadBuffer)): \
-//                                     ( (unsigned int )(gBspUartData.pRxWriteBuffer + UART_RX_BUFFER_SIZE - gBspUartData.pRxReadBuffer)))
-
-
-// #define BSP_CDC_GET_NB_BYTES_IN_TX_BUFFER()  ((gBspUartData.pTxReadBuffer <= gBspUartData.pTxWriteBuffer)? \
-//                                     ( (unsigned int )(gBspUartData.pTxWriteBuffer - gBspUartData.pTxReadBuffer)): \
-//                                     ( (unsigned int )(gBspUartData.pTxWriteBuffer + UART_TX_BUFFER_SIZE - gBspUartData.pTxReadBuffer)))
-
-
-// #define BSP_CDC_TX_THRESHOLD_XOFF  (UART_TX_BUFFER_SIZE / 50)
-// #define BSP_CDC_TX_THRESHOLD_XON   (UART_TX_BUFFER_SIZE / 100)
-// #define BSP_CDC_RX_THRESHOLD_XOFF  (UART_RX_BUFFER_SIZE / 2)
-// #define BSP_CDC_RX_THRESHOLD_XON   (UART_RX_BUFFER_SIZE / 3)
-// #endif
 
 /* Private functions ---------------------------------------------------------*/
 
@@ -78,9 +62,9 @@ volatile USBD_HandleTypeDef USBD_Device;
 volatile uint8_t gBspCdcTxBuffer[CDC_TX_BUFFER_SIZE]; // real size is double to easily handle memcpy and tx uart
 volatile uint8_t gBspCdcRxBuffer[CDC_RX_BUFFER_SIZE];
 
-volatile uint8_t *pRxBuffer = gBspCdcRxBuffer;
-volatile uint8_t *pRxWriteBuffer;
-volatile uint8_t *pRxReadBuffer;
+static volatile uint8_t *pRxBuffer = gBspCdcRxBuffer;
+static volatile uint8_t *pRxWriteBuffer;
+static volatile uint8_t *pRxReadBuffer;
 uint32_t debugNbRxFrames = 0;
 uint32_t debugNbTxFrames = 0;
 #ifdef USE_XONXOFF
@@ -107,6 +91,11 @@ void BSP_CdcHwInit(uint32_t newBaudRate)
   USBD_CDC_RegisterInterface(&USBD_Device, &USBD_CDC_fops);
 }
 
+void BSP_CdcHwDeInit()
+{
+	USBD_DeInit(&USBD_Device);
+}
+
 
 /******************************************************//**
  * @brief  Start the USB CDC interface
@@ -123,6 +112,17 @@ void BSP_CdcIfStart(void)
   debugNbRxFrames = 0;
 //Delay to allow connection before trying to send data
   HAL_Delay(10);
+}
+
+void BSP_CdcIfStop(void)
+{
+	  USBD_Stop(&USBD_Device);
+	  pRxWriteBuffer =  pRxBuffer;
+	  pRxReadBuffer =  pRxBuffer;
+	  debugNbTxFrames = 0;
+	  debugNbRxFrames = 0;
+	//Delay to allow connection before trying to send data
+	  HAL_Delay(10);
 }
 
 /******************************************************//**
@@ -155,7 +155,7 @@ void BSP_CdcIfSendQueuedData()
 		if((HAL_GetTick()-startTick)>timeout)
 			return;
 	}
-	BSP_LED_Off(LED_RED);
+	BSP_LED_Off(LED_GREEN);
 }
 
 /******************************************************//**
@@ -167,29 +167,36 @@ void BSP_CdcIfSendQueuedData()
  * @param[in] *Len pointer containing the number of received bytes
  * @retval None
  **********************************************************/
+uint8_t rxInProgress = 0;
 void BSP_CDC_RxCpltCallback(uint8_t* Buf, uint32_t *Len)
 {
-	//Copy character by character to avoid wraparound issues
-	for(uint32_t i=0;i<*Len;i++)
+	rxInProgress = 0;
+	uint32_t startnB = BSP_CdcGetNbRxAvailableBytes(0);
+	BSP_LED_On(LED_GREEN);
+	uint8_t *writePtr = (uint8_t *)(Buf);
+	uint32_t bytesToCopy = MIN(*Len,CDC_RX_BUFFER_SIZE);
+	uint32_t firstBytesToCopy = MIN(bytesToCopy,
+	&pRxBuffer[CDC_RX_BUFFER_SIZE]-pRxWriteBuffer);
+	uint32_t secondBytesToCopy = bytesToCopy - firstBytesToCopy;
+	memcpy(pRxWriteBuffer,
+			writePtr,
+			firstBytesToCopy);
+	pRxWriteBuffer += firstBytesToCopy;
+	if(pRxWriteBuffer==&pRxBuffer[CDC_RX_BUFFER_SIZE])
 	{
-		//Check next byte location first
-		uint32_t *j = pRxWriteBuffer + 1;
-	    if (j >= (pRxBuffer + CDC_RX_BUFFER_SIZE)) {
-	      j = pRxBuffer;
-	    }		//Wrap back to 0
-	    if(j!=pRxReadBuffer) //Buffer is not full
-	    {
-			*pRxWriteBuffer = Buf[i];
-			pRxWriteBuffer = j;
-	    	BSP_LED_Off(LED_BLUE);
-	    }
-	    else
-	    {
-	    	BSP_LED_On(LED_BLUE);
-	    	//CDC_ERROR(7); //Buffer overrun is not fatal, parser will handle garbage data
-	    }
-	    debugNbRxFrames++;
+		if(secondBytesToCopy>0)
+			memcpy(pRxBuffer,
+				&writePtr[firstBytesToCopy],
+				secondBytesToCopy);
+		pRxWriteBuffer = &pRxBuffer[secondBytesToCopy];
 	}
+	BSP_LED_Off(LED_GREEN);
+//Wait until at least half the buffer is free before signaling to host we are available for reception.	Otherwise check in the timer ISR periodically
+if(CDC_RX_BUFFER_SIZE-BSP_CdcGetNbRxAvailableBytes(0)>CDC_RX_BUFFER_SIZE/2)
+		USBD_CDC_ReceivePacket(&USBD_Device);
+	//We've overflowed, throw an error
+	if(*Len>0 && BSP_CdcGetNbRxAvailableBytes(0)<=startnB)
+		CDC_ERROR(10);
 }
 
 /******************************************************//**
@@ -206,20 +213,14 @@ uint32_t BSP_CdcPrintf(const char* format,...)
   va_list args;
   uint32_t size;
   uint32_t retSize = 0;
-  char *writeBufferp = gBspCdcTxBuffer;
+  unsigned char *writeBufferp = gBspCdcTxBuffer;
   /* the string to transmit is copied in the temporary buffer in order to    */
   /* check its size.                                                         */
   va_start(args, format);
-  size=vsprintf(writeBufferp, (const char*)format, args);
+  size=vsprintf((char *)writeBufferp, (const char*)format, args);
   va_end(args);
    
   retSize = size;   
-  if (*(writeBufferp + size - 1) == '\n')
-  {
-    *(writeBufferp + size - 1) = '\r';
-    *(writeBufferp + size) = '\n';
-    size++;
-  }
   if (size != 0) {
     if ( size > CDC_TX_BUFFER_SIZE ) {
       CDC_ERROR(9);
@@ -235,7 +236,7 @@ uint32_t BSP_CdcPrintf(const char* format,...)
  * @param[in] fnone
   * @retval nxRxBytes nb received bytes
  **********************************************************/
-uint32_t BSP_CdcGetNbRxAvailableBytes(void)
+uint32_t BSP_CdcGetNbRxAvailableBytes(uint8_t waitForNewLine)
 {
   uint8_t *writePtr = (uint8_t *)(pRxWriteBuffer - 1);
   
@@ -245,7 +246,7 @@ uint32_t BSP_CdcGetNbRxAvailableBytes(void)
   }  
   
   //waitline feed to have a complete line before processing bytes
-  if ((*writePtr) != '\r' && (*writePtr) != '\n')
+  if (waitForNewLine && ((*writePtr) != '\r' && (*writePtr) != '\n'))
     return (0);
   
   int32_t nxRxBytes = pRxWriteBuffer - pRxReadBuffer;
@@ -253,6 +254,28 @@ uint32_t BSP_CdcGetNbRxAvailableBytes(void)
     nxRxBytes += CDC_RX_BUFFER_SIZE;
   }
   return ((uint32_t) nxRxBytes );
+}
+
+uint32_t BSP_CdcCopyNextRxBytes(uint8_t *buff, uint32_t maxlen)
+{
+	BSP_LED_On(LED_BLUE);
+	uint32_t bytesToCopy = MIN(maxlen,BSP_CdcGetNbRxAvailableBytes(0));
+	uint32_t firstBytesToCopy = MIN(bytesToCopy,
+											&pRxBuffer[CDC_RX_BUFFER_SIZE]-pRxReadBuffer);
+	uint32_t secondBytesToCopy = bytesToCopy - firstBytesToCopy;
+	memcpy(buff,
+			pRxReadBuffer,
+			firstBytesToCopy);
+	pRxReadBuffer += firstBytesToCopy;
+	if(pRxReadBuffer==&pRxBuffer[CDC_RX_BUFFER_SIZE])	{
+		if(secondBytesToCopy)
+			memcpy(&buff[firstBytesToCopy],
+				pRxBuffer,
+				secondBytesToCopy);
+		pRxReadBuffer = &pRxBuffer[secondBytesToCopy];
+	}
+	BSP_LED_Off(LED_BLUE);
+	return bytesToCopy;
 }
 
 /******************************************************//**

@@ -63,7 +63,11 @@ vector_3 vector_3::get_normal() {
   return normalized;
 }
 
-float vector_3::get_length() { return sqrt((x * x) + (y * y) + (z * z)); }
+float vector_3::get_length() {
+	float temp;
+	arm_sqrt_f32(((x * x) + (y * y) + (z * z)),&temp);
+	return temp;
+}
 
 void vector_3::normalize() {
   float length = get_length();

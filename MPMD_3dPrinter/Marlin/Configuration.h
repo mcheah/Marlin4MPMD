@@ -278,7 +278,6 @@
 // PID Tuning Guide here: http://reprap.org/wiki/PID_Tuning
 
 // Comment the following line to disable PID and enable bang-bang.
-//TODO: re-enable PID temp control
 #define PIDTEMP
 #define BANG_MAX 255 // limits current to nozzle while in bang-bang mode; 255=full current
 #define PID_MAX BANG_MAX // limits current to nozzle while PID is active (see PID_FUNCTIONAL_RANGE below); 255=full current
@@ -455,6 +454,7 @@
 
   // Print surface diameter/2 minus unreachable space (avoid collisions with vertical towers).
   #define DELTA_PRINTABLE_RADIUS 60.0
+  #define DELTA_PROBEABLE_RADIUS (DELTA_PRINTABLE_RADIUS - 5)
   // Delta calibration menu
   // uncomment to add three points calibration menu option.
   // See http://minow.blogspot.com/index.html#4918805519571907051
@@ -560,16 +560,16 @@
 //  (0,0)
 #define X_PROBE_OFFSET_FROM_EXTRUDER 0 // X offset: -left  +right  [of the nozzle]
 #define Y_PROBE_OFFSET_FROM_EXTRUDER 0 // Y offset: -front +behind [the nozzle]
-#define Z_PROBE_OFFSET_FROM_EXTRUDER -0.0 //  Z offset: -below +above  [the nozzle]
+#define Z_PROBE_OFFSET_FROM_EXTRUDER -0.6 //  Z offset: -below +above  [the nozzle]
 
 // X and Y axis travel speed (mm/m) between probes
 #define XY_PROBE_SPEED (30*60)
 // Speed for the first approach when double-probing (with PROBE_DOUBLE_TOUCH)
-#define Z_PROBE_SPEED_FAST HOMING_FEEDRATE_Z
+#define Z_PROBE_SPEED_FAST HOMING_FEEDRATE_Z/2
 // Speed for the "accurate" probe of each point
 #define Z_PROBE_SPEED_SLOW (Z_PROBE_SPEED_FAST / 2)
 // Use double touch for probing
-#define PROBE_DOUBLE_TOUCH
+//#define PROBE_DOUBLE_TOUCH
 
 //
 // Allen Key Probe is defined in the Delta example configurations.
@@ -620,13 +620,13 @@
 //#define DISABLE_Z_MIN_PROBE_ENDSTOP
 
 // Enable Z Probe Repeatability test to see how accurate your probe is
-#define Z_MIN_PROBE_REPEATABILITY_TEST
+//#define Z_MIN_PROBE_REPEATABILITY_TEST
 
 //
 // Probe Raise options provide clearance for the probe to deploy, stow, and travel.
 //
 #define Z_RAISE_PROBE_DEPLOY_STOW 15 // Raise to make room for the probe to deploy / stow
-#define Z_RAISE_BETWEEN_PROBINGS 15  // Raise between probing points.
+#define Z_RAISE_BETWEEN_PROBINGS 25  // Raise between probing points.
 
 //
 // For M851 give a range for adjusting the Z probe offset
@@ -740,10 +740,7 @@
 //===========================================================================
 
 // @section bedlevel
-//TODO: re-enable later
-#if DISABLED(MINIMAL_BUILD)
-#define AUTO_BED_LEVELING_FEATURE // Delete the comment to enable (remove // at the start of the line)
-#endif
+#define AUTO_BED_LEVELING_FEATURE
 // Enable this feature to get detailed logging of G28, G29, M48, etc.
 // Logging is off by default. Enable this logging feature with 'M111 S32'.
 // NOTE: Requires a huge amount of PROGMEM.
@@ -768,12 +765,10 @@
 
   #if ENABLED(AUTO_BED_LEVELING_GRID)
 
-	#define DELTA_PROBEABLE_RADIUS (DELTA_PRINTABLE_RADIUS - 15)
-	#define LEFT_PROBE_BED_POSITION -(DELTA_PROBEABLE_RADIUS)
-	#define RIGHT_PROBE_BED_POSITION DELTA_PROBEABLE_RADIUS
-	#define FRONT_PROBE_BED_POSITION -(DELTA_PROBEABLE_RADIUS)
-	#define BACK_PROBE_BED_POSITION DELTA_PROBEABLE_RADIUS
-
+	#define LEFT_PROBE_BED_POSITION -(DELTA_PROBEABLE_RADIUS-10)
+	#define RIGHT_PROBE_BED_POSITION (DELTA_PROBEABLE_RADIUS-10)
+	#define FRONT_PROBE_BED_POSITION -(DELTA_PROBEABLE_RADIUS-10)
+	#define BACK_PROBE_BED_POSITION (DELTA_PROBEABLE_RADIUS-10)
 	#define MIN_PROBE_EDGE 10 // The Z probe minimum square sides can be no smaller than this.
 
   // Non-linear bed leveling will be used.
@@ -845,7 +840,7 @@
 #ifndef DELTA
 #define HOMING_FEEDRATE_XY (50*60)
 #endif
-  #define HOMING_FEEDRATE_Z  (50*60)
+#define HOMING_FEEDRATE_Z  (50*60)
 
 //
 // MOVEMENT SETTINGS
@@ -855,7 +850,15 @@
 // default settings
 //TODO: adjust these settings
 #define MOTOR_STEPS_PER_REVOLUTION	  200.0//(360/1.8)
+#if ENABLED(STEPPERS_128X)
+#define MOTOR_MICROSTEPS_COUNT		  128.0
+#elif ENABLED(STEPPERS_32X)
+#define MOTOR_MICROSTEPS_COUNT		  32.0
+#elif ENABLED(STEPPERS_16X)
+#define MOTOR_MICROSTEPS_COUNT		  16.0
+#else
 #define MOTOR_MICROSTEPS_COUNT		  8.0
+#endif
 #define MOTOR_PULLEY_TEETH_COUNT	  14.0
 #define MOTOR_BELT_PITCH_MM			  2.0
 #define MOTOR_DEFAULT_STEPS_PER_UNIT  (MOTOR_STEPS_PER_REVOLUTION * MOTOR_MICROSTEPS_COUNT / MOTOR_PULLEY_TEETH_COUNT / MOTOR_BELT_PITCH_MM)
@@ -1097,14 +1100,14 @@
 // SD Card support is disabled by default. If your controller has an SD slot,
 // you must uncomment the following option or it won't work.
 //
-#if DISABLED(MINIMAL_BUILD)
+#define FLASH_SETTINGS
 #define SDSUPPORT
-#endif
-#if ENABLED(SDSUPPORT)
+#if ENABLED(SDSUPPORT) && DISABLED(FLASH_SETTINGS)
   #define SD_SETTINGS
   #define CONFIG_FILE_NAME "m_cfg.g"
   #define UPPER_CONFIG_FILE_NAME "M_CFG.G"
 #endif
+//#define SDLOGGING
 //
 // SD CARD: SPI SPEED
 //

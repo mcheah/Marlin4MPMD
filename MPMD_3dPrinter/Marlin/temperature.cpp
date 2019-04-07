@@ -769,7 +769,13 @@ void Temperature::manage_heater() {
   #if TEMP_SENSOR_BED != 0
 
     #if HAS_THERMALLY_PROTECTED_BED
-      thermal_runaway_protection(&thermal_runaway_bed_state_machine, &thermal_runaway_bed_timer, current_temperature_bed, target_temperature_bed, -1, THERMAL_PROTECTION_BED_PERIOD, THERMAL_PROTECTION_BED_HYSTERESIS);
+      thermal_runaway_protection(&thermal_runaway_bed_state_machine,
+    		  	  	  	  	  	  &thermal_runaway_bed_timer,
+								  current_temperature_bed,
+								  target_temperature_bed,
+								  -1,
+								  THERMAL_PROTECTION_BED_PERIOD,
+								  THERMAL_PROTECTION_BED_HYSTERESIS);
     #endif
 
     #if ENABLED(PIDTEMPBED)
@@ -1239,7 +1245,14 @@ void Temperature::init() {
     switch (*state) {
       // Inactive state waits for a target temperature to be set
       case TRInactive: break;
-      // When first heating, wait for the temperature to be reached then go to Stable state
+      // Wait out timer before transitioning to FirstHeating state.  This gives time for temperature to drop below target temp
+      case TRFirstHeatingDelayed:
+    	  if(ELAPSED(millis(), *timer))
+    	  {
+    		  *state = TRFirstHeating;
+    	  }
+    	  break;
+          // When first heating, wait for the temperature to be reached then go to Stable state
       case TRFirstHeating:
         if (temperature < tr_target_temperature[heater_index]) break;
         *state = TRStable;

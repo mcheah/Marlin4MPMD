@@ -97,8 +97,18 @@ void HAL_PCD_MspInit(PCD_HandleTypeDef *hpcd)
   */
 void HAL_PCD_MspDeInit(PCD_HandleTypeDef *hpcd)
 {
+  GPIO_InitTypeDef  GPIO_InitStruct;
   /* Disable USB FS Clock */
   __HAL_RCC_USB_CLK_DISABLE();
+  /* Configure USB DM and DP pins.
+     This is optional, and maintained only for user guidance. */
+  GPIO_InitStruct.Pin = (GPIO_PIN_11 | GPIO_PIN_12);
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF2_USB;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_WritePin(GPIOA,(GPIO_PIN_11 | GPIO_PIN_12),GPIO_PIN_RESET);
 }
 
 /*******************************************************************************
@@ -176,7 +186,7 @@ void HAL_PCD_SuspendCallback(PCD_HandleTypeDef *hpcd)
   */
 void HAL_PCD_ResumeCallback(PCD_HandleTypeDef *hpcd)
 {
-	USBD_LL_Resume((USBD_CDC_HandleTypeDef*)hpcd->pData);
+	USBD_LL_Resume((USBD_HandleTypeDef*)hpcd->pData);
 }
 
 /**

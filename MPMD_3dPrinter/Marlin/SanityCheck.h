@@ -98,17 +98,17 @@
 /**
  * Babystepping
  */
-#if ENABLED(BABYSTEPPING)
-  #if DISABLED(ULTRA_LCD)
-    #error "BABYSTEPPING requires an LCD controller."
-  #endif
-  #if ENABLED(SCARA)
-    #error "BABYSTEPPING is not implemented for SCARA yet."
-  #endif
-  #if ENABLED(DELTA) && ENABLED(BABYSTEP_XY)
-    #error "BABYSTEPPING only implemented for Z axis on deltabots."
-  #endif
-#endif
+//#if ENABLED(BABYSTEPPING)
+//  #if DISABLED(ULTRA_LCD)
+//    #error "BABYSTEPPING requires an LCD controller."
+//  #endif
+//  #if ENABLED(SCARA)
+//    #error "BABYSTEPPING is not implemented for SCARA yet."
+//  #endif
+//  #if ENABLED(DELTA) && ENABLED(BABYSTEP_XY)
+//    #error "BABYSTEPPING only implemented for Z axis on deltabots."
+//  #endif
+//#endif
 
 /**
  * Filament Runout needs a pin and either SD Support or Auto print start detection
@@ -660,7 +660,9 @@
 #if DISABLED(STM32_USE_USB_CDC) && (ENABLED(MALYAN_LCD))
   #error "Cannot use UART and Malyan LCD at the same time"
 #endif
-
+#if ENABLED(SD_SETTINGS) && ENABLED(FLASH_SETTINGS)
+  #error "Cannot enable SD_SETTINGS and FLASH_SETTINGS at the same time"
+#endif
  /**
  * Warnings for old configurations
  */

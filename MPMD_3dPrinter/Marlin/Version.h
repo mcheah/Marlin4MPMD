@@ -25,7 +25,7 @@
  * overriden by the ones defined on _Version.h by using the Configuration.h
  * directive USE_AUTOMATIC_VERSIONING.
  */
-
+#include "Configuration_STM.h"
 #if ENABLED(USE_AUTOMATIC_VERSIONING)
 
   #include "_Version.h"
@@ -35,8 +35,11 @@
   /**
    * Marlin release version identifier
    */
-  #define SHORT_BUILD_VERSION "1.2.2-MPMD"
-
+  #define SHORT_BUILD_VERSION "1.3.3-MPMD"
+  #define MARLIN_MAJOR_FW_VERSION 1
+  #define MARLIN_MINOR_FW_VERSION 3
+  #define MARLIN_MAJOR_FW_SUBVERSION 3
+  #define MARLIN_MINOR_FW_SUBVERSION 0
   /**
    * Verbose version identifier which should contain a reference to the location
    * from where the binary was downloaded or the source code was compiled.
@@ -48,7 +51,7 @@
    * here we define this default string as the date where the latest release
    * version was tagged.
    */
-  #define STRING_DISTRIBUTION_DATE "2018-07-25 00:00"
+  #define STRING_DISTRIBUTION_DATE "2019-04-06 00:00"
 
   /**
    * Required minimum Configuration.h and Configuration_adv.h file versions.

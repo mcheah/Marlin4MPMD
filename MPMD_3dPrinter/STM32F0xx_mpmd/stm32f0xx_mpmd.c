@@ -39,7 +39,9 @@
 #ifdef STM32_MPMD
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f0xx_mpmd.h"
-
+#ifndef USE_FAST_SPI
+#include "string.h"
+#endif
 
 /** @defgroup BSP BSP
   * @{
@@ -113,8 +115,8 @@ const uint8_t BUTTON_IRQn[BUTTONn] = {USER_BUTTON_EXTI_IRQn};
 //
 //#ifdef ADAFRUIT_TFT_JOY_SD_ID802
 #ifdef HAL_SPI_MODULE_ENABLED
-uint32_t SpixTimeout = NUCLEO_SPIx_TIMEOUT_MAX; /*<! Value of Timeout when SPI communication fails */
-static SPI_HandleTypeDef hnucleo_Spi;
+const uint32_t SpixTimeout = NUCLEO_SPIx_TIMEOUT_MAX; /*<! Value of Timeout when SPI communication fails */
+SPI_HandleTypeDef hnucleo_Spi;
 #endif /* HAL_SPI_MODULE_ENABLED */
 
 //#ifdef HAL_ADC_MODULE_ENABLED
@@ -136,6 +138,7 @@ static SPI_HandleTypeDef hnucleo_Spi;
 #ifdef HAL_SPI_MODULE_ENABLED
 static void SPIx_Init(void);
 static void SPIx_Write(uint8_t Value);
+static uint8_t SPIx_WriteRead(uint8_t Value);
 static void SPIx_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLegnth);
 static void SPIx_FlushFifo(void);
 static void SPIx_Error(void);
@@ -145,7 +148,8 @@ static void SPIx_MspInit(SPI_HandleTypeDef *hspi);
 void SD_IO_Init(void);
 void SD_IO_CSState(uint8_t state);
 void SD_IO_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLength);
-uint8_t SD_IO_WriteByte(uint8_t Data);
+void SD_IO_WriteByte(uint8_t Data);
+uint8_t SD_IO_WriteReadByte(uint8_t Data);
 
 ///* LCD IO functions */
 //void LCD_IO_Init(void);
@@ -408,7 +412,11 @@ static void SPIx_Init(void)
 	      - For STM32F412ZG devices: 12,5 MHz maximum (PCLK2/SPI_BAUDRATEPRESCALER_8 = 100 MHz/8 = 12,5 MHz)
 		  - For STM32F446ZE/STM32F429ZI devices: 11,25 MHz maximum (PCLK2/SPI_BAUDRATEPRESCALER_8 = 90 MHz/8 = 11,25 MHz)
    */
+#ifdef USE_FAST_SPI_CLK
+    hnucleo_Spi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+#else
     hnucleo_Spi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
+#endif
    hnucleo_Spi.Init.Direction = SPI_DIRECTION_2LINES;
    hnucleo_Spi.Init.CLKPhase = SPI_PHASE_2EDGE;
    hnucleo_Spi.Init.CLKPolarity = SPI_POLARITY_HIGH;
@@ -423,6 +431,7 @@ static void SPIx_Init(void)
    SPIx_MspInit(&hnucleo_Spi);
 #ifndef SOFTWARE_SPI
    HAL_SPI_Init(&hnucleo_Spi);
+   __HAL_SPI_ENABLE(&hnucleo_Spi);
 #endif
  }
 }
@@ -473,6 +482,46 @@ BSP_LED_Toggle(LED3);
 //  sei();
   return rxdata;
 }
+/**
+ * @brief  SPI Write a byte to device
+ * @param  DataIn: value to be written
+ * @param  DataOut: value to read
+ * @param  DataLegnth: length of data
+ */
+static void SPIx_Write(uint8_t Value) {
+	 HAL_StatusTypeDef status = HAL_OK;
+#ifdef USE_FAST_SPI
+	 status = HAL_SPI_Transmit_Byte(&hnucleo_Spi,Value,SpixTimeout);
+#else
+	 status = HAL_SPI_Transmit(&hnucleo_Spi, &Value,1,SpixTimeout);
+	 if(status != HAL_OK)
+	 {
+	   /* Execute user timeout callback */
+	   SPIx_Error();
+	 }
+#endif
+}
+/**
+ * @brief  SPI Write a byte to device
+ * @param  DataIn: value to be written
+ * @param  DataOut: value to read
+ * @param  DataLegnth: length of data
+ */
+static uint8_t SPIx_WriteRead(uint8_t Value) {
+	 HAL_StatusTypeDef status = HAL_OK;
+	 uint8_t tmp;
+#ifdef USE_FAST_SPI
+	 status = HAL_SPI_TransmitReceive_Byte(&hnucleo_Spi,Value,&tmp,SpixTimeout);
+#else
+	 status = HAL_SPI_TransmitReceive(&hnucleo_Spi, &Value,&tmp,1,SpixTimeout);
+	 if(status != HAL_OK)
+	 {
+	   /* Execute user timeout callback */
+	   SPIx_Error();
+	 }
+#endif
+	 return tmp;
+}
 
 /**
  * @brief  SPI Write a byte to device
@@ -480,31 +529,72 @@ BSP_LED_Toggle(LED3);
  * @param  DataOut: value to read
  * @param  DataLegnth: length of data
  */
-static void SPIx_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLegnth)
+static void SPIx_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLength)
 {
  HAL_StatusTypeDef status = HAL_OK;
-#ifdef SOFTWARE_SPI
-  for(uint16_t i=0;i<DataLegnth;i++)
+
+#ifdef USE_FAST_SPI
+    status = HAL_SPI_TransmitReceive_Fast(&hnucleo_Spi, (uint8_t*) DataIn, DataOut, DataLength, SpixTimeout);
+#elif SOFTWARE_SPI
+  for(uint16_t i=0;i<DataLength;i++)
   {
 	  DataOut[i] = SWSPISendReceive(DataIn[i]);
   }
 #else
- status = HAL_SPI_TransmitReceive(&hnucleo_Spi, (uint8_t*) DataIn, DataOut, DataLegnth, SpixTimeout);
-#endif
+  status = HAL_SPI_TransmitReceive(&hnucleo_Spi, (uint8_t*) DataIn, DataOut, DataLength, SpixTimeout);
  /* Check the communication status */
- if(status != HAL_OK)
- {
-   /* Execute user timeout callback */
-   SPIx_Error();
- }
+  if(status != HAL_OK)
+  {
+    /* Execute user timeout callback */
+    SPIx_Error();
+  }
+#endif
 }
 
 /**
  * @brief  SPI Write a byte to device.
  * @param  Value: value to be written
  */
-// static void SPIx_Write(uint8_t Value)
-// {
+static void SPIx_WriteData(uint8_t *DataIn, uint16_t DataLength)
+{
+  HAL_StatusTypeDef status = HAL_OK;
+
+#ifdef USE_FAST_SPI
+	  status = HAL_SPI_Transmit_Fast(&hnucleo_Spi, DataIn, DataLength, SpixTimeout);
+#else
+  	  status = HAL_SPI_Transmit(&hnucleo_Spi, DataIn, DataLength, SpixTimeout);
+	  if(status != HAL_OK)
+	  {
+	      /* Execute user timeout callback */
+	      SPIx_Error();
+	  }
+#endif
+  /* Check the communication status */
+
+}
+
+static void SPIx_ReadData(uint8_t *DataOut, uint16_t DataLength) {
+	HAL_StatusTypeDef status = HAL_OK;
+#ifdef USE_FAST_SPI
+	status = HAL_SPI_Receive_Fast2(&hnucleo_Spi,DataOut,DataLength,SpixTimeout);
+#else
+	memset(DataOut,SD_DUMMY_BYTE,DataLength);
+	status = HAL_SPI_Receive(&hnucleo_Spi,DataOut,DataLength,SpixTimeout);
+	if(status != HAL_OK)
+	{
+	    /* Execute user timeout callback */
+	    SPIx_Error();
+	}
+#endif
+}
+
+///**
+//  * @brief  SPI Write a byte to device
+//  * @param  Value value to be written
+//  * @retval None
+//  */
+//static void SPIx_Write(uint8_t Value)
+//{
 //  HAL_StatusTypeDef status = HAL_OK;
 //  uint8_t data;
 //
@@ -518,6 +608,15 @@ static void SPIx_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t
 //  }
 // }
 
+/**
+  * @brief  SPIx_FlushFifo
+  * @retval None
+  */
+static void SPIx_FlushFifo(void)
+{
+
+  HAL_SPIEx_FlushRxFifo(&hnucleo_Spi);
+}
 /**
  * @brief  SPI error treatment function
  */
@@ -601,19 +700,77 @@ void SD_IO_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataL
  /* Send the byte */
  SPIx_WriteReadData(DataIn, DataOut, DataLength);
 }
-
-/**
- * @brief  Writes a byte on the SD.
- * @param  Data: byte to send.
- */
+#if 0
 uint8_t SD_IO_WriteByte(uint8_t Data)
 {
  uint8_t tmp;
+
  /* Send the byte */
  SPIx_WriteReadData(&Data,&tmp,1);
  return tmp;
 }
 
+/**
+  * @brief  Write a byte on the SD.
+  * @param  Data byte to send.
+  * @retval Data written
+  */
+uint8_t SD_IO_WriteReadByte(uint8_t Data)
+{
+//  uint8_t tmp;
+
+  /* Send the byte */
+	return SD_IO_WriteByte(Data);
+//  return SPIx_WriteData(&Data,&tmp,1);
+//  return tmp;
+}
+#else
+/**
+  * @brief  Write a byte on the SD.
+  * @param  Data byte to send.
+  * @retval Data written
+ */
+void SD_IO_WriteByte(uint8_t Data)
+{
+ /* Send the byte */
+ SPIx_Write(Data);
+}
+/**
+  * @brief  Write a byte on the SD.
+  * @param  Data byte to send.
+  * @retval Data written
+  */
+uint8_t SD_IO_WriteReadByte(uint8_t Data)
+{
+  /* Send the byte */
+	return SPIx_WriteRead(Data);
+}
+#endif
+/**
+  * @brief  Write an amount of data on the SD.
+  * @param  DataOut byte to send.
+  * @param  DataLength number of bytes to write
+  * @retval none
+  */
+void SD_IO_ReadData(uint8_t *DataOut, uint16_t DataLength)
+{
+  /* Send the byte */
+//  SD_IO_WriteReadData(DataOut, DataOut, DataLength);
+	SPIx_ReadData(DataOut,DataLength);
+}
+
+/**
+  * @brief  Write an amount of data on the SD.
+  * @param  Data byte to send.
+  * @param  DataLength number of bytes to write
+  * @retval none
+  */
+void SD_IO_WriteData(const uint8_t *Data, uint16_t DataLength)
+{
+  /* Send the byte */
+  SPIx_WriteData((uint8_t *)Data, DataLength);
+  SPIx_FlushFifo();
+}
 ///********************************* LINK LCD ***********************************/
 ///**
 //  * @brief  Initializes the LCD
@@ -928,6 +1085,107 @@ uint8_t SD_IO_WriteByte(uint8_t Data)
 //
 //#endif /* ADAFRUIT_TFT_JOY_SD_ID802 */
 
+///******************************* Flash driver ********************************/
+/**
+  * @brief  Unlocks Flash for write access
+  * @param  None
+  * @retval None
+  */
+void FLASH_If_Init(void)
+{
+  /* Unlock the Program memory */
+  HAL_FLASH_Unlock();
+
+  /* Clear all FLASH flags */
+  __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_EOP | FLASH_FLAG_PGERR | FLASH_FLAG_WRPERR);
+  /* Unlock the Program memory */
+  HAL_FLASH_Lock();
+}
+
+/**
+  * @brief  This function does an erase of all user flash area
+  * @param  start: start of user flash area
+  * @retval FLASHIF_OK : user flash area successfully erased
+  *         FLASHIF_ERASEKO : error occurred
+  */
+uint32_t FLASH_If_Erase(uint32_t start,uint32_t end)
+{
+  uint32_t NbrOfPages = 0;
+  uint32_t PageError = 0;
+  FLASH_EraseInitTypeDef pEraseInit;
+  HAL_StatusTypeDef status = HAL_OK;
+
+  /* Unlock the Flash to enable the flash control register access *************/
+  HAL_FLASH_Unlock();
+
+  /* Get the sector where start the user flash area */
+  NbrOfPages = (end - start)/FLASH_PAGE_SIZE;
+
+  pEraseInit.TypeErase = FLASH_TYPEERASE_PAGES;
+  pEraseInit.PageAddress = start;
+  pEraseInit.NbPages = NbrOfPages;
+  status = HAL_FLASHEx_Erase(&pEraseInit, &PageError);
+
+  /* Lock the Flash to disable the flash control register access (recommended
+     to protect the FLASH memory against possible unwanted operation) *********/
+  HAL_FLASH_Lock();
+
+  if (status != HAL_OK)
+  {
+    /* Error occurred while page erase */
+    return FLASHIF_ERASEKO;
+  }
+
+  return FLASHIF_OK;
+}
+
+/* Public functions ---------------------------------------------------------*/
+/**
+  * @brief  This function writes a data buffer in flash (data are 32-bit aligned).
+  * @note   After writing data buffer, the flash content is checked.
+  * @param  destination: start address for target location
+  * @param  p_source: pointer on buffer with data to write
+  * @param  length: length of data buffer (unit is 32-bit word)
+  * @retval uint32_t 0: Data successfully written to Flash memory
+  *         1: Error occurred while writing data in Flash memory
+  *         2: Written Data in flash memory is different from expected one
+  */
+uint32_t FLASH_If_Write(uint32_t destination, uint16_t *p_source, uint32_t length)
+{
+  uint32_t i = 0;
+
+  /* Unlock the Flash to enable the flash control register access *************/
+  HAL_FLASH_Unlock();
+
+  for (i = 0; (i < length) && (destination <= (FLASH_BANK1_END-1)); i++)
+  {
+    /* Device voltage range supposed to be [2.7V to 3.6V], the operation will
+       be done by word */
+	  //STM32F070 only supports HALFWORD programming
+    if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, destination, *(uint16_t*)(p_source+i)) == HAL_OK)
+    {
+     /* Check the written value */
+      if (*(uint16_t*)destination != *(uint16_t*)(p_source+i))
+      {
+        /* Flash content doesn't match SRAM content */
+        return(FLASHIF_WRITINGCTRL_ERROR);
+      }
+      /* Increment FLASH destination address */
+      destination += sizeof(uint16_t);
+    }
+    else
+    {
+      /* Error occurred while writing data in Flash memory */
+      return (FLASHIF_WRITING_ERROR);
+    }
+  }
+
+  /* Lock the Flash to disable the flash control register access (recommended
+     to protect the FLASH memory against possible unwanted operation) *********/
+  HAL_FLASH_Lock();
+
+  return (FLASHIF_OK);
+}
 
 /**
   * @}
@@ -944,5 +1202,5 @@ uint8_t SD_IO_WriteByte(uint8_t Data)
 /**
   * @}
   */ 
-#endif
+#endif //ifdef STM32_MPMD
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -9,6 +9,7 @@ USE AT YOUR OWN RISK! 3d printers have been known to fail and cause fires while 
 
 The stock power supply cannot power both heaters on at the same time, so a special firmware has been created to prevent this situation to allow use of the stock power supply.  If you have upgraded to a 10A power supply, use the "firmware_10ALimit.bin" file to allow faster heating and potentially a higher max bed temperature.  Otherwise, use the "firmware_5ALimit.bin" file, which should still heat the bed faster, but will still respect the 5A limit of the power supply
 ###  Changes from stock monoprice firmware
+See [[Migration Guide]] for more details
 - Mesh bed leveling ignores the P0-5 / C parameters that the stock firmware uses.  Instead, calling G29 will run a mesh leveling grid over a 7x7 area between -45 to 45mm on the X and Y axes in 15mm increments.  Points outside the probeable radius on the print bed will be extrapolated based on probed values.  This mesh grid is persistent, and saved/loaded by M500/M501.  
 
 **New 1.2.2**
@@ -70,7 +71,6 @@ Calibration settings from stock firmware should be directly applicable from the 
   
 ###  Current known Limitations:
 There are a number of stock features that have not been implemented.  They all should be possible, I just haven't bothered implementing them as this was more of a proof of concept than anything.
-- EEPROM support is implemented by saving to M_CFG.G on the SD card, this implies that the SD card is present when executing M500 or M501.  Since M501 effectively just executes a G-code script, this means that it cannot be executed inside of another g-code file.  Therefore you will need to trigger M501 on connection through octoprint or manually run it every time you power on.
 - Only one G29 calibration pattern of a 7x7 mesh is supported at the moment.  This version allows direct editing and saving of the mesh grid, but it's currently hard-coded to a 7x7 grid as it's likely that you will not actually want to run this before every print.  **fixed in 1.2.2. Call G29 P0 in your g-code**<s>As a result, it is not able to adjust for changes in delta height without re-running a full mesh calibration, so if you need to finetune the delta height, use the M665 H parameter.</s>
 - LCD GUI browsing of SD card folders isn't supported, all g-code must be stored in the root directory
 - SOME wifi functionality may be available given that you have already set up the IP address previously, but loading g-code or running arbitrary functions over WIFI are not supported.  If you're reading this, I'm going to guess that you're already using something like octoprint already
@@ -101,6 +101,39 @@ Debugging directly on the printer hardware requires access to the 4-pin SWD jump
 The MCU on this board has been locked down with the security read-out protection set to level 1, meaning that any attempt to re-flash any memory location or change the security bits results in a full erase of the flash memory.  Therefore care should be taken when going down the route of debugging directly on the actual printer.  I've included the original bootloader that I was able to extract so that you can restore the stock software without risking bricking your printer.  To enable debugging on the board with an ST-link debugger, you will need to start the STM32 ST-LINK utility and change the Read Out Protection level to 0.  This will trigger a full erase, but will allow you to debug the firmware directly.
 
 ###  Recent changes
+## Marlin4MPMD - v1.3.3 4/6/2018
+- M20 now lists folders correctly and hides hidden folders
+- Changed dropsegments to 0 to allow for very small microstepping movements
+- Added a "Next" entry to LCD file listing to allow selecting more than 64 files, folders are still not supported
+- Fixed a bug where G33 would not work if towers were rotated in software
+- Added a check for fast file upload with M34.  Stay tuned for a standalone app supporting this command, transfer speeds > 20x over USB are possible...
+- Added G28 S0 option to disable safe homing drop after homing
+- Added support for binary-packed '.bgc' gcode files for faster file upload
+- Added tweaks and fixes for LCD display including sending cancel/pause/resume commands to octoprint
+# Updates for the 1.3.2 Release Candidate
+- Fixed progress bar not updating during SD prints
+- Fixed issues listing files on the LCD with filenames longer than 20 characters
+- Fixed longstanding bug where `M421 E` would erroneously corrupt points in the bed level matrix == 0.0
+- Inverted G33 D flag to represent "dryrun" when enabled
+- Added ability to change the mesh grid spacing by issuing `M421 X<spacing> Y<spacing>`.  Default is 15mm
+# Updates for the 1.3.1 Release Candidate
+- I reverted the changes that doubled the feedrates.  This was a bug related to the Lerdge board specifically and didn't apply to the MPMD.  Oops.  That said, there was a bug in accelerations on 16x stepper boards that has been fixed as well as a bug that prevented step rates above ~70mm/sec that was fixed, so in general things should be a little bit snappier.
+
+# Updates for the 1.3.0 Release Candidate
+If you've made it to try out the latest 1.3.0 Release Candidate, here are some random notes.  I haven't had a chance to document everything yet, so please contact me on gitter.im or report an issue as you notice changes.
+## List of changes
+1. Rotate the towers by default to place +Y directly opposite the LCD screen and +X to the right of the LCD.  Many of you had done this in hardware by swapping the cables. To go back, issue `M665 X-120 Y-120 Z-120`
+2. Settings are now stored in flash instead of on the SD card.  To load your old settings, just run `M32 M_CFG.G` followed by `M500`.  If you get an error about the API version not matching this indicates the data in flash isn't valid and should be overwritten
+3. Fixed a bug that caused feedrates to be half of what they were programmed to.  This means for the same G-code the printer will now run twice as fast (matching the stock firmware).  The bug also prematurely limited the max travel speeds, you can now issue commands as fast as 150mm/s (although motors will likely start grinding at this speed).  As a result, you will have to half the feed rates in your slicer settings to compensate.
+4. Added G33 command to auto calibrate the M666 settings for leveling the endstops.  This may take multiple iterations to complete.  Issue `G33 V3 R<Radius>` to set the radius to probe at and display the individual probing data.  If the delta height/radius is not adjusted right, the head might crash into the bed when probing G33.  To fix this issue `M851 R<Raise Height>` beforehand to increase the probe raise height.
+5. Mesh grids will automatically be adjusted so that the center point is 0.00 adjustment.  This was done because the mesh calibration would override the delta height adjust.  If your delta height is wrong (did not run `G29 P0` or `G29 P2`) doing a `G29 P1` will potentially cause the print to fail.  The correct way to adjust for your first layer height is to either change your probe offset `M851 Z<Offset>` and issue `G29 P0`, or manually edit `M665 H`.
+6. Manually changing mesh settings is made easier by detecting if you're on a mesh adjust point when changing with `M421 Z/Q`.  The effects are immediate so if you probe with G30, get an error of +1.2, if you issue `M421 Q1.2`, you should immediately be able to go to `G1 Z0` and run the paper test.  Obviously doesn't work if you're in between mesh probe points.
+7. Long file names should now be supported
+8. Removed `M48`, `M290`, and several other unused functions.  Added `M524` to abort SD prints
+9. Better handling of cancelling prints.  Should not correctly trigger octoprint to stop using action commands, requires 1.3.9 or greater.  Have not tested with USB printing from pronterface/repetier/cura.
+10. Hopefully fixed the errant thermal runaway triggering when heating the bed first on 5A firmware.  Would like testing with high bed temps to confirm.
+11. Fixed mesh extrapolation issue noted in [#16](https://github.com/mcheah/Marlin4MPMD/pull/16)
+
 ## Marlin4MPMD - v1.2.2 7/31/2018
 - Many reliability fixes that should hopefully prevent some of the common issues people were experiencing
   - Automatically re-initialize the SD card in case of ejecting the card unsafely

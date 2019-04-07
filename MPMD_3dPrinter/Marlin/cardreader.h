@@ -47,7 +47,7 @@
 #define MAX_FILES (24) //MAX_FILES*LONG_FILENAME_LENGTH < 4096
 
 // Number of UTF-16 characters per entry
-#define FILENAME_LENGTH (13)
+#define FILENAME_LENGTH (255)
 
 // Number of VFAT entries used. Every entry has 13 UTF-16 characters
 //#define MAX_VFAT_ENTRIES (2)
@@ -83,7 +83,7 @@ class CardReader
 {
 public:
 
-	// Public varaibles
+	// Public variables
 	//------------------
 
 	bool saving;
@@ -98,8 +98,11 @@ public:
 	char longFilename[LONG_FILENAME_LENGTH];
 	bool filenameIsDir;
 	int lastnr; //last number of the autostart;
-
+	bool isBinaryMode;
+	unsigned char *pRead;
+	unsigned char *pReadEnd;
 	unsigned long autostart_atmillis;
+	uint32_t filesize;
 
 	// Public methods
 	//----------------
@@ -125,6 +128,7 @@ public:
 	 * \param buf  Pointer to a char buffer.
 	 */
 	void write_command(char *buf);
+	void write_buff(unsigned char *buf,uint32_t len);
 
 	/**
 	 * \fn void checkautostart(bool x)
@@ -202,10 +206,28 @@ public:
 	void pauseSDPrint();
 
 	/**
+	 * \fn void pauseSDPrint()
+	 * \brief Function used to pause the printing action.
+	 */
+	void stopSDPrint();
+
+	/**
 	 * \fn void getStatus()
 	 * \brief Function used to status of the printing action.
 	 */
 	void getStatus();
+
+	/**
+	 * \fn void read_buff()
+	 * \brief copies len bytes from file/read buffer to buf
+	 */
+	int read_buff(unsigned char *buf,uint32_t len);
+	/**
+	 * \fn void push_read_buff()
+	 * \brief pushes the read buffer back len characters to account for discarded characters
+	 */
+	void push_read_buff(int len);
+
 
 	uint16_t get_num_Files();
 	void printingHasFinished();
@@ -223,9 +245,16 @@ public:
 
 	FORCE_INLINE uint32_t fileLength() { return filesize; }
 	FORCE_INLINE bool isFileOpen() { return (bool)file.obj.fs; }
-	FORCE_INLINE bool eof() { return sdpos>=filesize ;};
+	FORCE_INLINE bool eof() {
+		if(!isBinaryMode)
+			return sdpos>=filesize ;
+		else {
+			int bytesAvailable = pReadEnd - pRead;
+			return (sdpos-bytesAvailable)>=filesize;
+		}
+	};
 	FORCE_INLINE int16_t get() {
-		BYTE readByte;
+		UINT readByte;
 		UINT rc;
 		if (f_read(&file, &readByte, 1, &rc) != FR_OK)                     {
 			readByte = -1;
@@ -236,7 +265,12 @@ public:
 		}
 		return (int16_t) readByte;
 	};
-	FORCE_INLINE void setIndex(long index) {sdpos = index;f_lseek(&file, index);};
+	FORCE_INLINE void setIndex(long index) {
+		sdpos = index;
+		f_lseek(&file, index);
+		if(isBinaryMode)
+			flush_buff();
+	};
 	FORCE_INLINE uint8_t percentDone(){
 		if(!isFileOpen())
 			return 0;
@@ -251,14 +285,15 @@ public:
 #if (!MB(STM_3DPRINT))
 	FORCE_INLINE char* getWorkDirName(){workDir.getFilename(filename);return filename;};
 #endif
-  
+	uint32_t sdpos ;
+
 private:
 
 	// Private variables
 	//-------------------
 
 	uint16_t workDirDepth;
-	DIR root, *curDir, workDir, workDirParents[MAX_DIR_DEPTH];
+	DIR root, *curDir, workDir, workDirParents[MAX_DIR_DEPTH+1];
 	FIL file;  // Current file
 	FATFS fileSystem;
 	char SDPath[4]; /* SD card logical drive path */
@@ -266,9 +301,7 @@ private:
 	uint8_t file_subcall_ctr;
 	uint32_t filespos[SD_PROCEDURE_DEPTH];
 	char filenames[SD_PROCEDURE_DEPTH][MAXPATHNAMELENGTH];
-	uint32_t filesize;
 	//int16_t n;
-	uint32_t sdpos ;
 
 	// This variable is used to determine if the autostart have to be check or not in the function checkautostart()
 	bool autostart_stilltocheck; //the sd start is delayed, because otherwise the serial cannot answer fast enought to make contact with the hostsoftware.
@@ -282,6 +315,7 @@ private:
 
 	void lsDive(const char *prepend, DIR *parent, const char * const match=NULL);
 	bool testPath( char *name, char **fname);
+	void flush_buff(void);
 
 
 };

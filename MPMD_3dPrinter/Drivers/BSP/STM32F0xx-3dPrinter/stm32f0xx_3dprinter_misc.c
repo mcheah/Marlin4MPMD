@@ -39,7 +39,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f0xx_3dprinter_misc.h"
-#include "motorcontrol.h"
 #include "stm32f0xx_3dprinter_motor.h"
 #include "stm32f0xx_3dprinter_adc.h"
 #include "stm32f0xx_3dprinter_uart.h"
@@ -47,7 +46,6 @@
 #ifdef MOTOR_L6474
 #include "l6474.h"
 #elif defined(MOTOR_A4985)
-#include "A4985.h"
 #endif
 
 #include "string.h"
@@ -62,17 +60,17 @@
 GPIO_TypeDef* gArrayGpioPort[BSP_MISC_MAX_PIN_NUMBER] = {
   BSP_MOTOR_CONTROL_BOARD_PWM_X_PORT,    //X_STEP_PIN       0       
   BSP_MOTOR_CONTROL_BOARD_DIR_X_PORT,    //X_DIR_PIN        1
-  BSP_MOTOR_CONTROL_BOARD_RESET_X_PORT,  //X_ENABLE_PIN    
+  BSP_MOTOR_CONTROL_BOARD_RESET_XYZ_PORT,  //X_ENABLE_PIN    
   0,                       //X_MIN_PIN
   BSP_STOP_X_PORT,                                     //X_MAX_PIN
   BSP_MOTOR_CONTROL_BOARD_PWM_Y_PORT,    //Y_STEP_PIN       5
   BSP_MOTOR_CONTROL_BOARD_DIR_Y_PORT,    //Y_DIR_PIN       
-  BSP_MOTOR_CONTROL_BOARD_RESET_Y_PORT,  //Y_ENABLE_PIN    
+  BSP_MOTOR_CONTROL_BOARD_RESET_XYZ_PORT,  //Y_ENABLE_PIN
   0,                       //Y_MIN_PIN
   BSP_STOP_Y_PORT,                                     //Y_MAX_PIN
   BSP_MOTOR_CONTROL_BOARD_PWM_Z_PORT,    //Z_STEP_PIN      10
   BSP_MOTOR_CONTROL_BOARD_DIR_Z_PORT,    //Z_DIR_PIN       
-  BSP_MOTOR_CONTROL_BOARD_RESET_Z_PORT,  //Z_ENABLE_PIN    
+  BSP_MOTOR_CONTROL_BOARD_RESET_XYZ_PORT,  //Z_ENABLE_PIN
   BSP_STOP_W_PORT,                       //Z_MIN_PIN
   BSP_STOP_Z_PORT,                                     //Z_MAX_PIN
   0,                                     //Y2_STEP_PIN     15
@@ -119,17 +117,17 @@ GPIO_TypeDef* gArrayGpioPort[BSP_MISC_MAX_PIN_NUMBER] = {
 uint16_t gArrayGpioPin[BSP_MISC_MAX_PIN_NUMBER] = {
   BSP_MOTOR_CONTROL_BOARD_PWM_X_PIN,    //X_STEP_PIN        0       
   BSP_MOTOR_CONTROL_BOARD_DIR_X_PIN,    //X_DIR_PIN         1
-  BSP_MOTOR_CONTROL_BOARD_RESET_X_PIN,  //X_ENABLE_PIN    
+  BSP_MOTOR_CONTROL_BOARD_RESET_XYZ_PIN,  //X_ENABLE_PIN    
   0,                       				//X_MIN_PIN
   BSP_STOP_X_PIN,                                    //X_MAX_PIN
   BSP_MOTOR_CONTROL_BOARD_PWM_Y_PIN,    //Y_STEP_PIN        5
   BSP_MOTOR_CONTROL_BOARD_DIR_Y_PIN,    //Y_DIR_PIN               
-  BSP_MOTOR_CONTROL_BOARD_RESET_Y_PIN,  //Y_ENABLE_PIN    
+  BSP_MOTOR_CONTROL_BOARD_RESET_XYZ_PIN,  //Y_ENABLE_PIN
   0,                       				//Y_MIN_PIN
   BSP_STOP_Y_PIN,                                    //Y_MAX_PIN
   BSP_MOTOR_CONTROL_BOARD_PWM_Z_PIN,    //Z_STEP_PIN       10
   BSP_MOTOR_CONTROL_BOARD_DIR_Z_PIN,    //Z_DIR_PIN       
-  BSP_MOTOR_CONTROL_BOARD_RESET_Z_PIN,  //Z_ENABLE_PIN    
+  BSP_MOTOR_CONTROL_BOARD_RESET_XYZ_PIN,  //Z_ENABLE_PIN
   BSP_STOP_W_PIN,                       //Z_MIN_PIN
   BSP_STOP_Z_PIN,                       //Z_MAX_PIN
   0,                                    //Y2_STEP_PIN      15
@@ -272,17 +270,11 @@ void BSP_MiscOverallInit(uint8_t nbDevices)
   
   //----- Init of the Motor control library to use nB device */
   bspMiscNbMotorDevices = nbDevices;
-#ifdef MOTOR_L6474
-  BSP_MotorControl_Init(BSP_MOTOR_CONTROL_BOARD_ID_L6474, nbDevices);
-#elif defined(MOTOR_A4985)
-  BSP_MotorControl_Init(BSP_MOTOR_CONTROL_BOARD_ID_A4985, nbDevices);
-#endif
-  
+  BSP_MotorControlBoard_GpioInit(nbDevices);
   /* Attach the function MyFlagInterruptHandler (defined below) to the flag interrupt */
 //  BSP_MotorControl_AttachFlagInterrupt(BSP_MiscFlagInterruptHandler);
 
   /* Attach the function Error_Handler (defined below) to the error Handler*/
-  BSP_MotorControl_AttachErrorHandler(BSP_MiscErrorHandler); 
 }
 
 /******************************************************//**
@@ -290,81 +282,6 @@ void BSP_MiscOverallInit(uint8_t nbDevices)
  * @param None
  * @retval None
  **********************************************************/
-void BSP_MiscFlagInterruptHandler(void)
-{
-  uint16_t statusRegister;
-  uint8_t loop;
-  
-  for (loop =0; loop < bspMiscNbMotorDevices; loop++)
-  {
-    /* Get the value of the status register via the L6474 command GET_STATUS */
-    statusRegister = BSP_MotorControl_CmdGetStatus(loop);
-#ifdef MOTOR_L6474
-    /* Check HIZ flag: if set, power brigdes are disabled */
-    if ((statusRegister & L6474_STATUS_HIZ) == L6474_STATUS_HIZ)
-    {
-      // HIZ state
-      // Action to be customized            
-    }
-
-    /* Check direction bit */
-    if ((statusRegister & L6474_STATUS_DIR) == L6474_STATUS_DIR)
-    {
-      // Forward direction is set
-      // Action to be customized            
-    }  
-    else
-    {
-      // Backward direction is set
-      // Action to be customized            
-    }  
-
-    /* Check NOTPERF_CMD flag: if set, the command received by SPI can't be performed */
-    /* This often occures when a command is sent to the L6474 */
-    /* while it is in HIZ state */
-    if ((statusRegister & L6474_STATUS_NOTPERF_CMD) == L6474_STATUS_NOTPERF_CMD)
-    {
-        // Command received by SPI can't be performed
-       // Action to be customized            
-    }  
-
-    /* Check WRONG_CMD flag: if set, the command does not exist */
-    if ((statusRegister & L6474_STATUS_WRONG_CMD) == L6474_STATUS_WRONG_CMD)
-    {
-       //command received by SPI does not exist 
-       // Action to be customized          
-    }  
-
-    /* Check UVLO flag: if not set, there is an undervoltage lock-out */
-    if ((statusRegister & L6474_STATUS_UVLO) == 0)
-    {
-       //undervoltage lock-out 
-       // Action to be customized          
-    }  
-
-    /* Check TH_WRN flag: if not set, the thermal warning threshold is reached */
-    if ((statusRegister & L6474_STATUS_TH_WRN) == 0)
-    {
-      //thermal warning threshold is reached
-      // Action to be customized          
-    }    
-
-    /* Check TH_SHD flag: if not set, the thermal shut down threshold is reached */
-    if ((statusRegister & L6474_STATUS_TH_SD) == 0)
-    {
-      //thermal shut down threshold is reached 
-      // Action to be customized          
-    }    
-
-    /* Check OCD  flag: if not set, there is an overcurrent detection */
-    if ((statusRegister & L6474_STATUS_OCD) == 0)
-    {
-      //overcurrent detection 
-      // Action to be customized          
-    }
-#endif
-  }
-}
 
 
 /******************************************************//**
@@ -864,7 +781,7 @@ void BSP_MiscTickSetFreq(uint32_t newFreq)
 //    newFreq = (newFreq >> 1)&0x7fff;
 //  }
   
-  timPeriod = (HAL_RCC_GetSysClockFreq()/ (TICK_TIMER_PRESCALER * (uint32_t)newFreq));
+  timPeriod = (CORE_CPU_FREQ/ (TICK_TIMER_PRESCALER * (uint32_t)newFreq))-1;
   if (timPeriod < 100) timPeriod = 100;
   if (timPeriod > 0xFFFF) timPeriod = 0xFFFF;
   __HAL_TIM_SetCompare(&hTimTick, BSP_MISC_CHAN_TIMER_TICK, timerCnt + timPeriod);
@@ -899,7 +816,7 @@ void BSP_MiscTickSetFreq(uint32_t newFreq)
  * @retval None
  * @note The frequency is directly the current speed of the device
  **********************************************************/
-void BSP_MiscTickSetPeriod(uint32_t newTimPeriod)
+inline void BSP_MiscTickSetPeriod(uint32_t newTimPeriod)
 {
   uint32_t timerCnt = hTimTick.Instance->CNT + newTimPeriod;
   __HAL_TIM_SetCompare(&hTimTick, BSP_MISC_CHAN_TIMER_TICK, timerCnt);
@@ -953,9 +870,9 @@ void BSP_MiscTick2Init(void)
  **********************************************************/
 void BSP_MiscTick2SetFreq(float newPeriod)
 {
-  uint32_t sysFreq = HAL_RCC_GetSysClockFreq();
+  uint32_t sysFreq = CORE_CPU_FREQ;
   uint32_t tick;
-  uint32_t timPeriod = ((uint32_t)(sysFreq * newPeriod)/ TICK_TIMER_PRESCALER) - 1; 
+  uint32_t timPeriod = ((uint32_t)(sysFreq * newPeriod)/ TICK_TIMER_PRESCALER) - 1;
   
   __HAL_TIM_SetAutoreload(&hTimTick2, timPeriod);
   __HAL_TIM_SetCompare(&hTimTick2, BSP_MISC_CHAN_TIMER_TICK2, timPeriod >> 1);
@@ -990,7 +907,7 @@ void BSP_MiscSetStepClockToSwMode(void)
   uint8_t deviceId;
   uint32_t gpioPin;
   GPIO_TypeDef* gpioPort;  
-  
+
   for (deviceId = 0; deviceId < bspMiscNbMotorDevices; deviceId++) 
   {
     switch (deviceId)
@@ -1035,7 +952,6 @@ void BSP_MiscSetStepClockToSwMode(void)
         break;
 #endif//BSP_HEAT_E2_PIN
     }
-    HAL_TIM_PWM_DeInit(pHTim);
   
   /* GPIO configuration */
     GPIO_InitStruct.Pin = gpioPin;
@@ -1418,8 +1334,38 @@ void BSP_MiscUserGpioInit(uint8_t id, uint32_t mode, uint32_t pull)
   HAL_GPIO_Init(gpioPort, &GPIO_InitStruct);      
 }
 #endif
-
-
+/**********************************************************
+ * @brief  Erases user EEPROM emulated in flash
+ * @retval None
+ **********************************************************/
+void BSP_MiscEEPROMErase() {
+	FLASH_If_Init();
+	FLASH_If_Erase(EEPROM_ADDRESS,EEPROM_ADDRESS+FLASH_PAGE_SIZE); //Exactly one page reserved for EEPROM
+}
+/**********************************************************
+ * @brief  Writes a float value to user EEPROM emulated in flash
+ * @retval None
+ **********************************************************/
+void BSP_MiscEEPROMWriteF32(void *destination, float value)
+{
+	FLASH_If_Write((uint32_t)destination,&value,sizeof(float)/sizeof(uint16_t));
+}
+/**********************************************************
+ * @brief  Writes a uint16_t value to user EEPROM emulated in flash
+ * @retval None
+ **********************************************************/
+void BSP_MiscEEPROMWriteU16(void *destination, uint16_t value)
+{
+	FLASH_If_Write((uint32_t)destination,&value,sizeof(uint16_t)/sizeof(uint16_t));
+}
+/**********************************************************
+ * @brief  Writes a uint32_t value to user EEPROM emulated in flash
+ * @retval None
+ **********************************************************/
+void BSP_MiscEEPROMWriteU32(void *destination, uint32_t value)
+{
+	FLASH_If_Write((uint32_t)destination,&value,sizeof(uint32_t)/sizeof(uint16_t));
+}
 /**
   * @}
   */    

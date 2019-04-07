@@ -76,6 +76,7 @@ static uint8_t  UART_Itf_IsTxQueueEmpty(void);
 BspUartDataType gBspUartData;
 uint8_t gBspUartTxBuffer[UART_TX_BUFFER_SIZE];
 uint8_t gBspUartRxBuffer[UART_RX_BUFFER_SIZE];
+static volatile uint8_t *pRxBuffer = gBspUartRxBuffer;
 #ifdef USE_XONXOFF
 static uint8_t  BspUartXonXoff = 0;
 static uint8_t BspUartXoffBuffer[12] = " SEND XOFF\n";
@@ -144,7 +145,7 @@ void BSP_UartIfStart(void)
   pUart->gCodeDataMode = 0;
     
   /* wait for 1 bytes on the RX uart */
-  if (HAL_UART_Receive_IT(&pUart->handle, (uint8_t *)(&pUart->rxWriteChar), 1) != HAL_OK)
+  if (HAL_UART_Receive_IT(&pUart->handle, pUart->pRxBuffer, UART_RX_BUFFER_SIZE) != HAL_OK)
   {
     UART_ERROR(3);
   }  
@@ -345,12 +346,36 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle)
     }
     /* Set transmission flag: transfer complete*/
     pUart->txBusy = RESET;
+    //Send out any additional queued data
+    BSP_UartIfSendQueuedData();
   }
 }
 
 /******************************************************//**
- * @brief  Rx Transfer completed callback
+ * @brief  Rx Transfer callback
+ *         called on every byte reception to update fifo
  * @param[in] UartHandle UART handle. 
+ * @retval None
+ **********************************************************/
+void HAL_UART_RxCallback(UART_HandleTypeDef *UartHandle)
+{
+	  BspUartDataType *pUart = &gBspUartData;
+  
+	  if (UartHandle == &(pUart->handle))
+	  {
+	    pUart->pRxWriteBuffer++;
+	    if (pUart->pRxWriteBuffer == pUart->pRxReadBuffer)
+	    {
+	      // Rx buffer is full
+	      UART_ERROR(7);
+	    }
+	  }
+}
+
+/******************************************************//**
+ * @brief  Rx Transfer completed callback
+ *         called when entire buffer has been filled
+ * @param[in] UartHandle UART handle.
  * @retval None
  **********************************************************/
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
@@ -359,35 +384,17 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
   
   if (UartHandle == &(pUart->handle))
   {
-    *pUart->pRxWriteBuffer = pUart->rxWriteChar;
-    if (HAL_UART_Receive_IT(&pUart->handle, (uint8_t *)(&pUart->rxWriteChar), 1) != HAL_OK)
-    {
-      UART_ERROR(6);
-    }
-    
-    pUart->pRxWriteBuffer++;
-    
-    if (pUart->pRxWriteBuffer >= (pUart->pRxBuffer + UART_RX_BUFFER_SIZE))
-    {
-      pUart->pRxWriteBuffer = pUart->pRxBuffer;
-    }
-    
-#ifdef USE_XONXOFF    
-    if ((BSP_UART_GET_NB_BYTES_IN_RX_BUFFER()  > BSP_UART_RX_THRESHOLD_XOFF) && (BspUartXonXoff == 0))
-    {
-      BspUartXonXoff = 2;
-    }
-    else if ((BSP_UART_GET_NB_BYTES_IN_RX_BUFFER()  < BSP_UART_RX_THRESHOLD_XON) && (BspUartXonXoff == 3)&& (BSP_UART_GET_NB_BYTES_IN_TX_BUFFER() <BSP_UART_TX_THRESHOLD_XON))
-    {
-      BspUartXonXoff = 1;
-    }
-#endif    
+    pUart->pRxWriteBuffer = pUart->pRxBuffer;
+
     if (pUart->pRxWriteBuffer == pUart->pRxReadBuffer)
     {
       // Rx buffer is full 
       UART_ERROR(7);
-    }    
-//    HAL_UART_Transmit(UartHandle,&(pUart->rxWriteChar),1,500);
+    }
+    if (HAL_UART_Receive_IT(&pUart->handle, pUart->pRxWriteBuffer, UART_RX_BUFFER_SIZE) != HAL_OK)
+    {
+      UART_ERROR(6);
+    }
     if (pUart->uartRxDataCallback != 0)
     {
       pUart->uartRxDataCallback((uint8_t *)pUart->pRxReadBuffer,pUart->pRxWriteBuffer - pUart->pRxReadBuffer);
@@ -403,7 +410,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
  **********************************************************/
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 {
-    UART_ERROR(8);
+//    UART_ERROR(8);
 }
 
 /******************************************************//**
@@ -506,6 +513,26 @@ uint32_t BSP_UartGetNbRxAvailableBytes(void)
   return ((uint32_t) nxRxBytes );
 }
 
+uint32_t BSP_UartCopyNextRxBytes(uint8_t *buff, uint32_t maxlen)
+{
+	BspUartDataType *pUart = &gBspUartData;
+	uint32_t bytesToCopy = MIN(maxlen,BSP_UartGetNbRxAvailableBytes());
+	uint32_t firstBytesToCopy = MIN(bytesToCopy,
+											&(pUart->pRxBuffer[UART_RX_BUFFER_SIZE])-pUart->pRxReadBuffer);
+	uint32_t secondBytesToCopy = bytesToCopy - firstBytesToCopy;
+	memcpy(buff,
+			pUart->pRxReadBuffer,
+			firstBytesToCopy);
+	pUart->pRxReadBuffer += firstBytesToCopy;
+	if(pUart->pRxReadBuffer==&pRxBuffer[UART_RX_BUFFER_SIZE])	{
+		if(secondBytesToCopy)
+			memcpy(&buff[firstBytesToCopy],
+				pRxBuffer,
+				secondBytesToCopy);
+		pUart->pRxReadBuffer = &pRxBuffer[secondBytesToCopy];
+	}
+	return bytesToCopy;
+}
 
 /******************************************************//**
  * @brief  This function returns the first byte available on the UART

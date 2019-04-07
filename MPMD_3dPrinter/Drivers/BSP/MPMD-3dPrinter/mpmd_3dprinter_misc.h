@@ -121,6 +121,7 @@
 
 /// TICK global interrupt
 #define BSP_MISC_TICK_IRQn                    (TIM3_IRQn)
+#define BSP_MISC_TICK_IRQHandler			  (TIM3_IRQHandler)
    
 /* Definition for Tick2 timer  (Marlin Only)*/
 /// Timer used for Tick2
@@ -136,6 +137,7 @@
 
 /// TICK global interrupt
 #define BSP_MISC_TICK2_IRQn                    (TIM14_IRQn)
+#define BSP_MISC_TICK2_IRQHandler			   (TIM14_IRQHandler)
 
 //TODO: update these timers since only FAN PWM is connector to a timer channel
  /// Timer used for PWM_HEAT_BED
@@ -303,8 +305,9 @@
 
 //TODO: review this value
 //Tick timer prescaler
-#define TICK_TIMER_PRESCALER  (32)
-   
+#define TICK_TIMER_PRESCALER  (32) //48Mhz / 32 = 1.5Mhz
+
+#define EEPROM_ADDRESS		(FLASH_BASE+0x0001F800)
 /* Exported constants --------------------------------------------------------*/
 extern GPIO_TypeDef* gArrayGpioPort[BSP_MISC_MAX_PIN_NUMBER];
 extern uint16_t gArrayGpioPin[BSP_MISC_MAX_PIN_NUMBER];
@@ -332,10 +335,14 @@ void BSP_MiscSetOcdThreshold(uint8_t deviceId, uint32_t current);
 void BSP_MiscHeatManualInit(uint8_t heatId);
 void BSP_MiscHeatPwmInit(uint8_t heatId);
 void BSP_MiscHeatPwmSetDutyCycle(uint8_t heatId, uint8_t newDuty);
-void  BSP_MotorControlBoard_ServoInit(void);
-void  BSP_MotorControlBoard_ServoSetTimerValue(uint32_t value);
-void  BSP_MotorControlBoard_ServoStop(void);
+void BSP_MotorControlBoard_ServoInit(void);
+void BSP_MotorControlBoard_ServoSetTimerValue(uint32_t value);
+void BSP_MotorControlBoard_ServoStop(void);
 void BSP_MiscUserGpioInit(uint8_t id, uint32_t mode, uint32_t pull);
+void BSP_MiscEEPROMErase();
+void BSP_MiscEEPROMWriteF32(void *destination, float value);
+void BSP_MiscEEPROMWriteU16(void *destination, uint16_t value);
+void BSP_MiscEEPROMWriteU32(void *destination, uint32_t value);
 
 #ifdef __cplusplus
 }

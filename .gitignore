@@ -438,8 +438,6 @@
 *.pch
 
 # Libraries
-*.lib
-*.a
 *.la
 *.lo
 
@@ -465,3 +463,6 @@ STM32072B_EVAL*/
 STM32F070CB_SD_TEST/
 *language.settings.xml
 *.cfg
+stm32MemStream/
+.settings/
+**/.vscode

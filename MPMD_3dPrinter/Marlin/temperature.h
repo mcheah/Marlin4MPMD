@@ -31,7 +31,7 @@
 #include "planner.h"
 #include "thermistortables.h"
 
-#if ENABLED(PID_EXTRUSION_SCALING)
+#if ENABLED(PID_EXTRUSION_SCALING) || ENABLED(BABYSTEPPING)
   #include "stepper.h"
 #endif
 
@@ -332,9 +332,9 @@ class Temperature {
       if(thermal_runaway_bed_state_machine!=TRInactive &&
     		  target_temperature[HOTEND_INDEX] > current_temperature[HOTEND_INDEX]) {
     	  //When slewing HOTEND temp, the bed heater will turn off, triggering thermal runaway
-    	  //to combat this, set and overly generous timeout, and change state to FirstHeating
+    	  //to combat this, we disable thermal runaway for 30 seconds, before transitioning to a FirstHeating state
     	  thermal_runaway_bed_timer = millis() + 30 * 1000UL;
-    	  thermal_runaway_bed_state_machine = TRFirstHeating;
+    	  thermal_runaway_bed_state_machine = TRFirstHeatingDelayed;
       }
 	#endif
     }
@@ -450,7 +450,7 @@ class Temperature {
 
     #if ENABLED(THERMAL_PROTECTION_HOTENDS) || HAS_THERMALLY_PROTECTED_BED
 
-      typedef enum TRState { TRInactive, TRFirstHeating, TRStable, TRRunaway } TRstate;
+      typedef enum TRState { TRInactive, TRFirstHeating,TRFirstHeatingDelayed, TRStable, TRRunaway } TRstate;
 
       static void thermal_runaway_protection(TRState* state, millis_t* timer, float temperature, float target_temperature, int heater_id, int period_seconds, int hysteresis_degc);
 

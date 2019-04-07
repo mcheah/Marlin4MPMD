@@ -4,6 +4,7 @@
 #include <strings.h>
 
 #if ENABLED(SDSUPPORT)
+static unsigned char readBuff[512];
 
 CardReader::CardReader()
 {
@@ -20,6 +21,9 @@ CardReader::CardReader()
    workDirDepth = 0;
    file_subcall_ctr=0;
    cardReaderInitialized = false;
+   isBinaryMode = false;
+   pReadEnd = readBuff+512;
+   pRead = pReadEnd;
 
    curDir = NULL;
    diveDirName = NULL;
@@ -75,7 +79,7 @@ void CardReader::initsd()
 		  SERIAL_ERROR_START;
 		  SERIAL_ERRORLNPGM(MSG_SD_VOL_INIT_FAIL);
 		  sprintf((char *)buff,"code=%d\n",code);
-		  BSP_CdcIfQueueTxData(buff,sizeof(buff));
+		  MYSERIAL.print((char *)buff);
 		  release();
 		  return;//Previously uninitialized, don't try again
 		}
@@ -84,7 +88,7 @@ void CardReader::initsd()
 		  SERIAL_ERROR_START;
 		  SERIAL_ERRORLNPGM(MSG_SD_OPENROOT_FAIL);
 		  sprintf((char *)buff,"code=%d\n",code);
-		  BSP_CdcIfQueueTxData(buff,sizeof(buff));
+		  MYSERIAL.print((char *)buff);
 		  release();
 		  return;//Previously uninitialized, don't try again
 		}
@@ -110,7 +114,7 @@ void CardReader::initsd()
 			  SERIAL_ERROR_START;
 			  SERIAL_ERRORLNPGM(MSG_SD_OPENROOT_FAIL);
 			  sprintf((char *)buff,"code=%d\n",res);
-			  BSP_CdcIfQueueTxData(buff,sizeof(buff));
+			  MYSERIAL.print((char *)buff);
 			  release(); //test failed, loop again after releasing
 		}
 		else {
@@ -158,8 +162,7 @@ void CardReader::lsDive(const char *prepend, DIR *parent, const char * const mat
       DIR subDir;
       char path[MAXPATHNAMELENGTH];
       char lfilename[FILENAME_LENGTH];
-      createFilename(lfilename,&entry);
-      
+      strcpy(lfilename,entry.altname);
       path[0]=0;
       if(strlen(prepend)==0) //avoid leading / if already in prepend
       {
@@ -177,15 +180,14 @@ void CardReader::lsDive(const char *prepend, DIR *parent, const char * const mat
           SERIAL_ECHOLN(path);
         }
       }
-      else
+	  //Do not include hidden folders in the listing
+      else if(entry.fname[0]!='.' && (entry.fattrib & (AM_HID | AM_SYS)) == 0)
       {
         strcat(path,"/");
         lsDive(path,&subDir);  
         //close done automatically by destructor of SdFile
       }
     }
-
-
     else
     {
       char fn0 = entry.fname[0];
@@ -199,7 +201,7 @@ void CardReader::lsDive(const char *prepend, DIR *parent, const char * const mat
       if(!filenameIsDir)
       {
         char *ptr = strchr(entry.fname, '.');
-        if ((ptr==NULL) || (ptr-entry.fname >= 12) || (*(ptr+1)!='G'))
+        if(ptr==NULL)
         {
           continue;
         }
@@ -329,6 +331,8 @@ void CardReader::release()
   disk_deinitialize(fileSystem.drv);
   SERIAL_ECHO_START;
   SERIAL_ECHOLNPGM(MSG_SD_INIT_FAIL);
+  if(isBinaryMode)
+	  flush_buff();
 }
 
 void CardReader::startFileprint()
@@ -343,14 +347,18 @@ void CardReader::startFileprint()
 //	    enqueue_and_echo_commands_P(PSTR("G90"));
 //	}
 #if ENABLED(MALYAN_LCD)
+#if ENABLED(SD_SETTINGS)
   const char upper_config_file_name[] = UPPER_CONFIG_FILE_NAME;
   updateLCD = ( strncmp(longFilename,
 		  	  upper_config_file_name,
 			  sizeof(upper_config_file_name))!=0);
   if(updateLCD)
+#else
+  updateLCD = true;
+#endif// ENABLED(SD_SETTINGS)
 	lcd_setstatuspgm(PSTR(MSG_BUILD));
-#endif
-    sdprinting = true;
+#endif// ENABLED(MALYAN_LCD)
+  sdprinting = true;
 }
 
 void CardReader::pauseSDPrint()
@@ -362,6 +370,17 @@ void CardReader::pauseSDPrint()
 //    enqueue_and_echo_command_now("M91");
 //    enqueue_and_echo_commands_P(PSTR("G1 Z50 S1"));
   }
+}
+
+void CardReader::stopSDPrint() {
+	  if(sdprinting)
+	  {
+	    sdprinting = false;
+	    //TODO: add behavior to correctly raise the print head but currently causes deadlock
+	//    enqueue_and_echo_command_now("M91");
+	//    enqueue_and_echo_commands_P(PSTR("G1 Z50 S1"));
+	    closefile();
+	  }
 }
 
 
@@ -570,6 +589,7 @@ void CardReader::openFile(char* name,bool read, bool replace_current/*=true*/)
     }
     else
     {
+      sdpos = 0;
       saving = true;
       SERIAL_PROTOCOLPGM(MSG_SD_WRITE_TO_FILE);
       SERIAL_PROTOCOLLN(name);
@@ -579,7 +599,8 @@ void CardReader::openFile(char* name,bool read, bool replace_current/*=true*/)
 #endif
     }
   }
-
+  if(isBinaryMode)
+	flush_buff();
 }
 
 void CardReader::openAndPrintFile(const char *name) {
@@ -613,6 +634,8 @@ void CardReader::removeFile(char* name)
 		SERIAL_PROTOCOLPGM("File deleted:");
 		SERIAL_PROTOCOLLN(fname);
 		sdpos = 0;
+		if(isBinaryMode)
+			flush_buff();
 	}
 	else
 	{
@@ -636,6 +659,92 @@ void CardReader::getStatus()
   }
 }
 
+void CardReader::flush_buff() {
+	pReadEnd = readBuff+512;
+	pRead = pReadEnd;
+}
+
+int CardReader::read_buff(unsigned char *buf,uint32_t len)
+{
+	unsigned int bytesCopied = 0;
+    unsigned int bytesRemaining = len;
+	unsigned int bytesRead = -1;
+	FRESULT readStatus;
+
+	while(bytesCopied<len && bytesRead!=0) {
+		if(pRead>=pReadEnd) {
+			BSP_LED_On(LED_RED);
+			BSP_LED_On(LED_GREEN);
+			BSP_LED_On(LED_BLUE);
+			readStatus = f_read(&file, readBuff, 512, &bytesRead);
+		    if(readStatus != FR_OK)
+		    {
+			  SERIAL_ERROR_START;
+			  SERIAL_ERRORLNPGM(MSG_SD_ERR_READ);
+		    }
+			BSP_LED_Off(LED_RED);
+			BSP_LED_Off(LED_GREEN);
+			BSP_LED_Off(LED_BLUE);
+			pRead = readBuff;
+			pReadEnd = readBuff +bytesRead;
+			sdpos += bytesRead;
+		}
+		int bytesAvailable = pReadEnd - pRead;
+		if(bytesAvailable>0) {
+			unsigned int bytestoCopy = min(bytesAvailable,(int)bytesRemaining);
+			memcpy(buf,pRead,bytestoCopy);
+			bytesCopied+=bytestoCopy;
+            pRead+=bytestoCopy;
+            buf+=bytestoCopy;
+            bytesRemaining-=bytestoCopy;
+		}
+	}
+    return bytesCopied;
+}
+
+void CardReader::push_read_buff(int len)
+{
+    if((pRead-len)<readBuff) {
+    	unsigned int bytesRead;
+    	FSIZE_t curpos = f_tell(&file);
+        f_lseek(&file,curpos-((pReadEnd)-pRead+len));
+        sdpos-=((pReadEnd)-pRead+len);
+        FRESULT readStatus = f_read(&file, readBuff, 512, &bytesRead);
+	    if(readStatus != FR_OK)
+	    {
+		  SERIAL_ERROR_START;
+		  SERIAL_ERRORLNPGM(MSG_SD_ERR_READ);
+	    }
+        // printf("Rewinding %ld Reading %d bytes, got %d bytes\n",pRead-readBuff-len,512,bytesRead);
+        pRead = readBuff;
+        pReadEnd = readBuff+bytesRead;
+		sdpos += bytesRead;
+    }
+    else
+        pRead = pRead-len;
+}
+
+void CardReader::write_buff(unsigned char *buf,uint32_t len)
+{
+  if(len==512)
+	  BSP_LED_On(LED_RED);
+  BSP_LED_On(LED_GREEN);
+  BSP_LED_On(LED_BLUE);
+  unsigned int bytesWritten;
+  FRESULT writeStatus;
+
+  writeStatus = f_write(&file, buf, len, &bytesWritten);
+  sdpos+=bytesWritten;
+  if( 	(writeStatus != FR_OK) ||
+		(bytesWritten != len))
+  {
+    SERIAL_ERROR_START;
+    SERIAL_ERRORLNPGM(MSG_SD_ERR_WRITE_TO_FILE);
+  }
+  BSP_LED_Off(LED_GREEN);
+  BSP_LED_Off(LED_BLUE);
+  BSP_LED_Off(LED_RED);
+}
 
 void CardReader::write_command(char *buf)
 {
@@ -723,7 +832,10 @@ void CardReader::closefile(bool store_location)
   f_close(&file);
   saving = false; 
   logging = false;
-  
+  sdpos = 0;
+  updateLCD = false;
+  if(isBinaryMode)
+	  flush_buff();
   if(store_location)
   {
     //future: store printer state, filename and position for continuing a stopped print
@@ -745,6 +857,9 @@ void CardReader::getfilename(uint16_t nr, const char * const match/*=NULL*/)
 
 uint16_t CardReader::getnrfilenames()
 {
+  initsd();
+  if(!cardOK)
+	return 0;
   curDir=&workDir;
   lsAction=LS_Count;
   nrFiles=0;
@@ -799,7 +914,7 @@ uint16_t CardReader::get_num_Files() {
 void CardReader::printingHasFinished()
 {
     stepper.synchronize();
-    if(file_subcall_ctr>0) //heading up to a parent file that called current as a procedure.
+    if(file_subcall_ctr>0 && SD_PROCEDURE_DEPTH>1) //heading up to a parent file that called current as a procedure.
     {
       fileOpened[file_subcall_ctr] = 0;
       f_close(&file);

@@ -63,7 +63,9 @@ Stepper stepper; // Singleton
 // public:
 
 block_t* Stepper::current_block = NULL;  // A pointer to the block currently being traced
-
+#if ENABLED(BABYSTEPPING)
+  bool Stepper::inc_on_babystep = true;
+#endif
 #if ENABLED(ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED)
   bool Stepper::abort_on_endstop_hit = false;
 #endif
@@ -118,7 +120,7 @@ volatile signed char Stepper::count_direction[NUM_AXIS] = { 1, 1, 1, 1 };
   long Stepper::counter_M[MIXING_STEPPERS];
 #endif
 
-unsigned short Stepper::acc_step_rate; // needed for deceleration start point
+unsigned long Stepper::acc_step_rate; // needed for deceleration start point
 uint8_t Stepper::step_loops, Stepper::step_loops_nominal;
 unsigned short Stepper::OCR1A_nominal;
 
@@ -197,7 +199,7 @@ volatile long Stepper::endstops_trigsteps[3];
 // C1 B1 A1 is longIn1
 // D2 C2 B2 A2 is longIn2
 //
-#define MultiU24X32toH16(intRes, longIn1, longIn2)  intRes = (uint16_t)((((uint64_t)longIn1 * (uint64_t)longIn2)>> 24)& 0XFFFF);
+#define MultiU24X32toH16(intRes, longIn1, longIn2)  intRes = ((uint64_t)longIn1*(uint64_t)longIn2)>>24
 /* BDI  -- To suppress
 #define MultiU24X32toH16(intRes, longIn1, longIn2) \
   asm volatile ( \
@@ -253,6 +255,14 @@ volatile long Stepper::endstops_trigsteps[3];
 #define ENABLE_STEPPER_DRIVER_INTERRUPT()  SBI(TIMSK1, OCIE1A)
 #define DISABLE_STEPPER_DRIVER_INTERRUPT() CBI(TIMSK1, OCIE1A)
 */
+
+static void delayMicroseconds(int uSec) {
+	volatile uint32_t X = 0;
+	for(uint32_t i=0;i<uSec*F_CPU()/(1e6/10);i++)
+	{
+		X++;
+	}
+}
 
 /**
  *         __________________________
@@ -368,7 +378,6 @@ void Stepper::StepperHandler()
     }
     else {
       BSP_MiscTickSetFreq(STEPPER_NOMINAL_FREQ); //1kHz
-      // OCR1A = 2000; // 1kHz.  -- BDI : To supp
     }
   }
 
@@ -383,6 +392,7 @@ void Stepper::StepperHandler()
 
     // Take multiple steps per interrupt (For high speed moves)
     for (int8_t i = 0; i < step_loops; i++) {
+      if (step_events_completed >= current_block->step_event_count) break;
       #ifndef USBCON
         customizedSerial.checkRx(); // Check for serial chars.
       #endif
@@ -522,7 +532,8 @@ void Stepper::StepperHandler()
     #endif
 
     // Calculate new timer value
-    unsigned short timer, step_rate;
+    unsigned short timer;
+    unsigned long step_rate;
     if (step_events_completed <= (unsigned long)current_block->accelerate_until) {
 
       MultiU24X32toH16(acc_step_rate, acceleration_time, current_block->acceleration_rate);
@@ -1034,14 +1045,14 @@ void Stepper::report_positions() {
   #if ENABLED(COREXY) || ENABLED(COREYZ)
     SERIAL_PROTOCOLPGM(" B:");
   #else
-    SERIAL_PROTOCOLPGM(" Y:");
+    SERIAL_PROTOCOLPGM(" y :");
   #endif
   SERIAL_PROTOCOL(ypos);
 
   #if ENABLED(COREXZ) || ENABLED(COREYZ)
     SERIAL_PROTOCOLPGM(" C:");
   #else
-    SERIAL_PROTOCOLPGM(" Z:");
+    SERIAL_PROTOCOLPGM(" z :");
   #endif
   SERIAL_PROTOCOL(zpos);
 
@@ -1062,11 +1073,13 @@ void Stepper::report_positions() {
     #define BABYSTEP_AXIS(axis, AXIS, INVERT) { \
         _ENABLE(axis); \
         uint8_t old_pin = _READ_DIR(AXIS); \
-        _APPLY_DIR(AXIS, _INVERT_DIR(AXIS)^direction^INVERT); \
+        _APPLY_DIR(AXIS, _GPIO_PIN_STATE(_INVERT_DIR(AXIS)^direction^INVERT)); \
         _APPLY_STEP(AXIS)(!_INVERT_STEP_PIN(AXIS), true); \
         delayMicroseconds(2); \
         _APPLY_STEP(AXIS)(_INVERT_STEP_PIN(AXIS), true); \
         _APPLY_DIR(AXIS, old_pin); \
+        if(inc_on_babystep) \
+	    	count_position[_AXIS(AXIS)] += direction ? 1 : -1; \
       }
 
     switch (axis) {
@@ -1080,12 +1093,9 @@ void Stepper::report_positions() {
         break;
 
       case Z_AXIS: {
-
-        #if DISABLED(DELTA)
+//Enable babystepping on all axis independently, will move towers separately
 
           BABYSTEP_AXIS(z, Z, BABYSTEP_INVERT_Z);
-
-        #else // DELTA
 
           bool z_direction = direction ^ BABYSTEP_INVERT_Z;
 
@@ -1096,9 +1106,9 @@ void Stepper::report_positions() {
                   old_y_dir_pin = Y_DIR_READ,
                   old_z_dir_pin = Z_DIR_READ;
           //setup new step
-          X_DIR_WRITE(INVERT_X_DIR ^ z_direction);
-          Y_DIR_WRITE(INVERT_Y_DIR ^ z_direction);
-          Z_DIR_WRITE(INVERT_Z_DIR ^ z_direction);
+          X_DIR_WRITE(_GPIO_PIN_STATE(INVERT_X_DIR ^ z_direction));
+          Y_DIR_WRITE(_GPIO_PIN_STATE(INVERT_Y_DIR ^ z_direction));
+          Z_DIR_WRITE(_GPIO_PIN_STATE(INVERT_Z_DIR ^ z_direction));
           //perform step
           X_STEP_WRITE(!INVERT_X_STEP_PIN);
           Y_STEP_WRITE(!INVERT_Y_STEP_PIN);
@@ -1111,8 +1121,6 @@ void Stepper::report_positions() {
           X_DIR_WRITE(old_x_dir_pin);
           Y_DIR_WRITE(old_y_dir_pin);
           Z_DIR_WRITE(old_z_dir_pin);
-
-        #endif
 
       } break;
 

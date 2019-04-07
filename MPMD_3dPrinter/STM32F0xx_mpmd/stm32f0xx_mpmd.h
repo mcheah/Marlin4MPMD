@@ -46,6 +46,7 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+#include "configuration_STM.h"
 #include "stm32f0xx_hal.h"
    
 /* To be defined only if the board is provided with the related shield */
@@ -122,6 +123,8 @@ typedef enum
 /** @defgroup STM32F0XX_MPMD_LOW_LEVEL_LED STM32F0XX NUCLEO 144 LOW LEVEL LED
   * @{
   */
+
+#define CORE_CPU_FREQ							48000000u
 #define LEDn                                    3
 
 #define LED1_PIN                                GPIO_PIN_15
@@ -212,7 +215,7 @@ typedef enum
 #define NUCLEO_SPIx_MISO_MOSI_GPIO_CLK_DISABLE()        __HAL_RCC_GPIOB_CLK_DISABLE()
 #define NUCLEO_SPIx_MISO_PIN                            GPIO_PIN_4
 #define NUCLEO_SPIx_MOSI_PIN                            GPIO_PIN_5
-/* Maximum Timeout values for flags waiting loops. These timeout are not based
+/* Maximum Timeout values for flags waiting loops. These timeouts are not based
    on accurate values, they just guarantee that the application will not remain
    stuck if the SPI communication is corrupted.
    You may modify these timeout values depending on CPU frequency and application
@@ -270,6 +273,15 @@ typedef enum
 
 #endif /* HAL_SPI_MODULE_ENABLED */
 
+/* Error code */
+enum
+{
+  FLASHIF_OK = 0,
+  FLASHIF_ERASEKO,
+  FLASHIF_WRITINGCTRL_ERROR,
+  FLASHIF_WRITING_ERROR,
+  FLASHIF_PROTECTION_ERRROR
+};
 /*################################ ADCx for Nucleo 144 board ######################################*/
 /**
   * @brief  ADCx Interface pins
@@ -327,6 +339,10 @@ void             BSP_LED_Toggle(Led_TypeDef Led);
 void             BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef ButtonMode);
 void             BSP_PB_DeInit(Button_TypeDef Button);
 uint32_t         BSP_PB_GetState(Button_TypeDef Button);
+void 			 FLASH_If_Init(void);
+uint32_t 		 FLASH_If_Erase(uint32_t start,uint32_t end);
+uint32_t 		 FLASH_If_Write(uint32_t destination, uint16_t *p_source, uint32_t length);
+
 //#ifdef HAL_ADC_MODULE_ENABLED
 //uint8_t          BSP_JOY_Init(void);
 //JOYState_TypeDef BSP_JOY_GetState(void);
