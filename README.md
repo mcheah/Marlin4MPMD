@@ -100,6 +100,12 @@ STM32_USE_USB_CDC in configuration.h determines whether the program will use the
 Debugging directly on the printer hardware requires access to the 4-pin SWD jumper on the bottom of the board.  You will need to solder on some header pins to connect directly.  I use an [ST-link V2](http://www.st.com/en/development-tools/st-link-v2.html) as my debugger, but any OpenOCD compatible Cortex M-class debugger should work fine.  
 The MCU on this board has been locked down with the security read-out protection set to level 1, meaning that any attempt to re-flash any memory location or change the security bits results in a full erase of the flash memory.  Therefore care should be taken when going down the route of debugging directly on the actual printer.  I've included the original bootloader that I was able to extract so that you can restore the stock software without risking bricking your printer.  To enable debugging on the board with an ST-link debugger, you will need to start the STM32 ST-LINK utility and change the Read Out Protection level to 0.  This will trigger a full erase, but will allow you to debug the firmware directly.
 
+## Donations
+I work on and support this project in my free time for fun.  I enjoy answering questions and helping people make the best out of this little printer, but the process of adding new features and bugfixes is time consuming and challenging to troubleshoot different conditions and hardware.  This is truly free software to do with as you please, but if you have found this project to be useful or would like to see a custom feature or build added, 
+
+[Feel free to buy me a coffee](https://paypal.me/MCheah?locale.x=en_US).  
+
+Any and all support by the community is greatly appreciated!
 ###  Recent changes
 ## Marlin4MPMD - v1.3.3 4/6/2019
 - M20 now lists folders correctly and hides hidden folders
