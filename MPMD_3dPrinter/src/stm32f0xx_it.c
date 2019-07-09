@@ -177,10 +177,12 @@ void TIM14_IRQHandler(void)
   *         used for USART data transmission
   */
 //TODO: should use a different handle between debug UART and LCD UART
+#ifndef LCD_UART
 void BSP_UART_DEBUG_IRQHandler(void)
 {
   HAL_UART_IRQHandler(&gBspUartData.handle);
 }
+#endif
 /**
   * @brief  This function handles LCD interrupt request for debug.
   * @param  None
@@ -188,7 +190,7 @@ void BSP_UART_DEBUG_IRQHandler(void)
   * @Note   This function is redefined in "main.h" and related to DMA
   *         used for USART data transmission
   */
-#ifdef MALYAN_LCD
+#if defined(MALYAN_LCD) || defined(LCD_UART)
 void BSP_UART_LCD_IRQHandler(void)
 {
   HAL_UART_IRQHandler(&gBspUartData.handle);

@@ -4803,6 +4803,27 @@ inline void gcode_M42() {
     }
   #endif
 }
+#else
+inline void gcode_M42() {
+  int pin = code_seen('P') ? code_value_int() : -1;
+  GPIO_PinState val = GPIO_PIN_RESET;
+  if(code_seen('S') && code_value_int()==1)
+	  val = GPIO_PIN_SET;
+  GPIO_InitTypeDef pinInit;
+  pinInit.Mode = GPIO_MODE_OUTPUT_PP;
+  switch(pin) {
+  	  case 2:
+  		  pinInit.Pin = GPIO_PIN_2;
+  		  HAL_GPIO_Init(GPIOA,&pinInit);
+  		  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_2,val);
+  		  break;
+  	  case 3:
+  		  pinInit.Pin = GPIO_PIN_3;
+  		  HAL_GPIO_Init(GPIOA,&pinInit);
+  		  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_3,val);
+  		  break;
+  }
+}
 #endif
 #if ENABLED(Z_MIN_PROBE_REPEATABILITY_TEST)
 //TODO: put these in the appropriate header file, got lazy and hacked these in for the bed repeatability test
@@ -8610,8 +8631,8 @@ void FlushSerialRequestResend() {
 void ok_to_send() {
   refresh_cmd_timeout();
 #ifndef STM32_USE_USB_CDC
-  if (!send_ok[cmd_queue_index_r] ||
-		  MYSERIAL.available() >= (2*(UART_RX_BUFFER_SIZE-MAX_CMD_SIZE)) ) return;
+  if (!send_ok[cmd_queue_index_r] /*||
+		  MYSERIAL.available() >= (2*(UART_RX_BUFFER_SIZE-MAX_CMD_SIZE))*/ ) return;
 #else
   if (!send_ok[cmd_queue_index_r] /*||
 		  MYSERIAL.available() >= (2*(CDC_RX_BUFFER_SIZE-MAX_CMD_SIZE))*/ )

@@ -93,7 +93,7 @@ void BSP_UartHwInit(uint32_t newBaudRate)
 {
   BspUartDataType *pUart = &gBspUartData;
 //TODO: add a method for enabling both malyan LCD and UART as primary interface
-#ifndef MALYAN_LCD
+#if !defined(MALYAN_LCD) && !defined(LCD_UART)
   pUart->handle.Instance = BSP_UART_DEBUG;
 #else
   pUart->handle.Instance = BSP_UART_LCD;

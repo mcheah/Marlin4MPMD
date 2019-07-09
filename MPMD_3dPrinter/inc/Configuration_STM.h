@@ -31,6 +31,7 @@
 // USE USB CDC Serial Interface.  Comment this line out to use USART2 directly instead.
 // Useful if Raspberry Pi GPIO's are hooked directly to UART interface for faster data transfer
 #define STM32_USE_USB_CDC
+//#define LCD_UART
 // LCD for Malyan M200/300 printers.
 //
 #define MALYAN_LCD
